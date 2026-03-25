@@ -1,4 +1,4 @@
-package cuarto.construccion.domain;
+package cuarto.construccion.logic.dto;
 
 
 public class User {

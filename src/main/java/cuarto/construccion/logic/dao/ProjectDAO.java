@@ -1,5 +1,9 @@
 package cuarto.construccion.logic.dao;
 
-public class ProjectDAO {
+
+import cuarto.construccion.logic.contracts.IProjectDAO;
+
+
+public class ProjectDAO implements IProjectDAO{
 
 }
