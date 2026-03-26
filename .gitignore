@@ -1,0 +1,21 @@
+# Carpeta de compilación
+/target/
+
+# Archivos compilados
+*.class
+
+# Logs
+*.log
+
+# Archivos temporales
+*.tmp
+
+# IDE (VS Code)
+.vscode/
+
+# IDE (IntelliJ)
+.idea/
+
+# Sistema
+.DS_Store
+Thumbs.db
