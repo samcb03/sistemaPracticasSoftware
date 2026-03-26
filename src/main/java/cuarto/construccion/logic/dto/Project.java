@@ -9,6 +9,9 @@ public class Project {
     private String projectObjective;
     private String projectDescription;
     
+    public Project() {
+    }
+
     public Project(int idProject, String projectName, String projectMethodology, int capacity, 
             String projectObjective, String projectDescription) {
         this.idProject = idProject;
