@@ -1,22 +1,20 @@
-package cuarto.construccion.logic.dto;
+package uv.lis.logic.dto;
 
 
 public class Subject {
+    private final static String CAREER = "Ingenieria de Software";
     private String nrc;
     private String subjectName;
-    private String career;
     private int idSchoolPeriod;
 
     public Subject(){
 
     }
 
-    public Subject(String nrc, String subjectName, String career, int idSchoolPeriod) {
+    public Subject(String nrc, String subjectName, int idSchoolPeriod) {
         this.nrc = nrc;
         this.subjectName = subjectName;
-        this.career = career;
         this.idSchoolPeriod = idSchoolPeriod;
-
     }
 
     public String getNrc() {
@@ -35,12 +33,8 @@ public class Subject {
         this.subjectName = subjectName;
     }
 
-    public String getCareer() {
-        return career;
-    }
-
-    public void setCareer(String career) {
-        this.career = career;
+    public String getCAREER() {
+        return CAREER;
     }
 
     public int getIdSchoolPeriod() {

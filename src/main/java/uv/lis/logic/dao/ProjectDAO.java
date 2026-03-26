@@ -1,4 +1,4 @@
-package cuarto.construccion.logic.dao;
+package uv.lis.logic.dao;
 
 
 import java.sql.Connection;
@@ -8,9 +8,9 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
-import cuarto.construccion.dataaccess.MySQLConnectionManager;
-import cuarto.construccion.logic.contracts.IProjectDAO;
-import cuarto.construccion.logic.dto.Project;
+import uv.lis.dataaccess.MySQLConnectionManager;
+import uv.lis.logic.contracts.IProjectDAO;
+import uv.lis.logic.dto.Project;
 
 
 public class ProjectDAO implements IProjectDAO{
@@ -27,12 +27,12 @@ public class ProjectDAO implements IProjectDAO{
 
             while (resultSet.next()) {
                 Project project = new Project();
-                project.setIdProject(resultSet.getInt("idProyecto"));
-                project.setProjectName(resultSet.getString("nombre"));
-                project.setProjectMethodology(resultSet.getString("metodologiaProyecto"));
+                project.setId(resultSet.getInt("idProyecto"));
+                project.setName(resultSet.getString("nombre"));
+                project.setMethodology(resultSet.getString("metodologiaProyecto"));
                 project.setCapacity(resultSet.getInt("Cupo"));
-                project.setProjectObjective(resultSet.getString("objetivoProyecto"));
-                project.setProjectDescription(resultSet.getString("descripcion"));
+                project.setObjective(resultSet.getString("objetivoProyecto"));
+                project.setDescription(resultSet.getString("descripcion"));
                 
                 projects.add(project);
             }
@@ -56,12 +56,12 @@ public class ProjectDAO implements IProjectDAO{
             
             while (resultSet.next()) {
                 Project project = new Project();
-                project.setIdProject(resultSet.getInt("idProyecto"));
-                project.setProjectName(resultSet.getString("nombre"));
-                project.setProjectMethodology(resultSet.getString("metodologiaProyecto"));
+                project.setId(resultSet.getInt("idProyecto"));
+                project.setName(resultSet.getString("nombre"));
+                project.setMethodology(resultSet.getString("metodologiaProyecto"));
                 project.setCapacity(resultSet.getInt("Cupo"));
-                project.setProjectObjective(resultSet.getString("objetivoProyecto"));
-                project.setProjectDescription(resultSet.getString("descripcion"));
+                project.setObjective(resultSet.getString("objetivoProyecto"));
+                project.setDescription(resultSet.getString("descripcion"));
                 
                 projects.add(project);
             }
@@ -82,16 +82,16 @@ public class ProjectDAO implements IProjectDAO{
             "VALUES(?, ?, ?, ?, ?, ?);";
             PreparedStatement preparedStatement = databaseConnection.prepareStatement(projectQuery);
             
-            preparedStatement.setInt(1, project.getIdProject());
-            preparedStatement.setString(2, project.getProjectName());
-            preparedStatement.setString(3, project.getProjectDescription());
+            preparedStatement.setInt(1, project.getId());
+            preparedStatement.setString(2, project.getName());
+            preparedStatement.setString(3, project.getDescription());
             preparedStatement.setInt(4, project.getCapacity());
-            preparedStatement.setString(5, project.getProjectMethodology());
-            preparedStatement.setString(6, project.getProjectObjective());
+            preparedStatement.setString(5, project.getMethodology());
+            preparedStatement.setString(6, project.getObjective());
             
             preparedStatement.executeUpdate();
             databaseConnection.close();
-            return project.getIdProject();
+            return project.getId();
         } catch (SQLException e) {
             System.out.println(e.getMessage());
         }
@@ -108,10 +108,10 @@ public class ProjectDAO implements IProjectDAO{
             "WHERE idProyecto = ?;";
             PreparedStatement preparedStatement = databaseConnection.prepareStatement(projectQuery);
             
-            preparedStatement.setString(1, project.getProjectName());
-            preparedStatement.setString(2, project.getProjectDescription());
-            preparedStatement.setString(3, project.getProjectObjective());
-            preparedStatement.setInt(4, project.getIdProject());
+            preparedStatement.setString(1, project.getName());
+            preparedStatement.setString(2, project.getDescription());
+            preparedStatement.setString(3, project.getObjective());
+            preparedStatement.setInt(4, project.getId());
             
             preparedStatement.executeUpdate();
             databaseConnection.close();

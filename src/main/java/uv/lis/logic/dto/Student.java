@@ -1,21 +1,21 @@
-package cuarto.construccion.logic.dto;
+package uv.lis.logic.dto;
 
 
 import java.util.Date;
 
 
 public class Student extends User {
-    private int studentId;
+    private int id;
     private Date dateOfBirth;
     private int completedHours;
     private Gender gender;
     private boolean indigenousLanguage;
     private String autoevaluation;
 
-    public Student(int idUser, String firstName, String lastName, int studentId, Date dateOfBirth, 
+    public Student(int idUser, String firstName, String lastName, int id, Date dateOfBirth, 
             int completedHours, Gender gender, boolean indigenousLanguage, String autoevaluation) {
         super(idUser, firstName, lastName);
-        this.studentId = studentId;
+        this.id = id;
         this.dateOfBirth = dateOfBirth;
         this.completedHours = completedHours;
         this.gender = gender;
@@ -23,12 +23,12 @@ public class Student extends User {
         this.autoevaluation = autoevaluation;
     }
 
-    public int getStudentId() {
-        return studentId;
+    public int getId() {
+        return id;
     }
 
-    public void setStudentId(int studentId) {
-        this.studentId = studentId;
+    public void setId(int id) {
+        this.id = id;
     }
 
     public Date getDateOfBirth() {

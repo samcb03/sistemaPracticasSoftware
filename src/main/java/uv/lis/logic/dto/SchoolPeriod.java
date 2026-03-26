@@ -1,28 +1,28 @@
-package cuarto.construccion.logic.dto;
+package uv.lis.logic.dto;
 
 
 import java.sql.Date;
 
 public class SchoolPeriod {
-    private int idSchoolPeriod;
+    private int id;
     private Date startDate;
     private Date endDate;
 
     public SchoolPeriod() {
     }
 
-    public SchoolPeriod(int idSchoolPeriod, Date startDate, Date endDate) {
-        this.idSchoolPeriod = idSchoolPeriod;
+    public SchoolPeriod(int id, Date startDate, Date endDate) {
+        this.id = id;
         this.startDate = startDate;
         this.endDate = endDate;
     }
 
-    public int getIdSchoolPeriod() {
-        return idSchoolPeriod;
+    public int getId() {
+        return id;
     }
 
-    public void setIdSchoolPeriod(int idSchoolPeriod) {
-        this.idSchoolPeriod = idSchoolPeriod;
+    public void setId(int id) {
+        this.id = id;
     }
 
     public Date getStartDate() {

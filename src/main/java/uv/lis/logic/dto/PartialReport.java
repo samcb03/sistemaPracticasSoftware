@@ -1,4 +1,4 @@
-package cuarto.construccion.logic.dto;
+package uv.lis.logic.dto;
 
 public class PartialReport extends Report {
     private boolean isMensual;
@@ -12,12 +12,14 @@ public PartialReport(String observation, String dueDate, int idReport, int idStu
     }
 
     public PartialReport(boolean isMensual) {
-        this.isMensual=isMensual;
+        this.isMensual = isMensual;
     }
 
-    public boolean isMensual() {
+    public boolean getIsMensual() {
         return isMensual;
     }
 
-
+    public void setIsMensual(boolean isMensual) {
+        this.isMensual = isMensual;
+    }
 }

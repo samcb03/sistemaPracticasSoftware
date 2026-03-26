@@ -1,9 +1,9 @@
-package cuarto.construccion.logic.dto;
+package uv.lis.logic.dto;
 
 
 public class AffiliatedOrganization {
-    private int idAffiliatedOrganization;
-    private String nameAffiliatedOrganization;
+    private int id;
+    private String name;
     private String city;
     private String state;
     private String email;
@@ -11,10 +11,10 @@ public class AffiliatedOrganization {
     private int numberOfDirectUsers;
     private int numberOfIndirectUsers;
    
-    public AffiliatedOrganization(int idAffiliatedOrganization, String nameAffiliatedOrganization, String city,
+    public AffiliatedOrganization(int id, String name, String city,
             String state, String email, String phoneNumber, int numberOfDirectUsers, int numberOfIndirectUsers) {
-        this.idAffiliatedOrganization = idAffiliatedOrganization;
-        this.nameAffiliatedOrganization = nameAffiliatedOrganization;
+        this.id = id;
+        this.name = name;
         this.city = city;
         this.state = state;
         this.email = email;
@@ -23,20 +23,20 @@ public class AffiliatedOrganization {
         this.numberOfIndirectUsers = numberOfIndirectUsers;
     }
 
-    public int getIdAffiliatedOrganization() {
-        return idAffiliatedOrganization;
+    public int getId() {
+        return id;
     }
 
-    public void setIdAffiliatedOrganization(int idAffiliatedOrganization) {
-        this.idAffiliatedOrganization = idAffiliatedOrganization;
+    public void setId(int id) {
+        this.id = id;
     }
 
-    public String getNameAffiliatedOrganization() {
-        return nameAffiliatedOrganization;
+    public String getName() {
+        return name;
     }
 
-    public void setNameAffiliatedOrganization(String nameAffiliatedOrganization) {
-        this.nameAffiliatedOrganization = nameAffiliatedOrganization;
+    public void setName(String name) {
+        this.name = name;
     }
 
     public String getCity() {
