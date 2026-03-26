@@ -1,4 +1,4 @@
-package cuarto.construccion.logic.dao;
+package uv.lis.logic.dao;
 
 
 import java.sql.Connection;
@@ -9,9 +9,9 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
-import cuarto.construccion.dataaccess.MySQLConnectionManager;
-import cuarto.construccion.logic.contracts.ISchoolPeriodDAO;
-import cuarto.construccion.logic.dto.SchoolPeriod;
+import uv.lis.dataaccess.MySQLConnectionManager;
+import uv.lis.logic.contracts.ISchoolPeriodDAO;
+import uv.lis.logic.dto.SchoolPeriod;
 
 public class SchoolPeriodDAO implements ISchoolPeriodDAO{
 
@@ -50,7 +50,7 @@ public class SchoolPeriodDAO implements ISchoolPeriodDAO{
             Connection connection = MySQLConnectionManager.getConnection();
             String schoolPeriodQuery = "INSERT INTO PeriodoEscolar(idPeriodoEscolar,FechaInicio, FechaFin) VALUES(?,?);";
             PreparedStatement preparedStatement = connection.prepareStatement(schoolPeriodQuery);
-            preparedStatement.setInt(1, schoolPeriod.getIdSchoolPeriod());
+            preparedStatement.setInt(1, schoolPeriod.getId());
             preparedStatement.setDate(2, schoolPeriod.getStartDate());
             preparedStatement.setDate(3, schoolPeriod.getEndDate());
             preparedStatement.executeUpdate();
@@ -75,7 +75,7 @@ public class SchoolPeriodDAO implements ISchoolPeriodDAO{
             PreparedStatement preparedStatement = connection.prepareStatement(schoolPeriodQuery);
             preparedStatement.setDate(1, schoolPeriod.getStartDate());
             preparedStatement.setDate(2, schoolPeriod.getEndDate());
-            preparedStatement.setInt(3, schoolPeriod.getIdSchoolPeriod());
+            preparedStatement.setInt(3, schoolPeriod.getId());
             preparedStatement.executeUpdate();
             connection.close();
             return true;

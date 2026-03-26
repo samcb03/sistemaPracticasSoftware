@@ -1,17 +1,17 @@
-package cuarto.construccion.logic.dto;
+package uv.lis.logic.dto;
 
 public class Report {
+    protected int id;
     protected String observation;
     protected String dueDate;
-    protected int idReport;
     protected int idStudent;
 
     public Report() {
     }
-    public Report(String observation, String dueDate, int idReport, int idStudent) {
+    public Report(String observation, String dueDate, int id, int idStudent) {
         this.observation = observation;
         this.dueDate = dueDate;
-        this.idReport = idReport;
+        this.id = id;
         this.idStudent = idStudent;
     }
 
@@ -32,12 +32,12 @@ public class Report {
         this.dueDate = dueDate;
     }
 
-    public int getIdReport() {
-        return idReport;
+    public int getId() {
+        return id;
     }
 
-    public void setIdReport(int idReport) {
-        this.idReport = idReport;
+    public void setId(int id) {
+        this.id = id;
     }
 
     public int getIdStudent() {

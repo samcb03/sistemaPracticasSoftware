@@ -1,4 +1,4 @@
-package cuarto.construccion.logic.dao;
+package uv.lis.logic.dao;
 
 
 import java.sql.Connection;
@@ -9,9 +9,9 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
-import cuarto.construccion.dataaccess.MySQLConnectionManager;
-import cuarto.construccion.logic.contracts.IActivityDAO;
-import cuarto.construccion.logic.dto.Activity;
+import uv.lis.dataaccess.MySQLConnectionManager;
+import uv.lis.logic.contracts.IActivityDAO;
+import uv.lis.logic.dto.Activity;
 
 public class ActivityDAO implements IActivityDAO {
 
@@ -77,8 +77,8 @@ public class ActivityDAO implements IActivityDAO {
             "VALUES(?, ?, ?, ?, ?);";
             PreparedStatement preparedStatement = connection.prepareStatement(activityQuery);
             
-            preparedStatement.setInt(1, activity.getIdActivity());
-            preparedStatement.setString(2, activity.getActivityName());
+            preparedStatement.setInt(1, activity.getId());
+            preparedStatement.setString(2, activity.getName());
             preparedStatement.setString(3, activity.getDescription());
             preparedStatement.setDate(4, activity.getStartDate());
             preparedStatement.setDate(5, activity.getEndDate());
@@ -102,11 +102,11 @@ public class ActivityDAO implements IActivityDAO {
             String activityQuery = "UPDATE Actividad SET descripcionActividad = ?, FechaInicio = ?, FechaFin = ? WHERE idActividad = ?;";
             PreparedStatement preparedStatement = connection.prepareStatement(activityQuery);
             
-            preparedStatement.setString(1, activity.getActivityName());
+            preparedStatement.setString(1, activity.getName());
             preparedStatement.setString(2, activity.getDescription());
             preparedStatement.setDate(3, activity.getStartDate());
             preparedStatement.setDate(4, activity.getEndDate());
-            preparedStatement.setInt(5, activity.getIdActivity());
+            preparedStatement.setInt(5, activity.getId());
             
             preparedStatement.executeUpdate();
             connection.close();

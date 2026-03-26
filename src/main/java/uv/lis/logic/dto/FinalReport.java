@@ -1,4 +1,4 @@
-package cuarto.construccion.logic.dto;
+package uv.lis.logic.dto;
 
 public class FinalReport extends Report {
     private String porcentajeAvance;

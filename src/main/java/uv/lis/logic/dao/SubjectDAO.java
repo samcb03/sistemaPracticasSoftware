@@ -1,4 +1,4 @@
-package cuarto.construccion.logic.dao;
+package uv.lis.logic.dao;
 
 
 import java.sql.Connection;
@@ -8,9 +8,9 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
-import cuarto.construccion.dataaccess.MySQLConnectionManager;
-import cuarto.construccion.logic.contracts.ISubjectDAO;
-import cuarto.construccion.logic.dto.Subject;
+import uv.lis.dataaccess.MySQLConnectionManager;
+import uv.lis.logic.contracts.ISubjectDAO;
+import uv.lis.logic.dto.Subject;
 
 public class SubjectDAO implements ISubjectDAO{
 
@@ -30,10 +30,9 @@ public class SubjectDAO implements ISubjectDAO{
             while (resultSet.next()) {
                 String nrc = resultSet.getString("NRC");
                 String subjectName = resultSet.getString("Nombre experiencia educativa");
-                String career = resultSet.getString("Carrera");
                 int idSchoolPeriod = resultSet.getInt("IdPeriodoEscolar");
                 
-                subjects.add(new Subject(nrc, subjectName, career, idSchoolPeriod));
+                subjects.add(new Subject(nrc, subjectName, idSchoolPeriod));
             }
             connection.close();
         } catch (SQLException e) {
@@ -54,7 +53,7 @@ public class SubjectDAO implements ISubjectDAO{
             PreparedStatement preparedStatement = connection.prepareStatement(subjectQuery);
             preparedStatement.setString(1, subject.getNrc());
             preparedStatement.setString(2, subject.getSubjectName());
-            preparedStatement.setString(3, subject.getCareer());
+            preparedStatement.setString(3, subject.getCAREER());
             preparedStatement.setInt(4, subject.getIdSchoolPeriod());
             preparedStatement.executeUpdate();
             connection.close();
@@ -77,7 +76,7 @@ public class SubjectDAO implements ISubjectDAO{
             "WHERE NRC = ?;";
             PreparedStatement preparedStatement = connection.prepareStatement(subjectQuery);
             preparedStatement.setString(1, subject.getSubjectName());
-            preparedStatement.setString(2, subject.getCareer());
+            preparedStatement.setString(2, subject.getCAREER());
             preparedStatement.setInt(3, subject.getIdSchoolPeriod());
             preparedStatement.setString(4, subject.getNrc());
             preparedStatement.executeUpdate();

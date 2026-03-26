@@ -1,11 +1,11 @@
-package cuarto.construccion.logic.dto;
+package uv.lis.logic.dto;
 
 
 import java.sql.Date;
 
 public class Activity {
-    private int idActivity;
-    private String activityName;
+    private int id;
+    private String name;
     private String description;
     private Date startDate;
     private Date endDate;
@@ -13,28 +13,28 @@ public class Activity {
     public Activity() {
     }
 
-    public Activity(int idActivity, String activityName, String description, Date startDate, Date endDate) {
-        this.idActivity = idActivity;
-        this.activityName = activityName;
+    public Activity(int id, String name, String description, Date startDate, Date endDate) {
+        this.id = id;
+        this.name = name;
         this.description = description;
         this.startDate = startDate;
         this.endDate = endDate;
     }
 
-    public int getIdActivity() {
-        return idActivity;
+    public int getId() {
+        return id;
     }
 
-    public void setIdActivity(int idActivity) {
-        this.idActivity = idActivity;
+    public void setId(int id) {
+        this.id = id;
     }
 
-    public String getActivityName() {
-        return activityName;
+    public String getName() {
+        return name;
     }
 
-    public void setActivityName(String activityName) {
-        this.activityName = activityName;
+    public void setName(String name) {
+        this.name = name;
     }
 
     public String getDescription() {

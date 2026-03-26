@@ -1,9 +1,9 @@
-package cuarto.construccion.logic.contracts;
+package uv.lis.logic.contracts;
 
 
 import java.util.List;
 
-import cuarto.construccion.logic.dto.Project;
+import uv.lis.logic.dto.Project;
 
 
 public interface IProjectDAO {
