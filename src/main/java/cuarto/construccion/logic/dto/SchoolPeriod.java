@@ -1,14 +1,17 @@
 package cuarto.construccion.logic.dto;
 
+
+import java.sql.Date;
+
 public class SchoolPeriod {
     private int idSchoolPeriod;
-    private String startDate;
-    private String endDate;
+    private Date startDate;
+    private Date endDate;
 
     public SchoolPeriod() {
     }
 
-    public SchoolPeriod(int idSchoolPeriod, String startDate, String endDate) {
+    public SchoolPeriod(int idSchoolPeriod, Date startDate, Date endDate) {
         this.idSchoolPeriod = idSchoolPeriod;
         this.startDate = startDate;
         this.endDate = endDate;
@@ -22,19 +25,19 @@ public class SchoolPeriod {
         this.idSchoolPeriod = idSchoolPeriod;
     }
 
-    public String getStartDate() {
+    public Date getStartDate() {
         return startDate;
     }
 
-    public void setStartDate(String startDate) {
+    public void setStartDate(Date startDate) {
         this.startDate = startDate;
     }
 
-    public String getEndDate() {
+    public Date getEndDate() {
         return endDate;
     }
 
-    public void setEndDate(String endDate) {
+    public void setEndDate(Date endDate) {
         this.endDate = endDate;
     }
 }

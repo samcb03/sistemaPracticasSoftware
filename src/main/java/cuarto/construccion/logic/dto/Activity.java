@@ -1,16 +1,19 @@
 package cuarto.construccion.logic.dto;
 
+
+import java.sql.Date;
+
 public class Activity {
     private int idActivity;
     private String activityName;
     private String description;
-    private String startDate;
-    private String endDate;
+    private Date startDate;
+    private Date endDate;
 
     public Activity() {
     }
 
-    public Activity(int idActivity, String activityName, String description, String startDate, String endDate) {
+    public Activity(int idActivity, String activityName, String description, Date startDate, Date endDate) {
         this.idActivity = idActivity;
         this.activityName = activityName;
         this.description = description;
@@ -42,19 +45,19 @@ public class Activity {
         this.description = description;
     }
 
-    public String getStartDate() {
+    public Date getStartDate() {
         return startDate;
     }
 
-    public void setStartDate(String startDate) {
+    public void setStartDate(Date startDate) {
         this.startDate = startDate;
     }
 
-    public String getEndDate() {
+    public Date getEndDate() {
         return endDate;
     }
 
-    public void setEndDate(String endDate) {
+    public void setEndDate(Date endDate) {
         this.endDate = endDate;
     }
 }
