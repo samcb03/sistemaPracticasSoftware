@@ -73,7 +73,8 @@ public class ActivityDAO implements IActivityDAO {
         }
         try {
             Connection connection = MySQLConnectionManager.getConnection();
-            String activityQuery = "INSERT INTO Actividad(idActividad, `Nombre actividad`, Descripcion, `Fecha de inicio`, `Fecha de fin`) VALUES(?, ?, ?, ?, ?);";
+            String activityQuery = "INSERT INTO Actividad(idActividad, descripcionActividad, FechaInicio, FechaFinal)" + 
+            "VALUES(?, ?, ?, ?, ?);";
             PreparedStatement preparedStatement = connection.prepareStatement(activityQuery);
             
             preparedStatement.setInt(1, activity.getIdActivity());

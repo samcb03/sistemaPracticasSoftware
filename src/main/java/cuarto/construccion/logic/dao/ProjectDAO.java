@@ -77,7 +77,9 @@ public class ProjectDAO implements IProjectDAO{
 
         try {
             Connection databaseConnection = MySQLConnectionManager.getConnection();
-            String projectQuery = "INSERT INTO Proyecto(idProyecto, nombre, descripcion, cupo, metodologiaProyecto, objetivoProyecto) VALUES(?, ?, ?, ?, ?, ?);";
+            String projectQuery = "INSERT INTO Proyecto(idProyecto," +
+            "nombre, descripcion, cupo, metodologiaProyecto, objetivoProyecto)" +
+            "VALUES(?, ?, ?, ?, ?, ?);";
             PreparedStatement preparedStatement = databaseConnection.prepareStatement(projectQuery);
             
             preparedStatement.setInt(1, project.getIdProject());
@@ -101,7 +103,9 @@ public class ProjectDAO implements IProjectDAO{
 
         try {
             Connection databaseConnection = MySQLConnectionManager.getConnection();
-            String projectQuery = "UPDATE Proyecto SET nombre = ?, descripcion = ?, objetivoProyecto = ? WHERE idProyecto = ?;";
+            String projectQuery = "UPDATE Proyecto"+ 
+            "SET nombre = ?, descripcion = ?, objetivoProyecto = ?" + 
+            "WHERE idProyecto = ?;";
             PreparedStatement preparedStatement = databaseConnection.prepareStatement(projectQuery);
             
             preparedStatement.setString(1, project.getProjectName());

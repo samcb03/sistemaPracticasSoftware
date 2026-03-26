@@ -52,9 +52,10 @@ public class SubjectDAO implements ISubjectDAO{
             String subjectQuery = "INSERT INTO ExperienciaEducativa(NRC, nombreExperiencia, carrera, idPeriodoEscolar)" +
             "VALUES(?,?,?,?);";
             PreparedStatement preparedStatement = connection.prepareStatement(subjectQuery);
-            preparedStatement.setString(1, subject.getSubjectName());
-            preparedStatement.setString(2, subject.getCareer());
-            preparedStatement.setInt(3, subject.getIdSchoolPeriod());
+            preparedStatement.setString(1, subject.getNrc());
+            preparedStatement.setString(2, subject.getSubjectName());
+            preparedStatement.setString(3, subject.getCareer());
+            preparedStatement.setInt(4, subject.getIdSchoolPeriod());
             preparedStatement.executeUpdate();
             connection.close();
             return true;
@@ -71,7 +72,8 @@ public class SubjectDAO implements ISubjectDAO{
         }
         try {
             Connection connection = MySQLConnectionManager.getConnection();
-            String subjectQuery = "UPDATE ExperienciaEducativa SET nombreExperiencia = ? ,carrera = ? ,idPeriodoEscolar = ?)" +
+            String subjectQuery = "UPDATE ExperienciaEducativa" +
+            "SET nombreExperiencia = ? ,carrera = ? ,idPeriodoEscolar = ?)" +
             "WHERE NRC = ?;";
             PreparedStatement preparedStatement = connection.prepareStatement(subjectQuery);
             preparedStatement.setString(1, subject.getSubjectName());
