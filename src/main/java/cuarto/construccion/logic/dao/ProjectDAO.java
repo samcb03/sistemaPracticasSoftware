@@ -18,8 +18,7 @@ public class ProjectDAO implements IProjectDAO{
     @Override
     public List<Project> getProjects() {
         
-        List<Project> projects = new ArrayList<>();
-        
+        List<Project> projects = new ArrayList<>(); 
         try {
             Connection databaseConnection = MySQLConnectionManager.getConnection();
             String projectQuery = "SELECT * FROM Proyecto;";
@@ -46,6 +45,7 @@ public class ProjectDAO implements IProjectDAO{
 
     @Override
     public List<Project> getProjectsById(int idProject) {
+        
         List<Project> projects = new ArrayList<>();
         try {
             Connection databaseConnection = MySQLConnectionManager.getConnection();
