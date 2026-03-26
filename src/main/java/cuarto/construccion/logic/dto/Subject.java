@@ -5,13 +5,13 @@ public class Subject {
     private String nrc;
     private String subjectName;
     private String career;
-    private String idSchoolPeriod;
+    private int idSchoolPeriod;
 
     public Subject(){
 
     }
 
-    public Subject(String nrc, String subjectName, String career, String idSchoolPeriod) {
+    public Subject(String nrc, String subjectName, String career, int idSchoolPeriod) {
         this.nrc = nrc;
         this.subjectName = subjectName;
         this.career = career;
@@ -43,11 +43,11 @@ public class Subject {
         this.career = career;
     }
 
-    public String getIdSchoolPeriod() {
+    public int getIdSchoolPeriod() {
         return idSchoolPeriod;
     }
 
-    public void setIdSchoolPeriod(String idSchoolPeriod) {
+    public void setIdSchoolPeriod(int idSchoolPeriod) {
         this.idSchoolPeriod = idSchoolPeriod;
     }
 }
