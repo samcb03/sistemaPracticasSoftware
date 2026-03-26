@@ -48,11 +48,11 @@ public class SchoolPeriodDAO implements ISchoolPeriodDAO{
         }
         try {
             Connection connection = MySQLConnectionManager.getConnection();
-            String schoolPeriodQuery = "INSERT INTO PeriodoEscolar(FechaInicio, FechaFin) VALUES(?,?);";
+            String schoolPeriodQuery = "INSERT INTO PeriodoEscolar(idPeriodoEscolar,FechaInicio, FechaFin) VALUES(?,?);";
             PreparedStatement preparedStatement = connection.prepareStatement(schoolPeriodQuery);
-            preparedStatement.setDate(1, schoolPeriod.getStartDate());
-            preparedStatement.setDate(2, schoolPeriod.getEndDate());
-            preparedStatement.setInt(3, schoolPeriod.getIdSchoolPeriod());
+            preparedStatement.setInt(1, schoolPeriod.getIdSchoolPeriod());
+            preparedStatement.setDate(2, schoolPeriod.getStartDate());
+            preparedStatement.setDate(3, schoolPeriod.getEndDate());
             preparedStatement.executeUpdate();
             connection.close();
             return true;
@@ -69,7 +69,9 @@ public class SchoolPeriodDAO implements ISchoolPeriodDAO{
         }
         try {
             Connection connection = MySQLConnectionManager.getConnection();
-            String schoolPeriodQuery = "UPDATE PeriodoEscolar SET FechaInicio = ? , FechaFin = ? WHERE idPeriodoEscolar = ?;";
+            String schoolPeriodQuery = "UPDATE PeriodoEscolar" +
+            "SET FechaInicio = ? , FechaFin = ?" + 
+            "WHERE idPeriodoEscolar = ?;";
             PreparedStatement preparedStatement = connection.prepareStatement(schoolPeriodQuery);
             preparedStatement.setDate(1, schoolPeriod.getStartDate());
             preparedStatement.setDate(2, schoolPeriod.getEndDate());
