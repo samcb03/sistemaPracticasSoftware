@@ -12,8 +12,8 @@ public class FinalReport extends Report {
         this.resultadoEntregable = resultadoEntregable;
     }
 
-    public FinalReport(String observation, String dueDate, int idReport, int studentId, int porcentajeAvance, String resultadoEntregable) {
-        super(observation, dueDate, idReport, studentId); 
+    public FinalReport(String observation, String dueDate, int idReport, String matricula, int porcentajeAvance, String resultadoEntregable) {
+        super(observation, dueDate, idReport, matricula); 
         this.porcentajeAvance = porcentajeAvance;
         this.resultadoEntregable = resultadoEntregable;
     }
