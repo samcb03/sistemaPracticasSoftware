@@ -1,0 +1,5 @@
+package uv.lis.logic.dao;
+
+public class AffiliatedOrganizationDAO {
+
+}
