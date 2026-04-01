@@ -9,24 +9,16 @@ public interface IReportDAO {
 
     List<Report> getReports();
 
-    Report getReportById(int idReporte);
-
-    PartialReport getPartialReportById(int idPartialReport);
+    PartialReport getReportById(int idPartialReport);
 
     boolean registerPartialReport(PartialReport partialReport);
 
     boolean modifyPartialReport(PartialReport partialReport);
 
-    PartialReport getMensualReportById(int idMensualReport);
-
-    boolean registerMensualReport(PartialReport mensualReport);
-
-    boolean modifyMensualReport(PartialReport mensualReport);
-
     FinalReport getFinalReportById(int idFinalReport);
 
     boolean registerFinalReport(FinalReport finalReport);
 
-    boolean modifyFinalReport(FinalReport finalReport);
+    boolean modifyFinalReport(FinalReport idFinalReport);
     
 }

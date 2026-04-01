@@ -1,3 +1,4 @@
 {
-    "java.configuration.updateBuildConfiguration": "interactive"
+    "java.configuration.updateBuildConfiguration": "interactive",
+    "C_Cpp.default.compilerPath": "c:\\Users\\dom99\\Downloads\\01_shared_memory_consumer.c"
 }

@@ -12,7 +12,7 @@ public interface IProjectDAO {
 
     List<Project> getProjectsById(int idProject);
 
-    int registerProject(Project project);
+    boolean registerProject(Project project);
 
     boolean modifyProjectById(Project project);
 

@@ -1,28 +1,28 @@
 package uv.lis.logic.dto;
 
 public class FinalReport extends Report {
-    private String porcentajeAvance;
+    private int porcentajeAvance;
     private String resultadoEntregable;
 
     public FinalReport() {
     }
 
-    public FinalReport(String porcentajeAvance, String resultadoEntregable) {
+    public FinalReport(int porcentajeAvance, String resultadoEntregable) {
         this.porcentajeAvance = porcentajeAvance;
         this.resultadoEntregable = resultadoEntregable;
     }
 
-    public FinalReport(String observation, String dueDate, int idReport, int studentId, String porcentajeAvance, String resultadoEntregable) {
-        super(observation, dueDate, idReport, studentId); 
+    public FinalReport(String observation, String dueDate, int idReport, String matricula, int porcentajeAvance, String resultadoEntregable) {
+        super(observation, dueDate, idReport, matricula); 
         this.porcentajeAvance = porcentajeAvance;
         this.resultadoEntregable = resultadoEntregable;
     }
 
-    public String getPorcentajeAvance() {
+    public int getPorcentajeAvance() {
         return porcentajeAvance;
     }
 
-    public void setPorcentajeAvance(String porcentajeAvance) {
+    public void setPorcentajeAvance(int porcentajeAvance) {
         this.porcentajeAvance = porcentajeAvance;
     }
 

@@ -1,92 +1,103 @@
 package uv.lis.logic.dao;
 
-
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import uv.lis.dataaccess.MySQLConnectionManager;
 import uv.lis.logic.contracts.ISubjectDAO;
 import uv.lis.logic.dto.Subject;
 
-public class SubjectDAO implements ISubjectDAO{
+public class SubjectDAO implements ISubjectDAO {
+
+    private static final Logger logger = Logger.getLogger(SubjectDAO.class.getName());
 
     @Override
-    public List<Subject> getSubjectbyId(int FoundNrc) {
+    public List<Subject> getSubjectbyId(int foundNrc) { 
         List<Subject> subjects = new ArrayList<>();
-        try {
-            Connection connection = MySQLConnectionManager.getConnection();
-            
-            String subjectQuery = "SELECT * FROM ExperienciaEducativa WHERE NRC = ?;";
-            
-            PreparedStatement preparedStatement = connection.prepareStatement(subjectQuery);
-            preparedStatement.setInt(1, FoundNrc);
-            
-            ResultSet resultSet = preparedStatement.executeQuery();
-            
-            while (resultSet.next()) {
-                String nrc = resultSet.getString("NRC");
-                String subjectName = resultSet.getString("Nombre experiencia educativa");
-                int idSchoolPeriod = resultSet.getInt("IdPeriodoEscolar");
+        String query = "SELECT * FROM ExperienciaEducativa WHERE NRC = ?;";
+
+        try (Connection connection = MySQLConnectionManager.getConnection();
+             PreparedStatement preparedStatement = connection.prepareStatement(query)) {
                 
-                subjects.add(new Subject(nrc, subjectName, idSchoolPeriod));
+            preparedStatement.setInt(1, foundNrc);
+   
+            try (ResultSet resultSet = preparedStatement.executeQuery()) {
+                
+                if (resultSet.next()) {
+                    String nrc = resultSet.getString("NRC");
+                    String subjectName = resultSet.getString("nombreExperiencia");
+                    int idSchoolPeriod = resultSet.getInt("idPeriodoEscolar"); 
+                    
+                    subjects.add(new Subject(nrc, subjectName, idSchoolPeriod));
+                }
             }
-            connection.close();
+            
+            logger.log(Level.INFO, "Busqueda de Experiencia Educativa con NRC {0} realizada.", foundNrc);
+
         } catch (SQLException e) {
-            System.out.println("Error en la BD: " + e.getMessage());
+            logger.log(Level.SEVERE, "Error al buscar la Experiencia Educativa con NRC: " + foundNrc, e);
         }
+        
         return subjects;
     }
 
     @Override
     public boolean registerSubject(Subject subject) {
-        if (subject == null){
-            return false;
-        }
-        try {
-            Connection connection = MySQLConnectionManager.getConnection();
-            String subjectQuery = "INSERT INTO ExperienciaEducativa(NRC, nombreExperiencia, carrera, idPeriodoEscolar)" +
-            "VALUES(?,?,?,?);";
-            PreparedStatement preparedStatement = connection.prepareStatement(subjectQuery);
+        boolean isRegistered = false;
+        
+        String query = "INSERT INTO ExperienciaEducativa (NRC, nombreExperiencia, carrera, idPeriodoEscolar) " +
+                       "VALUES (?, ?, ?, ?);";
+
+        try (Connection connection = MySQLConnectionManager.getConnection();
+             PreparedStatement preparedStatement = connection.prepareStatement(query)) {
+
             preparedStatement.setString(1, subject.getNrc());
             preparedStatement.setString(2, subject.getSubjectName());
             preparedStatement.setString(3, subject.getCAREER());
             preparedStatement.setInt(4, subject.getIdSchoolPeriod());
-            preparedStatement.executeUpdate();
-            connection.close();
-            return true;
+
+            if (preparedStatement.executeUpdate() > 0) {
+                isRegistered = true;
+                logger.log(Level.INFO, "Experiencia Educativa registrada con éxito. NRC: {0}", subject.getNrc());
+            }
+
         } catch (SQLException e) {
-            System.out.println(e.getMessage());
+            logger.log(Level.SEVERE, "Error al registrar la Experiencia Educativa con NRC: " + subject.getNrc(), e);
         }
-        return false;
+        
+        return isRegistered;
     }
 
     @Override
     public boolean modifySubject(Subject subject) {
-        if (subject == null){
-            return false;
-        }
-        try {
-            Connection connection = MySQLConnectionManager.getConnection();
-            String subjectQuery = "UPDATE ExperienciaEducativa" +
-            "SET nombreExperiencia = ? ,carrera = ? ,idPeriodoEscolar = ?)" +
-            "WHERE NRC = ?;";
-            PreparedStatement preparedStatement = connection.prepareStatement(subjectQuery);
+        boolean isModified = false;
+        
+        String query = "UPDATE ExperienciaEducativa SET nombreExperiencia = ?, carrera = ?, idPeriodoEscolar = ? " +
+                       "WHERE NRC = ?;";
+
+        try (Connection connection = MySQLConnectionManager.getConnection();
+             PreparedStatement preparedStatement = connection.prepareStatement(query)) {
+            
             preparedStatement.setString(1, subject.getSubjectName());
             preparedStatement.setString(2, subject.getCAREER());
             preparedStatement.setInt(3, subject.getIdSchoolPeriod());
-            preparedStatement.setString(4, subject.getNrc());
-            preparedStatement.executeUpdate();
-            connection.close();
-            return true;
-        } catch (SQLException e) {
-            System.out.println(e.getMessage());
-        }
-        return false;
-    }
+            preparedStatement.setString(4, subject.getNrc()); 
+            
+            if (preparedStatement.executeUpdate() > 0) {
+                isModified = true;
+                logger.log(Level.INFO, "Experiencia Educativa modificada con éxito. NRC: {0}", subject.getNrc());
+            }
 
-    
+        } catch (SQLException e) {
+            logger.log(Level.SEVERE, "Error al modificar la Experiencia Educativa con NRC: " + (subject != null ? subject.getNrc() : "null"), e);
+        }
+        
+        return isModified;
+    }
 }
