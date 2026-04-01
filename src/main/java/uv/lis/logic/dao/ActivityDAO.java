@@ -8,20 +8,23 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import uv.lis.dataaccess.MySQLConnectionManager;
 import uv.lis.logic.contracts.IActivityDAO;
 import uv.lis.logic.dto.Activity;
 
 public class ActivityDAO implements IActivityDAO {
+        private static final Logger logger = Logger.getLogger(ActivityDAO.class.getName());
 
     @Override
     public List<Activity> getActivities() {
         List<Activity> activities = new ArrayList<>();
-        try {
-            Connection connection = MySQLConnectionManager.getConnection();
-            String activityQuery = "SELECT * FROM Actividad;";
-            PreparedStatement preparedStatement = connection.prepareStatement(activityQuery);
+        String activityQuery = "SELECT * FROM Actividad;";
+
+        try (Connection connection = MySQLConnectionManager.getConnection();
+            PreparedStatement preparedStatement = connection.prepareStatement(activityQuery)) {
             ResultSet resultSet = preparedStatement.executeQuery();
             
             while (resultSet.next()) {
@@ -33,9 +36,8 @@ public class ActivityDAO implements IActivityDAO {
                 
                 activities.add(new Activity(idActivity, activityName, activityDescription, startDate, endDate));
             }
-            connection.close();
         } catch (SQLException e) {
-            System.out.println(e.getMessage());
+            logger.log(Level.SEVERE, "Error de conexion con la base de datos",e);
         }
         return activities;
     }
@@ -43,10 +45,10 @@ public class ActivityDAO implements IActivityDAO {
     @Override
     public List<Activity> getActivitiesById(int idActivity) {
         List<Activity> activities = new ArrayList<>();
-        try {
-            Connection connection = MySQLConnectionManager.getConnection();
-            String activityQuery = "SELECT * FROM Actividad WHERE idActividad = ?;";
-            PreparedStatement preparedStatement = connection.prepareStatement(activityQuery);
+        String activityQuery = "SELECT * FROM Actividad WHERE idActividad = ?;";
+
+        try (Connection connection = MySQLConnectionManager.getConnection();
+            PreparedStatement preparedStatement = connection.prepareStatement(activityQuery)) {
             preparedStatement.setInt(1, idActivity);
             ResultSet resultSet = preparedStatement.executeQuery();
             
@@ -59,23 +61,24 @@ public class ActivityDAO implements IActivityDAO {
                 
                 activities.add(new Activity(id, activityName, activityDescription, startDate, endDate));
             }
-            connection.close();
         } catch (SQLException e) {
-            System.out.println(e.getMessage());
+            logger.log(Level.SEVERE, "Error de conexion con la base de datos",e);
         }
         return activities;
     }
 
     @Override
     public boolean registerActivity(Activity activity) {
+        boolean isRegistered = false;
+        String activityQuery = "INSERT INTO Actividad(idActividad, descripcionActividad, FechaInicio, FechaFinal)" + 
+                               "VALUES(?, ?, ?, ?, ?);";
+
         if (activity == null) {
-            return false;
+            isRegistered = false;
         }
-        try {
-            Connection connection = MySQLConnectionManager.getConnection();
-            String activityQuery = "INSERT INTO Actividad(idActividad, descripcionActividad, FechaInicio, FechaFinal)" + 
-            "VALUES(?, ?, ?, ?, ?);";
-            PreparedStatement preparedStatement = connection.prepareStatement(activityQuery);
+
+        try (Connection connection = MySQLConnectionManager.getConnection();
+            PreparedStatement preparedStatement = connection.prepareStatement(activityQuery)) {
             
             preparedStatement.setInt(1, activity.getId());
             preparedStatement.setString(2, activity.getName());
@@ -83,24 +86,25 @@ public class ActivityDAO implements IActivityDAO {
             preparedStatement.setDate(4, activity.getStartDate());
             preparedStatement.setDate(5, activity.getEndDate());
             
-            preparedStatement.executeUpdate();
-            connection.close();
-            return true;
+            if (preparedStatement.executeUpdate() > 0) {
+                isRegistered = true;
+            }
         } catch (SQLException e) {
-            System.out.println(e.getMessage());
+            logger.log(Level.SEVERE, "Error de conexion con la base de datos",e);
         }
-        return false;
+        return isRegistered;
     }
 
     @Override
     public boolean modifyActivity(Activity activity) {
+        boolean isModified = false;
+        String activityQuery = "UPDATE Actividad SET descripcionActividad = ?, FechaInicio = ?, FechaFin = ? WHERE idActividad = ?;";
+
         if (activity == null) {
-            return false;
+            isModified = false;
         }
-        try {
-            Connection connection = MySQLConnectionManager.getConnection();
-            String activityQuery = "UPDATE Actividad SET descripcionActividad = ?, FechaInicio = ?, FechaFin = ? WHERE idActividad = ?;";
-            PreparedStatement preparedStatement = connection.prepareStatement(activityQuery);
+        try (Connection connection = MySQLConnectionManager.getConnection();
+            PreparedStatement preparedStatement = connection.prepareStatement(activityQuery)) {
             
             preparedStatement.setString(1, activity.getName());
             preparedStatement.setString(2, activity.getDescription());
@@ -108,12 +112,12 @@ public class ActivityDAO implements IActivityDAO {
             preparedStatement.setDate(4, activity.getEndDate());
             preparedStatement.setInt(5, activity.getId());
             
-            preparedStatement.executeUpdate();
-            connection.close();
-            return true;
+            if (preparedStatement.executeUpdate() > 0) {
+                isModified = true;
+            }
         } catch (SQLException e) {
-            System.out.println(e.getMessage());
+            logger.log(Level.SEVERE, "Error de conexion con la base de datos",e);
         }
-        return false;
+        return isModified;
     }
 }

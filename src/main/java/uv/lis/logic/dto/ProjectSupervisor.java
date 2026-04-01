@@ -6,6 +6,11 @@ public class ProjectSupervisor {
     private String name;
     private String lastName;
     private String email;
+    private int idAffiliatedOrganization;
+
+    public ProjectSupervisor(){
+
+    }
     
     public ProjectSupervisor(int id, String name, String lastName,
             String email) {
@@ -47,5 +52,11 @@ public class ProjectSupervisor {
         this.email = email;
     }
 
-      
+    public int getIdAffiliatedOrganization() {
+        return idAffiliatedOrganization;
+    }
+
+    public void setIdAffiliatedOrganization(int idAffiliatedOrganization) {
+        this.idAffiliatedOrganization = idAffiliatedOrganization;
+    }
 }

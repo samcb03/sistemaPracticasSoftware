@@ -5,17 +5,21 @@ import java.util.Date;
 
 
 public class Student extends User {
-    private int id;
+    private String matricula;
     private Date dateOfBirth;
     private int completedHours;
     private Gender gender;
     private boolean indigenousLanguage;
     private String autoevaluation;
 
-    public Student(int idUser, String firstName, String lastName, int id, Date dateOfBirth, 
+    public Student(){
+
+    }
+
+    public Student(int idUser, String firstName, String lastName, String password, String matricula, Date dateOfBirth, 
             int completedHours, Gender gender, boolean indigenousLanguage, String autoevaluation) {
-        super(idUser, firstName, lastName);
-        this.id = id;
+        super(idUser, firstName, lastName, password);
+        this.matricula = matricula;
         this.dateOfBirth = dateOfBirth;
         this.completedHours = completedHours;
         this.gender = gender;
@@ -23,12 +27,12 @@ public class Student extends User {
         this.autoevaluation = autoevaluation;
     }
 
-    public int getId() {
-        return id;
+    public String getMatricula() {
+        return matricula;
     }
 
-    public void setId(int id) {
-        this.id = id;
+    public void setMatricula(String matricula) {
+        this.matricula = matricula;
     }
 
     public Date getDateOfBirth() {
@@ -71,7 +75,7 @@ public class Student extends User {
         this.autoevaluation = autoevaluation;
     }
 
-    private enum Gender {
+    public enum Gender {
         MALE,
         FEMALE,
         OTHER

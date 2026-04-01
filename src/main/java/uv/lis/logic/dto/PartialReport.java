@@ -6,8 +6,8 @@ public class PartialReport extends Report {
     public PartialReport(){
     }
 
-public PartialReport(String observation, String dueDate, int idReport, int idStudent, boolean isMensual) {
-        super(observation, dueDate, idReport, idStudent);
+public PartialReport(String observation, String dueDate, int idReport, String matricula, boolean isMensual) {
+        super(observation, dueDate, idReport, matricula);
         this.isMensual = isMensual;
     }
 

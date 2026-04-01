@@ -10,6 +10,10 @@ public class AffiliatedOrganization {
     private String phoneNumber;
     private int numberOfDirectUsers;
     private int numberOfIndirectUsers;
+
+    public AffiliatedOrganization(){
+        
+    }
    
     public AffiliatedOrganization(int id, String name, String city,
             String state, String email, String phoneNumber, int numberOfDirectUsers, int numberOfIndirectUsers) {

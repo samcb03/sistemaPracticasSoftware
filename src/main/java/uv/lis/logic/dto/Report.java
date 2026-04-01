@@ -4,15 +4,15 @@ public class Report {
     protected int id;
     protected String observation;
     protected String dueDate;
-    protected int idStudent;
+    protected String matricula;
 
     public Report() {
     }
-    public Report(String observation, String dueDate, int id, int idStudent) {
+    public Report(String observation, String dueDate, int id, String matricula) {
         this.observation = observation;
         this.dueDate = dueDate;
         this.id = id;
-        this.idStudent = idStudent;
+        this.matricula = matricula;
     }
 
 
@@ -40,11 +40,11 @@ public class Report {
         this.id = id;
     }
 
-    public int getIdStudent() {
-        return idStudent;
+    public String getMatricula() {
+        return matricula;
     }
 
-    public void setIdStudent(int idStudent) {
-        this.idStudent = idStudent;
+    public void setMatricula(String matricula) {
+        this.matricula = matricula;
     }
 }
