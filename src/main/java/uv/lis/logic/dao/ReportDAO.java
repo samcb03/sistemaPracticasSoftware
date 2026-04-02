@@ -1,5 +1,6 @@
 package uv.lis.logic.dao;
 
+
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -8,24 +9,22 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
 import uv.lis.dataaccess.MySQLConnectionManager;
 import uv.lis.logic.contracts.IReportDAO;
 import uv.lis.logic.dto.FinalReport;
 import uv.lis.logic.dto.PartialReport;
 import uv.lis.logic.dto.Report;
 
+
 public class ReportDAO implements IReportDAO{
-    private static final Logger logger = Logger.getLogger(ReportDAO.class.getName());
+    private static final int NO_ROWS_AFFECTED = 0;
+    private static final Logger LOGGER = Logger.getLogger(ReportDAO.class.getName());
 
     @Override
     public List<Report> getReports() {
         List<Report> reports = new ArrayList<>();
-        String reportQuery = "SELECT p.idReporte, p.tipo,r.observaciones, " + 
-                             "r.fechaEntrega, r.matricula " +
-                             "FROM Parcial p " +
-                             "INNER JOIN Reporte r ON p.idReporte = r.idReporte " +
-                             "WHERE p.idReporte = ?;";
+        String reportQuery = "SELECT p.idReporte, p.tipo,r.observaciones, r.fechaEntrega," 
+        + "r.matricula FROM Parcial p, INNER JOIN Reporte r ON p.idReporte = r.idReporte WHERE p.idReporte = ?;";
         try (Connection databaseConnection = MySQLConnectionManager.getConnection();
             PreparedStatement preparedStatement = databaseConnection.prepareStatement(reportQuery)) {
             ResultSet resultSet = preparedStatement.executeQuery();
@@ -37,7 +36,7 @@ public class ReportDAO implements IReportDAO{
         }
 
         } catch (SQLException e){
-            logger.log(Level.SEVERE, "Error de conexion con la base de datos",e);
+            LOGGER.log(Level.SEVERE, "Error de conexion con la base de datos",e);
 
         }
 
@@ -54,8 +53,8 @@ public class ReportDAO implements IReportDAO{
                              "INNER JOIN Reporte r ON p.idReporte = r.idReporte " +
                              "WHERE p.idReporte = ?;";
 
-        try (Connection databasConnection = MySQLConnectionManager.getConnection();
-            PreparedStatement preparedStatement = databasConnection.prepareStatement(finalReportQuery)){
+        try (Connection databaseConnection = MySQLConnectionManager.getConnection();
+            PreparedStatement preparedStatement = databaseConnection.prepareStatement(finalReportQuery)){
 
                 preparedStatement.setInt(1, idPartialReport);
 
@@ -77,7 +76,7 @@ public class ReportDAO implements IReportDAO{
                     }
                 }
             } catch (SQLException e) {
-                logger.log(Level.SEVERE, "Error de conexion con la base de datos",e);
+                LOGGER.log(Level.SEVERE, "Error de conexion con la base de datos",e);
             }
 
         return report;
@@ -86,10 +85,11 @@ public class ReportDAO implements IReportDAO{
     @Override
     public boolean registerPartialReport(PartialReport partialReport) {
         boolean isRegistered = false;
-        String partialReportQuery = "INSERT INTO ReporteParcial (observacion, fecha_limite, id_estudiante, tipo_reporte) VALUES (?, ?, ?, ?);";
+        String partialReportQuery = "INSERT INTO ReporteParcial " 
+        + "(observacion, fecha_limite, id_estudiante, tipo_reporte) VALUES (?, ?, ?, ?);";
 
-        try(Connection databasConnection = MySQLConnectionManager.getConnection();
-            PreparedStatement preparedStatement = databasConnection.prepareStatement(partialReportQuery)) {
+        try(Connection databaseConnection = MySQLConnectionManager.getConnection();
+            PreparedStatement preparedStatement = databaseConnection.prepareStatement(partialReportQuery)) {
                 preparedStatement.setString(1, partialReport.getObservation());
                 preparedStatement.setString(2, partialReport.getDueDate());
                 preparedStatement.setString(3, partialReport.getMatricula());
@@ -100,12 +100,12 @@ public class ReportDAO implements IReportDAO{
                     preparedStatement.setString(4, "PARCIAL");
                 }
 
-                if (preparedStatement.executeUpdate() > 0) {
+                if (preparedStatement.executeUpdate() > NO_ROWS_AFFECTED) {
                     isRegistered = true;
                 }
 
             } catch (SQLException e) {
-                logger.log(Level.SEVERE, "Error de conexion con la base de datos",e);
+                LOGGER.log(Level.SEVERE, "Error de conexion con la base de datos",e);
             }
             return isRegistered;
         }
@@ -113,10 +113,8 @@ public class ReportDAO implements IReportDAO{
     @Override
     public boolean modifyPartialReport(PartialReport partialReport) {
         boolean isModified = false;
-        String partialReportQuery = "UPDATE ReporteParcial SET " + 
-                                    "observaciones = ?, fechaEntrega = ?," + 
-                                    "matricula = ?, tipo = ?" + 
-        "WHERE idReporte = ?";
+        String partialReportQuery = "UPDATE ReporteParcial SET " 
+            + "observaciones = ?, fechaEntrega = ?, matricula = ?, tipo = ? WHERE idReporte = ?";
 
         try (Connection databaseConnection = MySQLConnectionManager.getConnection();
             PreparedStatement preparedStatement = databaseConnection.prepareStatement(partialReportQuery)) {
@@ -132,12 +130,12 @@ public class ReportDAO implements IReportDAO{
 
                 preparedStatement.setInt(5,partialReport.getId());
 
-                if (preparedStatement.executeUpdate() > 0) {
+                if (preparedStatement.executeUpdate() > NO_ROWS_AFFECTED) {
                     isModified = true;
                 }
 
         } catch (SQLException e) {
-            logger.log(Level.SEVERE, "Error con la conexión de la base de datos, e");
+            LOGGER.log(Level.SEVERE, "Error con la conexión de la base de datos, e");
         }
 
         return isModified;
@@ -150,8 +148,8 @@ public class ReportDAO implements IReportDAO{
         String finalReportQuery = "SELECT * FROM ReporteFinal "+
         "WHERE idReporte = ?;";
 
-        try (Connection databasConnection = MySQLConnectionManager.getConnection();
-            PreparedStatement preparedStatement = databasConnection.prepareStatement(finalReportQuery)){
+        try (Connection databaseConnection = MySQLConnectionManager.getConnection();
+            PreparedStatement preparedStatement = databaseConnection.prepareStatement(finalReportQuery)){
 
                 preparedStatement.setInt(1, idFinalReport);
                 try (ResultSet resultSet = preparedStatement.executeQuery()) {
@@ -163,7 +161,7 @@ public class ReportDAO implements IReportDAO{
                     }
                 }
             } catch (SQLException e) {
-                logger.log(Level.SEVERE, "Error de conexion con la base de datos",e);
+                LOGGER.log(Level.SEVERE, "Error de conexion con la base de datos",e);
             }
 
         return report;
@@ -174,16 +172,16 @@ public class ReportDAO implements IReportDAO{
         boolean isRegistered = false;
         String finalReportQuery = "INSERT INTO ReporteFinal (PorcentajeAvance, ResultadoEntregable) VALUES (?, ?);";
 
-        try(Connection databasConnection = MySQLConnectionManager.getConnection();
-            PreparedStatement preparedStatement = databasConnection.prepareStatement(finalReportQuery)) {
+        try(Connection databaseConnection = MySQLConnectionManager.getConnection();
+            PreparedStatement preparedStatement = databaseConnection.prepareStatement(finalReportQuery)) {
                 preparedStatement.setInt(1, finalReport.getPorcentajeAvance());
                 preparedStatement.setString(2,finalReport.getResultadoEntregable());
 
-            if (preparedStatement.executeUpdate() > 0) {
+            if (preparedStatement.executeUpdate() > NO_ROWS_AFFECTED) {
                 isRegistered = true;
             }
         } catch (SQLException e) {
-            logger.log(Level.SEVERE, "Error de conexion con la base de datos",e);
+            LOGGER.log(Level.SEVERE, "Error de conexion con la base de datos",e);
             }
             return isRegistered;
         }
@@ -192,8 +190,8 @@ public class ReportDAO implements IReportDAO{
     public boolean modifyFinalReport(FinalReport finalReport) {
         boolean isModified = false;
 
-        String finalReportQuery = "UPDATE ReporteFinal SET " + 
-        "porcentajeAvance = ?, resultadoEntregable = ? WHERE idReporte = ?;";
+        String finalReportQuery = "UPDATE ReporteFinal SET " 
+            + "porcentajeAvance = ?, resultadoEntregable = ? WHERE idReporte = ?;";
 
         try (Connection databaseConnection = MySQLConnectionManager.getConnection();
             PreparedStatement preparedStatement = databaseConnection.prepareStatement(finalReportQuery)) {
@@ -201,12 +199,12 @@ public class ReportDAO implements IReportDAO{
                 preparedStatement.setString(2,finalReport.getResultadoEntregable());
                 preparedStatement.setInt(3, finalReport.getId());
 
-                if (preparedStatement.executeUpdate() > 0) {
+                if (preparedStatement.executeUpdate() > NO_ROWS_AFFECTED) {
                     isModified = true;
                 }
 
         } catch (SQLException e) {
-            logger.log(Level.SEVERE, "Error de conexion con la base de datos",e);
+            LOGGER.log(Level.SEVERE, "Error de conexion con la base de datos",e);
         }
 
         return isModified;

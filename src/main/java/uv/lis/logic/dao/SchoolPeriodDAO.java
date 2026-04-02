@@ -10,12 +10,13 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
 import uv.lis.dataaccess.MySQLConnectionManager;
 import uv.lis.logic.contracts.ISchoolPeriodDAO;
 import uv.lis.logic.dto.SchoolPeriod;
 
+
 public class SchoolPeriodDAO implements ISchoolPeriodDAO{
+        private static final int NO_ROWS_AFFECTED = 0; 
         private static final Logger logger = Logger.getLogger(SchoolPeriodDAO.class.getName());
     
 
@@ -48,14 +49,14 @@ public class SchoolPeriodDAO implements ISchoolPeriodDAO{
         boolean isRegistered = false;
         String schoolPeriodQuery = "INSERT INTO PeriodoEscolar(idPeriodoEscolar,FechaInicio, FechaFin) VALUES(?,?);";
 
-        try (Connection connection = MySQLConnectionManager.getConnection();
-            PreparedStatement preparedStatement = connection.prepareStatement(schoolPeriodQuery)){
+        try (Connection databaseConnection = MySQLConnectionManager.getConnection();
+            PreparedStatement preparedStatement = databaseConnection.prepareStatement(schoolPeriodQuery)){
 
             preparedStatement.setInt(1, schoolPeriod.getId());
             preparedStatement.setDate(2, schoolPeriod.getStartDate());
             preparedStatement.setDate(3, schoolPeriod.getEndDate());
 
-            if (preparedStatement.executeUpdate() > 0){
+            if (preparedStatement.executeUpdate() > NO_ROWS_AFFECTED){
                 isRegistered = true;
             }
         } catch (SQLException e) {
@@ -67,18 +68,17 @@ public class SchoolPeriodDAO implements ISchoolPeriodDAO{
     @Override
     public boolean modifySchoolPeriod(SchoolPeriod schoolPeriod) {
         boolean isModified = false;
-        String schoolPeriodQuery = "UPDATE PeriodoEscolar" +
-                                   "SET FechaInicio = ? , FechaFin = ?" + 
-                                   "WHERE idPeriodoEscolar = ?;";
+        String schoolPeriodQuery = "UPDATE PeriodoEscolar" 
+            + "SET FechaInicio = ? , FechaFin = ? WHERE idPeriodoEscolar = ?;";
 
-        try (Connection connection = MySQLConnectionManager.getConnection();
-            PreparedStatement preparedStatement = connection.prepareStatement(schoolPeriodQuery)){
+        try (Connection databaseConnection = MySQLConnectionManager.getConnection();
+            PreparedStatement preparedStatement = databaseConnection.prepareStatement(schoolPeriodQuery)){
 
             preparedStatement.setDate(1, schoolPeriod.getStartDate());
             preparedStatement.setDate(2, schoolPeriod.getEndDate());
             preparedStatement.setInt(3, schoolPeriod.getId());
 
-            if (preparedStatement.executeUpdate() > 0) {
+            if (preparedStatement.executeUpdate() > NO_ROWS_AFFECTED) {
                 isModified = true;
             }
         } catch (SQLException e) {
