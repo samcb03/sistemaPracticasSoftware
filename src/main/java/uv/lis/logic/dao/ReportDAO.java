@@ -45,7 +45,7 @@ public class ReportDAO implements IReportDAO{
     }
 
     @Override
-    public PartialReport getReportById(int idPartialReport) {
+    public PartialReport getPartialReportById(int idPartialReport) {
         PartialReport report = null;
         String finalReportQuery = "SELECT p.idReporte, p.tipo,r.observaciones, " + 
                              "r.fechaEntrega, r.matricula " +
@@ -145,8 +145,7 @@ public class ReportDAO implements IReportDAO{
     public FinalReport getFinalReportById(int idFinalReport) {
         FinalReport report = null;
 
-        String finalReportQuery = "SELECT * FROM ReporteFinal "+
-        "WHERE idReporte = ?;";
+        String finalReportQuery = "SELECT * FROM ReporteFinal WHERE idReporte = ?;";
 
         try (Connection databaseConnection = MySQLConnectionManager.getConnection();
             PreparedStatement preparedStatement = databaseConnection.prepareStatement(finalReportQuery)){

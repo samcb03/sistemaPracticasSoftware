@@ -11,7 +11,7 @@ import uv.lis.logic.dto.PartialReport;
 public interface IReportDAO {
     List<Report> getReports();
 
-    PartialReport getReportById(int idPartialReport) throws SQLException;
+    PartialReport getPartialReportById(int idPartialReport) throws SQLException;
 
     boolean registerPartialReport(PartialReport partialReport) throws SQLException;
 
