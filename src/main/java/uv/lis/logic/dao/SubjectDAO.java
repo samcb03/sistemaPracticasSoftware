@@ -1,5 +1,6 @@
 package uv.lis.logic.dao;
 
+
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -8,13 +9,13 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
 import uv.lis.dataaccess.MySQLConnectionManager;
 import uv.lis.logic.contracts.ISubjectDAO;
 import uv.lis.logic.dto.Subject;
 
-public class SubjectDAO implements ISubjectDAO {
 
+public class SubjectDAO implements ISubjectDAO {
+    private static final int NO_ROWS_AFFECTED = 0;
     private static final Logger logger = Logger.getLogger(SubjectDAO.class.getName());
 
     @Override
@@ -51,18 +52,18 @@ public class SubjectDAO implements ISubjectDAO {
     public boolean registerSubject(Subject subject) {
         boolean isRegistered = false;
         
-        String query = "INSERT INTO ExperienciaEducativa (NRC, nombreExperiencia, carrera, idPeriodoEscolar) " +
-                       "VALUES (?, ?, ?, ?);";
+        String query = "INSERT INTO ExperienciaEducativa (NRC, nombreExperiencia, carrera, idPeriodoEscolar) " 
+            + "VALUES (?, ?, ?, ?);";
 
-        try (Connection connection = MySQLConnectionManager.getConnection();
-             PreparedStatement preparedStatement = connection.prepareStatement(query)) {
+        try (Connection databaseConnection = MySQLConnectionManager.getConnection();
+             PreparedStatement preparedStatement = databaseConnection.prepareStatement(query)) {
 
             preparedStatement.setString(1, subject.getNrc());
             preparedStatement.setString(2, subject.getSubjectName());
             preparedStatement.setString(3, subject.getCAREER());
             preparedStatement.setInt(4, subject.getIdSchoolPeriod());
 
-            if (preparedStatement.executeUpdate() > 0) {
+            if (preparedStatement.executeUpdate() > NO_ROWS_AFFECTED) {
                 isRegistered = true;
                 logger.log(Level.INFO, "Experiencia Educativa registrada con éxito. NRC: {0}", subject.getNrc());
             }
@@ -78,24 +79,25 @@ public class SubjectDAO implements ISubjectDAO {
     public boolean modifySubject(Subject subject) {
         boolean isModified = false;
         
-        String query = "UPDATE ExperienciaEducativa SET nombreExperiencia = ?, carrera = ?, idPeriodoEscolar = ? " +
-                       "WHERE NRC = ?;";
+        String query = "UPDATE ExperienciaEducativa SET nombreExperiencia = ?, carrera = ?, idPeriodoEscolar = ? " 
+            + "WHERE NRC = ?;";
 
-        try (Connection connection = MySQLConnectionManager.getConnection();
-             PreparedStatement preparedStatement = connection.prepareStatement(query)) {
+        try (Connection databaseConnection = MySQLConnectionManager.getConnection();
+             PreparedStatement preparedStatement = databaseConnection.prepareStatement(query)) {
             
             preparedStatement.setString(1, subject.getSubjectName());
             preparedStatement.setString(2, subject.getCAREER());
             preparedStatement.setInt(3, subject.getIdSchoolPeriod());
             preparedStatement.setString(4, subject.getNrc()); 
             
-            if (preparedStatement.executeUpdate() > 0) {
+            if (preparedStatement.executeUpdate() > NO_ROWS_AFFECTED) {
                 isModified = true;
                 logger.log(Level.INFO, "Experiencia Educativa modificada con éxito. NRC: {0}", subject.getNrc());
             }
 
         } catch (SQLException e) {
-            logger.log(Level.SEVERE, "Error al modificar la Experiencia Educativa con NRC: " + (subject != null ? subject.getNrc() : "null"), e);
+            logger.log(Level.SEVERE, "Error al modificar la Experiencia Educativa con NRC: " 
+                + (subject != null ? subject.getNrc() : "null"), e);
         }
         
         return isModified;

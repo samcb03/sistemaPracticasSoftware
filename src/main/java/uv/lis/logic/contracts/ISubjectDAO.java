@@ -1,16 +1,15 @@
 package uv.lis.logic.contracts;
 
 
+import java.sql.SQLException;
 import java.util.List;
-
 import uv.lis.logic.dto.Subject;
 
+
 public interface ISubjectDAO {
+    List<Subject> getSubjectbyId(int idSubject) throws SQLException;
 
-    List<Subject> getSubjectbyId(int idSubject);
+    boolean registerSubject(Subject subject) throws SQLException;
 
-    boolean registerSubject(Subject subject);
-
-    boolean modifySubject(Subject subject);
-    
+    boolean modifySubject(Subject subject) throws SQLException;
 }

@@ -1,39 +1,41 @@
 package uv.lis.logic.dao;
 
+
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.logging.Logger;
 import java.util.logging.Level;
-
 import uv.lis.dataaccess.MySQLConnectionManager;
 import uv.lis.logic.contracts.IUserDAO;
 import uv.lis.logic.dto.Professor;
 import uv.lis.logic.dto.Student;
 import uv.lis.logic.dto.User;
 
+
 public class UserDAO implements IUserDAO{
-    private static final Logger logger = Logger.getLogger(UserDAO.class.getName());
+    private static final int NO_ROWS_AFFECTED = 0;
+    private static final Logger LOGGER = Logger.getLogger(UserDAO.class.getName());
 
 @Override 
     public boolean registerUser(User user) {
         boolean isRegistered = false;
         String userQuery = "INSERT INTO Usuario (nombre, apellido, password) VALUES (?, ?, ?);";
 
-        try (Connection conn = MySQLConnectionManager.getConnection();
-            PreparedStatement preparedStatement = conn.prepareStatement(userQuery)) {
+        try (Connection databaseConnection = MySQLConnectionManager.getConnection();
+            PreparedStatement preparedStatement = databaseConnection.prepareStatement(userQuery)) {
  
             preparedStatement.setString(1, user.getFirstName());
             preparedStatement.setString(2, user.getLastName());
             preparedStatement.setString(3, user.getPassword());
 
 
-            if (preparedStatement.executeUpdate() > 0) {
+            if (preparedStatement.executeUpdate() > NO_ROWS_AFFECTED) {
                 isRegistered = true;
             }
         } catch (SQLException e) {
-            logger.log(Level.SEVERE, "Error de conexion con la base de datos",e);
+            LOGGER.log(Level.SEVERE, "Error de conexion con la base de datos",e);
         }
         return isRegistered;
     }
@@ -56,12 +58,13 @@ public class UserDAO implements IUserDAO{
                     professor.setLastName(resultSet.getString("apellidos"));
                     professor.setIsCoordinator(false); 
 
-                    logger.log(Level.INFO, "Busqueda de Profesor con numero de personal obtenido con exito", professor.getNumeroPersonal());
+                    LOGGER.log(Level.INFO, "Busqueda de Profesor con numero de personal obtenido con exito", 
+                        professor.getNumeroPersonal());
                 }
             }
 
         } catch (SQLException e) {
-            logger.log(Level.SEVERE, "Error de conexion con la base de datos",e);
+            LOGGER.log(Level.SEVERE, "Error de conexion con la base de datos",e);
         }
 
         return professor;
@@ -73,8 +76,8 @@ public class UserDAO implements IUserDAO{
         
         String proffesorQuery = "INSERT INTO profesor (idUsuario, numeroPersonal, rol) VALUES (?, ?, ?);";
 
-        try (Connection conn = MySQLConnectionManager.getConnection();
-             PreparedStatement preparedStatement = conn.prepareStatement(proffesorQuery)) {
+        try (Connection databaseConnection = MySQLConnectionManager.getConnection();
+             PreparedStatement preparedStatement = databaseConnection.prepareStatement(proffesorQuery)) {
             
             preparedStatement.setInt(1, professor.getId());      
             preparedStatement.setString(2, professor.getNumeroPersonal());     
@@ -85,13 +88,13 @@ public class UserDAO implements IUserDAO{
                 preparedStatement.setString(3, "Maestro");
             }
 
-            if (preparedStatement.executeUpdate() > 0) {
+            if (preparedStatement.executeUpdate() > NO_ROWS_AFFECTED) {
                 isRegistered = true;
-                logger.log(Level.INFO, "Registro de profesor con ID {0} exitosa.", professor.getNumeroPersonal());
+                LOGGER.log(Level.INFO, "Registro de profesor con ID {0} exitosa.", professor.getNumeroPersonal());
             }
 
         } catch (SQLException e) {
-            logger.log(Level.SEVERE, "Error de conexion con la base de datos",e);
+            LOGGER.log(Level.SEVERE, "Error de conexion con la base de datos",e);
         }
         
         return isRegistered;
@@ -101,13 +104,11 @@ public class UserDAO implements IUserDAO{
     public boolean modifyProfessor(Professor professor) {
         boolean isModified = false;
 
-        String proffesorQuery = "UPDATE Profesor p " +
-                       "INNER JOIN Usuario u ON p.idUsuario = u.idUsuario " +
-                       "SET p.rol = ?, u.nombre = ?, u.apellidos = ? " +
-                       "WHERE p.numeroPersonal = ?;";
+        String proffesorQuery = "UPDATE Profesor p INNER JOIN Usuario u ON p.idUsuario = u.idUsuario SET p.rol = ?," 
+            + "u.nombre = ?, u.apellidos = ? WHERE p.numeroPersonal = ?;";
 
-        try (Connection conn = MySQLConnectionManager.getConnection();
-             PreparedStatement preparedStament = conn.prepareStatement(proffesorQuery)) {
+        try (Connection databaseConnection = MySQLConnectionManager.getConnection();
+             PreparedStatement preparedStament = databaseConnection.prepareStatement(proffesorQuery)) {
 
             if (professor.getIsCoordinator()) { 
                 preparedStament.setString(1, "Coordinador");
@@ -120,13 +121,13 @@ public class UserDAO implements IUserDAO{
             
             preparedStament.setInt(4, professor.getId()); 
 
-            if (preparedStament.executeUpdate() > 0) {
+            if (preparedStament.executeUpdate() > NO_ROWS_AFFECTED) {
                 isModified = true;
-                logger.log(Level.INFO, "Modificacion de profesor con ID {0} exitosa.", professor.getNumeroPersonal());
+                LOGGER.log(Level.INFO, "Modificacion de profesor con ID {0} exitosa.", professor.getNumeroPersonal());
             }
 
         } catch (SQLException e) {
-            logger.log(Level.SEVERE, "Error de conexion con la base de datos",e);
+            LOGGER.log(Level.SEVERE, "Error de conexion con la base de datos",e);
         }
 
         return isModified;
@@ -143,13 +144,14 @@ public class UserDAO implements IUserDAO{
             
             preparedStatement.setString(1, professor.getNumeroPersonal());
 
-            if (preparedStatement.executeUpdate() > 0) {
+            if (preparedStatement.executeUpdate() > NO_ROWS_AFFECTED) {
                 isInactived = true;
-                logger.log(Level.INFO, "Inactivacion de profesor con numero de personal exitosa.", professor.getNumeroPersonal());
+                LOGGER.log(Level.INFO, "Inactivacion de profesor con numero de personal exitosa.", 
+                    professor.getNumeroPersonal());
             }
 
         } catch (SQLException e) {
-            logger.log(Level.SEVERE, "Error de conexion con la base de datos",e);
+            LOGGER.log(Level.SEVERE, "Error de conexion con la base de datos",e);
         }
 
         return isInactived;
@@ -159,13 +161,11 @@ public class UserDAO implements IUserDAO{
     public Student getStudentById(int idStudent) { 
         Student student = null;
 
-        String query = "SELECT e.idUsuario, e.matricula, u.nombre, u.apellidos " +
-                       "FROM Estudiante e " +
-                       "INNER JOIN Usuario u ON e.idUsuario = u.idUsuario " +
-                       "WHERE e.idUsuario = ?;";
+        String query = "SELECT e.idUsuario, e.matricula, u.nombre, u.apellidos " 
+            + "FROM Estudiante e INNER JOIN Usuario u ON e.idUsuario = u.idUsuario WHERE e.idUsuario = ?;";
 
-        try (Connection conn = MySQLConnectionManager.getConnection();
-             PreparedStatement preparedStatement = conn.prepareStatement(query)) {
+        try (Connection databaseConnection = MySQLConnectionManager.getConnection();
+             PreparedStatement preparedStatement = databaseConnection.prepareStatement(query)) {
             
             preparedStatement.setInt(1, idStudent);
             
@@ -177,10 +177,10 @@ public class UserDAO implements IUserDAO{
                     student.setFirstName(rs.getString("nombre"));
                     student.setLastName(rs.getString("apellidos"));
                 }
-                logger.log(Level.INFO, "Busqueda de responsable de proyecto con ID {0} exitosa.", student.getId());
+                LOGGER.log(Level.INFO, "Busqueda de responsable de proyecto con ID {0} exitosa.", student.getId());
             }
         } catch (SQLException e) {
-            logger.log(Level.SEVERE, "Error de conexion con la base de datos",e);
+            LOGGER.log(Level.SEVERE, "Error de conexion con la base de datos",e);
         }
         
         return student;
@@ -192,19 +192,19 @@ public class UserDAO implements IUserDAO{
 
         String studentQuery = "INSERT INTO Estudiante (idUsuario, matricula) VALUES (?, ?);";
 
-        try (Connection conn = MySQLConnectionManager.getConnection();
-             PreparedStatement preparedStatement = conn.prepareStatement(studentQuery)) {
+        try (Connection databaseConnection = MySQLConnectionManager.getConnection();
+             PreparedStatement preparedStatement = databaseConnection.prepareStatement(studentQuery)) {
             
             preparedStatement.setInt(1, student.getId());
             preparedStatement.setString(2, student.getMatricula()); 
 
-            if (preparedStatement.executeUpdate() > 0) {
+            if (preparedStatement.executeUpdate() > NO_ROWS_AFFECTED) {
                 isRegistered = true;
-                logger.log(Level.INFO, "Busqueda de estudiante con ID {0} exitosa.", student.getId());
+                LOGGER.log(Level.INFO, "Registro de estudiante con ID {0} exitoso.", student.getId());
             }
 
         } catch (SQLException e) {
-            logger.log(Level.SEVERE, "Error de conexion con la base de datos",e);
+            LOGGER.log(Level.SEVERE, "Error de conexion con la base de datos",e);
         }
         
         return isRegistered;
@@ -214,26 +214,25 @@ public class UserDAO implements IUserDAO{
     public boolean modifyStudent(Student student) {
         boolean isModified = false;
 
-        String studentQuery = "UPDATE Estudiante e " +
-                       "INNER JOIN Usuario u ON e.idUsuario = u.idUsuario " +
-                       "SET e.matricula = ?, u.nombre = ?, u.apellidos = ? " +
-                       "WHERE e.idUsuario = ?;";
+        String studentQuery = "UPDATE Estudiante e " 
+            + "INNER JOIN Usuario u ON e.idUsuario = u.idUsuario SET e.matricula = ?, u.nombre = ?, u.apellidos = ?" 
+            + "WHERE e.idUsuario = ?;";
 
-        try (Connection conn = MySQLConnectionManager.getConnection();
-             PreparedStatement preparedStatement = conn.prepareStatement(studentQuery)) {
+        try (Connection databaseConnection = MySQLConnectionManager.getConnection();
+             PreparedStatement preparedStatement = databaseConnection.prepareStatement(studentQuery)) {
             
             preparedStatement.setString(1, student.getMatricula());
             preparedStatement.setString(2, student.getFirstName());
             preparedStatement.setString(3, student.getLastName());
             preparedStatement.setInt(4, student.getId());
 
-            if (preparedStatement.executeUpdate() > 0) {
+            if (preparedStatement.executeUpdate() > NO_ROWS_AFFECTED) {
                 isModified = true;
-                logger.log(Level.INFO, "Modificacion de alumno con matricula exitosa.", student.getMatricula());
+                LOGGER.log(Level.INFO, "Modificacion de alumno con matricula exitosa.", student.getMatricula());
             }
 
         } catch (SQLException e) {
-            logger.log(Level.SEVERE, "Error de conexion con la base de datos",e);
+            LOGGER.log(Level.SEVERE, "Error de conexion con la base de datos",e);
         }
 
         return isModified;
@@ -243,20 +242,20 @@ public class UserDAO implements IUserDAO{
     public boolean inactiveStudent(Student student) {
         boolean isInactive = false;
         
-        String studentQuery = "UPDATE Estudiante SET estado = 'Inactivo' WHERE idUsuario = ?;";
+        String studentQuery = "UPDATE Estudiante SET estado = 1 WHERE idUsuario = ?;";
 
-        try (Connection conn = MySQLConnectionManager.getConnection();
-             PreparedStatement preparedStatement = conn.prepareStatement(studentQuery)) {
+        try (Connection databaseConnection = MySQLConnectionManager.getConnection();
+             PreparedStatement preparedStatement = databaseConnection.prepareStatement(studentQuery)) {
             
             preparedStatement.setInt(1, student.getId());
 
-            if (preparedStatement.executeUpdate() > 0) {
+            if (preparedStatement.executeUpdate() > NO_ROWS_AFFECTED) {
                 isInactive = true;
-                logger.log(Level.INFO, "Inactivacion de alumno con matricula exitosa.", student.getMatricula());
+                LOGGER.log(Level.INFO, "Inactivacion de alumno con matricula exitosa.", student.getMatricula());
             }
 
         } catch (SQLException e) {
-            logger.log(Level.SEVERE, "Error de conexion con la base de datos",e);
+            LOGGER.log(Level.SEVERE, "Error de conexion con la base de datos",e);
         }
 
         return isInactive;

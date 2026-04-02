@@ -1,25 +1,27 @@
 package uv.lis.logic.dao;
 
+
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
 import uv.lis.dataaccess.MySQLConnectionManager;
 import uv.lis.logic.contracts.IAffiliatedOrganizationDAO;
 import uv.lis.logic.dto.AffiliatedOrganization;
 
+
 public class AffiliatedOrganizationDAO implements IAffiliatedOrganizationDAO{
-    private static final Logger logger = Logger.getLogger(AffiliatedOrganizationDAO.class.getName());
+    private static final int NO_ROWS_AFFECTED = 0;
+    private static final Logger LOGGER = Logger.getLogger(AffiliatedOrganizationDAO.class.getName());
 
     @Override
     public AffiliatedOrganization getAffiliatedOrganizationById(int idAfilliatedOrganization) {
         AffiliatedOrganization affiliatedOrganization = null;
 
-        String affiliatedOrganizationQuery = "SELECT * FROM organizacionVinculada " +
-        "WHERE idOrganizacionVinculada = ?"; 
+        String affiliatedOrganizationQuery = "SELECT * FROM organizacionVinculada " 
+        + "WHERE idOrganizacionVinculada = ?"; 
 
         try (Connection databaseConnection = MySQLConnectionManager.getConnection();
             PreparedStatement preparedStatement = databaseConnection.prepareStatement(affiliatedOrganizationQuery)) {
@@ -43,7 +45,7 @@ public class AffiliatedOrganizationDAO implements IAffiliatedOrganizationDAO{
             }
 
         } catch (SQLException e) {
-            logger.log(Level.SEVERE, "Error de conexion con la base de datos",e);
+            LOGGER.log(Level.SEVERE, "Error de conexion con la base de datos",e);
         }
 
         return affiliatedOrganization;   
@@ -70,14 +72,14 @@ public class AffiliatedOrganizationDAO implements IAffiliatedOrganizationDAO{
             preparedStatement.setInt(7,affiliatedOrganization.getNumberOfIndirectUsers());
             preparedStatement.setInt(8,affiliatedOrganization.getNumberOfDirectUsers());
 
-            if (preparedStatement.executeUpdate() > 0) {
+            if (preparedStatement.executeUpdate() > NO_ROWS_AFFECTED) {
                 isRegistered = true;
                 databaseConnection.close();
             }
             databaseConnection.close();
 
         } catch (SQLException e) {
-            logger.log(Level.SEVERE, "Error de conexion con la base de datos",e);
+            LOGGER.log(Level.SEVERE, "Error de conexion con la base de datos",e);
         }
         return isRegistered;
     }
@@ -86,9 +88,8 @@ public class AffiliatedOrganizationDAO implements IAffiliatedOrganizationDAO{
     public boolean modifyAffiliatedOrganization(AffiliatedOrganization affiliatedOrganization) {
         boolean isModified = false;
 
-        String query = "UPDATE organizacionVinculada SET nombreOv = ?, ciudad = ?, estado = ?, correo = ?, " +
-                       "telefono = ?, numUsuariosIndirectos = ?, numUsuariosDirectos = ? " +
-                       "WHERE idOrganizacion = ?;";
+        String query = "UPDATE organizacionVinculada SET nombreOv = ?, ciudad = ?, estado = ?, correo = ?, " 
+            + "telefono = ?, numUsuariosIndirectos = ?, numUsuariosDirectos = ? " + "WHERE idOrganizacion = ?;";
 
         try (Connection databaseConnection = MySQLConnectionManager.getConnection();
              PreparedStatement preparedStatement = databaseConnection.prepareStatement(query)) {
@@ -102,12 +103,12 @@ public class AffiliatedOrganizationDAO implements IAffiliatedOrganizationDAO{
             preparedStatement.setInt(7, affiliatedOrganization.getNumberOfDirectUsers());
             preparedStatement.setInt(8, affiliatedOrganization.getId());
 
-            if (preparedStatement.executeUpdate() > 0) {
+            if (preparedStatement.executeUpdate() > NO_ROWS_AFFECTED) {
                 isModified = true;
             }
 
         } catch (SQLException e) {
-            logger.log(Level.SEVERE, "Error de conexion con la base de datos",e);
+            LOGGER.log(Level.SEVERE, "Error de conexion con la base de datos",e);
         }
 
         return isModified;
@@ -117,19 +118,19 @@ public class AffiliatedOrganizationDAO implements IAffiliatedOrganizationDAO{
     public boolean inactiveAffiliatedOrganization(AffiliatedOrganization affiliatedOrganization) {
         boolean isInactive = false;
 
-        String query = "UPDATE organizacionVinculada SET estado = 'Inactivo' WHERE idOrganizacion = ?;";
+        String query = "UPDATE organizacionVinculada SET estado = '1' WHERE idOrganizacion = ?;";
 
         try (Connection databaseConnection = MySQLConnectionManager.getConnection();
              PreparedStatement preparedStatement = databaseConnection.prepareStatement(query)) {
 
             preparedStatement.setInt(1, affiliatedOrganization.getId());
 
-            if (preparedStatement.executeUpdate() > 0) {
+            if (preparedStatement.executeUpdate() > NO_ROWS_AFFECTED) {
                 isInactive = true;
             }
 
         } catch (SQLException e) {
-               logger.log(Level.SEVERE, "Error de conexion con la base de datos",e);
+               LOGGER.log(Level.SEVERE, "Error de conexion con la base de datos",e);
         }
 
         return isInactive;

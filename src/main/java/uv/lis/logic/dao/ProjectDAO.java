@@ -9,14 +9,14 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
 import uv.lis.dataaccess.MySQLConnectionManager;
 import uv.lis.logic.contracts.IProjectDAO;
 import uv.lis.logic.dto.Project;
 
 
 public class ProjectDAO implements IProjectDAO{
-    private static final Logger logger = Logger.getLogger(ProjectDAO.class.getName());
+    private static final int NO_ROWS_AFFECTED = 0;
+    private static final Logger LOGGER = Logger.getLogger(ProjectDAO.class.getName());
 
     @Override
     public List<Project> getProjects() {
@@ -41,7 +41,7 @@ public class ProjectDAO implements IProjectDAO{
             }
             databaseConnection.close();
         } catch (SQLException e) {
-            logger.log(Level.SEVERE, "Error de conexion con la base de datos",e);
+            LOGGER.log(Level.SEVERE, "Error de conexion con la base de datos",e);
         }
         return projects;
     }
@@ -70,7 +70,7 @@ public class ProjectDAO implements IProjectDAO{
                 projects.add(project);
             }
         } catch (SQLException e) {
-            logger.log(Level.SEVERE, "Error de conexion con la base de datos",e);
+            LOGGER.log(Level.SEVERE, "Error de conexion con la base de datos",e);
         }
         return projects;
     }
@@ -79,9 +79,8 @@ public class ProjectDAO implements IProjectDAO{
     public boolean registerProject(Project project) {
         boolean isRegistered = false;
 
-        String projectQuery = "INSERT INTO Proyecto(idProyecto," +
-                              "nombre, descripcion, cupo, metodologiaProyecto, objetivoProyecto)" +
-                              "VALUES(?, ?, ?, ?, ?, ?);";
+        String projectQuery = "INSERT INTO Proyecto(idProyecto," 
+            + "nombre, descripcion, cupo, metodologiaProyecto, objetivoProyecto) VALUES(?, ?, ?, ?, ?, ?);";
 
         try (Connection databaseConnection = MySQLConnectionManager.getConnection();
             PreparedStatement preparedStatement = databaseConnection.prepareStatement(projectQuery)){
@@ -93,13 +92,12 @@ public class ProjectDAO implements IProjectDAO{
             preparedStatement.setString(5, project.getMethodology());
             preparedStatement.setString(6, project.getObjective());
             
-            if (preparedStatement.executeUpdate() > 0){
+            if (preparedStatement.executeUpdate() > NO_ROWS_AFFECTED){
                 isRegistered = true;
-                
             }
 
         } catch (SQLException e) {
-            logger.log(Level.SEVERE, "Error de conexion con la base de datos",e);
+            LOGGER.log(Level.SEVERE, "Error de conexion con la base de datos",e);
         }
         return isRegistered;
     }
@@ -107,9 +105,8 @@ public class ProjectDAO implements IProjectDAO{
     @Override
     public boolean modifyProjectById(Project project) {
         boolean isModified = false;
-        String projectQuery = "UPDATE Proyecto"+ 
-                              "SET nombre = ?, descripcion = ?, objetivoProyecto = ?" + 
-                              "WHERE idProyecto = ?;";
+        String projectQuery = "UPDATE Proyecto" + "SET nombre = ?, descripcion = ?, objetivoProyecto = ?" 
+            + "WHERE idProyecto = ?;";
 
         try (Connection databaseConnection = MySQLConnectionManager.getConnection();
             PreparedStatement preparedStatement = databaseConnection.prepareStatement(projectQuery)){
@@ -119,21 +116,36 @@ public class ProjectDAO implements IProjectDAO{
             preparedStatement.setString(3, project.getObjective());
             preparedStatement.setInt(4, project.getId());
             
-            if (preparedStatement.executeUpdate() > 0){
+            if (preparedStatement.executeUpdate() > NO_ROWS_AFFECTED){
                 isModified = true;
-
             }
         } catch (SQLException e) {
-            logger.log(Level.SEVERE, "Error de conexion con la base de datos",e);
+            LOGGER.log(Level.SEVERE, "Error de conexion con la base de datos",e);
         }
 
         return isModified;
     }
 
     @Override
-    public int inactivateProject(Project project) {
-        // TODO inactivateProject logic
-        throw new UnsupportedOperationException("Unimplemented method 'inactivateProject'");
+    public boolean inactivateProject(Project project) {
+        boolean isInactive = false;
+
+        String query = "UPDATE proyecto SET estado = 1 WHERE idProyecto = ?;";
+
+        try (Connection databaseConnection = MySQLConnectionManager.getConnection();
+             PreparedStatement preparedStatement = databaseConnection.prepareStatement(query)) {
+
+            preparedStatement.setInt(1, project.getId());
+
+            if (preparedStatement.executeUpdate() > NO_ROWS_AFFECTED) {
+                isInactive = true;
+            }
+
+        } catch (SQLException e) {
+               LOGGER.log(Level.SEVERE, "Error de conexion con la base de datos",e);
+        }
+
+        return isInactive;
     }
 
 }

@@ -1,15 +1,15 @@
 package uv.lis.logic.contracts;
 
 
+import java.sql.SQLException;
 import java.util.List;
-
 import uv.lis.logic.dto.SchoolPeriod;
 
+
 public interface ISchoolPeriodDAO {
+    List<SchoolPeriod> getSchoolPeriodbyId(int idSchoolPeriod) throws SQLException;
 
-    List<SchoolPeriod> getSchoolPeriodbyId(int idSchoolPeriod);
+    boolean registerSchoolPeriod(SchoolPeriod schoolPeriod) throws SQLException;
 
-    boolean registerSchoolPeriod(SchoolPeriod schoolPeriod);
-
-    boolean modifySchoolPeriod(SchoolPeriod schoolPeriod);   
+    boolean modifySchoolPeriod(SchoolPeriod schoolPeriod) throws SQLException;
 }

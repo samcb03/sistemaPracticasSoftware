@@ -1,15 +1,16 @@
 package uv.lis.logic.contracts;
 
+
+import java.sql.SQLException;
 import uv.lis.logic.dto.ProjectSupervisor;
 
+
 public interface IProjectSupervisorDAO {
+    ProjectSupervisor getProjectSupervisorById (int idProject) throws SQLException;
 
-    ProjectSupervisor getProjectSupervisorById (int idProject);
+    boolean registerProjectSupervisor(ProjectSupervisor projectSupervisor) throws SQLException;
 
-    boolean registerProjectSupervisor(ProjectSupervisor projectSupervisor);
+    boolean modifyProjectSupervisor(ProjectSupervisor projectSupervisor) throws SQLException;
 
-    boolean modifyProjectSupervisor(ProjectSupervisor projectSupervisor);
-
-    boolean inactiveProjectSupervisor(ProjectSupervisor projectSupervisor);
-
+    boolean inactiveProjectSupervisor(ProjectSupervisor projectSupervisor) throws SQLException;
 }
