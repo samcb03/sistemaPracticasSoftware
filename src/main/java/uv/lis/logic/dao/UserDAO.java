@@ -30,7 +30,6 @@ public class UserDAO implements IUserDAO{
             preparedStatement.setString(2, user.getLastName());
             preparedStatement.setString(3, user.getPassword());
 
-
             if (preparedStatement.executeUpdate() > NO_ROWS_AFFECTED) {
                 isRegistered = true;
             }

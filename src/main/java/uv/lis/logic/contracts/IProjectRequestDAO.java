@@ -19,5 +19,7 @@ public interface IProjectRequestDAO {
     boolean hasAlreadyRequested(String id, int idProject) throws SQLException;
 
     boolean validateProjectRequest(String idStudent, int idProject) throws SQLException;
+
+    boolean assignStudentToProject(String idStudent, int idProject) throws SQLException;
 }
 
