@@ -105,7 +105,7 @@ public class ProjectRequestDAO implements IProjectRequestDAO {
     }
 
     @Override
-    public boolean hasAlreadyRequested(String idStudent, int idProject) {
+    public boolean hasAlreadyRequested(String idStudent, int idProject) throws SQLException {
         boolean hasRequested = false;
         String query = "SELECT COUNT(*) as total FROM Solicita_Proyecto WHERE matricula = ? AND idProyecto = ?;";
 
@@ -122,13 +122,14 @@ public class ProjectRequestDAO implements IProjectRequestDAO {
             }
         } catch (SQLException e) {
             LOGGER.log(Level.SEVERE, "Error al verificar solicitud existente", e);
+            throw e;
         }
 
         return hasRequested;
     }
 
     @Override
-    public boolean hasAvailableCapacity(int idProject) {
+    public boolean hasAvailableCapacity(int idProject) throws SQLException {
         boolean hasCapacity = false;
         String query = "SELECT p.cupo, COUNT(sp.idStudent) as solicitudes FROM Proyecto p "
             + "LEFT JOIN Solicita_Proyecto sp ON p.idProject = sp.idProject WHERE p.idProject = ? "
@@ -148,6 +149,7 @@ public class ProjectRequestDAO implements IProjectRequestDAO {
             }
         } catch (SQLException e) {
             LOGGER.log(Level.SEVERE, "Error al verificar cupo del proyecto", e);
+            throw e;
         }
         
         return hasCapacity;
@@ -185,13 +187,13 @@ public class ProjectRequestDAO implements IProjectRequestDAO {
         try {
             if (getActiveRequestCountByStudentId(idStudent) >= MAX_REQUESTS) {
                 LOGGER.log(Level.WARNING, "El practicante {0} ya tiene {1} solicitudes activas", 
-                        new Object[]{idStudent, MAX_REQUESTS});
+                    new Object[]{idStudent, MAX_REQUESTS});
                 isValid = false;
             }
 
             if (hasAlreadyRequested(idStudent, idProject)) {
                 LOGGER.log(Level.WARNING, "El practicante {0} ya solicitó el proyecto {1}", 
-                        new Object[]{idStudent, idProject});
+                    new Object[]{idStudent, idProject});
                 isValid = false;
             }
 
@@ -205,5 +207,28 @@ public class ProjectRequestDAO implements IProjectRequestDAO {
         } 
         return isValid;
     }
+
+    @Override
+    public boolean assignStudentToProject(String idStudent, int idProject) {
+        boolean isAssigned = false;
+        String query = "UPDATE Solicita_Proyecto SET estatus = TRUE WHERE idStudent = ? AND idProject = ?;";
+
+        try (Connection databaseConnection = MySQLConnectionManager.getConnection();
+             PreparedStatement preparedStatement = databaseConnection.prepareStatement(query)) {
+            
+            preparedStatement.setString(1, idStudent);
+            preparedStatement.setInt(2, idProject);
+
+            if (preparedStatement.executeUpdate() > NO_ROWS_AFFECTED) {
+                isAssigned = true;
+                LOGGER.log(Level.INFO, "Practicante {0} asignado al proyecto {1} exitosamente", 
+                    new Object[]{idStudent, idProject});
+            }
+        } catch (SQLException e) {
+            LOGGER.log(Level.SEVERE, "Error al asignar practicante al proyecto", e);
+        }
+
+        return isAssigned;
+    } 
     
 }
