@@ -5,21 +5,20 @@ import java.util.Date;
 
 
 public class Student extends User {
-    private String matricula;
+    private String idStudent;
     private Date dateOfBirth;
     private int completedHours;
-    private Gender gender;
+    private String gender;
     private boolean indigenousLanguage;
     private String autoevaluation;
-
     public Student(){
 
     }
 
-    public Student(int idUser, String firstName, String lastName, String password, String matricula, Date dateOfBirth, 
-            int completedHours, Gender gender, boolean indigenousLanguage, String autoevaluation) {
+    public Student(int idUser, String firstName, String lastName, String password, String idStudent, Date dateOfBirth, 
+            int completedHours, String gender, boolean indigenousLanguage, String autoevaluation) {
         super(idUser, firstName, lastName, password);
-        this.matricula = matricula;
+        this.idStudent = idStudent;
         this.dateOfBirth = dateOfBirth;
         this.completedHours = completedHours;
         this.gender = gender;
@@ -27,12 +26,12 @@ public class Student extends User {
         this.autoevaluation = autoevaluation;
     }
 
-    public String getMatricula() {
-        return matricula;
+    public String getIdStudent() {
+        return idStudent;
     }
 
-    public void setMatricula(String matricula) {
-        this.matricula = matricula;
+    public void setIdStudent(String idStudent) {
+        this.idStudent = idStudent;
     }
 
     public Date getDateOfBirth() {
@@ -51,11 +50,11 @@ public class Student extends User {
         this.completedHours = completedHours;
     }
 
-    public Gender getGender() {
+    public String getGender() {
         return gender;
     }
 
-    public void setGender(Gender gender) {
+    public void setGender(String gender) {
         this.gender = gender;
     }
 
@@ -73,11 +72,5 @@ public class Student extends User {
 
     public void setAutoevaluation(String autoevaluation) {
         this.autoevaluation = autoevaluation;
-    }
-
-    public enum Gender {
-        MALE,
-        FEMALE,
-        OTHER
     }
 }

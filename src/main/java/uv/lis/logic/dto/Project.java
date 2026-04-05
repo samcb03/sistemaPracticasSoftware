@@ -8,13 +8,13 @@ public class Project {
     private int capacity;
     private String objective;
     private String description;
+    private int counter = 0;
     
     public Project() {
     }
 
-    public Project(int id, String name, String methodology, int capacity, 
-            String objective, String description) {
-        this.id = id;
+    public Project(String name, String methodology, int capacity, String objective, String description) {
+        this.id = generateId();
         this.name = name;
         this.methodology = methodology;
         this.capacity = capacity;
@@ -69,4 +69,8 @@ public class Project {
     public void setDescription(String description) {
         this.description = description;
     }  
+
+    private int generateId() {
+        return ++counter;
+    }
 }

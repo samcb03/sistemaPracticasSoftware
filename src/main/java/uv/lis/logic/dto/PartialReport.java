@@ -1,25 +1,25 @@
 package uv.lis.logic.dto;
 
 public class PartialReport extends Report {
-    private boolean isMensual;
+    private boolean isMonthly;
 
     public PartialReport(){
     }
 
-public PartialReport(String observation, String dueDate, int idReport, String matricula, boolean isMensual) {
+public PartialReport(String observation, String dueDate, int idReport, String matricula, boolean isMonthly) {
         super(observation, dueDate, idReport, matricula);
-        this.isMensual = isMensual;
+        this.isMonthly = isMonthly;
     }
 
-    public PartialReport(boolean isMensual) {
-        this.isMensual = isMensual;
+    public PartialReport(boolean isMonthly) {
+        this.isMonthly = isMonthly;
     }
 
-    public boolean getIsMensual() {
-        return isMensual;
+    public boolean getIsMonthly() {
+        return isMonthly;
     }
 
-    public void setIsMensual(boolean isMensual) {
-        this.isMensual = isMensual;
+    public void setIsMonthly(boolean isMonthly) {
+        this.isMonthly = isMonthly;
     }
 }

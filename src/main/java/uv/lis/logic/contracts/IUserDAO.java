@@ -17,13 +17,15 @@ public interface IUserDAO {
 
     boolean modifyProfessor(Professor professor) throws SQLException;
 
-    boolean inactiveProfessor(Professor professor) throws SQLException;
+    boolean inactivateProfessor(Professor professor) throws SQLException;
 
-    Student getStudentById(int idStudent) throws SQLException;
+    Student getStudentById(String idStudent) throws SQLException;
 
     boolean registerStudent(Student student) throws SQLException;
 
     boolean modifyStudent(Student student) throws SQLException;
 
-    boolean inactiveStudent(Student student) throws SQLException;
+    boolean inactivateStudent(Student student) throws SQLException;
+
+    String getUserType(User user) throws SQLException;
 }

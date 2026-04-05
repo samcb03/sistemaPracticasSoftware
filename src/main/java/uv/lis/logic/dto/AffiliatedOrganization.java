@@ -10,14 +10,15 @@ public class AffiliatedOrganization {
     private String phoneNumber;
     private int numberOfDirectUsers;
     private int numberOfIndirectUsers;
+    private int counter = 0;
 
     public AffiliatedOrganization(){
         
     }
    
-    public AffiliatedOrganization(int id, String name, String city,
+    public AffiliatedOrganization(String name, String city,
             String state, String email, String phoneNumber, int numberOfDirectUsers, int numberOfIndirectUsers) {
-        this.id = id;
+        this.id = generateId();
         this.name = name;
         this.city = city;
         this.state = state;
@@ -90,4 +91,8 @@ public class AffiliatedOrganization {
     public void setNumberOfIndirectUsers(int numberOfIndirectUsers) {
         this.numberOfIndirectUsers = numberOfIndirectUsers;
     } 
+
+    private int generateId() {
+        return counter++;
+    }
 }
