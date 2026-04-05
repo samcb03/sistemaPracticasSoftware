@@ -65,13 +65,13 @@ public class ReportDAO implements IReportDAO{
                         report.setObservation(resultSet.getString("observaciones"));
                         report.setDueDate(resultSet.getString("fechaEntrega"));
                         report.setMatricula(resultSet.getString("matricula"));
-                        report.setIsMensual(false);
+                        report.setIsMonthly(false);
 
                         String tipo = resultSet.getString("tipo");
                         if (tipo != null && tipo.equalsIgnoreCase("MENSUAL")) {
-                            report.setIsMensual(true);
+                            report.setIsMonthly(true);
                         } else {
-                            report.setIsMensual(false);
+                            report.setIsMonthly(false);
                         }
                     }
                 }
@@ -94,7 +94,7 @@ public class ReportDAO implements IReportDAO{
                 preparedStatement.setString(2, partialReport.getDueDate());
                 preparedStatement.setString(3, partialReport.getMatricula());
 
-                if(partialReport.getIsMensual()) {
+                if(partialReport.getIsMonthly()) {
                     preparedStatement.setString(4, "MENSUAL");
                 } else {
                     preparedStatement.setString(4, "PARCIAL");
@@ -122,7 +122,7 @@ public class ReportDAO implements IReportDAO{
                 preparedStatement.setString(2,partialReport.getDueDate());
                 preparedStatement.setString(3, partialReport.getMatricula());
 
-                if(partialReport.getIsMensual()) {
+                if(partialReport.getIsMonthly()) {
                     preparedStatement.setString(4,"MENSUAL");
                 } else {
                     preparedStatement.setString(4,"PARCIAL");
@@ -155,8 +155,8 @@ public class ReportDAO implements IReportDAO{
                     if(resultSet.next()) {
                         report = new FinalReport();
                         report.setId(resultSet.getInt("idReporte"));
-                        report.setPorcentajeAvance(resultSet.getInt("PorcentajeAvance"));
-                        report.setResultadoEntregable(resultSet.getString("ResultadoEntregable"));
+                        report.setAdvancePercentage(resultSet.getInt("PorcentajeAvance"));
+                        report.setResult(resultSet.getString("ResultadoEntregable"));
                     }
                 }
             } catch (SQLException e) {
@@ -173,8 +173,8 @@ public class ReportDAO implements IReportDAO{
 
         try(Connection databaseConnection = MySQLConnectionManager.getConnection();
             PreparedStatement preparedStatement = databaseConnection.prepareStatement(finalReportQuery)) {
-                preparedStatement.setInt(1, finalReport.getPorcentajeAvance());
-                preparedStatement.setString(2,finalReport.getResultadoEntregable());
+                preparedStatement.setInt(1, finalReport.getAdvancePercentage());
+                preparedStatement.setString(2,finalReport.getResult());
 
             if (preparedStatement.executeUpdate() > NO_ROWS_AFFECTED) {
                 isRegistered = true;
@@ -194,8 +194,8 @@ public class ReportDAO implements IReportDAO{
 
         try (Connection databaseConnection = MySQLConnectionManager.getConnection();
             PreparedStatement preparedStatement = databaseConnection.prepareStatement(finalReportQuery)) {
-                preparedStatement.setInt(1, finalReport.getPorcentajeAvance());
-                preparedStatement.setString(2,finalReport.getResultadoEntregable());
+                preparedStatement.setInt(1, finalReport.getAdvancePercentage());
+                preparedStatement.setString(2,finalReport.getResult());
                 preparedStatement.setInt(3, finalReport.getId());
 
                 if (preparedStatement.executeUpdate() > NO_ROWS_AFFECTED) {

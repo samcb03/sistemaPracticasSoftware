@@ -115,7 +115,7 @@ public class AffiliatedOrganizationDAO implements IAffiliatedOrganizationDAO{
     }
 
     @Override
-    public boolean inactiveAffiliatedOrganization(AffiliatedOrganization affiliatedOrganization) {
+    public boolean inactivateAffiliatedOrganization(AffiliatedOrganization affiliatedOrganization) {
         boolean isInactive = false;
 
         String query = "UPDATE organizacionVinculada SET estado = '1' WHERE idOrganizacion = ?;";

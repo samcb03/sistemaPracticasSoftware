@@ -12,5 +12,5 @@ public interface IAffiliatedOrganizationDAO {
 
     boolean modifyAffiliatedOrganization(AffiliatedOrganization affiliatedOrganization) throws SQLException;
 
-    boolean inactiveAffiliatedOrganization(AffiliatedOrganization affiliatedOrganization) throws SQLException;
+    boolean inactivateAffiliatedOrganization(AffiliatedOrganization affiliatedOrganization) throws SQLException;
 }

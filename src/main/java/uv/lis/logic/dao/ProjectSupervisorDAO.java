@@ -102,7 +102,7 @@ public class ProjectSupervisorDAO implements IProjectSupervisorDAO {
     }
 
     @Override
-    public boolean inactiveProjectSupervisor(ProjectSupervisor projectSupervisor) {
+    public boolean inactivateProjectSupervisor(ProjectSupervisor projectSupervisor) {
         boolean isInactive = false;
 
         String query = "UPDATE responsableProyecto SET estado = '1' WHERE idResponsableProyecto = ?;";

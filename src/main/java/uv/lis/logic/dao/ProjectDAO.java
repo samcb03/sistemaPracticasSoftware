@@ -47,9 +47,8 @@ public class ProjectDAO implements IProjectDAO{
     }
 
     @Override
-    public List<Project> getProjectsById(int idProject) {
-        
-        List<Project> projects = new ArrayList<>();
+    public Project getProjectById(int idProject) {
+        Project project = new Project();
         String projectQuery = "SELECT * FROM Proyecto WHERE idProyecto = ?;";
 
         try (Connection databaseConnection = MySQLConnectionManager.getConnection();
@@ -58,21 +57,18 @@ public class ProjectDAO implements IProjectDAO{
             preparedStatement.setInt(1, idProject);
             ResultSet resultSet = preparedStatement.executeQuery();
             
-            while (resultSet.next()) {
-                Project project = new Project();
+            if (resultSet.next()) {
                 project.setId(resultSet.getInt("idProyecto"));
                 project.setName(resultSet.getString("nombre"));
                 project.setMethodology(resultSet.getString("metodologiaProyecto"));
                 project.setCapacity(resultSet.getInt("Cupo"));
                 project.setObjective(resultSet.getString("objetivoProyecto"));
                 project.setDescription(resultSet.getString("descripcion"));
-                
-                projects.add(project);
             }
         } catch (SQLException e) {
             LOGGER.log(Level.SEVERE, "Error de conexion con la base de datos",e);
         }
-        return projects;
+        return project;
     }
 
     @Override
@@ -103,7 +99,7 @@ public class ProjectDAO implements IProjectDAO{
     }
 
     @Override
-    public boolean modifyProjectById(Project project) {
+    public boolean modifyProject(Project project) {
         boolean isModified = false;
         String projectQuery = "UPDATE Proyecto" + "SET nombre = ?, descripcion = ?, objetivoProyecto = ?" 
             + "WHERE idProyecto = ?;";

@@ -12,5 +12,5 @@ public interface IProjectSupervisorDAO {
 
     boolean modifyProjectSupervisor(ProjectSupervisor projectSupervisor) throws SQLException;
 
-    boolean inactiveProjectSupervisor(ProjectSupervisor projectSupervisor) throws SQLException;
+    boolean inactivateProjectSupervisor(ProjectSupervisor projectSupervisor) throws SQLException;
 }

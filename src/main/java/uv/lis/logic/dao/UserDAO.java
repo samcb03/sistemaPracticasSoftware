@@ -133,7 +133,7 @@ public class UserDAO implements IUserDAO{
     }
 
     @Override
-    public boolean inactiveProfessor(Professor professor) {
+    public boolean inactivateProfessor(Professor professor) {
         boolean isInactived = false;
 
         String proffesorQuery = "UPDATE Profesor SET estado = 'Inactivo' WHERE numeroPersonal = ?;";
@@ -157,7 +157,7 @@ public class UserDAO implements IUserDAO{
     }
 
     @Override
-    public Student getStudentById(int idStudent) { 
+    public Student getStudentById(String idStudent) { 
         Student student = null;
 
         String query = "SELECT e.idUsuario, e.matricula, u.nombre, u.apellidos " 
@@ -166,17 +166,17 @@ public class UserDAO implements IUserDAO{
         try (Connection databaseConnection = MySQLConnectionManager.getConnection();
              PreparedStatement preparedStatement = databaseConnection.prepareStatement(query)) {
             
-            preparedStatement.setInt(1, idStudent);
+            preparedStatement.setString(1, idStudent);
             
             try (ResultSet rs = preparedStatement.executeQuery()) {
                 if (rs.next()) {
                     student = new Student();
-                    student.setId(idStudent);
-                    student.setMatricula(rs.getString("matricula")); 
+                    student.setIdStudent(rs.getString("matricula"));
                     student.setFirstName(rs.getString("nombre"));
                     student.setLastName(rs.getString("apellidos"));
                 }
-                LOGGER.log(Level.INFO, "Busqueda de responsable de proyecto con ID {0} exitosa.", student.getId());
+                LOGGER.log(Level.INFO, "Busqueda de responsable de proyecto con ID {0} exitosa.", 
+                    student.getId());
             }
         } catch (SQLException e) {
             LOGGER.log(Level.SEVERE, "Error de conexion con la base de datos",e);
@@ -195,7 +195,7 @@ public class UserDAO implements IUserDAO{
              PreparedStatement preparedStatement = databaseConnection.prepareStatement(studentQuery)) {
             
             preparedStatement.setInt(1, student.getId());
-            preparedStatement.setString(2, student.getMatricula()); 
+            preparedStatement.setString(2, student.getIdStudent()); 
 
             if (preparedStatement.executeUpdate() > NO_ROWS_AFFECTED) {
                 isRegistered = true;
@@ -220,14 +220,14 @@ public class UserDAO implements IUserDAO{
         try (Connection databaseConnection = MySQLConnectionManager.getConnection();
              PreparedStatement preparedStatement = databaseConnection.prepareStatement(studentQuery)) {
             
-            preparedStatement.setString(1, student.getMatricula());
+            preparedStatement.setString(1, student.getIdStudent());
             preparedStatement.setString(2, student.getFirstName());
             preparedStatement.setString(3, student.getLastName());
             preparedStatement.setInt(4, student.getId());
 
             if (preparedStatement.executeUpdate() > NO_ROWS_AFFECTED) {
                 isModified = true;
-                LOGGER.log(Level.INFO, "Modificacion de alumno con matricula exitosa.", student.getMatricula());
+                LOGGER.log(Level.INFO, "Modificacion de alumno con matricula exitosa.", student.getIdStudent());
             }
 
         } catch (SQLException e) {
@@ -238,7 +238,7 @@ public class UserDAO implements IUserDAO{
     }
 
     @Override
-    public boolean inactiveStudent(Student student) {
+    public boolean inactivateStudent(Student student) {
         boolean isInactive = false;
         
         String studentQuery = "UPDATE Estudiante SET estado = 1 WHERE idUsuario = ?;";
@@ -250,7 +250,7 @@ public class UserDAO implements IUserDAO{
 
             if (preparedStatement.executeUpdate() > NO_ROWS_AFFECTED) {
                 isInactive = true;
-                LOGGER.log(Level.INFO, "Inactivacion de alumno con matricula exitosa.", student.getMatricula());
+                LOGGER.log(Level.INFO, "Inactivacion de alumno con matricula exitosa.", student.getIdStudent());
             }
 
         } catch (SQLException e) {
@@ -258,5 +258,25 @@ public class UserDAO implements IUserDAO{
         }
 
         return isInactive;
+    }
+
+    @Override
+    public String getUserType(User user) {
+        /*try (Connection databaseConnection = MySQLConnectionManager.getConnection()) {
+            String query = "SELECT rol FROM Profesor p INNER JOIN Usuario u ON p.idUsuario = u.idUsuario WHERE u.idUsuario = ?;";
+            try (PreparedStatement preparedStatement = databaseConnection.prepareStatement(query)) {
+                preparedStatement.setInt(1, user.getId());
+                try (ResultSet resultSet = preparedStatement.executeQuery()) {
+                    if (resultSet.next()) {
+                        return resultSet.getString("rol");
+                    }
+                }
+            }
+        } catch (SQLException e) {
+            LOGGER.log(Level.SEVERE, "Error de conexion con la base de datos", e);
+        }
+        return null;*/
+        String userType = "Coordinador";
+        return userType;
     }
 }

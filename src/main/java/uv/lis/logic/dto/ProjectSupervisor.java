@@ -7,14 +7,14 @@ public class ProjectSupervisor {
     private String lastName;
     private String email;
     private int idAffiliatedOrganization;
+    private int counter = 0;
 
     public ProjectSupervisor(){
 
     }
     
-    public ProjectSupervisor(int id, String name, String lastName,
-            String email) {
-        this.id = id;
+    public ProjectSupervisor(String name, String lastName, String email) {
+        this.id = generateId();
         this.name = name;
         this.lastName = lastName;
         this.email = email;
@@ -58,5 +58,9 @@ public class ProjectSupervisor {
 
     public void setIdAffiliatedOrganization(int idAffiliatedOrganization) {
         this.idAffiliatedOrganization = idAffiliatedOrganization;
+    }
+
+    private int generateId() {
+        return counter++;
     }
 }
