@@ -21,18 +21,56 @@ import uv.lis.logic.dto.User;
 
 
 public class Main {
-    public static void main(String[] args) {
-        User currentUser = new User();
-        UserDAO userDAO = new UserDAO();
-        if(userDAO.getUserType(currentUser).equals("Profesor")) {
-            new Main().showProfessorMenu();
-        } else if (userDAO.getUserType(currentUser).equals("Coordinador")) {
-            new Main().showCoordinatorMenu();
-        } else if (userDAO.getUserType(currentUser).equals("Alumno")) {
-            new Main().showStudentMenu();
+public static void main(String[] args) {
+        Main app = new Main();
+
+        User currentUser = app.login();
+
+        if (currentUser != null) {
+            String userType = currentUser.getUserType();
+            System.out.println("\nAccediendo como: " + userType);
+
+            if ("Profesor".equals(userType)) {
+                app.showProfessorMenu();
+            } else if ("Coordinador".equals(userType)) {
+                app.showCoordinatorMenu();
+            } else if ("Estudiante".equals(userType) || "Alumno".equals(userType)) {
+                app.showStudentMenu();
+            } else {
+                System.out.println("Tipo de usuario no reconocido: " + userType);
+            }
         } else {
-            System.out.println("Tipo de usuario no reconocido");
+            System.out.println("Intentalo de nuevo");
         }
+    }
+
+    private User login() {
+        UserDAO userDAO = new UserDAO();
+        User loggedUser = null;
+        Scanner scanner = new Scanner(System.in);
+
+        int attempts = 0;
+        final int MAX_ATTEMPTS = 3; 
+
+        System.out.println("=== SISTEMA DE GESTIÓN DE PROYECTOS LIS ===");
+        System.out.println("Inicio de sesion\n");
+
+        while (loggedUser == null && attempts < MAX_ATTEMPTS) {
+            System.out.print("Matricula/No.Personal: ");
+            String identification = scanner.nextLine();
+
+            System.out.print("Contraseña: ");
+            String password = scanner.nextLine();
+
+            loggedUser = userDAO.authenticate(identification, password);
+
+            if (loggedUser == null) {
+                attempts++;
+                System.out.println("Identificador/Contraseña incorrectos. Intentos restantes: " + (MAX_ATTEMPTS - attempts) + "\n");
+            }
+        }
+        
+        return loggedUser; 
     }
 
     private void showProfessorMenu() {
@@ -44,6 +82,7 @@ public class Main {
             System.out.println("3. Salir");
 
             option = scanner.nextInt();
+            scanner.nextLine();
             switch (option) {
                 case 1:
                     System.out.println("Función no disponible por el momento");
@@ -349,6 +388,8 @@ public class Main {
             System.out.println("4. Salir");
 
             option = scanner.nextInt();
+            scanner.nextLine();
+
             switch (option) {
                 case 1:
                     ProjectRequestDAO requestDAO = new ProjectRequestDAO();
