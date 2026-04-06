@@ -3,6 +3,7 @@ package uv.lis.logic.dao;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -23,9 +24,9 @@ public class AutoevaluationDAO implements IAutoevaluationDAO {
     @Override
     public boolean registerAutoevaluation(Autoevaluation autoevaluation) {
     boolean isRegistered = false;
-    
-    String query = "INSERT INTO Autoevaluacion (matricula, participacionProductiva, " +
-        "conocimientoAplicado, confianzaEnActividades, interesEnActividades, " 
+
+    String query = "INSERT INTO Autoevaluacion (matricula, participacionProductiva, "
+        + "conocimientoAplicado, confianzaEnActividades, interesEnActividades, " 
         + "apoyoOrganizacional, conocimientoDeReglas, orientacionSupervisor, " 
         + "seguimientoEfectivo, alineacionCarrera, importanciaPracticas, " 
         + "puntuacionFinal) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);";
@@ -56,5 +57,26 @@ public class AutoevaluationDAO implements IAutoevaluationDAO {
     }
 
     return isRegistered;
+    }
+
+    @Override
+    public boolean existsByStudent(String studentId) {
+        boolean exists = false;
+
+        String query = "SELECT 1 FROM Autoevaluacion WHERE matricula = ? LIMIT 1";
+
+        try (Connection databaseConnection = connectionManager.getConnection();
+            PreparedStatement preparedStatement = databaseConnection.prepareStatement(query)) {
+
+            preparedStatement.setString(1, studentId);
+            ResultSet resultSet = preparedStatement.executeQuery();
+
+            exists = resultSet.next();
+
+        } catch (SQLException e) {
+            LOGGER.log(Level.SEVERE, "Error verificando la existencia de la autoevaluación", e);
+        }
+
+        return exists;
     }
 }

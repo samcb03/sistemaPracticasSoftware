@@ -1,38 +1,25 @@
 package uv.lis.logic.dto;
 
-
 public class Report {
-    protected int id;
-    protected String observation;
-    protected String dueDate;
-    protected String matricula;
-    private int counter = 0;
+
+    private int id;
+    private String description;
+    private String observations;
+    private String activity;
+    private String studentId;
 
     public Report() {
-    }
-    public Report(String observation, String dueDate, int id, String matricula) {
-        this.observation = observation;
-        this.dueDate = dueDate;
-        this.id = generateId();
-        this.matricula = matricula;
+        
     }
 
-    public String getObservation() {
-        return observation;
+    public Report(int id, String description, String observations, String activity, String studentId) {
+        this.id = id;
+        this.description = description;
+        this.observations = observations;
+        this.activity = activity;
+        this.studentId = studentId;
     }
-
-    public void setObservation(String observation) {
-        this.observation = observation;
-    }
-
-    public String getDueDate() {
-        return dueDate;
-    }
-
-    public void setDueDate(String dueDate) {
-        this.dueDate = dueDate;
-    }
-
+    
     public int getId() {
         return id;
     }
@@ -41,15 +28,35 @@ public class Report {
         this.id = id;
     }
 
-    public String getMatricula() {
-        return matricula;
+    public String getDescription() {
+        return description;
     }
 
-    public void setMatricula(String matricula) {
-        this.matricula = matricula;
+    public void setDescription(String description) {
+        this.description = description;
     }
 
-    private int generateId() {
-        return ++counter;
+    public String getObservations() {
+        return observations;
+    }
+
+    public void setObservations(String observations) {
+        this.observations = observations;
+    }
+
+    public String getActivity() {
+        return activity;
+    }
+
+    public void setActivity(String activity) {
+        this.activity = activity;
+    }
+
+    public String getStudentId() {
+        return studentId;
+    }
+
+    public void setStudentId(String studentId) {
+        this.studentId = studentId;
     }
 }

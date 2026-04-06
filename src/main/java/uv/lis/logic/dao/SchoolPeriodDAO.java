@@ -6,8 +6,6 @@ import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import uv.lis.dataaccess.MySQLConnectionManager;
@@ -25,8 +23,8 @@ public class SchoolPeriodDAO implements ISchoolPeriodDAO{
     }
 
     @Override
-    public List<SchoolPeriod> getSchoolPeriodbyId(int foundIdSchoolPeriod) {
-        List<SchoolPeriod> schoolPeriods = new ArrayList<>();
+    public SchoolPeriod getSchoolPeriodbyId(int foundIdSchoolPeriod) {
+        SchoolPeriod schoolPeriod = new SchoolPeriod();
         String schoolPeriodQuery = "SELECT * FROM PeriodoEscolar WHERE idPeriodoEscolar = ?;";
 
         try (Connection databaseConnection = connectionManager.getConnection();
@@ -37,21 +35,25 @@ public class SchoolPeriodDAO implements ISchoolPeriodDAO{
             
             if (resultSet.next()) {
                 int idSchoolPeriod = resultSet.getInt("idPeriodoEscolar");
-                Date startDate = resultSet.getDate("Fecha de inicio");
-                Date enDate = resultSet.getDate("Fecha de fin");
-                schoolPeriods.add(new SchoolPeriod(idSchoolPeriod, startDate, enDate));
+                Date startDate = resultSet.getDate("FechaInicio");
+                Date enDate = resultSet.getDate("FechaFin");
+                
+                schoolPeriod.setId(idSchoolPeriod);
+                schoolPeriod.setStartDate(startDate);
+                schoolPeriod.setEndDate(enDate);
             }
             
         } catch (SQLException e) {
             logger.log(Level.SEVERE, "Error de conexion con la base de datos",e);
         }
-        return schoolPeriods;
+        return schoolPeriod;
     }
 
     @Override
     public boolean registerSchoolPeriod(SchoolPeriod schoolPeriod) {
         boolean isRegistered = false;
-        String schoolPeriodQuery = "INSERT INTO PeriodoEscolar(idPeriodoEscolar,FechaInicio, FechaFin) VALUES(?,?);";
+        String schoolPeriodQuery = "INSERT INTO PeriodoEscolar(idPeriodoEscolar,FechaInicio, FechaFin) " 
+            + "VALUES(?, ?, ?);";
 
         try (Connection databaseConnection = connectionManager.getConnection();
             PreparedStatement preparedStatement = databaseConnection.prepareStatement(schoolPeriodQuery)){
@@ -72,7 +74,7 @@ public class SchoolPeriodDAO implements ISchoolPeriodDAO{
     @Override
     public boolean modifySchoolPeriod(SchoolPeriod schoolPeriod) {
         boolean isModified = false;
-        String schoolPeriodQuery = "UPDATE PeriodoEscolar" 
+        String schoolPeriodQuery = "UPDATE PeriodoEscolar " 
             + "SET FechaInicio = ? , FechaFin = ? WHERE idPeriodoEscolar = ?;";
 
         try (Connection databaseConnection = connectionManager.getConnection();
@@ -89,5 +91,24 @@ public class SchoolPeriodDAO implements ISchoolPeriodDAO{
             logger.log(Level.SEVERE, "Error de conexion con la base de datos",e);
         }
         return isModified;
+    }
+
+    @Override
+    public boolean existsSchoolPeriod(int idPeriod) {
+        String query = "SELECT 1 FROM PeriodoEscolar WHERE idPeriodoEscolar = ?";
+
+        try (Connection conn = connectionManager.getConnection();
+            PreparedStatement ps = conn.prepareStatement(query)) {
+
+            ps.setInt(1, idPeriod);
+            ResultSet rs = ps.executeQuery();
+
+            return rs.next(); 
+
+        } catch (SQLException e) {
+            logger.log(Level.SEVERE, "Error validando periodo escolar", e);
+        }
+
+        return false;
     }
 }

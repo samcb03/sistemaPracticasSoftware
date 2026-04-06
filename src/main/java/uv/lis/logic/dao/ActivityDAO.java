@@ -35,10 +35,10 @@ public class ActivityDAO implements IActivityDAO {
             
             while (resultSet.next()) {
                 int idActivity = resultSet.getInt("idActividad");
-                String activityName = resultSet.getString("Nombre actividad");
-                String activityDescription = resultSet.getString("Descripcion");
-                Date startDate = resultSet.getDate("Fecha de inicio");
-                Date endDate = resultSet.getDate("Fecha de fin");
+                String activityName = resultSet.getString("nombreActividad");
+                String activityDescription = resultSet.getString("descripcionActividad");
+                Date startDate = resultSet.getDate("FechaInicio");
+                Date endDate = resultSet.getDate("FechaFin");
                 
                 activities.add(new Activity(idActivity, activityName, activityDescription, startDate, endDate));
             }
@@ -76,8 +76,8 @@ public class ActivityDAO implements IActivityDAO {
     @Override
     public boolean registerActivity(Activity activity) {
         boolean isRegistered = false;
-        String activityQuery = "INSERT INTO Actividad(idActividad, descripcionActividad, FechaInicio, FechaFinal)" 
-            + "VALUES(?, ?, ?, ?, ?);";
+        String activityQuery = "INSERT INTO Actividad(idActividad, nombreActividad, descripcionActividad, FechaInicio, " 
+            + "FechaFinal) VALUES(?, ?, ?, ?, ?);";
 
         if (activity == null) {
             isRegistered = false;

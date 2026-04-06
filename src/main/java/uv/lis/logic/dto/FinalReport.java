@@ -13,9 +13,9 @@ public class FinalReport extends Report {
         this.result = result;
     }
 
-    public FinalReport(String observation, String dueDate, int idReport, String idStudent, int advancePercentage, 
-        String result) {
-        super(observation, dueDate, idReport, idStudent); 
+    public FinalReport(String observations, String dueDate, int id, String studentId, int advancePercentage, 
+        String result, String description, String activity) {
+        super(id, description, observations, activity, studentId); 
         this.advancePercentage = advancePercentage;
         this.result = result;
     }

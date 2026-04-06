@@ -27,7 +27,7 @@ public class ProjectRequestDAO implements IProjectRequestDAO {
     @Override
     public int getActiveRequestCountByStudentId(String idStudent) throws SQLException {
         int count = 0;
-        String query = "SELECT COUNT(*) as total FROM Solicita_Proyecto WHERE idStudent = ?;";
+        String query = "SELECT COUNT(*) as total FROM Solicita_Proyecto WHERE matricula = ?;";
 
         try (Connection databaseConnection = connectionManager.getConnection();
             PreparedStatement preparedStatement = databaseConnection.prepareStatement(query)) {
@@ -66,7 +66,7 @@ public class ProjectRequestDAO implements IProjectRequestDAO {
                     project.setDescription(resultSet.getString("descripcion"));
                     project.setCapacity(resultSet.getInt("cupo"));
                     project.setMethodology(resultSet.getString("metodologiaProyecto"));
-                    project.setObjective(resultSet.getString("objetivoProyecto"));
+                    project.setObjective(resultSet.getString("objetivo"));
                     
                     projects.add(project);
                 }
@@ -136,9 +136,9 @@ public class ProjectRequestDAO implements IProjectRequestDAO {
     @Override
     public boolean hasAvailableCapacity(int idProject) throws SQLException {
         boolean hasCapacity = false;
-        String query = "SELECT p.cupo, COUNT(sp.idStudent) as solicitudes FROM Proyecto p "
-            + "LEFT JOIN Solicita_Proyecto sp ON p.idProject = sp.idProject WHERE p.idProject = ? "
-            + "GROUP BY p.idProject, p.cupo;";
+        String query = "SELECT p.cupo, COUNT(sp.matricula) as solicitudes FROM Proyecto p "
+            + "LEFT JOIN Solicita_Proyecto sp ON p.idProyecto = sp.idProyecto WHERE p.idProyecto = ? "
+            + "GROUP BY p.idProyecto, p.cupo;";
 
         try (Connection databaseConnection = connectionManager.getConnection();
              PreparedStatement preparedStatement = databaseConnection.prepareStatement(query)) {
@@ -165,7 +165,7 @@ public class ProjectRequestDAO implements IProjectRequestDAO {
         boolean isRegistered = false;
         
         if (validateProjectRequest(idStudent, idProject)) {
-            String query = "INSERT INTO Solicita_Proyecto (idProject, idStudent, estatus) VALUES (?, ?, FALSE);";
+            String query = "INSERT INTO Solicita_Proyecto (idProyecto, matricula, estatus) VALUES (?, ?, FALSE);";
 
             try (Connection databaseConnection = connectionManager.getConnection();
                 PreparedStatement preparedStatement = databaseConnection.prepareStatement(query)) {
@@ -216,7 +216,7 @@ public class ProjectRequestDAO implements IProjectRequestDAO {
     @Override
     public boolean assignStudentToProject(String idStudent, int idProject) {
         boolean isAssigned = false;
-        String query = "UPDATE Solicita_Proyecto SET estatus = TRUE WHERE idStudent = ? AND idProject = ?;";
+        String query = "UPDATE Solicita_Proyecto SET estatus = TRUE WHERE matricula = ? AND idProyecto = ?;";
 
         try (Connection databaseConnection = connectionManager.getConnection();
              PreparedStatement preparedStatement = databaseConnection.prepareStatement(query)) {

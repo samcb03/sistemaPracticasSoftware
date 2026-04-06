@@ -1,6 +1,5 @@
 package uv.lis;
 
-
 import java.sql.Date;
 import java.util.Scanner;
 
@@ -11,66 +10,52 @@ import uv.lis.logic.dao.ProjectSupervisorDAO;
 import uv.lis.logic.dao.ReportDAO;
 import uv.lis.logic.dao.UserDAO;
 import uv.lis.logic.dto.AffiliatedOrganization;
+import uv.lis.logic.dto.Autoevaluation;
 import uv.lis.logic.dto.FinalReport;
+import uv.lis.logic.dto.MonthlyReport;
 import uv.lis.logic.dto.PartialReport;
 import uv.lis.logic.dto.Project;
 import uv.lis.logic.dto.ProjectSupervisor;
 import uv.lis.logic.dto.Student;
 import uv.lis.logic.dto.User;
-
-
+import uv.lis.logic.services.AutoevaluationService;
 
 public class Main {
-public static void main(String[] args) {
-        Main app = new Main();
-
-        User currentUser = app.login();
-
-        if (currentUser != null) {
-            String userType = currentUser.getUserType();
-            System.out.println("\nAccediendo como: " + userType);
-
-            if ("Profesor".equals(userType)) {
-                app.showProfessorMenu();
-            } else if ("Coordinador".equals(userType)) {
-                app.showCoordinatorMenu();
-            } else if ("Estudiante".equals(userType) || "Alumno".equals(userType)) {
-                app.showStudentMenu();
-            } else {
-                System.out.println("Tipo de usuario no reconocido: " + userType);
-            }
-        } else {
-            System.out.println("Intentalo de nuevo");
-        }
-    }
-
-    private User login() {
-        UserDAO userDAO = new UserDAO();
-        User loggedUser = null;
+    public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
+        Main app = new Main();
+        UserDAO userDAO = new UserDAO();
 
-        int attempts = 0;
-        final int MAX_ATTEMPTS = 3; 
+        System.out.print("Identificador: ");
+        String id = scanner.nextLine();
 
-        System.out.println("=== SISTEMA DE GESTIÓN DE PROYECTOS LIS ===");
-        System.out.println("Inicio de sesion\n");
+        System.out.print("Contraseña: ");
+        String password = scanner.nextLine();
 
-        while (loggedUser == null && attempts < MAX_ATTEMPTS) {
-            System.out.print("Matricula/No.Personal: ");
-            String identification = scanner.nextLine();
+        User user = userDAO.authenticate(id, password);
 
-            System.out.print("Contraseña: ");
-            String password = scanner.nextLine();
-
-            loggedUser = userDAO.authenticate(identification, password);
-
-            if (loggedUser == null) {
-                attempts++;
-                System.out.println("Identificador/Contraseña incorrectos. Intentos restantes: " + (MAX_ATTEMPTS - attempts) + "\n");
-            }
+        if (user == null) {
+            System.out.println("Credenciales incorrectas");
+            return;
         }
-        
-        return loggedUser; 
+        switch (user.getUserType()) {
+
+            case "ADMIN":
+                //app.showAdminMenu();
+                break;
+
+            case "COORDINADOR":
+                app.showCoordinatorMenu();
+                break;
+
+            case "PROFESOR":
+                app.showProfessorMenu();
+                break;
+
+            case "ALUMNO":
+                app.showStudentMenu();
+                break;
+        }
     }
 
     private void showProfessorMenu() {
@@ -95,8 +80,8 @@ public static void main(String[] args) {
             }
         } while (option != 3);
 
-        scanner.close();   
-    }   
+        scanner.close();
+    }
 
     private void showCoordinatorMenu() {
         UserDAO userDAO = new UserDAO();
@@ -209,7 +194,7 @@ public static void main(String[] args) {
                     int directUsers = scanner.nextInt();
                     System.out.println("Número de usuarios indirectos: ");
                     int indirectUsers = scanner.nextInt();
-                    
+
                     organization.setName(organizationName);
                     organization.setCity(city);
                     organization.setState(state);
@@ -224,8 +209,8 @@ public static void main(String[] args) {
                     AffiliatedOrganizationDAO organizationSearcherDAO = new AffiliatedOrganizationDAO();
                     System.out.println("Escriba el numero de identificacion de la organizacion a consultar: ");
                     int searchOrganizationId = scanner.nextInt();
-                    AffiliatedOrganization foundOrganization 
-                        = organizationSearcherDAO.getAffiliatedOrganizationById(searchOrganizationId);
+                    AffiliatedOrganization foundOrganization = organizationSearcherDAO
+                            .getAffiliatedOrganizationById(searchOrganizationId);
                     if (foundOrganization != null) {
                         System.out.println("Organización encontrada:");
                         System.out.println("Nombre: " + foundOrganization.getName());
@@ -233,8 +218,10 @@ public static void main(String[] args) {
                         System.out.println("Estado: " + foundOrganization.getState());
                         System.out.println("Correo electrónico: " + foundOrganization.getEmail());
                         System.out.println("Número telefónico: " + foundOrganization.getPhoneNumber());
-                        System.out.println("Número de usuarios directos: " + foundOrganization.getNumberOfDirectUsers());
-                        System.out.println("Número de usuarios indirectos: " + foundOrganization.getNumberOfIndirectUsers());
+                        System.out
+                                .println("Número de usuarios directos: " + foundOrganization.getNumberOfDirectUsers());
+                        System.out.println(
+                                "Número de usuarios indirectos: " + foundOrganization.getNumberOfIndirectUsers());
                         System.out.println("\n1. Actualizar Organizacion");
                         System.out.println("2. Inactivar organizacion");
                         System.out.println("3. Regresar al menú");
@@ -253,7 +240,7 @@ public static void main(String[] args) {
                         }
                     } else {
                         System.out.println("Organización no encontrada.");
-                    } 
+                    }
                     break;
                 case 5:
                     ProjectSupervisorDAO supervisorDAO = new ProjectSupervisorDAO();
@@ -274,7 +261,8 @@ public static void main(String[] args) {
                     ProjectSupervisorDAO supervisorSearcherDAO = new ProjectSupervisorDAO();
                     System.out.println("Escriba el numero de identificacion del supervisor a consultar: ");
                     int searchSupervisorId = scanner.nextInt();
-                    ProjectSupervisor foundSupervisor = supervisorSearcherDAO.getProjectSupervisorById(searchSupervisorId);
+                    ProjectSupervisor foundSupervisor = supervisorSearcherDAO
+                            .getProjectSupervisorById(searchSupervisorId);
                     if (foundSupervisor != null) {
                         System.out.println("Supervisor encontrado:");
                         System.out.println("Nombre: " + foundSupervisor.getName());
@@ -320,7 +308,7 @@ public static void main(String[] args) {
                     project.setDescription(description);
                     projectDAO.registerProject(project);
                     break;
-                case 8: 
+                case 8:
                     ProjectDAO projectSearcherDAO = new ProjectDAO();
                     System.out.println("Escriba el numero de identificacion del proyecto a consultar: ");
                     int searchProjectId = scanner.nextInt();
@@ -375,7 +363,7 @@ public static void main(String[] args) {
                     System.out.println("Opción no válida");
             }
         } while (option != 10);
-        scanner.close(); 
+        scanner.close();
     }
 
     private void showStudentMenu() {
@@ -402,51 +390,167 @@ public static void main(String[] args) {
                     break;
                 case 2:
                     ReportDAO reportDAO = new ReportDAO();
+
                     System.out.println("Tipo de reporte a generar: ");
                     System.out.println("1. Reporte parcial");
-                    System.out.println("2. Reporte final");
+                    System.out.println("2. Reporte mensual");
+                    System.out.println("3. Reporte final");
+
                     int reportType = scanner.nextInt();
+                    scanner.nextLine(); // limpiar buffer
+
+                    System.out.println("ID del reporte:");
+                    int id = scanner.nextInt();
+                    scanner.nextLine();
+
+                    System.out.println("Descripción:");
+                    String description = scanner.nextLine();
+
+                    System.out.println("Observaciones:");
+                    String observations = scanner.nextLine();
+
+                    System.out.println("Actividad:");
+                    String activity = scanner.nextLine();
+
+                    System.out.println("Matrícula del estudiante:");
+                    String idStudentReport = scanner.nextLine();
+
                     if (reportType == 1) {
+                        System.out.println("Tiempo planeado:");
+                        int plannedTime = scanner.nextInt();
+
+                        System.out.println("Tiempo real:");
+                        int realTime = scanner.nextInt();
+
                         PartialReport partialReport = new PartialReport();
-                        System.out.println("Observaciones: ");
-                        String observation = scanner.nextLine();
-                        System.out.println("Fecha límite (YYYY-MM-DD): ");
-                        String dueDate = scanner.nextLine();
-                        System.out.println("Es mensual? (true/false): ");
-                        boolean monthly = scanner.nextBoolean();
-                        partialReport.setObservation(observation);
-                        partialReport.setDueDate(dueDate);
-                        partialReport.setIsMonthly(monthly);
+                        partialReport.setId(id);
+                        partialReport.setDescription(description);
+                        partialReport.setObservations(observations);
+                        partialReport.setActivity(activity);
+                        partialReport.setStudentId(idStudentReport);
+                        partialReport.setPlannedTime(plannedTime);
+                        partialReport.setRealTime(realTime);
 
-                        reportDAO.registerPartialReport(partialReport);
+                        if (reportDAO.registerPartialReport(partialReport)) {
+                            System.out.println("Reporte parcial registrado correctamente");
+                        } else {
+                            System.out.println("Error al registrar reporte parcial");
+                        }
+
                     } else if (reportType == 2) {
-                        FinalReport finalReport = new FinalReport();
-                        System.out.println("Observaciones: ");
-                        String observation = scanner.nextLine();
-                        System.out.println("Fecha límite (YYYY-MM-DD): ");
-                        String dueDate = scanner.nextLine();
-                        System.out.println("Porcentaje de avance: ");
+                        System.out.println("Mes:");
+                        String month = scanner.nextLine();
+
+                        System.out.println("Horas reportadas:");
+                        int hours = scanner.nextInt();
+
+                        MonthlyReport monthlyReport = new MonthlyReport();
+                        monthlyReport.setId(id);
+                        monthlyReport.setDescription(description);
+                        monthlyReport.setObservations(observations);
+                        monthlyReport.setActivity(activity);
+                        monthlyReport.setStudentId(idStudentReport);
+                        monthlyReport.setMonth(month);
+                        monthlyReport.setReportedHours(hours);
+
+                        if (reportDAO.registerMonthlyReport(monthlyReport)) {
+                            System.out.println("Reporte mensual registrado correctamente");
+                        } else {
+                            System.out.println("Error al registrar reporte mensual");
+                        }
+
+                    } else if (reportType == 3) {
+                        System.out.println("Porcentaje de avance:");
                         int porcentajeAvance = scanner.nextInt();
-                        System.out.println("Resultado del entregable: ");
-                        String resultadoEntregable = scanner.nextLine();
+                        scanner.nextLine();
 
-                        finalReport.setObservation(observation);
-                        finalReport.setDueDate(dueDate);
+                        System.out.println("Resultado del entregable:");
+                        String resultado = scanner.nextLine();
+
+                        FinalReport finalReport = new FinalReport();
+                        finalReport.setId(id);
+                        finalReport.setDescription(description);
+                        finalReport.setObservations(observations);
+                        finalReport.setActivity(activity);
+                        finalReport.setStudentId(idStudentReport);
                         finalReport.setAdvancePercentage(porcentajeAvance);
-                        finalReport.setResult(resultadoEntregable);
+                        finalReport.setResult(resultado);
 
-                        reportDAO.registerFinalReport(finalReport);
+                        if (reportDAO.registerFinalReport(finalReport)) {
+                            System.out.println("Reporte final registrado correctamente");
+                        } else {
+                            System.out.println("Error al registrar reporte final");
+                        }
+
                     } else {
                         System.out.println("Opción no válida");
                     }
+
                     break;
                 case 3:
+                    AutoevaluationService autoevaluationService = new AutoevaluationService();
+
+                    scanner.nextLine();
+
+                    System.out.println("Matrícula del estudiante:");
+                    String studentIdAutoevaluation = scanner.nextLine();
+
+                    int[] answers = new int[10];
+
+                    System.out.println("Responde del 1 al 5:");
+
+                    System.out.print("1. Participación productiva: ");
+                    answers[0] = scanner.nextInt();
+
+                    System.out.print("2. Conocimiento aplicado: ");
+                    answers[1] = scanner.nextInt();
+
+                    System.out.print("3. Confianza en actividades: ");
+                    answers[2] = scanner.nextInt();
+
+                    System.out.print("4. Interés en actividades: ");
+                    answers[3] = scanner.nextInt();
+
+                    System.out.print("5. Apoyo de la organización: ");
+                    answers[4] = scanner.nextInt();
+
+                    System.out.print("6. Conocimiento de reglas: ");
+                    answers[5] = scanner.nextInt();
+
+                    System.out.print("7. Supervisión recibida: ");
+                    answers[6] = scanner.nextInt();
+
+                    System.out.print("8. Seguimiento efectivo: ");
+                    answers[7] = scanner.nextInt();
+
+                    System.out.print("9. Relación con la carrera: ");
+                    answers[8] = scanner.nextInt();
+
+                    System.out.print("10. Importancia de la práctica: ");
+                    answers[9] = scanner.nextInt();
+
+                    Autoevaluation autoevaluation = new Autoevaluation(studentIdAutoevaluation, answers);
+
+                    scanner.nextLine();
+                    System.out.print("Fecha (YYYY-MM-DD): ");
+                    autoevaluation.setEvaluationDate(scanner.nextLine());
+
+                    System.out.println("Puntaje final: " + autoevaluation.getFinalScore());
+
+                    if (autoevaluationService.registerAutoevaluation(autoevaluation)) {
+                        System.out.println("Autoevaluación registrada");
+                    } else {
+                        System.out.println(" Error al registrar autoevaluación");
+                    }
+
+                    break;
+                case 4:
                     System.out.println("Saliendo del programa...");
                     break;
                 default:
                     System.out.println("Opción no válida");
             }
-        } while (option != 3);
+        } while (option != 4);
 
         scanner.close();
     }

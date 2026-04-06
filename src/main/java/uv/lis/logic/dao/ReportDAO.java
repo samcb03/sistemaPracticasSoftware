@@ -12,11 +12,12 @@ import java.util.logging.Logger;
 import uv.lis.dataaccess.MySQLConnectionManager;
 import uv.lis.logic.contracts.IReportDAO;
 import uv.lis.logic.dto.FinalReport;
+import uv.lis.logic.dto.MonthlyReport;
 import uv.lis.logic.dto.PartialReport;
 import uv.lis.logic.dto.Report;
 
 
-public class ReportDAO implements IReportDAO{
+public class ReportDAO implements IReportDAO {
     private static final int NO_ROWS_AFFECTED = 0;
     private static final Logger LOGGER = Logger.getLogger(ReportDAO.class.getName());
     private MySQLConnectionManager connectionManager;
@@ -28,61 +29,57 @@ public class ReportDAO implements IReportDAO{
     @Override
     public List<Report> getReports() {
         List<Report> reports = new ArrayList<>();
-        String reportQuery = "SELECT p.idReporte, p.tipo,r.observaciones, r.fechaEntrega," 
-        + "r.matricula FROM Parcial p, INNER JOIN Reporte r ON p.idReporte = r.idReporte WHERE p.idReporte = ?;";
+        String reportQuery = "SELECT idReporte, descripcion, observaciones, actividad, matricula FROM Reporte";
+        
         try (Connection databaseConnection = connectionManager.getConnection();
-            PreparedStatement preparedStatement = databaseConnection.prepareStatement(reportQuery)) {
-            ResultSet resultSet = preparedStatement.executeQuery();
+             PreparedStatement preparedStatement = databaseConnection.prepareStatement(reportQuery);
+             ResultSet resultSet = preparedStatement.executeQuery()) {
 
-            if (resultSet.next()){
-            Report report = new Report();
-            report.setId(resultSet.getInt("idReporte"));
-            reports.add(report);
-        }
+            while (resultSet.next()) {
+                Report report = new Report();
+                report.setId(resultSet.getInt("idReporte"));
+                report.setDescription(resultSet.getString("descripcion"));
+                report.setObservations(resultSet.getString("observaciones"));
+                report.setActivity(resultSet.getString("actividad"));
+                report.setStudentId(resultSet.getString("matricula"));
+                reports.add(report);
+            }
 
-        } catch (SQLException e){
-            LOGGER.log(Level.SEVERE, "Error de conexion con la base de datos",e);
-
+        } catch (SQLException e) {
+            LOGGER.log(Level.SEVERE, "Error de conexion con la base de datos", e);
         }
 
         return reports;
-
     }
 
     @Override
     public PartialReport getPartialReportById(int idPartialReport) {
         PartialReport report = null;
-        String finalReportQuery = "SELECT p.idReporte, p.tipo,r.observaciones, " + 
-                             "r.fechaEntrega, r.matricula " +
-                             "FROM Parcial p" +
-                             "INNER JOIN Reporte r ON p.idReporte = r.idReporte " +
-                             "WHERE p.idReporte = ?;";
+        String partialReportQuery = "SELECT r.idReporte, r.descripcion, r.observaciones, r.actividad, r.matricula, " 
+            + "rp.tiempoPlaneado, rp.tiempoReal FROM ReporteParcial rp " 
+            + "INNER JOIN Reporte r ON rp.idReporte = r.idReporte " 
+            + "WHERE rp.idReporte = ?";
 
         try (Connection databaseConnection = connectionManager.getConnection();
-            PreparedStatement preparedStatement = databaseConnection.prepareStatement(finalReportQuery)){
+             PreparedStatement preparedStatement = databaseConnection.prepareStatement(partialReportQuery)) {
 
-                preparedStatement.setInt(1, idPartialReport);
+            preparedStatement.setInt(1, idPartialReport);
 
-                try (ResultSet resultSet = preparedStatement.executeQuery()) {
-                    if(resultSet.next()) {
-                        report = new PartialReport();
-                        report.setId(resultSet.getInt("idReporte"));
-                        report.setObservation(resultSet.getString("observaciones"));
-                        report.setDueDate(resultSet.getString("fechaEntrega"));
-                        report.setMatricula(resultSet.getString("matricula"));
-                        report.setIsMonthly(false);
-
-                        String tipo = resultSet.getString("tipo");
-                        if (tipo != null && tipo.equalsIgnoreCase("MENSUAL")) {
-                            report.setIsMonthly(true);
-                        } else {
-                            report.setIsMonthly(false);
-                        }
-                    }
+            try (ResultSet resultSet = preparedStatement.executeQuery()) {
+                if (resultSet.next()) {
+                    report = new PartialReport();
+                    report.setId(resultSet.getInt("idReporte"));
+                    report.setDescription(resultSet.getString("descripcion"));
+                    report.setObservations(resultSet.getString("observaciones"));
+                    report.setActivity(resultSet.getString("actividad"));
+                    report.setStudentId(resultSet.getString("matricula"));
+                    report.setPlannedTime(resultSet.getInt("tiempoPlaneado"));
+                    report.setRealTime(resultSet.getInt("tiempoReal"));
                 }
-            } catch (SQLException e) {
-                LOGGER.log(Level.SEVERE, "Error de conexion con la base de datos",e);
             }
+        } catch (SQLException e) {
+            LOGGER.log(Level.SEVERE, "Error de conexion con la base de datos", e);
+        }
 
         return report;
     }
@@ -90,83 +87,169 @@ public class ReportDAO implements IReportDAO{
     @Override
     public boolean registerPartialReport(PartialReport partialReport) {
         boolean isRegistered = false;
-        String partialReportQuery = "INSERT INTO ReporteParcial " 
-        + "(observacion, fecha_limite, id_estudiante, tipo_reporte) VALUES (?, ?, ?, ?);";
 
-        try(Connection databaseConnection = connectionManager.getConnection();
-            PreparedStatement preparedStatement = databaseConnection.prepareStatement(partialReportQuery)) {
-                preparedStatement.setString(1, partialReport.getObservation());
-                preparedStatement.setString(2, partialReport.getDueDate());
-                preparedStatement.setString(3, partialReport.getMatricula());
+        String reportQuery = "INSERT INTO Reporte (idReporte, descripcion, observaciones, actividad, matricula) "
+            + "VALUES (?, ?, ?, ?, ?)";
 
-                if(partialReport.getIsMonthly()) {
-                    preparedStatement.setString(4, "MENSUAL");
-                } else {
-                    preparedStatement.setString(4, "PARCIAL");
+        String partialQuery = "INSERT INTO ReporteParcial (idReporte, tiempoPlaneado, tiempoReal) " 
+            + "VALUES (?, ?, ?)";
+
+        try (Connection databaseConnection = connectionManager.getConnection()) {
+            databaseConnection.setAutoCommit(false);
+
+            try (PreparedStatement preparedStatementReport = databaseConnection.prepareStatement(reportQuery)) {
+                preparedStatementReport.setInt(1, partialReport.getId());
+                preparedStatementReport.setString(2, partialReport.getDescription());
+                preparedStatementReport.setString(3, partialReport.getObservations());
+                preparedStatementReport.setString(4, partialReport.getActivity());
+                preparedStatementReport.setString(5, partialReport.getStudentId());
+
+                preparedStatementReport.executeUpdate();
+
+                try (PreparedStatement psPartial = databaseConnection.prepareStatement(partialQuery)) {
+                    psPartial.setInt(1, partialReport.getId());
+                    psPartial.setInt(2, partialReport.getPlannedTime());
+                    psPartial.setInt(3, partialReport.getRealTime());
+
+                    psPartial.executeUpdate();
                 }
 
-                if (preparedStatement.executeUpdate() > NO_ROWS_AFFECTED) {
-                    isRegistered = true;
-                }
+                databaseConnection.commit();
+                isRegistered = true;
 
             } catch (SQLException e) {
-                LOGGER.log(Level.SEVERE, "Error de conexion con la base de datos",e);
+                databaseConnection.rollback();
+                LOGGER.log(Level.SEVERE, "Error al registrar reporte parcial", e);
             }
-            return isRegistered;
+
+        } catch (SQLException e) {
+            LOGGER.log(Level.SEVERE, "Error al registrar reporte parcial", e);
         }
+
+        return isRegistered;
+    }
+
+    public boolean registerMonthlyReport(MonthlyReport monthlyReport) {
+        boolean isRegistered = false;
+
+        String reportQuery = "INSERT INTO Reporte (idReporte, descripcion, observaciones, actividad, matricula) " +
+                "VALUES (?, ?, ?, ?, ?)";
+
+        String monthlyQuery = "INSERT INTO ReporteMensual (idReporte, mes, horasReportadas) " +
+                "VALUES (?, ?, ?)";
+
+        try (Connection databaseConnection = connectionManager.getConnection()) {
+            databaseConnection.setAutoCommit(false);
+
+            try (PreparedStatement preparedStatementReport = databaseConnection.prepareStatement(reportQuery)) {
+                preparedStatementReport.setInt(1, monthlyReport.getId());
+                preparedStatementReport.setString(2, monthlyReport.getDescription());
+                preparedStatementReport.setString(3, monthlyReport.getObservations());
+                preparedStatementReport.setString(4, monthlyReport.getActivity());
+                preparedStatementReport.setString(5, monthlyReport.getStudentId());
+
+                preparedStatementReport.executeUpdate();
+
+                try (PreparedStatement preparedStatementMonthly = databaseConnection.prepareStatement(monthlyQuery)) {
+                    preparedStatementMonthly.setInt(1, monthlyReport.getId());
+                    preparedStatementMonthly.setString(2, monthlyReport.getMonth());
+                    preparedStatementMonthly.setInt(3, monthlyReport.getReportedHours());
+
+                    preparedStatementMonthly.executeUpdate();
+                }
+
+                databaseConnection.commit();
+                isRegistered = true;
+
+            } catch (SQLException e) {
+                databaseConnection.rollback();
+                LOGGER.log(Level.SEVERE, "Error al registrar reporte mensual", e);
+            }
+
+        } catch (SQLException e) {
+            LOGGER.log(Level.SEVERE, "Error al registrar reporte mensual", e);
+        }
+
+        return isRegistered;
+    }
 
     @Override
     public boolean modifyPartialReport(PartialReport partialReport) {
         boolean isModified = false;
-        String partialReportQuery = "UPDATE ReporteParcial SET " 
-            + "observaciones = ?, fechaEntrega = ?, matricula = ?, tipo = ? WHERE idReporte = ?";
+        
+        String reportQuery = "UPDATE Reporte SET descripcion = ?, observaciones = ?, actividad = ?, matricula = ? " +
+                "WHERE idReporte = ?";
+        
+        String partialQuery = "UPDATE ReporteParcial SET tiempoPlaneado = ?, tiempoReal = ? " +
+                "WHERE idReporte = ?";
 
-        try (Connection databaseConnection = connectionManager.getConnection();
-            PreparedStatement preparedStatement = databaseConnection.prepareStatement(partialReportQuery)) {
-                preparedStatement.setString(1, partialReport.getObservation());
-                preparedStatement.setString(2,partialReport.getDueDate());
-                preparedStatement.setString(3, partialReport.getMatricula());
+        try (Connection databaseConnection = connectionManager.getConnection()) {
+            databaseConnection.setAutoCommit(false);
 
-                if(partialReport.getIsMonthly()) {
-                    preparedStatement.setString(4,"MENSUAL");
-                } else {
-                    preparedStatement.setString(4,"PARCIAL");
+            try (PreparedStatement psReport = databaseConnection.prepareStatement(reportQuery)) {
+                psReport.setString(1, partialReport.getDescription());
+                psReport.setString(2, partialReport.getObservations());
+                psReport.setString(3, partialReport.getActivity());
+                psReport.setString(4, partialReport.getStudentId());
+                psReport.setInt(5, partialReport.getId());
+
+                psReport.executeUpdate();
+
+                try (PreparedStatement psPartial = databaseConnection.prepareStatement(partialQuery)) {
+                    psPartial.setInt(1, partialReport.getPlannedTime());
+                    psPartial.setInt(2, partialReport.getRealTime());
+                    psPartial.setInt(3, partialReport.getId());
+
+                    if (psPartial.executeUpdate() > NO_ROWS_AFFECTED) {
+                        databaseConnection.commit();
+                        isModified = true;
+                    } else {
+                        databaseConnection.rollback();
+                    }
                 }
 
-                preparedStatement.setInt(5,partialReport.getId());
-
-                if (preparedStatement.executeUpdate() > NO_ROWS_AFFECTED) {
-                    isModified = true;
-                }
+            } catch (SQLException e) {
+                databaseConnection.rollback();
+                LOGGER.log(Level.SEVERE, "Error al modificar reporte parcial", e);
+            }
 
         } catch (SQLException e) {
-            LOGGER.log(Level.SEVERE, "Error con la conexión de la base de datos, e");
+            LOGGER.log(Level.SEVERE, "Error con la conexión de la base de datos", e);
         }
 
         return isModified;
     }
-    
+
     @Override
     public FinalReport getFinalReportById(int idFinalReport) {
         FinalReport report = null;
 
-        String finalReportQuery = "SELECT * FROM ReporteFinal WHERE idReporte = ?;";
+        String finalReportQuery = "SELECT r.idReporte, r.descripcion, r.observaciones, r.actividad, r.matricula, " +
+                "rf.porcentajeAvance, rf.ResultadoEntregable " +
+                "FROM ReporteFinal rf " +
+                "INNER JOIN Reporte r ON rf.idReporte = r.idReporte " +
+                "WHERE rf.idReporte = ?";
 
         try (Connection databaseConnection = connectionManager.getConnection();
-            PreparedStatement preparedStatement = databaseConnection.prepareStatement(finalReportQuery)){
+             PreparedStatement preparedStatement = databaseConnection.prepareStatement(finalReportQuery)) {
 
-                preparedStatement.setInt(1, idFinalReport);
-                try (ResultSet resultSet = preparedStatement.executeQuery()) {
-                    if(resultSet.next()) {
-                        report = new FinalReport();
-                        report.setId(resultSet.getInt("idReporte"));
-                        report.setAdvancePercentage(resultSet.getInt("PorcentajeAvance"));
-                        report.setResult(resultSet.getString("ResultadoEntregable"));
-                    }
+            preparedStatement.setInt(1, idFinalReport);
+            
+            try (ResultSet resultSet = preparedStatement.executeQuery()) {
+                if (resultSet.next()) {
+                    report = new FinalReport();
+                    report.setId(resultSet.getInt("idReporte"));
+                    report.setDescription(resultSet.getString("descripcion"));
+                    report.setObservations(resultSet.getString("observaciones"));
+                    report.setActivity(resultSet.getString("actividad"));
+                    report.setStudentId(resultSet.getString("matricula"));
+                    report.setAdvancePercentage(resultSet.getInt("porcentajeAvance"));
+                    report.setResult(resultSet.getString("ResultadoEntregable"));
                 }
-            } catch (SQLException e) {
-                LOGGER.log(Level.SEVERE, "Error de conexion con la base de datos",e);
             }
+        } catch (SQLException e) {
+            LOGGER.log(Level.SEVERE, "Error de conexion con la base de datos", e);
+        }
 
         return report;
     }
@@ -174,44 +257,94 @@ public class ReportDAO implements IReportDAO{
     @Override
     public boolean registerFinalReport(FinalReport finalReport) {
         boolean isRegistered = false;
-        String finalReportQuery = "INSERT INTO ReporteFinal (PorcentajeAvance, ResultadoEntregable) VALUES (?, ?);";
+        
+        String reportQuery = "INSERT INTO Reporte (idReporte, descripcion, observaciones, actividad, matricula) " +
+                "VALUES (?, ?, ?, ?, ?)";
+        
+        String finalReportQuery = "INSERT INTO ReporteFinal (idReporte, porcentajeAvance, ResultadoEntregable) " +
+                "VALUES (?, ?, ?)";
 
-        try(Connection databaseConnection = connectionManager.getConnection();
-            PreparedStatement preparedStatement = databaseConnection.prepareStatement(finalReportQuery)) {
-                preparedStatement.setInt(1, finalReport.getAdvancePercentage());
-                preparedStatement.setString(2,finalReport.getResult());
+        try (Connection databaseConnection = connectionManager.getConnection()) {
+            databaseConnection.setAutoCommit(false);
 
-            if (preparedStatement.executeUpdate() > NO_ROWS_AFFECTED) {
-                isRegistered = true;
+            try (PreparedStatement psReport = databaseConnection.prepareStatement(reportQuery)) {
+                psReport.setInt(1, finalReport.getId());
+                psReport.setString(2, finalReport.getDescription());
+                psReport.setString(3, finalReport.getObservations());
+                psReport.setString(4, finalReport.getActivity());
+                psReport.setString(5, finalReport.getStudentId());
+
+                psReport.executeUpdate();
+
+                try (PreparedStatement psFinal = databaseConnection.prepareStatement(finalReportQuery)) {
+                    psFinal.setInt(1, finalReport.getId());
+                    psFinal.setInt(2, finalReport.getAdvancePercentage());
+                    psFinal.setString(3, finalReport.getResult());
+
+                    if (psFinal.executeUpdate() > NO_ROWS_AFFECTED) {
+                        databaseConnection.commit();
+                        isRegistered = true;
+                    } else {
+                        databaseConnection.rollback();
+                    }
+                }
+
+            } catch (SQLException e) {
+                databaseConnection.rollback();
+                LOGGER.log(Level.SEVERE, "Error al registrar reporte final", e);
             }
+
         } catch (SQLException e) {
-            LOGGER.log(Level.SEVERE, "Error de conexion con la base de datos",e);
-            }
-            return isRegistered;
+            LOGGER.log(Level.SEVERE, "Error de conexion con la base de datos", e);
         }
+
+        return isRegistered;
+    }
 
     @Override
     public boolean modifyFinalReport(FinalReport finalReport) {
         boolean isModified = false;
 
-        String finalReportQuery = "UPDATE ReporteFinal SET " 
-            + "porcentajeAvance = ?, resultadoEntregable = ? WHERE idReporte = ?;";
+        String reportQuery = "UPDATE Reporte SET descripcion = ?, observaciones = ?, actividad = ?, matricula = ? " +
+                "WHERE idReporte = ?";
+        
+        String finalReportQuery = "UPDATE ReporteFinal SET porcentajeAvance = ?, ResultadoEntregable = ? " +
+                "WHERE idReporte = ?";
 
-        try (Connection databaseConnection = connectionManager.getConnection();
-            PreparedStatement preparedStatement = databaseConnection.prepareStatement(finalReportQuery)) {
-                preparedStatement.setInt(1, finalReport.getAdvancePercentage());
-                preparedStatement.setString(2,finalReport.getResult());
-                preparedStatement.setInt(3, finalReport.getId());
+        try (Connection databaseConnection = connectionManager.getConnection()) {
+            databaseConnection.setAutoCommit(false);
 
-                if (preparedStatement.executeUpdate() > NO_ROWS_AFFECTED) {
-                    isModified = true;
+            try (PreparedStatement psReport = databaseConnection.prepareStatement(reportQuery)) {
+                psReport.setString(1, finalReport.getDescription());
+                psReport.setString(2, finalReport.getObservations());
+                psReport.setString(3, finalReport.getActivity());
+                psReport.setString(4, finalReport.getStudentId());
+                psReport.setInt(5, finalReport.getId());
+
+                psReport.executeUpdate();
+
+                try (PreparedStatement psFinal = databaseConnection.prepareStatement(finalReportQuery)) {
+                    psFinal.setInt(1, finalReport.getAdvancePercentage());
+                    psFinal.setString(2, finalReport.getResult());
+                    psFinal.setInt(3, finalReport.getId());
+
+                    if (psFinal.executeUpdate() > NO_ROWS_AFFECTED) {
+                        databaseConnection.commit();
+                        isModified = true;
+                    } else {
+                        databaseConnection.rollback();
+                    }
                 }
 
+            } catch (SQLException e) {
+                databaseConnection.rollback();
+                LOGGER.log(Level.SEVERE, "Error al modificar reporte final", e);
+            }
+
         } catch (SQLException e) {
-            LOGGER.log(Level.SEVERE, "Error de conexion con la base de datos",e);
+            LOGGER.log(Level.SEVERE, "Error de conexion con la base de datos", e);
         }
 
         return isModified;
     }
 }
-    

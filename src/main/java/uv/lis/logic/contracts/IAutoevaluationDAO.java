@@ -8,5 +8,6 @@ import uv.lis.logic.dto.Autoevaluation;
 public interface IAutoevaluationDAO {
     boolean registerAutoevaluation(Autoevaluation autoevaluation) throws SQLException;
 
+    boolean existsByStudent(String studentId) throws SQLException;
     
 }

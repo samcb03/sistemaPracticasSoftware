@@ -33,13 +33,13 @@ public class ProjectDAO implements IProjectDAO{
             PreparedStatement preparedStatement = databaseConnection.prepareStatement(projectQuery)) {
             ResultSet resultSet = preparedStatement.executeQuery();
 
-            if (resultSet.next()) {
+            while (resultSet.next()) {
                 Project project = new Project();
                 project.setId(resultSet.getInt("idProyecto"));
                 project.setName(resultSet.getString("nombre"));
                 project.setMethodology(resultSet.getString("metodologiaProyecto"));
-                project.setCapacity(resultSet.getInt("Cupo"));
-                project.setObjective(resultSet.getString("objetivoProyecto"));
+                project.setCapacity(resultSet.getInt("cupo"));
+                project.setObjective(resultSet.getString("objetivo"));
                 project.setDescription(resultSet.getString("descripcion"));
                 
                 projects.add(project);
@@ -81,7 +81,7 @@ public class ProjectDAO implements IProjectDAO{
         boolean isRegistered = false;
 
         String projectQuery = "INSERT INTO Proyecto(idProyecto," 
-            + "nombre, descripcion, cupo, metodologiaProyecto, objetivoProyecto) VALUES(?, ?, ?, ?, ?, ?);";
+            + "nombre, descripcion, cupo, metodologiaProyecto, objetivo) VALUES(?, ?, ?, ?, ?, ?);";
 
         try (Connection databaseConnection = connectionManager.getConnection();
             PreparedStatement preparedStatement = databaseConnection.prepareStatement(projectQuery)){
@@ -106,7 +106,7 @@ public class ProjectDAO implements IProjectDAO{
     @Override
     public boolean modifyProject(Project project) {
         boolean isModified = false;
-        String projectQuery = "UPDATE Proyecto" + "SET nombre = ?, descripcion = ?, objetivoProyecto = ?" 
+        String projectQuery = "UPDATE Proyecto " + "SET nombre = ?, descripcion = ?, objetivoProyecto = ?" 
             + "WHERE idProyecto = ?;";
 
         try (Connection databaseConnection = connectionManager.getConnection();
@@ -131,7 +131,7 @@ public class ProjectDAO implements IProjectDAO{
     public boolean inactivateProject(Project project) {
         boolean isInactive = false;
 
-        String query = "UPDATE proyecto SET estado = 1 WHERE idProyecto = ?;";
+        String query = "UPDATE Proyecto SET estado = 0 WHERE idProyecto = ?;";
 
         try (Connection databaseConnection = connectionManager.getConnection();
              PreparedStatement preparedStatement = databaseConnection.prepareStatement(query)) {

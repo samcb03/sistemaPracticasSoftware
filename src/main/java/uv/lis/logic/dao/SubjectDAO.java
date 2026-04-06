@@ -89,45 +89,24 @@ public class SubjectDAO implements ISubjectDAO {
         String query = "UPDATE ExperienciaEducativa SET nombreExperiencia = ?, carrera = ?, idPeriodoEscolar = ? " 
             + "WHERE NRC = ?;";
 
-        if(existsSchoolPeriod(subject.getIdSchoolPeriod())) {
-            try (Connection databaseConnection = connectionManager.getConnection();
-                PreparedStatement preparedStatement = databaseConnection.prepareStatement(query)) {
+        try (Connection databaseConnection = connectionManager.getConnection();
+            PreparedStatement preparedStatement = databaseConnection.prepareStatement(query)) {
 
-                preparedStatement.setString(1, subject.getSubjectName());
-                preparedStatement.setString(2, subject.getCAREER());
-                preparedStatement.setInt(3, subject.getIdSchoolPeriod());
-                preparedStatement.setInt(4, subject.getNrc()); 
+            preparedStatement.setString(1, subject.getSubjectName());
+            preparedStatement.setString(2, subject.getCAREER());
+            preparedStatement.setInt(3, subject.getIdSchoolPeriod());
+            preparedStatement.setInt(4, subject.getNrc()); 
                 
-                if (preparedStatement.executeUpdate() > NO_ROWS_AFFECTED) {
-                    isModified = true;
-                    logger.log(Level.INFO, "Experiencia Educativa modificada con éxito. NRC: {0}", subject.getNrc());
-                }
-
-            } catch (SQLException e) {
-                logger.log(Level.SEVERE, "Error al modificar la Experiencia Educativa con NRC: " 
-                    + (subject != null ? subject.getNrc() : "null"), e);
+            if (preparedStatement.executeUpdate() > NO_ROWS_AFFECTED) {
+                isModified = true;
+                logger.log(Level.INFO, "Experiencia Educativa modificada con éxito. NRC: {0}", subject.getNrc());
             }
+
+        } catch (SQLException e) {
+            logger.log(Level.SEVERE, "Error al modificar la Experiencia Educativa con NRC: " 
+                + (subject != null ? subject.getNrc() : "null"), e);
         }
         
         return isModified;
-    }
-
-    @Override
-    public boolean existsSchoolPeriod(int idPeriod) {
-        String query = "SELECT 1 FROM PeriodoEscolar WHERE idPeriodoEscolar = ?";
-
-        try (Connection conn = connectionManager.getConnection();
-            PreparedStatement ps = conn.prepareStatement(query)) {
-
-            ps.setInt(1, idPeriod);
-            ResultSet rs = ps.executeQuery();
-
-            return rs.next(); 
-
-        } catch (SQLException e) {
-            logger.log(Level.SEVERE, "Error validando periodo escolar", e);
-        }
-
-        return false;
     }
 }

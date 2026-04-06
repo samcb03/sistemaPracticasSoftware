@@ -6,18 +6,27 @@ public class ProjectSupervisor {
     private String name;
     private String lastName;
     private String email;
-    private int idAffiliatedOrganization;
+    private String position;
     private int counter = 0;
 
     public ProjectSupervisor(){
 
     }
     
-    public ProjectSupervisor(String name, String lastName, String email) {
+    public ProjectSupervisor(String name, String lastName, String email, String position) {
         this.id = generateId();
         this.name = name;
         this.lastName = lastName;
+        this.position = position;
         this.email = email;
+    }
+
+    public String getPosition() {
+        return position;
+    }
+
+    public void setPosition(String position) {
+        this.position = position;
     }
 
     public int getId() {
@@ -51,15 +60,7 @@ public class ProjectSupervisor {
     public void setEmail(String email) {
         this.email = email;
     }
-
-    public int getIdAffiliatedOrganization() {
-        return idAffiliatedOrganization;
-    }
-
-    public void setIdAffiliatedOrganization(int idAffiliatedOrganization) {
-        this.idAffiliatedOrganization = idAffiliatedOrganization;
-    }
-
+    
     private int generateId() {
         return counter++;
     }

@@ -22,49 +22,46 @@ public class ProjectSupervisorDAO implements IProjectSupervisorDAO {
     }
 
     @Override
-    public ProjectSupervisor getProjectSupervisorById(int idProjectSupervisor) {
-        ProjectSupervisor projectSupervisor = null;
+    public ProjectSupervisor getProjectSupervisorById(int id) {
+        ProjectSupervisor supervisor = null;
 
-        String projectSupervisorQuery = "SELECT * FROM responsableProyecto WHERE idResponsableProyecto = ?;";
+        String query = "SELECT * FROM ResponsableProyecto WHERE idResponsableProyecto = ?";
 
-        try (Connection databaseConnection = connectionManager.getConnection();
-             PreparedStatement preparedStatement = databaseConnection.prepareStatement(projectSupervisorQuery)){
+        try (Connection conn = connectionManager.getConnection();
+            PreparedStatement ps = conn.prepareStatement(query)) {
 
-            preparedStatement.setInt(1, idProjectSupervisor);
-            
-            try (ResultSet resultSet = preparedStatement.executeQuery()){
-                if (resultSet.next()) {
-                    projectSupervisor = new ProjectSupervisor();
-                    projectSupervisor.setId(resultSet.getInt("idResponsableProyecto"));
-                    projectSupervisor.setName(resultSet.getString("nombre"));
-                    projectSupervisor.setEmail(resultSet.getString("correo"));
-                    projectSupervisor.setIdAffiliatedOrganization(resultSet.getInt("idOrganizacionVinculada"));
-                    
-                    LOGGER.log(Level.INFO, "Busqueda de responsable de proyecto con ID {0} exitosa.", 
-                        projectSupervisor.getId());
-                }
+            ps.setInt(1, id);
+            ResultSet rs = ps.executeQuery();
+
+            if (rs.next()) {
+                supervisor = new ProjectSupervisor();
+                supervisor.setId(rs.getInt("idResponsableProyecto"));
+                supervisor.setName(rs.getString("nombre"));
+                supervisor.setEmail(rs.getString("correo"));
+                supervisor.setPosition(rs.getString("cargo"));
             }
 
         } catch (SQLException e) {
-            LOGGER.log(Level.SEVERE, "Error de conexión a la base de datos al buscar por ID", e);
+            LOGGER.log(Level.SEVERE, "Error buscando al supervisor", e);
         }
 
-        return projectSupervisor;
+        return supervisor;
     }
 
     @Override
     public boolean registerProjectSupervisor(ProjectSupervisor projectSupervisor) {
         boolean isRegistered = false;
 
-        String projectSupervisorQuery = "INSERT INTO responsableProyecto(nombre, correo, idOrganizacionVinculada) " 
-            + "VALUES(?,?,?);";
+        String projectSupervisorQuery = "INSERT INTO responsableProyecto(nombre, correo," 
+            + "cargo, estado) VALUES(?,?,?,?);";
 
         try (Connection databaseConnection = connectionManager.getConnection();
              PreparedStatement preparedStatement = databaseConnection.prepareStatement(projectSupervisorQuery)) {
 
             preparedStatement.setString(1, projectSupervisor.getName());
             preparedStatement.setString(2, projectSupervisor.getEmail());
-            preparedStatement.setInt(3, projectSupervisor.getIdAffiliatedOrganization());
+            preparedStatement.setString(3, projectSupervisor.getPosition());
+            preparedStatement.setString(4, "1");
 
             if (preparedStatement.executeUpdate() > NO_ROWS_AFFECTED) {
                 isRegistered = true;
@@ -83,15 +80,14 @@ public class ProjectSupervisorDAO implements IProjectSupervisorDAO {
         boolean isModified = false;
 
         String projectSupervisorQuery = "UPDATE responsableProyecto SET " 
-            + "nombre = ?, correo = ?, idOrganizacionVinculada = ? WHERE idResponsableProyecto = ?;";
+            + "nombre = ?, correo = ?, cargo = ? WHERE idResponsableProyecto = ?;";
 
         try (Connection databaseConnection = connectionManager.getConnection();
              PreparedStatement preparedStatement = databaseConnection.prepareStatement(projectSupervisorQuery)){
             
             preparedStatement.setString(1, projectSupervisor.getName());
             preparedStatement.setString(2, projectSupervisor.getEmail());
-            preparedStatement.setInt(3, projectSupervisor.getIdAffiliatedOrganization());
-            
+            preparedStatement.setString(3, projectSupervisor.getPosition());
             preparedStatement.setInt(4, projectSupervisor.getId());
 
             if(preparedStatement.executeUpdate() > NO_ROWS_AFFECTED) {
@@ -110,7 +106,7 @@ public class ProjectSupervisorDAO implements IProjectSupervisorDAO {
     public boolean inactivateProjectSupervisor(ProjectSupervisor projectSupervisor) {
         boolean isInactive = false;
 
-        String query = "UPDATE responsableProyecto SET estado = '1' WHERE idResponsableProyecto = ?;";
+        String query = "UPDATE responsableProyecto SET estado = '0' WHERE idResponsableProyecto = ?;";
 
         try (Connection databaseConnection = connectionManager.getConnection();
              PreparedStatement preparedStatement = databaseConnection.prepareStatement(query)) {

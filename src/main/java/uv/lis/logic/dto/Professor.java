@@ -10,7 +10,7 @@ public class Professor extends User {
     }
    
     public Professor(int idUser, String firstName, String lastName,String password, String personnelNumber, boolean isCoordinator) {
-        super(idUser, firstName, lastName, password);
+        super(idUser, firstName, lastName, password, "Profesor");
         this.personnelNumber = personnelNumber;
         this.isCoordinator = isCoordinator;
     }

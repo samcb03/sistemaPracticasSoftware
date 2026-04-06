@@ -11,6 +11,4 @@ public interface ISubjectDAO {
     boolean registerSubject(Subject subject) throws SQLException;
 
     boolean modifySubject(Subject subject) throws SQLException;
-
-    boolean existsSchoolPeriod(int idPeriod) throws SQLException;
 }

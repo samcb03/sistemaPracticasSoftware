@@ -28,8 +28,8 @@ public class UserDAO implements IUserDAO{
         int generatedId = -1;
 
         String userQuery = "INSERT INTO Usuario " 
-            + "(nombre, apellidos, contraseña, tipoUsuario, identificador) " 
-            + "VALUES (?, ?, ?, ?, ?, ?);";
+            + "(nombre, apellidos, contraseña, identificador, rol) " 
+            + "VALUES (?, ?, ?, ?, ?);";
 
         try (Connection databaseConnection = connectionManager.getConnection();
             PreparedStatement preparedStatement = databaseConnection.prepareStatement(userQuery, 
@@ -37,9 +37,9 @@ public class UserDAO implements IUserDAO{
  
             preparedStatement.setString(1, user.getFirstName());
             preparedStatement.setString(2, user.getLastName());
-            preparedStatement.setString(4, user.getPassword());
+            preparedStatement.setString(3, user.getPassword());
+            preparedStatement.setString(4, user.getIdentification());
             preparedStatement.setString(5, user.getUserType());
-            preparedStatement.setString(6, user.getIdentification());
 
             ResultSet resultSet = preparedStatement.getGeneratedKeys();
 
@@ -282,7 +282,10 @@ public class UserDAO implements IUserDAO{
 
     @Override
     public User authenticate(String identification, String password) {
-        String query = "SELECT u.tipoUsuario, p.rol FROM Usuario u LEFT JOIN Profesor p ON u.idUsuario = p.idUsuario " 
+
+        String query = "SELECT u.rol, p.rol "
+            + "FROM Usuario u "
+            + "LEFT JOIN Profesor p ON u.idUsuario = p.idUsuario "
             + "WHERE u.identificador = ? AND u.contraseña = ?";
 
         try (Connection databaseConnection = connectionManager.getConnection();
@@ -297,15 +300,20 @@ public class UserDAO implements IUserDAO{
                 User user = new User();
                 user.setIdentification(identification);
 
-                String type = resultSet.getString("userType");
                 String rol = resultSet.getString("rol");
 
-                if ("Coordinador".equalsIgnoreCase(rol)) {
-                    user.setUserType("Coordinator");
-                } else if ("Profesor".equalsIgnoreCase(type)) {
-                    user.setUserType("Professor");
-                } else {
-                    user.setUserType("Student");
+                if ("Administrador".equalsIgnoreCase(rol)) {
+                    user.setUserType("ADMIN");
+                } else if ("Profesor".equalsIgnoreCase(rol)) {
+
+                    if ("Coordinador".equalsIgnoreCase(rol)) {
+                        user.setUserType("COORDINADOR");
+                    } else {
+                        user.setUserType("PROFESOR");
+                    }
+
+                } else if ("Alumno".equalsIgnoreCase(rol)) {
+                    user.setUserType("ALUMNO");
                 }
 
                 return user;
