@@ -300,7 +300,7 @@ public class UserDAO implements IUserDAO{
         User userAuthenticate = null;
         String userQuery = "SELECT u.idUsuario, u.contraseña, a.matricula, p.numeroPersonal " +
                        "FROM Usuario u " +
-                       "LEFT JOIN Practicante a ON u.idUsuario = a.idUsuario " +
+                       "LEFT JOIN Alumno a ON u.idUsuario = a.idUsuario " +
                        "LEFT JOIN Profesor p ON u.idUsuario = p.idUsuario " +
                        "WHERE (a.matricula = ? OR p.numeroPersonal = ?) " +
                        "AND u.contraseña = ?";
