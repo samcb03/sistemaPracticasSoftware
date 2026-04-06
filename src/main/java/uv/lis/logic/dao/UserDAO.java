@@ -161,7 +161,7 @@ public class UserDAO implements IUserDAO{
         Student student = null;
 
         String query = "SELECT e.idUsuario, e.matricula, u.nombre, u.apellidos " 
-            + "FROM Estudiante e INNER JOIN Usuario u ON e.idUsuario = u.idUsuario WHERE e.idUsuario = ?;";
+            + "FROM Practicante e INNER JOIN Usuario u ON e.idUsuario = u.idUsuario WHERE e.idUsuario = ?;";
 
         try (Connection databaseConnection = MySQLConnectionManager.getConnection();
              PreparedStatement preparedStatement = databaseConnection.prepareStatement(query)) {
@@ -189,7 +189,7 @@ public class UserDAO implements IUserDAO{
     public boolean registerStudent(Student student) {
         boolean isRegistered = false;
 
-        String studentQuery = "INSERT INTO Estudiante (idUsuario, matricula) VALUES (?, ?);";
+        String studentQuery = "INSERT INTO Practicante (idUsuario, matricula) VALUES (?, ?);";
 
         try (Connection databaseConnection = MySQLConnectionManager.getConnection();
              PreparedStatement preparedStatement = databaseConnection.prepareStatement(studentQuery)) {
@@ -213,7 +213,7 @@ public class UserDAO implements IUserDAO{
     public boolean modifyStudent(Student student) {
         boolean isModified = false;
 
-        String studentQuery = "UPDATE Estudiante e " 
+        String studentQuery = "UPDATE Practicante e " 
             + "INNER JOIN Usuario u ON e.idUsuario = u.idUsuario SET e.matricula = ?, u.nombre = ?, u.apellidos = ?" 
             + "WHERE e.idUsuario = ?;";
 
@@ -241,7 +241,7 @@ public class UserDAO implements IUserDAO{
     public boolean inactivateStudent(Student student) {
         boolean isInactive = false;
         
-        String studentQuery = "UPDATE Estudiante SET estado = 1 WHERE idUsuario = ?;";
+        String studentQuery = "UPDATE Practicante SET estado = 1 WHERE idUsuario = ?;";
 
         try (Connection databaseConnection = MySQLConnectionManager.getConnection();
              PreparedStatement preparedStatement = databaseConnection.prepareStatement(studentQuery)) {
@@ -279,4 +279,51 @@ public class UserDAO implements IUserDAO{
         String userType = "Coordinador";
         return userType;
     }
+
+@Override
+public User authenticate(String identification, String password) {
+    User userAuthenticate = null;
+    // Revisa bien que los nombres coincidan con tu tabla: idUsuario, tipoUsuario, identificador, contraseÃ±a
+    String userQuery = "SELECT u.tipoUsuario, p.rol " +
+                       "FROM Usuario u " +
+                       "LEFT JOIN profesor p ON u.idUsuario = p.idUsuario " +
+                       "WHERE u.identificador = ? AND u.contraseña = ?";
+
+    try (Connection databasConnection = MySQLConnectionManager.getConnection()) {
+        if (databasConnection == null) {
+            System.out.println("❌ ERROR: No hay conexión a la base de datos.");
+            return null;
+        }
+
+        try (PreparedStatement preparedStatement = databasConnection.prepareStatement(userQuery)) {
+            preparedStatement.setString(1, identification);
+            preparedStatement.setString(2, password);
+
+            try (ResultSet resultSet = preparedStatement.executeQuery()) {
+                if (resultSet.next()) {
+                    userAuthenticate = new User();
+                    userAuthenticate.setIdentification(identification);
+                    
+                    String tipoBase = resultSet.getString("tipoUsuario");
+                    String rolEspecifico = resultSet.getString("rol");
+
+                    System.out.println("🔍 BD encontró: Tipo=" + tipoBase + ", Rol=" + rolEspecifico);
+
+                    if ("Coordinador".equalsIgnoreCase(rolEspecifico)) {
+                        userAuthenticate.setUserType("Coordinador");
+                    } else if ("Profesor".equalsIgnoreCase(tipoBase)) {
+                        userAuthenticate.setUserType("Profesor");
+                    } else {
+                        userAuthenticate.setUserType("Estudiante");
+                    }
+                } else {
+                    System.out.println("❓ BD dice: Usuario o contraseña no encontrados para: " + identification);
+                }
+            }
+        }
+    } catch (SQLException e) {
+        System.out.println("🛑 ERROR SQL: " + e.getMessage());
+    }
+    return userAuthenticate;
+}
 }

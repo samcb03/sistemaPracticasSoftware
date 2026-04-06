@@ -5,6 +5,8 @@ public class User {
     private String firstName;
     private String lastName;
     private String password;
+    private String identification;
+    private String userType;
 
     public User(){
     }
@@ -47,4 +49,21 @@ public class User {
     public void setPassword(String password) {
         this.password = password;
     }
+
+    public String getIdentification() {
+        return identification;
+    }
+
+    public void setIdentification(String identification) {
+        this.identification = identification;
+    }
+
+    public String getUserType() {
+        return userType;
+    }
+
+    public void setUserType(String userType) {
+        this.userType = userType;
+    }
+
 }
