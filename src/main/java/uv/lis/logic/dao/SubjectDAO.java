@@ -5,8 +5,6 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import uv.lis.dataaccess.MySQLConnectionManager;
@@ -17,25 +15,34 @@ import uv.lis.logic.dto.Subject;
 public class SubjectDAO implements ISubjectDAO {
     private static final int NO_ROWS_AFFECTED = 0;
     private static final Logger logger = Logger.getLogger(SubjectDAO.class.getName());
+    private MySQLConnectionManager connectionManager;
+
+    public SubjectDAO() {
+        this.connectionManager = new MySQLConnectionManager();
+    }
 
     @Override
-    public List<Subject> getSubjectbyId(int foundNrc) { 
-        List<Subject> subjects = new ArrayList<>();
+    public Subject getSubjectById(int foundNrc) { 
         String query = "SELECT * FROM ExperienciaEducativa WHERE NRC = ?;";
 
-        try (Connection connection = MySQLConnectionManager.getConnection();
+        Subject subject = new Subject();
+         
+        try (Connection connection = connectionManager.getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement(query)) {
-                
+            
+            
             preparedStatement.setInt(1, foundNrc);
    
             try (ResultSet resultSet = preparedStatement.executeQuery()) {
                 
                 if (resultSet.next()) {
-                    String nrc = resultSet.getString("NRC");
+                    int nrc = resultSet.getInt("NRC");
                     String subjectName = resultSet.getString("nombreExperiencia");
                     int idSchoolPeriod = resultSet.getInt("idPeriodoEscolar"); 
-                    
-                    subjects.add(new Subject(nrc, subjectName, idSchoolPeriod));
+                
+                    subject.setNrc(nrc);
+                    subject.setSubjectName(subjectName);
+                    subject.setIdSchoolPeriod(idSchoolPeriod);
                 }
             }
             
@@ -45,7 +52,7 @@ public class SubjectDAO implements ISubjectDAO {
             logger.log(Level.SEVERE, "Error al buscar la Experiencia Educativa con NRC: " + foundNrc, e);
         }
         
-        return subjects;
+        return subject;
     }
 
     @Override
@@ -55,10 +62,10 @@ public class SubjectDAO implements ISubjectDAO {
         String query = "INSERT INTO ExperienciaEducativa (NRC, nombreExperiencia, carrera, idPeriodoEscolar) " 
             + "VALUES (?, ?, ?, ?);";
 
-        try (Connection databaseConnection = MySQLConnectionManager.getConnection();
+        try (Connection databaseConnection = connectionManager.getConnection();
              PreparedStatement preparedStatement = databaseConnection.prepareStatement(query)) {
 
-            preparedStatement.setString(1, subject.getNrc());
+            preparedStatement.setInt(1, subject.getNrc());
             preparedStatement.setString(2, subject.getSubjectName());
             preparedStatement.setString(3, subject.getCAREER());
             preparedStatement.setInt(4, subject.getIdSchoolPeriod());
@@ -82,24 +89,45 @@ public class SubjectDAO implements ISubjectDAO {
         String query = "UPDATE ExperienciaEducativa SET nombreExperiencia = ?, carrera = ?, idPeriodoEscolar = ? " 
             + "WHERE NRC = ?;";
 
-        try (Connection databaseConnection = MySQLConnectionManager.getConnection();
-             PreparedStatement preparedStatement = databaseConnection.prepareStatement(query)) {
-            
-            preparedStatement.setString(1, subject.getSubjectName());
-            preparedStatement.setString(2, subject.getCAREER());
-            preparedStatement.setInt(3, subject.getIdSchoolPeriod());
-            preparedStatement.setString(4, subject.getNrc()); 
-            
-            if (preparedStatement.executeUpdate() > NO_ROWS_AFFECTED) {
-                isModified = true;
-                logger.log(Level.INFO, "Experiencia Educativa modificada con éxito. NRC: {0}", subject.getNrc());
-            }
+        if(existsSchoolPeriod(subject.getIdSchoolPeriod())) {
+            try (Connection databaseConnection = connectionManager.getConnection();
+                PreparedStatement preparedStatement = databaseConnection.prepareStatement(query)) {
 
-        } catch (SQLException e) {
-            logger.log(Level.SEVERE, "Error al modificar la Experiencia Educativa con NRC: " 
-                + (subject != null ? subject.getNrc() : "null"), e);
+                preparedStatement.setString(1, subject.getSubjectName());
+                preparedStatement.setString(2, subject.getCAREER());
+                preparedStatement.setInt(3, subject.getIdSchoolPeriod());
+                preparedStatement.setInt(4, subject.getNrc()); 
+                
+                if (preparedStatement.executeUpdate() > NO_ROWS_AFFECTED) {
+                    isModified = true;
+                    logger.log(Level.INFO, "Experiencia Educativa modificada con éxito. NRC: {0}", subject.getNrc());
+                }
+
+            } catch (SQLException e) {
+                logger.log(Level.SEVERE, "Error al modificar la Experiencia Educativa con NRC: " 
+                    + (subject != null ? subject.getNrc() : "null"), e);
+            }
         }
         
         return isModified;
+    }
+
+    @Override
+    public boolean existsSchoolPeriod(int idPeriod) {
+        String query = "SELECT 1 FROM PeriodoEscolar WHERE idPeriodoEscolar = ?";
+
+        try (Connection conn = connectionManager.getConnection();
+            PreparedStatement ps = conn.prepareStatement(query)) {
+
+            ps.setInt(1, idPeriod);
+            ResultSet rs = ps.executeQuery();
+
+            return rs.next(); 
+
+        } catch (SQLException e) {
+            logger.log(Level.SEVERE, "Error validando periodo escolar", e);
+        }
+
+        return false;
     }
 }

@@ -16,16 +16,20 @@ import uv.lis.logic.dto.SchoolPeriod;
 
 
 public class SchoolPeriodDAO implements ISchoolPeriodDAO{
-        private static final int NO_ROWS_AFFECTED = 0; 
-        private static final Logger logger = Logger.getLogger(SchoolPeriodDAO.class.getName());
+    private static final int NO_ROWS_AFFECTED = 0; 
+    private static final Logger logger = Logger.getLogger(SchoolPeriodDAO.class.getName());
+    private MySQLConnectionManager connectionManager;
     
+    public SchoolPeriodDAO() {
+        this.connectionManager = new MySQLConnectionManager();
+    }
 
     @Override
     public List<SchoolPeriod> getSchoolPeriodbyId(int foundIdSchoolPeriod) {
         List<SchoolPeriod> schoolPeriods = new ArrayList<>();
         String schoolPeriodQuery = "SELECT * FROM PeriodoEscolar WHERE idPeriodoEscolar = ?;";
 
-        try (Connection databaseConnection = MySQLConnectionManager.getConnection();
+        try (Connection databaseConnection = connectionManager.getConnection();
             PreparedStatement preparedStatement = databaseConnection.prepareStatement(schoolPeriodQuery)) {
 
             preparedStatement.setInt(1, foundIdSchoolPeriod);
@@ -49,7 +53,7 @@ public class SchoolPeriodDAO implements ISchoolPeriodDAO{
         boolean isRegistered = false;
         String schoolPeriodQuery = "INSERT INTO PeriodoEscolar(idPeriodoEscolar,FechaInicio, FechaFin) VALUES(?,?);";
 
-        try (Connection databaseConnection = MySQLConnectionManager.getConnection();
+        try (Connection databaseConnection = connectionManager.getConnection();
             PreparedStatement preparedStatement = databaseConnection.prepareStatement(schoolPeriodQuery)){
 
             preparedStatement.setInt(1, schoolPeriod.getId());
@@ -71,7 +75,7 @@ public class SchoolPeriodDAO implements ISchoolPeriodDAO{
         String schoolPeriodQuery = "UPDATE PeriodoEscolar" 
             + "SET FechaInicio = ? , FechaFin = ? WHERE idPeriodoEscolar = ?;";
 
-        try (Connection databaseConnection = MySQLConnectionManager.getConnection();
+        try (Connection databaseConnection = connectionManager.getConnection();
             PreparedStatement preparedStatement = databaseConnection.prepareStatement(schoolPeriodQuery)){
 
             preparedStatement.setDate(1, schoolPeriod.getStartDate());

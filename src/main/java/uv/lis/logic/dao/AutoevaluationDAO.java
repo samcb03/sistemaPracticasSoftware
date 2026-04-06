@@ -14,6 +14,11 @@ import uv.lis.logic.dto.Autoevaluation;
 public class AutoevaluationDAO implements IAutoevaluationDAO {
     private static final int NO_ROWS_AFFECTED = 0;
     private static final Logger LOGGER = Logger.getLogger(AutoevaluationDAO.class.getName());
+    private MySQLConnectionManager connectionManager;
+
+    public AutoevaluationDAO() {
+        this.connectionManager = new MySQLConnectionManager();
+    }
 
     @Override
     public boolean registerAutoevaluation(Autoevaluation autoevaluation) {
@@ -25,7 +30,7 @@ public class AutoevaluationDAO implements IAutoevaluationDAO {
         + "seguimientoEfectivo, alineacionCarrera, importanciaPracticas, " 
         + "puntuacionFinal) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);";
 
-    try (Connection databaseConnection = MySQLConnectionManager.getConnection();
+    try (Connection databaseConnection = connectionManager.getConnection();
          PreparedStatement preparedStatement = databaseConnection.prepareStatement(query)) {
         
         preparedStatement.setString(1, autoevaluation.getIdStudent());

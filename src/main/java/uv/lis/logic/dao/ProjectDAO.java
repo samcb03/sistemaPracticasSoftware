@@ -17,6 +17,11 @@ import uv.lis.logic.dto.Project;
 public class ProjectDAO implements IProjectDAO{
     private static final int NO_ROWS_AFFECTED = 0;
     private static final Logger LOGGER = Logger.getLogger(ProjectDAO.class.getName());
+    private MySQLConnectionManager connectionManager;
+
+    public ProjectDAO() {
+        this.connectionManager = new MySQLConnectionManager();
+    }
 
     @Override
     public List<Project> getProjects() {
@@ -24,7 +29,7 @@ public class ProjectDAO implements IProjectDAO{
         List<Project> projects = new ArrayList<>(); 
         String projectQuery = "SELECT * FROM Proyecto;";
 
-        try (Connection databaseConnection = MySQLConnectionManager.getConnection();
+        try (Connection databaseConnection = connectionManager.getConnection();
             PreparedStatement preparedStatement = databaseConnection.prepareStatement(projectQuery)) {
             ResultSet resultSet = preparedStatement.executeQuery();
 
@@ -51,7 +56,7 @@ public class ProjectDAO implements IProjectDAO{
         Project project = new Project();
         String projectQuery = "SELECT * FROM Proyecto WHERE idProyecto = ?;";
 
-        try (Connection databaseConnection = MySQLConnectionManager.getConnection();
+        try (Connection databaseConnection = connectionManager.getConnection();
 
             PreparedStatement preparedStatement = databaseConnection.prepareStatement(projectQuery)) {
             preparedStatement.setInt(1, idProject);
@@ -78,7 +83,7 @@ public class ProjectDAO implements IProjectDAO{
         String projectQuery = "INSERT INTO Proyecto(idProyecto," 
             + "nombre, descripcion, cupo, metodologiaProyecto, objetivoProyecto) VALUES(?, ?, ?, ?, ?, ?);";
 
-        try (Connection databaseConnection = MySQLConnectionManager.getConnection();
+        try (Connection databaseConnection = connectionManager.getConnection();
             PreparedStatement preparedStatement = databaseConnection.prepareStatement(projectQuery)){
             
             preparedStatement.setInt(1, project.getId());
@@ -104,7 +109,7 @@ public class ProjectDAO implements IProjectDAO{
         String projectQuery = "UPDATE Proyecto" + "SET nombre = ?, descripcion = ?, objetivoProyecto = ?" 
             + "WHERE idProyecto = ?;";
 
-        try (Connection databaseConnection = MySQLConnectionManager.getConnection();
+        try (Connection databaseConnection = connectionManager.getConnection();
             PreparedStatement preparedStatement = databaseConnection.prepareStatement(projectQuery)){
             
             preparedStatement.setString(1, project.getName());
@@ -128,7 +133,7 @@ public class ProjectDAO implements IProjectDAO{
 
         String query = "UPDATE proyecto SET estado = 1 WHERE idProyecto = ?;";
 
-        try (Connection databaseConnection = MySQLConnectionManager.getConnection();
+        try (Connection databaseConnection = connectionManager.getConnection();
              PreparedStatement preparedStatement = databaseConnection.prepareStatement(query)) {
 
             preparedStatement.setInt(1, project.getId());

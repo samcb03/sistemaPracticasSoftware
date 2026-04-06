@@ -58,7 +58,7 @@ public class Student extends User {
         this.gender = gender;
     }
 
-    public boolean isIndigenousLanguage() {
+    public boolean hasIndigenousLanguage() {
         return indigenousLanguage;
     }
 

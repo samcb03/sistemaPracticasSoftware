@@ -15,6 +15,11 @@ import uv.lis.logic.dto.ProjectSupervisor;
 public class ProjectSupervisorDAO implements IProjectSupervisorDAO {
     private static final int NO_ROWS_AFFECTED = 0;
     private static final Logger LOGGER = Logger.getLogger(ProjectSupervisorDAO.class.getName());
+    private MySQLConnectionManager connectionManager;
+
+    public ProjectSupervisorDAO() {
+        this.connectionManager = new MySQLConnectionManager();
+    }
 
     @Override
     public ProjectSupervisor getProjectSupervisorById(int idProjectSupervisor) {
@@ -22,7 +27,7 @@ public class ProjectSupervisorDAO implements IProjectSupervisorDAO {
 
         String projectSupervisorQuery = "SELECT * FROM responsableProyecto WHERE idResponsableProyecto = ?;";
 
-        try (Connection databaseConnection = MySQLConnectionManager.getConnection();
+        try (Connection databaseConnection = connectionManager.getConnection();
              PreparedStatement preparedStatement = databaseConnection.prepareStatement(projectSupervisorQuery)){
 
             preparedStatement.setInt(1, idProjectSupervisor);
@@ -54,7 +59,7 @@ public class ProjectSupervisorDAO implements IProjectSupervisorDAO {
         String projectSupervisorQuery = "INSERT INTO responsableProyecto(nombre, correo, idOrganizacionVinculada) " 
             + "VALUES(?,?,?);";
 
-        try (Connection databaseConnection = MySQLConnectionManager.getConnection();
+        try (Connection databaseConnection = connectionManager.getConnection();
              PreparedStatement preparedStatement = databaseConnection.prepareStatement(projectSupervisorQuery)) {
 
             preparedStatement.setString(1, projectSupervisor.getName());
@@ -80,7 +85,7 @@ public class ProjectSupervisorDAO implements IProjectSupervisorDAO {
         String projectSupervisorQuery = "UPDATE responsableProyecto SET " 
             + "nombre = ?, correo = ?, idOrganizacionVinculada = ? WHERE idResponsableProyecto = ?;";
 
-        try (Connection databaseConnection = MySQLConnectionManager.getConnection();
+        try (Connection databaseConnection = connectionManager.getConnection();
              PreparedStatement preparedStatement = databaseConnection.prepareStatement(projectSupervisorQuery)){
             
             preparedStatement.setString(1, projectSupervisor.getName());
@@ -107,7 +112,7 @@ public class ProjectSupervisorDAO implements IProjectSupervisorDAO {
 
         String query = "UPDATE responsableProyecto SET estado = '1' WHERE idResponsableProyecto = ?;";
 
-        try (Connection databaseConnection = MySQLConnectionManager.getConnection();
+        try (Connection databaseConnection = connectionManager.getConnection();
              PreparedStatement preparedStatement = databaseConnection.prepareStatement(query)) {
 
             preparedStatement.setInt(1, projectSupervisor.getId());

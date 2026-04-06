@@ -3,7 +3,7 @@ package uv.lis.logic.dto;
 
 public class Subject {
     private final static String CAREER = "Ingenieria de Software";
-    private String nrc;
+    private int nrc;
     private String subjectName;
     private int idSchoolPeriod;
 
@@ -11,17 +11,17 @@ public class Subject {
 
     }
 
-    public Subject(String nrc, String subjectName, int idSchoolPeriod) {
+    public Subject(int nrc, String subjectName, int idSchoolPeriod) {
         this.nrc = nrc;
         this.subjectName = subjectName;
         this.idSchoolPeriod = idSchoolPeriod;
     }
 
-    public String getNrc() {
+    public int getNrc() {
         return nrc;
     }
 
-    public void setNrc(String nrc) {
+    public void setNrc(int nrc) {
         this.nrc = nrc;
     }
 

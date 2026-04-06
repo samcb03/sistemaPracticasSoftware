@@ -15,6 +15,11 @@ import uv.lis.logic.dto.AffiliatedOrganization;
 public class AffiliatedOrganizationDAO implements IAffiliatedOrganizationDAO{
     private static final int NO_ROWS_AFFECTED = 0;
     private static final Logger LOGGER = Logger.getLogger(AffiliatedOrganizationDAO.class.getName());
+    private MySQLConnectionManager connectionManager;
+
+    public AffiliatedOrganizationDAO() {
+        this.connectionManager = new MySQLConnectionManager();
+    }
 
     @Override
     public AffiliatedOrganization getAffiliatedOrganizationById(int idAfilliatedOrganization) {
@@ -23,7 +28,7 @@ public class AffiliatedOrganizationDAO implements IAffiliatedOrganizationDAO{
         String affiliatedOrganizationQuery = "SELECT * FROM organizacionVinculada " 
         + "WHERE idOrganizacionVinculada = ?"; 
 
-        try (Connection databaseConnection = MySQLConnectionManager.getConnection();
+        try (Connection databaseConnection = connectionManager.getConnection();
             PreparedStatement preparedStatement = databaseConnection.prepareStatement(affiliatedOrganizationQuery)) {
 
             preparedStatement.setInt(1,idAfilliatedOrganization);
@@ -54,12 +59,11 @@ public class AffiliatedOrganizationDAO implements IAffiliatedOrganizationDAO{
     @Override
     public boolean registerAffiliatedOrganization(AffiliatedOrganization affiliatedOrganization) {
         boolean isRegistered = false;
-        String affiliatedOrganizationQuery = "INSERT INTO organizacionVinculada(nombreOv," +
-                                             "ciudad,estado,sector,correo,telefono,poblacionAtentida," +
-                                             "numUsuariosIndirectos,numUsuariosDirectos)" +
-                                             "VALUES (?, ?, ?, ?, ?, ?, ?);";
+        String affiliatedOrganizationQuery = "INSERT INTO organizacionVinculada(nombreOv," 
+            + "ciudad,estado,sector,correo,telefono,poblacionAtentida, numUsuariosIndirectos,numUsuariosDirectos)" 
+            + "VALUES (?, ?, ?, ?, ?, ?, ?);";
 
-        try (Connection databaseConnection = MySQLConnectionManager.getConnection();
+        try (Connection databaseConnection = connectionManager.getConnection();
 
             PreparedStatement preparedStatement = databaseConnection.prepareStatement(affiliatedOrganizationQuery)){
 
@@ -91,7 +95,7 @@ public class AffiliatedOrganizationDAO implements IAffiliatedOrganizationDAO{
         String query = "UPDATE organizacionVinculada SET nombreOv = ?, ciudad = ?, estado = ?, correo = ?, " 
             + "telefono = ?, numUsuariosIndirectos = ?, numUsuariosDirectos = ? " + "WHERE idOrganizacion = ?;";
 
-        try (Connection databaseConnection = MySQLConnectionManager.getConnection();
+        try (Connection databaseConnection = connectionManager.getConnection();
              PreparedStatement preparedStatement = databaseConnection.prepareStatement(query)) {
 
             preparedStatement.setString(1, affiliatedOrganization.getName());
@@ -120,7 +124,7 @@ public class AffiliatedOrganizationDAO implements IAffiliatedOrganizationDAO{
 
         String query = "UPDATE organizacionVinculada SET estado = '1' WHERE idOrganizacion = ?;";
 
-        try (Connection databaseConnection = MySQLConnectionManager.getConnection();
+        try (Connection databaseConnection = connectionManager.getConnection();
              PreparedStatement preparedStatement = databaseConnection.prepareStatement(query)) {
 
             preparedStatement.setInt(1, affiliatedOrganization.getId());

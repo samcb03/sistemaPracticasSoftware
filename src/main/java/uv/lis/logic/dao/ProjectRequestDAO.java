@@ -18,13 +18,18 @@ public class ProjectRequestDAO implements IProjectRequestDAO {
     private static final int NO_ROWS_AFFECTED = 0;
     private static final int MAX_REQUESTS = 3;
     private static final Logger LOGGER = Logger.getLogger(ProjectRequestDAO.class.getName());
+    private MySQLConnectionManager connectionManager;
+
+    public ProjectRequestDAO() {
+        this.connectionManager = new MySQLConnectionManager();
+    }
 
     @Override
     public int getActiveRequestCountByStudentId(String idStudent) throws SQLException {
         int count = 0;
         String query = "SELECT COUNT(*) as total FROM Solicita_Proyecto WHERE idStudent = ?;";
 
-        try (Connection databaseConnection = MySQLConnectionManager.getConnection();
+        try (Connection databaseConnection = connectionManager.getConnection();
             PreparedStatement preparedStatement = databaseConnection.prepareStatement(query)) {
             
             preparedStatement.setString(1, idStudent);
@@ -50,7 +55,7 @@ public class ProjectRequestDAO implements IProjectRequestDAO {
             + "LEFT JOIN Solicita_Proyecto sp ON p.idProyecto = sp.idProyecto WHERE p.estado IS NULL OR p.estado = 0 " 
             + "GROUP BY p.idProyecto HAVING cupoDisponible > 0;";
 
-        try (Connection databaseConnection = MySQLConnectionManager.getConnection();
+        try (Connection databaseConnection = connectionManager.getConnection();
              PreparedStatement preparedStatement = databaseConnection.prepareStatement(query)) {
             
             try (ResultSet resultSet = preparedStatement.executeQuery()) {
@@ -79,7 +84,7 @@ public class ProjectRequestDAO implements IProjectRequestDAO {
         String query = "SELECT p.* FROM Proyecto p INNER JOIN Solicita_Proyecto sp ON p.idProyecto = sp.idProyecto " 
             + "WHERE sp.matricula = ?;";
 
-        try (Connection databaseConnection = MySQLConnectionManager.getConnection();
+        try (Connection databaseConnection = connectionManager.getConnection();
              PreparedStatement preparedStatement = databaseConnection.prepareStatement(query)) {
             
             preparedStatement.setString(1, idStudent);
@@ -109,7 +114,7 @@ public class ProjectRequestDAO implements IProjectRequestDAO {
         boolean hasRequested = false;
         String query = "SELECT COUNT(*) as total FROM Solicita_Proyecto WHERE matricula = ? AND idProyecto = ?;";
 
-        try (Connection databaseConnection = MySQLConnectionManager.getConnection();
+        try (Connection databaseConnection = connectionManager.getConnection();
              PreparedStatement preparedStatement = databaseConnection.prepareStatement(query)) {
             
             preparedStatement.setString(1, idStudent);
@@ -135,7 +140,7 @@ public class ProjectRequestDAO implements IProjectRequestDAO {
             + "LEFT JOIN Solicita_Proyecto sp ON p.idProject = sp.idProject WHERE p.idProject = ? "
             + "GROUP BY p.idProject, p.cupo;";
 
-        try (Connection databaseConnection = MySQLConnectionManager.getConnection();
+        try (Connection databaseConnection = connectionManager.getConnection();
              PreparedStatement preparedStatement = databaseConnection.prepareStatement(query)) {
             
             preparedStatement.setInt(1, idProject);
@@ -162,7 +167,7 @@ public class ProjectRequestDAO implements IProjectRequestDAO {
         if (validateProjectRequest(idStudent, idProject)) {
             String query = "INSERT INTO Solicita_Proyecto (idProject, idStudent, estatus) VALUES (?, ?, FALSE);";
 
-            try (Connection databaseConnection = MySQLConnectionManager.getConnection();
+            try (Connection databaseConnection = connectionManager.getConnection();
                 PreparedStatement preparedStatement = databaseConnection.prepareStatement(query)) {
                 
                 preparedStatement.setInt(1, idProject);
@@ -213,7 +218,7 @@ public class ProjectRequestDAO implements IProjectRequestDAO {
         boolean isAssigned = false;
         String query = "UPDATE Solicita_Proyecto SET estatus = TRUE WHERE idStudent = ? AND idProject = ?;";
 
-        try (Connection databaseConnection = MySQLConnectionManager.getConnection();
+        try (Connection databaseConnection = connectionManager.getConnection();
              PreparedStatement preparedStatement = databaseConnection.prepareStatement(query)) {
             
             preparedStatement.setString(1, idStudent);

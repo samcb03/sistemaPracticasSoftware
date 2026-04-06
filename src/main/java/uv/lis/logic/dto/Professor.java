@@ -2,27 +2,25 @@ package uv.lis.logic.dto;
 
 
 public class Professor extends User {
-    private String numeroPersonal;
+    private String personnelNumber;
     private boolean isCoordinator;
 
     public Professor(){
         
     }
    
-
-
-    public Professor(int idUser, String firstName, String lastName,String password, String numeroPersonal, boolean isCoordinator) {
+    public Professor(int idUser, String firstName, String lastName,String password, String personnelNumber, boolean isCoordinator) {
         super(idUser, firstName, lastName, password);
-        this.numeroPersonal = numeroPersonal;
+        this.personnelNumber = personnelNumber;
         this.isCoordinator = isCoordinator;
     }
 
-    public String getNumeroPersonal() {
-        return numeroPersonal;
+    public String getPersonnelNumber() {
+        return personnelNumber;
     }
 
-    public void setNumeroPersonal(String numeroPersonal) {
-        this.numeroPersonal = numeroPersonal;
+    public void setPersonnelNumber(String personnelNumber) {
+        this.personnelNumber = personnelNumber;
     }
 
     public boolean getIsCoordinator() {

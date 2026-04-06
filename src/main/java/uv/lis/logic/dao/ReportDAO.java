@@ -19,13 +19,18 @@ import uv.lis.logic.dto.Report;
 public class ReportDAO implements IReportDAO{
     private static final int NO_ROWS_AFFECTED = 0;
     private static final Logger LOGGER = Logger.getLogger(ReportDAO.class.getName());
+    private MySQLConnectionManager connectionManager;
+
+    public ReportDAO() {
+        this.connectionManager = new MySQLConnectionManager();
+    }
 
     @Override
     public List<Report> getReports() {
         List<Report> reports = new ArrayList<>();
         String reportQuery = "SELECT p.idReporte, p.tipo,r.observaciones, r.fechaEntrega," 
         + "r.matricula FROM Parcial p, INNER JOIN Reporte r ON p.idReporte = r.idReporte WHERE p.idReporte = ?;";
-        try (Connection databaseConnection = MySQLConnectionManager.getConnection();
+        try (Connection databaseConnection = connectionManager.getConnection();
             PreparedStatement preparedStatement = databaseConnection.prepareStatement(reportQuery)) {
             ResultSet resultSet = preparedStatement.executeQuery();
 
@@ -53,7 +58,7 @@ public class ReportDAO implements IReportDAO{
                              "INNER JOIN Reporte r ON p.idReporte = r.idReporte " +
                              "WHERE p.idReporte = ?;";
 
-        try (Connection databaseConnection = MySQLConnectionManager.getConnection();
+        try (Connection databaseConnection = connectionManager.getConnection();
             PreparedStatement preparedStatement = databaseConnection.prepareStatement(finalReportQuery)){
 
                 preparedStatement.setInt(1, idPartialReport);
@@ -88,7 +93,7 @@ public class ReportDAO implements IReportDAO{
         String partialReportQuery = "INSERT INTO ReporteParcial " 
         + "(observacion, fecha_limite, id_estudiante, tipo_reporte) VALUES (?, ?, ?, ?);";
 
-        try(Connection databaseConnection = MySQLConnectionManager.getConnection();
+        try(Connection databaseConnection = connectionManager.getConnection();
             PreparedStatement preparedStatement = databaseConnection.prepareStatement(partialReportQuery)) {
                 preparedStatement.setString(1, partialReport.getObservation());
                 preparedStatement.setString(2, partialReport.getDueDate());
@@ -116,7 +121,7 @@ public class ReportDAO implements IReportDAO{
         String partialReportQuery = "UPDATE ReporteParcial SET " 
             + "observaciones = ?, fechaEntrega = ?, matricula = ?, tipo = ? WHERE idReporte = ?";
 
-        try (Connection databaseConnection = MySQLConnectionManager.getConnection();
+        try (Connection databaseConnection = connectionManager.getConnection();
             PreparedStatement preparedStatement = databaseConnection.prepareStatement(partialReportQuery)) {
                 preparedStatement.setString(1, partialReport.getObservation());
                 preparedStatement.setString(2,partialReport.getDueDate());
@@ -147,7 +152,7 @@ public class ReportDAO implements IReportDAO{
 
         String finalReportQuery = "SELECT * FROM ReporteFinal WHERE idReporte = ?;";
 
-        try (Connection databaseConnection = MySQLConnectionManager.getConnection();
+        try (Connection databaseConnection = connectionManager.getConnection();
             PreparedStatement preparedStatement = databaseConnection.prepareStatement(finalReportQuery)){
 
                 preparedStatement.setInt(1, idFinalReport);
@@ -171,7 +176,7 @@ public class ReportDAO implements IReportDAO{
         boolean isRegistered = false;
         String finalReportQuery = "INSERT INTO ReporteFinal (PorcentajeAvance, ResultadoEntregable) VALUES (?, ?);";
 
-        try(Connection databaseConnection = MySQLConnectionManager.getConnection();
+        try(Connection databaseConnection = connectionManager.getConnection();
             PreparedStatement preparedStatement = databaseConnection.prepareStatement(finalReportQuery)) {
                 preparedStatement.setInt(1, finalReport.getAdvancePercentage());
                 preparedStatement.setString(2,finalReport.getResult());
@@ -192,7 +197,7 @@ public class ReportDAO implements IReportDAO{
         String finalReportQuery = "UPDATE ReporteFinal SET " 
             + "porcentajeAvance = ?, resultadoEntregable = ? WHERE idReporte = ?;";
 
-        try (Connection databaseConnection = MySQLConnectionManager.getConnection();
+        try (Connection databaseConnection = connectionManager.getConnection();
             PreparedStatement preparedStatement = databaseConnection.prepareStatement(finalReportQuery)) {
                 preparedStatement.setInt(1, finalReport.getAdvancePercentage());
                 preparedStatement.setString(2,finalReport.getResult());

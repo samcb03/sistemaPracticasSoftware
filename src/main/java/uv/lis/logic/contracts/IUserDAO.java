@@ -9,9 +9,9 @@ import uv.lis.logic.dto.User;
 
 
 public interface IUserDAO {
-    boolean registerUser(User user) throws SQLException;
+    int registerUser(User user) throws SQLException;
 
-    Professor getProfessorById(int idProfessor) throws SQLException;
+    Professor getProfessorByPersonnelNumber(String personnelNumber) throws SQLException;
 
     boolean registerProfessor(Professor professor) throws SQLException;
 
@@ -28,6 +28,4 @@ public interface IUserDAO {
     boolean inactivateStudent(Student student) throws SQLException;
 
     User authenticate(String identification, String password);
-
-    String getUserType(User user) throws SQLException;
 }

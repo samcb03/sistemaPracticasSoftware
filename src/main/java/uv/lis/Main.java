@@ -170,7 +170,7 @@ public static void main(String[] args) {
                         System.out.println("Matricula: " + foundStudent.getIdStudent());
                         System.out.println("Fecha de nacimiento: " + foundStudent.getDateOfBirth());
                         System.out.println("Género: " + foundStudent.getGender());
-                        System.out.println("Habla alguna lengua indígena: " + foundStudent.isIndigenousLanguage());
+                        System.out.println("Habla alguna lengua indígena: " + foundStudent.hasIndigenousLanguage());
                         System.out.println("Horas completadas: " + foundStudent.getCompletedHours());
                         System.out.println("\n1. Actualizar alumno");
                         System.out.println("2. Inactivar alumno");

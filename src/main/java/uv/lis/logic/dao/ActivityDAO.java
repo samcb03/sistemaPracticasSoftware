@@ -18,13 +18,18 @@ import uv.lis.logic.dto.Activity;
 public class ActivityDAO implements IActivityDAO {
         private static final int NO_ROWS_AFFECTED = 0;
         private static final Logger LOGGER = Logger.getLogger(ActivityDAO.class.getName());
+        private MySQLConnectionManager connectionManager;
+
+    public ActivityDAO() {
+        this.connectionManager = new MySQLConnectionManager();
+    }
 
     @Override
     public List<Activity> getActivities() {
         List<Activity> activities = new ArrayList<>();
         String activityQuery = "SELECT * FROM Actividad;";
 
-        try (Connection databaseConnection = MySQLConnectionManager.getConnection();
+        try (Connection databaseConnection = connectionManager.getConnection();
             PreparedStatement preparedStatement = databaseConnection.prepareStatement(activityQuery)) {
             ResultSet resultSet = preparedStatement.executeQuery();
             
@@ -48,7 +53,7 @@ public class ActivityDAO implements IActivityDAO {
         List<Activity> activities = new ArrayList<>();
         String activityQuery = "SELECT * FROM Actividad WHERE idActividad = ?;";
 
-        try (Connection databaseConnection = MySQLConnectionManager.getConnection();
+        try (Connection databaseConnection = connectionManager.getConnection();
             PreparedStatement preparedStatement = databaseConnection.prepareStatement(activityQuery)) {
             preparedStatement.setInt(1, idActivity);
             ResultSet resultSet = preparedStatement.executeQuery();
@@ -78,7 +83,7 @@ public class ActivityDAO implements IActivityDAO {
             isRegistered = false;
         }
 
-        try (Connection databaseConnection = MySQLConnectionManager.getConnection();
+        try (Connection databaseConnection = connectionManager.getConnection();
             PreparedStatement preparedStatement = databaseConnection.prepareStatement(activityQuery)) {
             
             preparedStatement.setInt(1, activity.getId());
@@ -105,7 +110,7 @@ public class ActivityDAO implements IActivityDAO {
         if (activity == null) {
             isModified = false;
         }
-        try (Connection databaseConnection = MySQLConnectionManager.getConnection();
+        try (Connection databaseConnection = connectionManager.getConnection();
             PreparedStatement preparedStatement = databaseConnection.prepareStatement(activityQuery)) {
             
             preparedStatement.setString(1, activity.getName());
