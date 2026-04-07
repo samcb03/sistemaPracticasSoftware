@@ -11,6 +11,7 @@ public class Student extends User {
     private String gender;
     private boolean indigenousLanguage;
     private String autoevaluation;
+
     public Student(){
 
     }
