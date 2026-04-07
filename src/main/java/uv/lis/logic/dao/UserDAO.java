@@ -298,16 +298,17 @@ public class UserDAO implements IUserDAO{
 @Override
     public User authenticate(String identification, String password) {
         User userAuthenticate = null;
-        String userQuery = "SELECT u.idUsuario, u.contraseña, a.matricula, p.numeroPersonal " +
-                       "FROM Usuario u " +
-                       "LEFT JOIN Practicante a ON u.idUsuario = a.idUsuario " +
-                       "LEFT JOIN Profesor p ON u.idUsuario = p.idUsuario " +
-                       "WHERE (a.matricula = ? OR p.numeroPersonal = ?) " +
-                       "AND u.contraseña = ?";
+        String userQuery = "SELECT u.idUsuario, u.contraseña, a.matricula, p.numeroPersonal, p.rol " +
+                           "FROM Usuario u " +
+                           "LEFT JOIN Alumno a ON u.idUsuario = a.idUsuario " +
+                           "LEFT JOIN Profesor p ON u.idUsuario = p.idUsuario " +
+                           "WHERE (a.matricula = ? OR p.numeroPersonal = ?) " +
+                           "AND u.contraseña = ?";
 
         try (Connection databasConnection = connectionManager.getConnection();
-            PreparedStatement preparedStatement = databasConnection.prepareStatement(userQuery)){
-                preparedStatement.setString(1,identification);
+             PreparedStatement preparedStatement = databasConnection.prepareStatement(userQuery)){
+             
+                preparedStatement.setString(1, identification);
                 preparedStatement.setString(2, identification);
                 preparedStatement.setString(3, password);
 
@@ -317,15 +318,20 @@ public class UserDAO implements IUserDAO{
                         userAuthenticate.setIdentification(identification);
 
                         if(resultSet.getString("matricula") != null) {
-                            userAuthenticate.setUserType("Practicante");
-                        } else if (resultSet.getString("numeroPersonal") != null) {
-                            userAuthenticate.setUserType("Profesor");
-                        }
+                            userAuthenticate.setUserType("Estudiante"); 
+                        } else {
+                            String rol = resultSet.getString("rol");
+                            if("Coordinador".equals(rol)) {
+                                userAuthenticate.setUserType("Coordinador");
+                            } else {
+                                userAuthenticate.setUserType("Profesor");
+                            }
+                        } 
                     }
                 }
             } catch (SQLException e) {
-                LOGGER.log(Level.SEVERE, "Error de autenticacion", e);
-            }
+                LOGGER.log(Level.SEVERE, "Error de autenticacion SQL", e);
+            }   
             return userAuthenticate;
     }
 }
