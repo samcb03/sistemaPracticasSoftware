@@ -23,7 +23,6 @@ import uv.lis.logic.dto.User;
 import uv.lis.logic.services.AutoevaluationService;
 
 
-
 public class Main {
 public static void main(String[] args) {
         Main app = new Main();
@@ -38,7 +37,7 @@ public static void main(String[] args) {
                 app.showProfessorMenu();
             } else if ("Coordinador".equals(userType)) {
                 app.showCoordinatorMenu();
-            } else if ("Estudiante".equals(userType) || "Alumno".equals(userType)) {
+            } else if ("Alumno".equals(userType)) {
                 app.showStudentMenu();
             } else if ("Administrador".equals(userType)){
                 app.showAdministrator();
@@ -68,7 +67,7 @@ public static void main(String[] args) {
             loggedUser = userDAO.authenticate(identification, password);
 
             if (loggedUser == null) {
-                System.out.println("Identificador/Contraseña incorrectos. Intentos restantes: " + "\n");
+                System.out.println("Identificador/Contraseña incorrectos" + "\n");
             }
         }
         return loggedUser; 
@@ -164,10 +163,6 @@ public static void main(String[] args) {
             }
         } while (option != 4);
     }
-
-
-
-
 
     private void showCoordinatorMenu() {
         UserDAO userDAO = new UserDAO();
@@ -592,8 +587,6 @@ public static void main(String[] args) {
                     break; 
                 case 3:
                     AutoevaluationService autoevaluationService = new AutoevaluationService();
-
-                    scanner.nextLine();
 
                     System.out.println("Matrícula del estudiante:");
                     String studentIdAutoevaluation = scanner.nextLine();

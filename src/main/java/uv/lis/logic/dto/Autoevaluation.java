@@ -146,6 +146,6 @@ public class Autoevaluation {
         totalScore += activitiesInterest + organizationSupport + rulesAwareness; 
         totalScore += supervisorGuidance + effectiveMonitoring + careerAlignment;
         totalScore += internshipImportance;
-        this.finalScore = (totalScore / MAX_POSSIBLE_SCORE) * PERCENTAGE_MULTIPLIER;
+        this.finalScore = ((double) totalScore / MAX_POSSIBLE_SCORE) * PERCENTAGE_MULTIPLIER;
     }
 }

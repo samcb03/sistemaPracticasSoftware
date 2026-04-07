@@ -317,7 +317,7 @@ public class UserDAO implements IUserDAO{
                         userAuthenticate.setIdentification(identification);
 
                         if(resultSet.getString("matricula") != null) {
-                            userAuthenticate.setUserType("Practicante");
+                            userAuthenticate.setUserType("Alumno");
                         } else if (resultSet.getString("numeroPersonal") != null) {
                             userAuthenticate.setUserType("Profesor");
                         }
