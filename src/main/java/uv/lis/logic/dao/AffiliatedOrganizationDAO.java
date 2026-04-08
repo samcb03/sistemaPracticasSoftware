@@ -61,8 +61,8 @@ public class AffiliatedOrganizationDAO implements IAffiliatedOrganizationDAO{
     public boolean registerAffiliatedOrganization(AffiliatedOrganization affiliatedOrganization) {
         boolean isRegistered = false;
         String affiliatedOrganizationQuery = "INSERT INTO organizacionVinculada(nombreOV," 
-            + "ciudad,estado,sector,correo,telefono,poblacionAtendida, numUsuariosIndirectos,numUsuariosDirectos)" 
-            + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);";
+            + "ciudad, estado, sector, correo, telefono, numUsuariosIndirectos,numUsuariosDirectos)" 
+            + "VALUES (?, ?, ?, ?, ?, ?, ?, ?);";
 
         try (Connection databaseConnection = connectionManager.getConnection();
 
@@ -74,10 +74,8 @@ public class AffiliatedOrganizationDAO implements IAffiliatedOrganizationDAO{
             preparedStatement.setString(4, affiliatedOrganization.getSector());
             preparedStatement.setString(5, affiliatedOrganization.getEmail());
             preparedStatement.setString(6, affiliatedOrganization.getPhoneNumber());
-            preparedStatement.setInt(7, affiliatedOrganization.getNumberOfDirectUsers() 
-                + affiliatedOrganization.getNumberOfIndirectUsers());
-            preparedStatement.setInt(8, affiliatedOrganization.getNumberOfIndirectUsers());
-            preparedStatement.setInt(9, affiliatedOrganization.getNumberOfDirectUsers());
+            preparedStatement.setInt(7, affiliatedOrganization.getNumberOfIndirectUsers());
+            preparedStatement.setInt(8, affiliatedOrganization.getNumberOfDirectUsers());
 
             if (preparedStatement.executeUpdate() > NO_ROWS_AFFECTED) {
                 isRegistered = true;

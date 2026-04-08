@@ -120,11 +120,14 @@ public static void main(String[] args) {
                     String password = scanner.nextLine();
                     System.out.println("Numero de personal");
                     String idProfessor = scanner.nextLine();
+                    System.out.println("Rol (Profesor/Coordinador)");
+                    String userType = scanner.nextLine();
 
                     professor.setFirstName(firstName);
                     professor.setLastName(lastName);
                     professor.setPassword(password);
                     professor.setPersonnelNumber(idProfessor);
+                    professor.setUserType(userType);
 
                     userDAO.registerUser(professor);
                     break;
@@ -170,7 +173,7 @@ public static void main(String[] args) {
         int option;
         do {
             System.out.println("1. Registrar alumno");
-            System.out.println("2. Consultar alumnos");
+            System.out.println("2. Consultar alumno por ID");
             System.out.println("3. Registrar organizacion vinculada");
             System.out.println("4. Consultar organizaciones vinculadas");
             System.out.println("5. Registrar responsable tecnico");
@@ -225,7 +228,7 @@ public static void main(String[] args) {
                     student.setGender(gender);
                     student.setIndigenousLanguage(indigenousLanguage);
                     student.setUserType("Alumno");
-                    student.setInactive(true);
+                    student.setInactive(false);
 
                     student.setIdentification(idStudent); 
                     int generatedId = userDAO.registerUser(student); 
@@ -273,6 +276,7 @@ public static void main(String[] args) {
                 case 3:
                     AffiliatedOrganizationDAO organizationDAO = new AffiliatedOrganizationDAO();
                     AffiliatedOrganization organization = new AffiliatedOrganization();
+                    scanner.nextLine();
                     System.out.println("Nombre: ");
                     String organizationName = scanner.nextLine();
                     System.out.println("Ciudad: ");
@@ -297,6 +301,7 @@ public static void main(String[] args) {
                     organization.setNumberOfIndirectUsers(indirectUsers);
 
                     organizationDAO.registerAffiliatedOrganization(organization);
+                    System.out.println("Organización registrada con éxito");
                     break;
                 case 4:
                     AffiliatedOrganizationDAO organizationSearcherDAO = new AffiliatedOrganizationDAO();
@@ -334,18 +339,19 @@ public static void main(String[] args) {
                     } 
                     break;
                 case 5:
+                    scanner.nextLine();
                     ProjectSupervisorDAO supervisorDAO = new ProjectSupervisorDAO();
                     ProjectSupervisor supervisor = new ProjectSupervisor();
                     System.out.println("Nombre: ");
                     String firstNameSupervisor = scanner.nextLine();
-                    System.out.println("Apellido(s): ");
-                    String lastNameSupervisor = scanner.nextLine();
                     System.out.println("Correo electrónico: ");
                     String emailSupervisor = scanner.nextLine();
+                    System.out.println("Cargo: ");
+                    String positionSupervisor = scanner.nextLine();
 
                     supervisor.setName(firstNameSupervisor);
-                    supervisor.setLastName(lastNameSupervisor);
                     supervisor.setEmail(emailSupervisor);
+                    supervisor.setPosition(positionSupervisor);
                     supervisorDAO.registerProjectSupervisor(supervisor);
                     break;
                 case 6:
@@ -356,8 +362,8 @@ public static void main(String[] args) {
                     if (foundSupervisor != null) {
                         System.out.println("Supervisor encontrado:");
                         System.out.println("Nombre: " + foundSupervisor.getName());
-                        System.out.println("Apellido(s): " + foundSupervisor.getLastName());
                         System.out.println("Correo electrónico: " + foundSupervisor.getEmail());
+                        System.out.println("Cargo: " + foundSupervisor.getPosition());
                         System.out.println("\n1. Actualizar supervisor");
                         System.out.println("2. Inactivar supervisor");
                         System.out.println("3. Regresar al menú");
@@ -378,6 +384,7 @@ public static void main(String[] args) {
                         System.out.println("Supervisor no encontrado.");
                     }
                 case 7:
+                    scanner.nextLine();
                     ProjectDAO projectDAO = new ProjectDAO();
                     Project project = new Project();
                     System.out.println("Nombre: ");
@@ -387,6 +394,7 @@ public static void main(String[] args) {
                     System.out.println("Capacidad de alumnos: ");
                     int studentCapacity = scanner.nextInt();
                     System.out.println("Objetivo: ");
+                    scanner.nextLine();
                     String objective = scanner.nextLine();
                     System.out.println("Descripción: ");
                     String description = scanner.nextLine();
@@ -470,7 +478,7 @@ public static void main(String[] args) {
                 default:
                     System.out.println("Opción no válida");
             }
-        } while (option != 10);
+        } while (option != 11);
         scanner.close(); 
     }
 

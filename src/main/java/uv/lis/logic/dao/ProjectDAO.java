@@ -54,11 +54,12 @@ public class ProjectDAO implements IProjectDAO{
     @Override
     public Project getProjectById(int idProject) {
         Project project = new Project();
+
         String projectQuery = "SELECT * FROM Proyecto WHERE idProyecto = ?;";
 
         try (Connection databaseConnection = connectionManager.getConnection();
-
             PreparedStatement preparedStatement = databaseConnection.prepareStatement(projectQuery)) {
+
             preparedStatement.setInt(1, idProject);
             ResultSet resultSet = preparedStatement.executeQuery();
             
@@ -67,7 +68,7 @@ public class ProjectDAO implements IProjectDAO{
                 project.setName(resultSet.getString("nombre"));
                 project.setMethodology(resultSet.getString("metodologiaProyecto"));
                 project.setCapacity(resultSet.getInt("Cupo"));
-                project.setObjective(resultSet.getString("objetivoProyecto"));
+                project.setObjective(resultSet.getString("objetivo"));
                 project.setDescription(resultSet.getString("descripcion"));
             }
         } catch (SQLException e) {

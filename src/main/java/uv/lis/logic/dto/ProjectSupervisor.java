@@ -4,7 +4,6 @@ package uv.lis.logic.dto;
 public class ProjectSupervisor {
     private int id;
     private String name;
-    private String lastName;
     private String email;
     private String position;
     private int counter = 0;
@@ -16,7 +15,6 @@ public class ProjectSupervisor {
     public ProjectSupervisor(String name, String lastName, String email, String position) {
         this.id = generateId();
         this.name = name;
-        this.lastName = lastName;
         this.position = position;
         this.email = email;
     }
@@ -43,14 +41,6 @@ public class ProjectSupervisor {
 
     public void setName(String name) {
         this.name = name;
-    }
-
-    public String getLastName() {
-        return lastName;
-    }
-
-    public void setLastName(String lastName) {
-        this.lastName = lastName;
     }
 
     public String getEmail() {

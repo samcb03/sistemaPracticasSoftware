@@ -27,18 +27,18 @@ public class ProjectSupervisorDAO implements IProjectSupervisorDAO {
 
         String query = "SELECT * FROM ResponsableProyecto WHERE idResponsableProyecto = ?";
 
-        try (Connection conn = connectionManager.getConnection();
-            PreparedStatement ps = conn.prepareStatement(query)) {
+        try (Connection databaseConnection = connectionManager.getConnection();
+            PreparedStatement preparedStatement = databaseConnection.prepareStatement(query)) {
 
-            ps.setInt(1, id);
-            ResultSet rs = ps.executeQuery();
+            preparedStatement.setInt(1, id);
+            ResultSet resultSet = preparedStatement.executeQuery();
 
-            if (rs.next()) {
+            if (resultSet.next()) {
                 supervisor = new ProjectSupervisor();
-                supervisor.setId(rs.getInt("idResponsableProyecto"));
-                supervisor.setName(rs.getString("nombre"));
-                supervisor.setEmail(rs.getString("correo"));
-                supervisor.setPosition(rs.getString("cargo"));
+                supervisor.setId(resultSet.getInt("idResponsableProyecto"));
+                supervisor.setName(resultSet.getString("nombre"));
+                supervisor.setEmail(resultSet.getString("correo"));
+                supervisor.setPosition(resultSet.getString("cargo"));
             }
 
         } catch (SQLException e) {
@@ -61,7 +61,7 @@ public class ProjectSupervisorDAO implements IProjectSupervisorDAO {
             preparedStatement.setString(1, projectSupervisor.getName());
             preparedStatement.setString(2, projectSupervisor.getEmail());
             preparedStatement.setString(3, projectSupervisor.getPosition());
-            preparedStatement.setString(4, "1");
+            preparedStatement.setString(4, "0");
 
             if (preparedStatement.executeUpdate() > NO_ROWS_AFFECTED) {
                 isRegistered = true;
