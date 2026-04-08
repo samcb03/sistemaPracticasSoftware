@@ -180,9 +180,8 @@ public static void main(String[] args) {
             System.out.println("6. Consultar responsables técnicos");
             System.out.println("7. Registrar proyecto");
             System.out.println("8. Consultar proyectos");
-            System.out.println("9. Inactivar proyecto");
-            System.out.println("10. Asignar proyecto a alumno");
-            System.out.println("11. Salir");
+            System.out.println("9. Asignar proyecto a alumno");
+            System.out.println("10. Salir");
 
             option = scanner.nextInt();
             switch (option) {
@@ -439,24 +438,6 @@ public static void main(String[] args) {
                     }
                     break;
                 case 9:
-                    System.out.println("Ingrese el id del proyecto a inactivar");
-                    int idToInactivatet = scanner.nextInt();
-                    ProjectDAO inactivateDAO = new ProjectDAO();
-
-                    Project projectFound = inactivateDAO.getProjectById(idToInactivatet);
-
-                    if(projectFound != null){
-                        boolean inactive = inactivateDAO.inactivateProject(projectFound);
-                        if (inactive) {
-                            System.out.println("Proyecto inactivado con exito");
-                        } else {
-                            System.out.println("No se pudo inactivar el proyecto");
-                        }
-                    } else {
-                        System.out.println("Proyecto no encontrado");
-                    }
-                    break;
-                case 10:
                     ProjectRequestDAO requestDAO = new ProjectRequestDAO();
                     System.out.println("Escriba la matricula del alumno: ");
                     String studentId = scanner.nextLine();
@@ -472,13 +453,13 @@ public static void main(String[] args) {
                         System.out.println("Alumno no encontrado.");
                     }
                     break;
-                case 11:
+                case 10:
                     System.out.println("Saliendo del programa...");
                     break;
                 default:
                     System.out.println("Opción no válida");
             }
-        } while (option != 11);
+        } while (option != 10);
         scanner.close(); 
     }
 
