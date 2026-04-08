@@ -7,16 +7,18 @@ public class User {
     private String password;
     private String identification;
     private String userType;
+    private boolean isInactive;
 
     public User(){
     }
 
-    public User(int id, String firstName, String lastName, String password, String userType) {
+    public User(int id, String firstName, String lastName, String password, String userType, boolean isInactive) {
         this.id = id;
         this.firstName = firstName;
         this.lastName = lastName;
         this.password = password;
         this.userType = userType;
+        this.isInactive = isInactive;
     }
 
     public int getId() {
@@ -67,4 +69,11 @@ public class User {
         this.userType = userType;
     }
 
+    public boolean isInactive() {
+        return isInactive;
+    }
+
+    public void setInactive(boolean isInactive) {
+        this.isInactive = isInactive;
+    }
 }

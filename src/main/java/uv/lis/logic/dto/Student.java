@@ -6,7 +6,7 @@ import java.util.Date;
 
 public class Student extends User {
     private String idStudent;
-    private Date dateOfBirth;
+    private Date birthDate;
     private int completedHours;
     private String gender;
     private boolean indigenousLanguage;
@@ -16,11 +16,11 @@ public class Student extends User {
 
     }
 
-    public Student(int idUser, String firstName, String lastName, String password, String idStudent, Date dateOfBirth, 
+    public Student(int idUser, String firstName, String lastName, String password, String idStudent, Date birthDate, 
             int completedHours, String gender, boolean indigenousLanguage, String autoevaluation) {
-        super(idUser, firstName, lastName, password, "Alumno");
+        super(idUser, firstName, lastName, password, "Alumno", true);
         this.idStudent = idStudent;
-        this.dateOfBirth = dateOfBirth;
+        this.birthDate = birthDate;
         this.completedHours = completedHours;
         this.gender = gender;
         this.indigenousLanguage = indigenousLanguage;
@@ -35,12 +35,12 @@ public class Student extends User {
         this.idStudent = idStudent;
     }
 
-    public Date getDateOfBirth() {
-        return dateOfBirth;
+    public Date getBirthDate() {
+        return birthDate;
     }
 
-    public void setDateOfBirth(Date dateOfBirth) {
-        this.dateOfBirth = dateOfBirth;
+    public void setBirthDate(Date birthDate) {
+        this.birthDate = birthDate;
     }
 
     public int getCompletedHours() {

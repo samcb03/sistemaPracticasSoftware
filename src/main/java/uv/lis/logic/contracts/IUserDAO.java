@@ -28,6 +28,4 @@ public interface IUserDAO {
     boolean inactivateStudent(Student student) throws SQLException;
 
     User authenticate(String identification, String password);
-
-    String getUserType(User user) throws SQLException;
 }

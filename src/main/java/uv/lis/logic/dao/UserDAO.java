@@ -23,12 +23,12 @@ public class UserDAO implements IUserDAO{
         this.connectionManager = new MySQLConnectionManager();
     }
 
-@Override 
+    @Override 
     public int registerUser(User user) {
-        int generateId = -1;
+        int generatedId = -1;
         String userQuery = "INSERT INTO Usuario" 
-            + "(nombre, apellidos, contraseña, identificador, rol) "
-            + "VALUES (?, ?, ?,?,?);";
+            + "(nombre, apellidos, contraseña, rol) "
+            + "VALUES (?, ?, ?, ?);";
 
         try (Connection databaseConnection = connectionManager.getConnection();
             PreparedStatement preparedStatement = databaseConnection.prepareStatement(userQuery,
@@ -37,18 +37,18 @@ public class UserDAO implements IUserDAO{
             preparedStatement.setString(1, user.getFirstName());
             preparedStatement.setString(2, user.getLastName());
             preparedStatement.setString(3, user.getPassword());
-            preparedStatement.setString(4, user.getIdentification());
-            preparedStatement.setString(5,user.getUserType());
-
-            ResultSet resultSet = preparedStatement.getGeneratedKeys();
+            preparedStatement.setString(4, user.getUserType());
 
             if (preparedStatement.executeUpdate() > NO_ROWS_AFFECTED) {
-                generateId = resultSet.getInt(1);
+                ResultSet resultSet = preparedStatement.getGeneratedKeys();
+                if (resultSet.next()) { 
+                    generatedId = resultSet.getInt(1);
+                }
             }
         } catch (SQLException e) {
             LOGGER.log(Level.SEVERE, "Error de conexion con la base de datos",e);
         }
-        return generateId;
+        return generatedId;
     }
 
     @Override
@@ -175,23 +175,30 @@ public class UserDAO implements IUserDAO{
     public Student getStudentById(String idStudent) { 
         Student student = null;
 
-        String query = "SELECT e.idUsuario, e.matricula, u.nombre, u.apellidoMaterno, u.apellidoPaterno " 
-            + "FROM Practicante e INNER JOIN Usuario u ON e.idUsuario = u.idUsuario WHERE e.idUsuario = ?;";
+    String query = "SELECT e.idUsuario, e.matricula, u.nombre, u.apellidos, e.fechaNacimiento, e.genero," 
+        + "e.lenguaIndigena FROM Alumno e INNER JOIN Usuario u ON e.idUsuario = u.idUsuario WHERE e.idUsuario = ?;"; 
 
         try (Connection databaseConnection = connectionManager.getConnection();
              PreparedStatement preparedStatement = databaseConnection.prepareStatement(query)) {
             
             preparedStatement.setString(1, idStudent);
             
-            try (ResultSet rs = preparedStatement.executeQuery()) {
-                if (rs.next()) {
+            try (ResultSet resultSet = preparedStatement.executeQuery()) {
+                if (resultSet.next()) {
                     student = new Student();
-                    student.setIdStudent(rs.getString("matricula"));
-                    student.setFirstName(rs.getString("nombre"));
-                    student.setLastName(rs.getString("apellidos"));
+                    student.setId(resultSet.getInt("idUsuario"));
+                    student.setIdStudent(resultSet.getString("matricula"));
+                    student.setFirstName(resultSet.getString("nombre"));
+                    student.setLastName(resultSet.getString("apellidos"));
+                    student.setBirthDate(resultSet.getDate("fechaNacimiento"));
+                    student.setGender(resultSet.getString("genero"));
+                    student.setIndigenousLanguage(resultSet.getBoolean("lenguaIndigena"));
+
+                    LOGGER.log(Level.INFO, "Busqueda de responsable de proyecto con ID {0} exitosa.", 
+                        idStudent);
+                } else {
+                    LOGGER.log(Level.INFO, "No se encontro un alumno con la matricula {0}.", idStudent);
                 }
-                LOGGER.log(Level.INFO, "Busqueda de responsable de proyecto con ID {0} exitosa.", 
-                    student.getId());
             }
         } catch (SQLException e) {
             LOGGER.log(Level.SEVERE, "Error de conexion con la base de datos",e);
@@ -204,17 +211,25 @@ public class UserDAO implements IUserDAO{
     public boolean registerStudent(Student student) {
         boolean isRegistered = false;
 
-        String studentQuery = "INSERT INTO Practicante (idUsuario, matricula) VALUES (?, ?);";
+        String studentQuery = "INSERT INTO Alumno (idUsuario, matricula, fechaNacimiento, genero, lenguaIndigena," 
+            + "estado) VALUES (?, ?, ?, ?, ?, ?);";
 
         try (Connection databaseConnection = connectionManager.getConnection();
              PreparedStatement preparedStatement = databaseConnection.prepareStatement(studentQuery)) {
             
             preparedStatement.setInt(1, student.getId());
-            preparedStatement.setString(2, student.getIdStudent()); 
+            preparedStatement.setString(2, student.getIdStudent());
+            java.util.Date birthDate = student.getBirthDate();
+            java.sql.Date sqlBirthDate = new java.sql.Date(birthDate.getTime());
+
+            preparedStatement.setDate(3, sqlBirthDate);
+            preparedStatement.setString(4, student.getGender());
+            preparedStatement.setBoolean(5, student.hasIndigenousLanguage());
+            preparedStatement.setBoolean(6, student.isInactive());
 
             if (preparedStatement.executeUpdate() > NO_ROWS_AFFECTED) {
                 isRegistered = true;
-                LOGGER.log(Level.INFO, "Registro de estudiante con ID {0} exitoso.", student.getId());
+                LOGGER.log(Level.INFO, "Registro de alumno con ID {0} exitoso.", student.getId());
             }
 
         } catch (SQLException e) {
@@ -228,7 +243,7 @@ public class UserDAO implements IUserDAO{
     public boolean modifyStudent(Student student) {
         boolean isModified = false;
 
-        String studentQuery = "UPDATE Practicante e " 
+        String studentQuery = "UPDATE Alumno e " 
             + "INNER JOIN Usuario u ON e.idUsuario = u.idUsuario SET e.matricula = ?, u.nombre = ?, u.apellidos = ?" 
             + "WHERE e.idUsuario = ?;";
 
@@ -256,7 +271,7 @@ public class UserDAO implements IUserDAO{
     public boolean inactivateStudent(Student student) {
         boolean isInactive = false;
         
-        String studentQuery = "UPDATE Practicante SET estado = 1 WHERE idUsuario = ?;";
+        String studentQuery = "UPDATE Alumno SET estado = 1 WHERE idUsuario = ?;";
 
         try (Connection databaseConnection = connectionManager.getConnection();
              PreparedStatement preparedStatement = databaseConnection.prepareStatement(studentQuery)) {
@@ -276,26 +291,6 @@ public class UserDAO implements IUserDAO{
     }
 
     @Override
-    public String getUserType(User user) {
-        /*try (Connection databaseConnection = MySQLConnectionManager.getConnection()) {
-            String query = "SELECT rol FROM Profesor p INNER JOIN Usuario u ON p.idUsuario = u.idUsuario WHERE u.idUsuario = ?;";
-            try (PreparedStatement preparedStatement = databaseConnection.prepareStatement(query)) {
-                preparedStatement.setInt(1, user.getId());
-                try (ResultSet resultSet = preparedStatement.executeQuery()) {
-                    if (resultSet.next()) {
-                        return resultSet.getString("rol");
-                    }
-                }
-            }
-        } catch (SQLException e) {
-            LOGGER.log(Level.SEVERE, "Error de conexion con la base de datos", e);
-        }
-        return null;*/
-        String userType = "Coordinador";
-        return userType;
-    }
-
-@Override
     public User authenticate(String identification, String password) {
         User userAuthenticate = null;
         String userQuery = "SELECT u.idUsuario, u.contraseña, a.matricula, p.numeroPersonal, p.rol " +

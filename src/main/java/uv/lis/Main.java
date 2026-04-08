@@ -184,17 +184,18 @@ public static void main(String[] args) {
             option = scanner.nextInt();
             switch (option) {
                 case 1:
+                    scanner.nextLine();
                     Student student = new Student();
                     System.out.println("Nombre: ");
                     String firstName = scanner.nextLine();
-                    System.out.println("Apellido: ");
+                    System.out.println("Apellidos: ");
                     String lastName = scanner.nextLine();
                     System.out.println("Contraseña: ");
                     String password = scanner.nextLine();
                     System.out.println("Matricula: ");
                     String idStudent = scanner.nextLine();
                     System.out.println("Fecha de nacimiento (YYYY-MM-DD): ");
-                    Date dateOfBirth = Date.valueOf(scanner.nextLine());
+                    Date birthDate = Date.valueOf(scanner.nextLine());
                     System.out.println("Genero: ");
                     System.out.println("1. Masculino");
                     System.out.println("2. Femenino");
@@ -220,13 +221,23 @@ public static void main(String[] args) {
                     student.setLastName(lastName);
                     student.setPassword(password);
                     student.setIdStudent(idStudent);
-                    student.setDateOfBirth(dateOfBirth);
+                    student.setBirthDate(birthDate);
                     student.setGender(gender);
                     student.setIndigenousLanguage(indigenousLanguage);
+                    student.setUserType("Alumno");
+                    student.setInactive(true);
 
-                    userDAO.registerUser(student);
+                    student.setIdentification(idStudent); 
+                    int generatedId = userDAO.registerUser(student); 
+                    if (generatedId != -1) {
+                        student.setId(generatedId);                   
+                        userDAO.registerStudent(student);
+                    } else {
+                        System.out.println("Error al registrar usuario.");
+                    }
                     break;
                 case 2:
+                    scanner.nextLine();
                     System.out.println("Escriba la matricula del alumno a consultar: ");
                     String searchId = scanner.nextLine();
                     Student foundStudent = userDAO.getStudentById(searchId);
@@ -235,7 +246,7 @@ public static void main(String[] args) {
                         System.out.println("Nombre: " + foundStudent.getFirstName());
                         System.out.println("Apellido: " + foundStudent.getLastName());
                         System.out.println("Matricula: " + foundStudent.getIdStudent());
-                        System.out.println("Fecha de nacimiento: " + foundStudent.getDateOfBirth());
+                        System.out.println("Fecha de nacimiento: " + foundStudent.getBirthDate());
                         System.out.println("Género: " + foundStudent.getGender());
                         System.out.println("Habla alguna lengua indígena: " + foundStudent.hasIndigenousLanguage());
                         System.out.println("Horas completadas: " + foundStudent.getCompletedHours());
