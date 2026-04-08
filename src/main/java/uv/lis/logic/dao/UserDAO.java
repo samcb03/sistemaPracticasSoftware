@@ -95,9 +95,9 @@ public class UserDAO implements IUserDAO{
             preparedStatement.setString(2, professor.getPersonnelNumber());     
 
             if (professor.getIsCoordinator()) { 
-                preparedStatement.setString(3, "Coordinador");
+                preparedStatement.setString(3, professor.getUserType());
             } else {
-                preparedStatement.setString(3, "Maestro");
+                preparedStatement.setString(3, professor.getUserType());
             }
 
             preparedStatement.setString(4,"1");
@@ -113,6 +113,15 @@ public class UserDAO implements IUserDAO{
         
         return isRegistered;
     }
+
+
+
+
+
+
+
+
+
 
 @Override
     public boolean modifyProfessor(Professor professor) {
@@ -293,11 +302,12 @@ public class UserDAO implements IUserDAO{
     @Override
     public User authenticate(String identification, String password) {
         User userAuthenticate = null;
-        String userQuery = "SELECT u.idUsuario, u.contraseña, a.matricula, p.numeroPersonal, p.rol " +
+        String userQuery = "SELECT u.idUsuario, u.contraseña, a.matricula, p.numeroPersonal,ad.usuario, p.rol " +
                            "FROM Usuario u " +
                            "LEFT JOIN Alumno a ON u.idUsuario = a.idUsuario " +
                            "LEFT JOIN Profesor p ON u.idUsuario = p.idUsuario " +
-                           "WHERE (a.matricula = ? OR p.numeroPersonal = ?) " +
+                           "LEFT JOIN Administrador ad ON u.idUsuario = ad.idUsuario " +
+                           "WHERE (a.matricula = ? OR p.numeroPersonal = ? OR ad.usuario = ?) " +
                            "AND u.contraseña = ?";
 
         try (Connection databasConnection = connectionManager.getConnection();
@@ -305,7 +315,8 @@ public class UserDAO implements IUserDAO{
              
                 preparedStatement.setString(1, identification);
                 preparedStatement.setString(2, identification);
-                preparedStatement.setString(3, password);
+                preparedStatement.setString(3, identification);
+                preparedStatement.setString(4, password);
 
                 try (ResultSet resultSet = preparedStatement.executeQuery()){
                     if (resultSet.next()) {
@@ -314,6 +325,8 @@ public class UserDAO implements IUserDAO{
 
                         if(resultSet.getString("matricula") != null) {
                             userAuthenticate.setUserType("Estudiante"); 
+                        } else if(resultSet.getString("usuario") != null) {
+                            userAuthenticate.setUserType("Administrador"); 
                         } else {
                             String rol = resultSet.getString("rol");
                             if("Coordinador".equals(rol)) {
@@ -321,7 +334,7 @@ public class UserDAO implements IUserDAO{
                             } else {
                                 userAuthenticate.setUserType("Profesor");
                             }
-                        } 
+                        }
                     }
                 }
             } catch (SQLException e) {
