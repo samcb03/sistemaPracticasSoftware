@@ -319,7 +319,53 @@ public static void main(String[] args) {
                         int studentOption = scanner.nextInt();
                         switch (studentOption) {
                             case 1:
-                                userDAO.modifyStudent(foundStudent);
+                                int modifyOption;
+                                do {
+                                    System.out.println("\n¿Qué campo desea modificar?");
+                                    System.out.println("1. Nombre");
+                                    System.out.println("2. Apellidos");
+                                    System.out.println("3. Género");
+                                    System.out.println("4. Lengua indígena");
+                                    System.out.println("5. Salir");
+
+                                    modifyOption = scanner.nextInt();
+                                    scanner.nextLine();
+
+                                    switch (modifyOption) {
+                                        case 1:
+                                            System.out.println("Nuevo nombre:");
+                                            foundStudent.setFirstName(scanner.nextLine());
+                                            break;
+
+                                        case 2:
+                                            System.out.println("Nuevo apellido:");
+                                            foundStudent.setLastName(scanner.nextLine());
+                                            break;
+
+                                        case 3:
+                                            System.out.println("Nuevo género:");
+                                            foundStudent.setGender(scanner.nextLine());
+                                            break;
+
+                                        case 4:
+                                            System.out.println("¿Habla lengua indígena? (true/false):");
+                                            foundStudent.setIndigenousLanguage(scanner.nextBoolean());
+                                            scanner.nextLine();
+                                            break;
+
+                                        case 5:
+                                            System.out.println("Saliendo...");
+                                            break;
+
+                                        default:
+                                            System.out.println("Opción no válida");
+                                    }
+
+                                    if (modifyOption != 5) {
+                                        userDAO.modifyStudent(foundStudent);
+                                    }
+
+                                } while (modifyOption != 5);
                                 break;
                             case 2:
                                 userDAO.inactivateStudent(foundStudent);
@@ -430,7 +476,45 @@ public static void main(String[] args) {
 
                         switch (scanner.nextInt()) {
                             case 1:
-                                supervisorSearcherDAO.modifyProjectSupervisor(foundSupervisor);
+                                int modifyOption;
+                                do {
+                                    System.out.println("\n¿Qué campo desea modificar?");
+                                    System.out.println("1. Nombre");
+                                    System.out.println("2. Correo electrónico");
+                                    System.out.println("3. Cargo");
+                                    System.out.println("4. Salir");
+
+                                    modifyOption = scanner.nextInt();
+                                    scanner.nextLine();
+
+                                    switch (modifyOption) {
+                                        case 1:
+                                            System.out.println("Nuevo nombre:");
+                                            foundSupervisor.setName(scanner.nextLine());
+                                            break;
+
+                                        case 2:
+                                            System.out.println("Nuevo correo electrónico:");
+                                            foundSupervisor.setEmail(scanner.nextLine());
+                                            break;
+
+                                        case 3:
+                                            System.out.println("Nuevo cargo:");
+                                            foundSupervisor.setPosition(scanner.nextLine());
+                                            break;
+                                        case 4:
+                                            System.out.println("Saliendo...");
+                                            break;
+
+                                        default:
+                                            System.out.println("Opción no válida");
+                                    }
+
+                                    if (modifyOption != 4) {
+                                        supervisorSearcherDAO.modifyProjectSupervisor(foundSupervisor);
+                                    }
+
+                                } while (modifyOption != 4);
                                 break;
                             case 2:
                                 supervisorSearcherDAO.inactivateProjectSupervisor(foundSupervisor);
