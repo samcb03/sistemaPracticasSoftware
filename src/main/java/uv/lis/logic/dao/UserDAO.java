@@ -82,7 +82,7 @@ public class UserDAO implements IUserDAO{
         return professor;
     }
 
-@Override
+    @Override
     public boolean registerProfessor(Professor professor) {
         boolean isRegistered = false;
         
@@ -114,7 +114,7 @@ public class UserDAO implements IUserDAO{
         return isRegistered;
     }
 
-@Override
+    @Override
     public boolean modifyProfessor(Professor professor) {
         boolean isModified = false;
 
@@ -244,7 +244,7 @@ public class UserDAO implements IUserDAO{
         boolean isModified = false;
 
         String studentQuery = "UPDATE Alumno e " 
-            + "INNER JOIN Usuario u ON e.idUsuario = u.idUsuario SET e.matricula = ?, u.nombre = ?, u.apellidos = ?" 
+            + "INNER JOIN Usuario u ON e.idUsuario = u.idUsuario SET e.matricula = ?, u.nombre = ?, u.apellidos = ? " 
             + "WHERE e.idUsuario = ?;";
 
         try (Connection databaseConnection = connectionManager.getConnection();
@@ -257,7 +257,7 @@ public class UserDAO implements IUserDAO{
 
             if (preparedStatement.executeUpdate() > NO_ROWS_AFFECTED) {
                 isModified = true;
-                LOGGER.log(Level.INFO, "Modificacion de alumno con matricula exitosa.", student.getIdStudent());
+                LOGGER.log(Level.INFO, "Modificacion de alumno con matricula {0} exitosa.", student.getIdStudent());
             }
 
         } catch (SQLException e) {
