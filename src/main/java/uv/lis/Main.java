@@ -3,7 +3,6 @@ package uv.lis;
 
 import java.sql.Date;
 import java.util.Scanner;
-
 import uv.lis.logic.dao.AffiliatedOrganizationDAO;
 import uv.lis.logic.dao.ProjectDAO;
 import uv.lis.logic.dao.ProjectRequestDAO;
@@ -26,21 +25,22 @@ import uv.lis.logic.services.AutoevaluationService;
 public class Main {
 public static void main(String[] args) {
         Main app = new Main();
+        Scanner scanner = new Scanner(System.in);
 
-        User currentUser = app.login();
+        User currentUser = app.login(scanner);
 
         if (currentUser != null) {
             String userType = currentUser.getUserType();
             System.out.println("\nAccediendo como: " + userType);
 
             if ("Profesor".equals(userType)) {
-                app.showProfessorMenu();
+                app.showProfessorMenu(scanner);
             } else if ("Coordinador".equals(userType)) {
-                app.showCoordinatorMenu();
-            } else if ("Alumno".equals(userType)) {
-                app.showStudentMenu();
+                app.showCoordinatorMenu(scanner);
+            } else if ("Estudiante".equals(userType)) {
+                app.showStudentMenu(scanner);
             } else if ("Administrador".equals(userType)){
-                app.showAdministrator();
+                app.showAdministratorMenu(scanner);
             } else {
                 System.out.println("No puede acceder");
             }
@@ -49,10 +49,9 @@ public static void main(String[] args) {
         }
     }
 
-    private User login() {
+    private User login(Scanner scanner) {
         UserDAO userDAO = new UserDAO();
         User loggedUser = null;
-        Scanner scanner = new Scanner(System.in);
 
         System.out.println("=== SISTEMA DE GESTION DE PROYECTOS LIS ===");
         System.out.println("           Inicio de sesion\n");
@@ -73,8 +72,7 @@ public static void main(String[] args) {
         return loggedUser; 
     }
 
-    private void showProfessorMenu() {
-        Scanner scanner = new Scanner(System.in);
+    private void showProfessorMenu(Scanner scanner) {
         int option;
         do {
             System.out.println("1. Registrar notificacion");
@@ -94,13 +92,11 @@ public static void main(String[] args) {
                     System.out.println("Opción no válida");
             }
         } while (option != 3);
-
-        scanner.close();   
+ 
     }   
 
-    private void showAdministrator() {
+    private void showAdministratorMenu(Scanner scanner) {
         UserDAO userDAO = new UserDAO();
-        Scanner scanner = new Scanner(System.in);
         int option;
         do {
             System.out.println("1. Registrar profesor");
@@ -227,13 +223,12 @@ public static void main(String[] args) {
         } while (option != 3);
     }
 
-    private void showCoordinatorMenu() {
+    private void showCoordinatorMenu(Scanner scanner) {
         UserDAO userDAO = new UserDAO();
-        Scanner scanner = new Scanner(System.in);
         int optionCoordinator;
         do {
             System.out.println("1. Registrar alumno");
-            System.out.println("2. Consultar alumno por ID");
+            System.out.println("2. Consultar alumno por matricula");
             System.out.println("3. Registrar organizacion vinculada");
             System.out.println("4. Consultar organizaciones vinculadas");
             System.out.println("5. Registrar responsable tecnico");
@@ -594,6 +589,7 @@ public static void main(String[] args) {
                     } else {
                         System.out.println("Supervisor no encontrado.");
                     }
+                    break;
                 case 7:
                     scanner.nextLine();
 
@@ -711,6 +707,7 @@ public static void main(String[] args) {
                     }
                     break;
                 case 9:
+                    scanner.nextLine();
                     ProjectRequestDAO requestDAO = new ProjectRequestDAO();
                     System.out.println("Escriba la matricula del alumno: ");
                     String studentId = scanner.nextLine();
@@ -733,11 +730,9 @@ public static void main(String[] args) {
                     System.out.println("Opción no válida");
             }
         } while (optionCoordinator != 10);
-        scanner.close(); 
     }
 
-    private void showStudentMenu() {
-        Scanner scanner = new Scanner(System.in);
+    private void showStudentMenu(Scanner scanner) {
         int option;
         do {
             System.out.println("1. Solicitar proyecto");
@@ -754,6 +749,7 @@ public static void main(String[] args) {
                     requestDAO.getAvailableProjects();
                     System.out.println("Escriba el numero de identificacion del proyecto a solicitar: ");
                     int requestProjectId = scanner.nextInt();
+                    scanner.nextLine();
                     System.out.println("Escriba su matricula: ");
                     String studentId = scanner.nextLine();
                     requestDAO.requestProject(studentId, requestProjectId);
@@ -920,7 +916,5 @@ public static void main(String[] args) {
                     System.out.println("Opción no válida");
             }
         } while (option != 4);
-
-        scanner.close();
     }
 }

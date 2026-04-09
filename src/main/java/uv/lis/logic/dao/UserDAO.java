@@ -176,7 +176,7 @@ public class UserDAO implements IUserDAO{
         Student student = null;
 
     String studentQuery = "SELECT e.idUsuario, e.matricula, u.nombre, u.apellidos, e.fechaNacimiento, e.genero," 
-        + "e.lenguaIndigena FROM Alumno e INNER JOIN Usuario u ON e.idUsuario = u.idUsuario WHERE e.idUsuario = ?;"; 
+        + "e.lenguaIndigena FROM Alumno e INNER JOIN Usuario u ON e.idUsuario = u.idUsuario WHERE e.matricula = ?;"; 
 
         try (Connection databaseConnection = connectionManager.getConnection();
              PreparedStatement preparedStatement = databaseConnection.prepareStatement(studentQuery)) {
@@ -194,7 +194,7 @@ public class UserDAO implements IUserDAO{
                     student.setGender(resultSet.getString("genero"));
                     student.setIndigenousLanguage(resultSet.getBoolean("lenguaIndigena"));
 
-                    LOGGER.log(Level.INFO, "Busqueda de responsable de proyecto con ID {0} exitosa.", 
+                    LOGGER.log(Level.INFO, "Busqueda de responsable de proyecto con matricula {0} exitosa.", 
                         idStudent);
                 } else {
                     LOGGER.log(Level.INFO, "No se encontro un alumno con la matricula {0}.", idStudent);
@@ -229,7 +229,7 @@ public class UserDAO implements IUserDAO{
 
             if (preparedStatement.executeUpdate() > NO_ROWS_AFFECTED) {
                 isRegistered = true;
-                LOGGER.log(Level.INFO, "Registro de alumno con ID {0} exitoso.", student.getId());
+                LOGGER.log(Level.INFO, "Registro de alumno con matricula {0} exitoso.", student.getIdStudent());
             }
 
         } catch (SQLException e) {
