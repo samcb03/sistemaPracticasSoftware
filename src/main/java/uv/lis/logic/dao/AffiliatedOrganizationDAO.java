@@ -65,8 +65,7 @@ public class AffiliatedOrganizationDAO implements IAffiliatedOrganizationDAO{
             + "VALUES (?, ?, ?, ?, ?, ?, ?, ?);";
 
         try (Connection databaseConnection = connectionManager.getConnection();
-
-            PreparedStatement preparedStatement = databaseConnection.prepareStatement(affiliatedOrganizationQuery)){
+            PreparedStatement preparedStatement = databaseConnection.prepareStatement(affiliatedOrganizationQuery, PreparedStatement.RETURN_GENERATED_KEYS)) {
 
             preparedStatement.setString(1, affiliatedOrganization.getName());
             preparedStatement.setString(2, affiliatedOrganization.getCity());
@@ -78,7 +77,14 @@ public class AffiliatedOrganizationDAO implements IAffiliatedOrganizationDAO{
             preparedStatement.setInt(8, affiliatedOrganization.getNumberOfDirectUsers());
 
             if (preparedStatement.executeUpdate() > NO_ROWS_AFFECTED) {
+                try (ResultSet generatedKeys = preparedStatement.getGeneratedKeys()) {
+                    if (generatedKeys.next()) {
+                        int generatedId = generatedKeys.getInt(1);
+                        affiliatedOrganization.setId(generatedId);
+                    }
+                }
                 isRegistered = true;
+                LOGGER.log(Level.INFO, "Registro de organizacion vinculada con ID {0} exitosa.", affiliatedOrganization.getId());
             }
         } catch (SQLException e) {
             LOGGER.log(Level.SEVERE, "Error de conexion con la base de datos",e);
@@ -90,11 +96,11 @@ public class AffiliatedOrganizationDAO implements IAffiliatedOrganizationDAO{
     public boolean modifyAffiliatedOrganization(AffiliatedOrganization affiliatedOrganization) {
         boolean isModified = false;
 
-        String query = "UPDATE organizacionVinculada SET nombreOv = ?, ciudad = ?, estado = ?, correo = ?, " 
-            + "telefono = ?, numUsuariosIndirectos = ?, numUsuariosDirectos = ? " + "WHERE idOrganizacion = ?;";
+        String afilliatedOrganizationQuery = "UPDATE organizacionVinculada SET nombreOv = ?, ciudad = ?, estado = ?, correo = ?, " 
+            + "telefono = ?, numUsuariosIndirectos = ?, numUsuariosDirectos = ? " + "WHERE idOrganizacionVinculada = ?;";
 
         try (Connection databaseConnection = connectionManager.getConnection();
-             PreparedStatement preparedStatement = databaseConnection.prepareStatement(query)) {
+             PreparedStatement preparedStatement = databaseConnection.prepareStatement(afilliatedOrganizationQuery)) {
 
             preparedStatement.setString(1, affiliatedOrganization.getName());
             preparedStatement.setString(2, affiliatedOrganization.getCity());
@@ -120,10 +126,10 @@ public class AffiliatedOrganizationDAO implements IAffiliatedOrganizationDAO{
     public boolean inactivateAffiliatedOrganization(AffiliatedOrganization affiliatedOrganization) {
         boolean isInactive = false;
 
-        String query = "UPDATE organizacionVinculada SET estadoEnBD = '0' WHERE idOrganizacion = ?;";
+        String afilliatedOrganizationQuery = "UPDATE organizacionVinculada SET estadoEnBD = '0' WHERE idOrganizacionVinculada = ?;";
 
         try (Connection databaseConnection = connectionManager.getConnection();
-             PreparedStatement preparedStatement = databaseConnection.prepareStatement(query)) {
+             PreparedStatement preparedStatement = databaseConnection.prepareStatement(afilliatedOrganizationQuery)) {
 
             preparedStatement.setInt(1, affiliatedOrganization.getId());
 
