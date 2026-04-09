@@ -23,12 +23,12 @@ public class SubjectDAO implements ISubjectDAO {
 
     @Override
     public Subject getSubjectById(int foundNrc) { 
-        String query = "SELECT * FROM ExperienciaEducativa WHERE NRC = ?;";
+        String subjectQuery = "SELECT * FROM ExperienciaEducativa WHERE NRC = ?;";
 
         Subject subject = new Subject();
          
         try (Connection connection = connectionManager.getConnection();
-             PreparedStatement preparedStatement = connection.prepareStatement(query)) {
+             PreparedStatement preparedStatement = connection.prepareStatement(subjectQuery)) {
             
             
             preparedStatement.setInt(1, foundNrc);
@@ -59,11 +59,11 @@ public class SubjectDAO implements ISubjectDAO {
     public boolean registerSubject(Subject subject) {
         boolean isRegistered = false;
         
-        String query = "INSERT INTO ExperienciaEducativa (NRC, nombreExperiencia, carrera, idPeriodoEscolar) " 
+        String subjectQuery = "INSERT INTO ExperienciaEducativa (NRC, nombreExperiencia, carrera, idPeriodoEscolar) " 
             + "VALUES (?, ?, ?, ?);";
 
         try (Connection databaseConnection = connectionManager.getConnection();
-             PreparedStatement preparedStatement = databaseConnection.prepareStatement(query)) {
+             PreparedStatement preparedStatement = databaseConnection.prepareStatement(subjectQuery)) {
 
             preparedStatement.setInt(1, subject.getNrc());
             preparedStatement.setString(2, subject.getSubjectName());
@@ -86,11 +86,11 @@ public class SubjectDAO implements ISubjectDAO {
     public boolean modifySubject(Subject subject) {
         boolean isModified = false;
         
-        String query = "UPDATE ExperienciaEducativa SET nombreExperiencia = ?, carrera = ?, idPeriodoEscolar = ? " 
+        String subjectQuery = "UPDATE ExperienciaEducativa SET nombreExperiencia = ?, carrera = ?, idPeriodoEscolar = ? " 
             + "WHERE NRC = ?;";
 
         try (Connection databaseConnection = connectionManager.getConnection();
-            PreparedStatement preparedStatement = databaseConnection.prepareStatement(query)) {
+            PreparedStatement preparedStatement = databaseConnection.prepareStatement(subjectQuery)) {
 
             preparedStatement.setString(1, subject.getSubjectName());
             preparedStatement.setString(2, subject.getCAREER());

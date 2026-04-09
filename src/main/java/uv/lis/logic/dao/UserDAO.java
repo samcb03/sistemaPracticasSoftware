@@ -57,8 +57,8 @@ public class UserDAO implements IUserDAO{
         String professorQuery = "SELECT p.numeroPersonal, p.rol, u.nombre, u.apellidos "
             + "FROM Profesor p INNER JOIN Usuario u ON p.idUsuario = u.idUsuario WHERE p.numeroPersonal = ?";
 
-        try (Connection databasConnection = connectionManager.getConnection();
-             PreparedStatement preparedStatement = databasConnection.prepareStatement(professorQuery)) {
+        try (Connection databaseConnection = connectionManager.getConnection();
+             PreparedStatement preparedStatement = databaseConnection.prepareStatement(professorQuery)) {
 
             preparedStatement.setString(1, personnelNumber);
 
@@ -301,8 +301,8 @@ public class UserDAO implements IUserDAO{
             + "WHERE (a.matricula = ? OR p.numeroPersonal = ? OR ad.usuario = ?) "
             + "AND u.contraseña = ?";
 
-        try (Connection databasConnection = connectionManager.getConnection();
-             PreparedStatement preparedStatement = databasConnection.prepareStatement(userQuery)){
+        try (Connection databaseConnection = connectionManager.getConnection();
+             PreparedStatement preparedStatement = databaseConnection.prepareStatement(userQuery)){
              
                 preparedStatement.setString(1, identification);
                 preparedStatement.setString(2, identification);

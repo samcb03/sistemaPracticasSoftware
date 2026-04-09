@@ -95,15 +95,15 @@ public class SchoolPeriodDAO implements ISchoolPeriodDAO{
 
     @Override
     public boolean existsSchoolPeriod(int idPeriod) {
-        String query = "SELECT 1 FROM PeriodoEscolar WHERE idPeriodoEscolar = ?";
+        String periodQuery = "SELECT 1 FROM PeriodoEscolar WHERE idPeriodoEscolar = ?";
 
-        try (Connection conn = connectionManager.getConnection();
-            PreparedStatement ps = conn.prepareStatement(query)) {
+        try (Connection databaseConnection = connectionManager.getConnection();
+            PreparedStatement preparedStatement = databaseConnection.prepareStatement(periodQuery)) {
 
-            ps.setInt(1, idPeriod);
-            ResultSet rs = ps.executeQuery();
+            preparedStatement.setInt(1, idPeriod);
+            ResultSet resultSet = preparedStatement.executeQuery();
 
-            return rs.next(); 
+            return resultSet.next(); 
 
         } catch (SQLException e) {
             logger.log(Level.SEVERE, "Error validando periodo escolar", e);

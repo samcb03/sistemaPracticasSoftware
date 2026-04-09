@@ -116,7 +116,7 @@ public class ProjectDAO implements IProjectDAO{
 @Override
 public boolean modifyProject(Project project) {
     boolean isModified = false;
-    // Tenemos 7 signos '?'
+
     String projectQuery = "UPDATE Proyecto " 
         + " SET nombre = ?, descripcion = ?, cupo = ?, "
         + " metodologiaProyecto = ?, objetivo = ?, estado = ? " 
