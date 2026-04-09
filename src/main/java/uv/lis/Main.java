@@ -163,10 +163,50 @@ public static void main(String[] args) {
                             scanner.nextLine();
                             switch (professorOption) {
                                 case 1:
-                                    userDAO.modifyProfessor(foundProfessor);
+                                    System.out.println("1. Modificar nombre");
+                                    System.out.println("2. Modificar apellido");
+                                    System.out.println("3. Modificar contraseña");
+                                    System.out.println("4. Modificar si es coordinador");
+                                    int modifyOption = scanner.nextInt();
+                                    scanner.nextLine();
+                                    switch (modifyOption) {
+                                        case 1:
+                                            System.out.println("Escriba el nuevo nombre: ");
+                                            String newName = scanner.nextLine();
+                                            foundProfessor.setFirstName(newName);
+                                            userDAO.modifyProfessor(foundProfessor);
+                                            break;
+                                        case 2:
+                                            System.out.println("Escriba el nuevo apellido: ");
+                                            String newLastName = scanner.nextLine();
+                                            foundProfessor.setLastName(newLastName);
+                                            userDAO.modifyProfessor(foundProfessor);
+                                            break;
+                                        case 3:
+                                            System.out.println("Escriba la nueva contraseña: ");
+                                            String newPassword = scanner.nextLine();
+                                            foundProfessor.setPassword(newPassword);
+                                            userDAO.modifyProfessor(foundProfessor);
+                                            break;
+                                        case 4:
+                                            System.out.println("¿Es coordinador? (si/no): ");
+                                            String isCoordInput = scanner.nextLine();
+                                            boolean isCoord = isCoordInput.equalsIgnoreCase("si");
+                                            foundProfessor.setIsCoordinator(isCoord);
+                                            foundProfessor.setUserType(isCoord ? "Coordinador" : "Maestro");
+                                            userDAO.modifyProfessor(foundProfessor);
+                                            break;
+                                        default:
+                                            System.out.println("Opción no válida");
+                                    }
                                     break;
                                 case 2:
-                                    userDAO.inactivateProfessor(foundProfessor);
+                                    boolean inactivated = userDAO.inactivateProfessor(foundProfessor);
+                                    if (inactivated) {
+                                        System.out.println("Profesor inactivado con exito");
+                                    } else {
+                                        System.out.println("Error al inactivar profesor");
+                                    }
                                     break;  
                                 case 3:
                                     System.out.println("Regresando al menú principal...");
