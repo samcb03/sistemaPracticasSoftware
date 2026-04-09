@@ -52,7 +52,7 @@ public class UserDAO implements IUserDAO{
     }
 
     @Override
-    public Professor getProfessorById(String personnelNumber) {
+    public Professor getProfessorByPersonalNumber(String personnelNumber) {
         Professor professor = null;
         String professorQuery = "SELECT p.numeroPersonal, p.rol, u.nombre, u.apellidos "
             + "FROM Profesor p INNER JOIN Usuario u ON p.idUsuario = u.idUsuario WHERE p.numeroPersonal = ?";
@@ -65,7 +65,7 @@ public class UserDAO implements IUserDAO{
             try (ResultSet resultSet = preparedStatement.executeQuery()) {
                 if (resultSet.next()) {
                     professor = new Professor();
-                    professor.setId(resultSet.getInt("numeroPersonal")); 
+                    professor.setPersonnelNumber(resultSet.getString("numeroPersonal")); 
                     professor.setFirstName(resultSet.getString("nombre")); 
                     professor.setLastName(resultSet.getString("apellidos"));
                     professor.setIsCoordinator(false); 
@@ -95,9 +95,9 @@ public class UserDAO implements IUserDAO{
             preparedStatement.setString(2, professor.getPersonnelNumber());     
 
             if (professor.getIsCoordinator()) { 
-                preparedStatement.setString(3, professor.getUserType());
+                preparedStatement.setString(3, "Coordinador");
             } else {
-                preparedStatement.setString(3, professor.getUserType());
+                preparedStatement.setString(3, "Maestro");
             }
 
             preparedStatement.setString(4,"1");
@@ -113,15 +113,6 @@ public class UserDAO implements IUserDAO{
         
         return isRegistered;
     }
-
-
-
-
-
-
-
-
-
 
 @Override
     public boolean modifyProfessor(Professor professor) {
@@ -142,11 +133,11 @@ public class UserDAO implements IUserDAO{
             preparedStament.setString(2, professor.getFirstName());
             preparedStament.setString(3, professor.getLastName());
             
-            preparedStament.setInt(4, professor.getId()); 
+            preparedStament.setString(4, professor.getPersonnelNumber()); 
 
             if (preparedStament.executeUpdate() > NO_ROWS_AFFECTED) {
                 isModified = true;
-                LOGGER.log(Level.INFO, "Modificacion de profesor con ID {0} exitosa.", professor.getPersonnelNumber());
+                LOGGER.log(Level.INFO, "Modificacion de profesor con numero de personal {0} exitosa.", professor.getPersonnelNumber());
             }
 
         } catch (SQLException e) {
@@ -184,11 +175,11 @@ public class UserDAO implements IUserDAO{
     public Student getStudentById(String idStudent) { 
         Student student = null;
 
-    String query = "SELECT e.idUsuario, e.matricula, u.nombre, u.apellidos, e.fechaNacimiento, e.genero," 
+    String studentQuery = "SELECT e.idUsuario, e.matricula, u.nombre, u.apellidos, e.fechaNacimiento, e.genero," 
         + "e.lenguaIndigena FROM Alumno e INNER JOIN Usuario u ON e.idUsuario = u.idUsuario WHERE e.idUsuario = ?;"; 
 
         try (Connection databaseConnection = connectionManager.getConnection();
-             PreparedStatement preparedStatement = databaseConnection.prepareStatement(query)) {
+             PreparedStatement preparedStatement = databaseConnection.prepareStatement(studentQuery)) {
             
             preparedStatement.setString(1, idStudent);
             

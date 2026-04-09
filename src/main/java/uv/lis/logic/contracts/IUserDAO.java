@@ -11,7 +11,7 @@ import uv.lis.logic.dto.User;
 public interface IUserDAO {
     int registerUser(User user) throws SQLException;
 
-    Professor getProfessorById(String idProfessor) throws SQLException;
+    Professor getProfessorByPersonalNumber(String idProfessor) throws SQLException;
 
     boolean registerProfessor(Professor professor) throws SQLException;
 
