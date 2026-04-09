@@ -151,7 +151,7 @@ public class UserDAO implements IUserDAO{
     public boolean inactivateProfessor(Professor professor) {
         boolean isInactived = false;
 
-        String proffesorQuery = "UPDATE Profesor SET estado = 'Inactivo' WHERE numeroPersonal = ?;";
+        String proffesorQuery = "UPDATE Profesor SET estado = 0 WHERE numeroPersonal = ?;";
 
         try (Connection databaseConnection = connectionManager.getConnection();
              PreparedStatement preparedStatement = databaseConnection.prepareStatement(proffesorQuery)) {
