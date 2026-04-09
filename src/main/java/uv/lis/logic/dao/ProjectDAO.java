@@ -53,26 +53,27 @@ public class ProjectDAO implements IProjectDAO{
 
     @Override
     public Project getProjectById(int idProject) {
-        Project project = new Project();
-
+        Project project = null; 
         String projectQuery = "SELECT * FROM Proyecto WHERE idProyecto = ?;";
 
         try (Connection databaseConnection = connectionManager.getConnection();
-            PreparedStatement preparedStatement = databaseConnection.prepareStatement(projectQuery)) {
+            PreparedStatement preparedStatement = databaseConnection.prepareStatement(projectQuery, PreparedStatement.RETURN_GENERATED_KEYS)) {
 
             preparedStatement.setInt(1, idProject);
-            ResultSet resultSet = preparedStatement.executeQuery();
             
-            if (resultSet.next()) {
-                project.setId(resultSet.getInt("idProyecto"));
-                project.setName(resultSet.getString("nombre"));
-                project.setMethodology(resultSet.getString("metodologiaProyecto"));
-                project.setCapacity(resultSet.getInt("Cupo"));
-                project.setObjective(resultSet.getString("objetivo"));
-                project.setDescription(resultSet.getString("descripcion"));
+            try (ResultSet resultSet = preparedStatement.executeQuery()) {
+                if (resultSet.next()) {
+                    project = new Project();
+                    project.setId(resultSet.getInt("idProyecto"));
+                    project.setName(resultSet.getString("nombre"));
+                    project.setDescription(resultSet.getString("descripcion"));
+                    project.setCapacity(resultSet.getInt("cupo")); 
+                    project.setMethodology(resultSet.getString("metodologiaProyecto"));
+                    project.setObjective(resultSet.getString("objetivo"));
+                }
             }
         } catch (SQLException e) {
-            LOGGER.log(Level.SEVERE, "Error de conexion con la base de datos",e);
+            LOGGER.log(Level.SEVERE, "Error al consultar proyecto", e);
         }
         return project;
     }
@@ -81,21 +82,29 @@ public class ProjectDAO implements IProjectDAO{
     public boolean registerProject(Project project) {
         boolean isRegistered = false;
 
-        String projectQuery = "INSERT INTO Proyecto(idProyecto," 
-            + "nombre, descripcion, cupo, metodologiaProyecto, objetivo) VALUES(?, ?, ?, ?, ?, ?);";
+        String projectQuery = "INSERT INTO Proyecto(nombre, " + 
+        "descripcion, cupo, metodologiaProyecto, objetivo,estado)" +
+        " VALUES(?, ?, ?, ?, ?, ?);";
 
         try (Connection databaseConnection = connectionManager.getConnection();
-            PreparedStatement preparedStatement = databaseConnection.prepareStatement(projectQuery)){
+            PreparedStatement preparedStatement = databaseConnection.prepareStatement(projectQuery, PreparedStatement.RETURN_GENERATED_KEYS)) {
             
-            preparedStatement.setInt(1, project.getId());
-            preparedStatement.setString(2, project.getName());
-            preparedStatement.setString(3, project.getDescription());
-            preparedStatement.setInt(4, project.getCapacity());
-            preparedStatement.setString(5, project.getMethodology());
-            preparedStatement.setString(6, project.getObjective());
+            preparedStatement.setString(1, project.getName());
+            preparedStatement.setString(2, project.getDescription());
+            preparedStatement.setInt(3, project.getCapacity());
+            preparedStatement.setString(4, project.getMethodology());
+            preparedStatement.setString(5, project.getObjective());
+            preparedStatement.setBoolean(6, true);
             
             if (preparedStatement.executeUpdate() > NO_ROWS_AFFECTED){
+                try(ResultSet resultSet = preparedStatement.getGeneratedKeys()) {
+                    if (resultSet.next()) {
+                        int generatedId = resultSet.getInt(1);
+                        project.setId(generatedId);
+                    }
+                }
                 isRegistered = true;
+                LOGGER.log(Level.INFO, "Proyecto con ID {0} registrado con éxito.", project.getId());
             }
 
         } catch (SQLException e) {
@@ -104,29 +113,36 @@ public class ProjectDAO implements IProjectDAO{
         return isRegistered;
     }
 
-    @Override
-    public boolean modifyProject(Project project) {
-        boolean isModified = false;
-        String projectQuery = "UPDATE Proyecto " + "SET nombre = ?, descripcion = ?, objetivoProyecto = ?" 
-            + "WHERE idProyecto = ?;";
+@Override
+public boolean modifyProject(Project project) {
+    boolean isModified = false;
+    // Tenemos 7 signos '?'
+    String projectQuery = "UPDATE Proyecto " 
+        + " SET nombre = ?, descripcion = ?, cupo = ?, "
+        + " metodologiaProyecto = ?, objetivo = ?, estado = ? " 
+        + " WHERE idProyecto = ?;";
 
-        try (Connection databaseConnection = connectionManager.getConnection();
-            PreparedStatement preparedStatement = databaseConnection.prepareStatement(projectQuery)){
-            
-            preparedStatement.setString(1, project.getName());
-            preparedStatement.setString(2, project.getDescription());
-            preparedStatement.setString(3, project.getObjective());
-            preparedStatement.setInt(4, project.getId());
-            
-            if (preparedStatement.executeUpdate() > NO_ROWS_AFFECTED){
-                isModified = true;
-            }
-        } catch (SQLException e) {
-            LOGGER.log(Level.SEVERE, "Error de conexion con la base de datos",e);
+    try (Connection databaseConnection = connectionManager.getConnection();
+         PreparedStatement preparedStatement = databaseConnection.prepareStatement(projectQuery)) {
+        
+        preparedStatement.setString(1, project.getName());
+        preparedStatement.setString(2, project.getDescription());
+        preparedStatement.setInt(3, project.getCapacity());
+        preparedStatement.setString(4, project.getMethodology());
+        preparedStatement.setString(5, project.getObjective());
+        preparedStatement.setBoolean(6, true); 
+        preparedStatement.setInt(7, project.getId());
+
+        if (preparedStatement.executeUpdate() > NO_ROWS_AFFECTED) {
+            isModified = true;
+            LOGGER.log(Level.INFO, "Proyecto con ID {0} modificado con éxito.", project.getId());
         }
-
-        return isModified;
+    } catch (SQLException e) {
+        LOGGER.log(Level.SEVERE, "Error de conexion con la base de datos", e);
     }
+
+    return isModified;
+}
 
     @Override
     public boolean inactivateProject(Project project) {

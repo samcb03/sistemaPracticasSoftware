@@ -55,10 +55,10 @@ public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
 
         System.out.println("=== SISTEMA DE GESTION DE PROYECTOS LIS ===");
-        System.out.println("Inicio de sesion\n");
+        System.out.println("           Inicio de sesion\n");
 
         while (loggedUser == null) {
-            System.out.print("Matricula/No.Personal: ");
+            System.out.print("Identificador: ");
             String identification = scanner.nextLine();
 
             System.out.print("Contraseña: ");
@@ -113,7 +113,6 @@ public static void main(String[] args) {
                 case 1:
                     Professor professor = new Professor();
                     System.out.println("Nombre: ");
-                    scanner.nextLine();
                     String firstName = scanner.nextLine();
                     System.out.println("Apellido(s): ");
                     String lastName = scanner.nextLine();
@@ -231,7 +230,7 @@ public static void main(String[] args) {
     private void showCoordinatorMenu() {
         UserDAO userDAO = new UserDAO();
         Scanner scanner = new Scanner(System.in);
-        int option;
+        int optionCoordinator;
         do {
             System.out.println("1. Registrar alumno");
             System.out.println("2. Consultar alumno por ID");
@@ -244,8 +243,8 @@ public static void main(String[] args) {
             System.out.println("9. Asignar proyecto a alumno");
             System.out.println("10. Salir");
 
-            option = scanner.nextInt();
-            switch (option) {
+            optionCoordinator = scanner.nextInt();
+            switch (optionCoordinator) {
                 case 1:
                     scanner.nextLine();
                     Student student = new Student();
@@ -405,6 +404,7 @@ public static void main(String[] args) {
                     organization.setPhoneNumber(phoneNumber);
                     organization.setNumberOfDirectUsers(directUsers);
                     organization.setNumberOfIndirectUsers(indirectUsers);
+                    
 
                     organizationDAO.registerAffiliatedOrganization(organization);
                     System.out.println("Organización registrada con éxito");
@@ -413,37 +413,104 @@ public static void main(String[] args) {
                     AffiliatedOrganizationDAO organizationSearcherDAO = new AffiliatedOrganizationDAO();
                     System.out.println("Escriba el numero de identificacion de la organizacion a consultar: ");
                     int searchOrganizationId = scanner.nextInt();
-                    AffiliatedOrganization foundOrganization 
-                        = organizationSearcherDAO.getAffiliatedOrganizationById(searchOrganizationId);
-                    if (foundOrganization != null) {
-                        System.out.println("Organización encontrada:");
-                        System.out.println("Nombre: " + foundOrganization.getName());
-                        System.out.println("Ciudad: " + foundOrganization.getCity());
-                        System.out.println("Estado: " + foundOrganization.getState());
-                        System.out.println("Correo electrónico: " + foundOrganization.getEmail());
-                        System.out.println("Número telefónico: " + foundOrganization.getPhoneNumber());
-                        System.out.println("Número de usuarios directos: " + foundOrganization.getNumberOfDirectUsers());
-                        System.out.println("Número de usuarios indirectos: " + foundOrganization.getNumberOfIndirectUsers());
-                        System.out.println("\n1. Actualizar Organizacion");
-                        System.out.println("2. Inactivar organizacion");
-                        System.out.println("3. Regresar al menú");
-                        int organizationOption = scanner.nextInt();
-                        switch (organizationOption) {
+                    AffiliatedOrganization foundOrganization = organizationSearcherDAO.getAffiliatedOrganizationById(searchOrganizationId);
+                        if (foundOrganization != null) {
+                            System.out.println("Organización encontrada:");
+                            System.out.println("Nombre: " + foundOrganization.getName());
+                            System.out.println("Ciudad: " + foundOrganization.getCity());
+                            System.out.println("Estado: " + foundOrganization.getState());
+                            System.out.println("Correo electrónico: " + foundOrganization.getEmail());
+                            System.out.println("Número telefónico: " + foundOrganization.getPhoneNumber());
+                            System.out.println("Número de usuarios directos: " + foundOrganization.getNumberOfDirectUsers());
+                            System.out.println("Número de usuarios indirectos: " + foundOrganization.getNumberOfIndirectUsers());
+
+                            System.out.println("\n1. Modificar Organizacion");
+                            System.out.println("2. Inactivar organizacion");
+                            System.out.println("3. Regresar al menú");
+
+                    int modifyOption = scanner.nextInt();
+                        switch (modifyOption) {
                             case 1:
-                                organizationSearcherDAO.modifyAffiliatedOrganization(foundOrganization);
-                                break;
+                                System.out.println("1. Modificar nombre: ");
+                                System.out.println("2. Modificar ciudad: ");
+                                System.out.println("3. Modificar estado: ");
+                                System.out.println("4. Modificar correo electrónico: ");
+                                System.out.println("5. Modificar número telefónico: ");
+                                System.out.println("6. Modificar número de usuarios directos: ");
+                                System.out.println("7. Modificar número de usuarios indirectos: ");
+                                System.out.println("8. Cancelar modificación");
+
+                                int modifyOrganizationOption = scanner.nextInt();
+                                scanner.nextLine();
+
+                                switch (modifyOrganizationOption) {
+                                    case 1:
+                                        System.out.println("Escriba el nuevo nombre: ");
+                                        String newName = scanner.nextLine();
+                                        foundOrganization.setName(newName);
+                                        organizationSearcherDAO.modifyAffiliatedOrganization(foundOrganization);
+                                        break;
+                                    case 2:
+                                        System.out.println("Escriba la nueva ciudad: ");
+                                        String newCity = scanner.nextLine();
+                                        foundOrganization.setCity(newCity);
+                                        organizationSearcherDAO.modifyAffiliatedOrganization(foundOrganization);
+                                        break;
+                                    case 3:
+                                        System.out.println("Escriba el nuevo estado: ");
+                                        String newState = scanner.nextLine();
+                                        foundOrganization.setState(newState);
+                                        organizationSearcherDAO.modifyAffiliatedOrganization(foundOrganization);
+                                        break;
+                                    case 4:
+                                        System.out.println("Escriba el nuevo correo electrónico: ");
+                                        String newEmail = scanner.nextLine();
+                                        foundOrganization.setEmail(newEmail);
+                                        organizationSearcherDAO.modifyAffiliatedOrganization(foundOrganization);
+                                        break;
+                                    case 5:
+                                        System.out.println("Escriba el nuevo número telefónico: ");
+                                        String newPhoneNumber = scanner.nextLine();
+                                        foundOrganization.setPhoneNumber(newPhoneNumber);
+                                        organizationSearcherDAO.modifyAffiliatedOrganization(foundOrganization);
+                                        break;
+                                    case 6:
+                                        System.out.println("Escriba el nuevo número de usuarios directos: ");
+                                        int newDirectUsers = scanner.nextInt();
+                                        foundOrganization.setNumberOfDirectUsers(newDirectUsers);
+                                        organizationSearcherDAO.modifyAffiliatedOrganization(foundOrganization);
+                                        break;
+                                    case 7:
+                                        System.out.println("Escriba el nuevo número de usuarios indirectos: ");
+                                        int newIndirectUsers = scanner.nextInt();
+                                        foundOrganization.setNumberOfIndirectUsers(newIndirectUsers);
+                                        organizationSearcherDAO.modifyAffiliatedOrganization(foundOrganization);
+                                        break;
+                                    case 8:
+                                        System.out.println("Cancelando modificación...");
+                                        break;
+                                    default:
+                                        System.out.println("Opción no válida");
+                                    }
+                                    break;
                             case 2:
-                                organizationSearcherDAO.inactivateAffiliatedOrganization(foundOrganization);
-                                break;
+                                boolean inactivated = organizationSearcherDAO.inactivateAffiliatedOrganization(foundOrganization);
+                                    if (inactivated) {
+                                        System.out.println("Organización inactivada con éxito");
+                                    } else {
+                                        System.out.println("Error al inactivar organización");
+                                    }
+                                    break;
                             case 3:
+                                System.out.println("Regresando al menú principal...");
                                 break;
                             default:
                                 System.out.println("Opción no válida");
-                        }
-                    } else {
-                        System.out.println("Organización no encontrada.");
-                    } 
-                    break;
+                                }
+                            } else {
+                                System.out.println("Organización no encontrada.");  
+                            }
+                            break;
                 case 5:
                     scanner.nextLine();
                     ProjectSupervisorDAO supervisorDAO = new ProjectSupervisorDAO();
@@ -529,26 +596,31 @@ public static void main(String[] args) {
                     }
                 case 7:
                     scanner.nextLine();
+
                     ProjectDAO projectDAO = new ProjectDAO();
                     Project project = new Project();
                     System.out.println("Nombre: ");
-                    String name = scanner.nextLine();
-                    System.out.println("Metodologia: ");
+                    String projectName = scanner.nextLine();
+                    System.out.println("Metodología: ");
                     String methodology = scanner.nextLine();
                     System.out.println("Capacidad de alumnos: ");
-                    int studentCapacity = scanner.nextInt();
-                    System.out.println("Objetivo: ");
+
+                    int capacity = scanner.nextInt();
                     scanner.nextLine();
+                    
+                    System.out.println("Objetivo: ");
                     String objective = scanner.nextLine();
                     System.out.println("Descripción: ");
                     String description = scanner.nextLine();
 
-                    project.setName(name);
+                    project.setName(projectName);
                     project.setMethodology(methodology);
-                    project.setCapacity(studentCapacity);
+                    project.setCapacity(capacity);
                     project.setObjective(objective);
                     project.setDescription(description);
+                    
                     projectDAO.registerProject(project);
+                    System.out.println("Proyecto registrado con éxito");
                     break;
                 case 8: 
                     ProjectDAO projectSearcherDAO = new ProjectDAO();
@@ -562,21 +634,77 @@ public static void main(String[] args) {
                         System.out.println("Capacidad de alumnos: " + foundProject.getCapacity());
                         System.out.println("Objetivo: " + foundProject.getObjective());
                         System.out.println("Descripción: " + foundProject.getDescription());
-                        System.out.println("\n1. Actualizar proyecto");
+
+                        System.out.println("\n1. Modificar proyecto");
                         System.out.println("2. Inactivar proyecto");
                         System.out.println("3. Regresar al menú");
 
-                        switch (scanner.nextInt()) {
+                        int projectSupervisorOption = scanner.nextInt();
+                        scanner.nextLine();
+
+                        switch (projectSupervisorOption) {
                             case 1:
-                                projectSearcherDAO.modifyProject(foundProject);
+                                System.out.println("1. Modificar nombre: ");
+                                System.out.println("2. Modificar metodología: ");
+                                System.out.println("3. Modificar capacidad de alumnos: ");
+                                System.out.println("4. Modificar objetivo: ");
+                                System.out.println("5. Modificar descripción: ");
+                                System.out.println("6. Cancelar modificación");
+
+                                int modifyProjectOption = scanner.nextInt();
+                                scanner.nextLine();
+
+                                switch (modifyProjectOption) {
+                                    case 1:
+                                        System.out.println("Escriba el nuevo nombre: ");
+                                        String newName = scanner.nextLine();
+                                        foundProject.setName(newName);
+                                        projectSearcherDAO.modifyProject(foundProject);
+                                        break;
+                                    case 2:
+                                        System.out.println("Escriba la nueva metodología: ");
+                                        String newMethodology = scanner.nextLine();
+                                        foundProject.setMethodology(newMethodology);
+                                        projectSearcherDAO.modifyProject(foundProject);
+                                        break;
+                                    case 3:
+                                        System.out.println("Escriba la nueva capacidad de alumnos: ");
+                                        int newCapacity = scanner.nextInt();
+                                        foundProject.setCapacity(newCapacity);
+                                        projectSearcherDAO.modifyProject(foundProject);
+                                        break;
+                                    case 4:
+                                        System.out.println("Escriba el nuevo objetivo: ");
+                                        String newObjective = scanner.nextLine();
+                                        foundProject.setObjective(newObjective);
+                                        projectSearcherDAO.modifyProject(foundProject);
+                                        break;
+                                    case 5:
+                                        System.out.println("Escriba la nueva descripción: ");
+                                        String newDescription = scanner.nextLine();
+                                        foundProject.setDescription(newDescription);
+                                        projectSearcherDAO.modifyProject(foundProject);
+                                        break;
+                                    case 6:
+                                        System.out.println("Cancelando modificación...");
+                                        break;
+                                    default:
+                                        System.out.println("Opción no válida");
+                                }
                                 break;
                             case 2:
-                                projectSearcherDAO.inactivateProject(foundProject);
+                                boolean inactivatedProject = projectSearcherDAO.inactivateProject(foundProject);
+                                    if (inactivatedProject) {
+                                        System.out.println("Proyecto inactivado con éxito");
+                                    } else {
+                                        System.out.println("Error al inactivar proyecto");
+                                    }
                                 break;
                             case 3:
+                                System.out.println("Regresando al menú principal...");
                                 break;
                             default:
-                                System.out.println("Opción no válida");
+                                System.out.println("Opcion no válida");
                         }
                     } else {
                         System.out.println("Proyecto no encontrado.");
@@ -604,7 +732,7 @@ public static void main(String[] args) {
                 default:
                     System.out.println("Opción no válida");
             }
-        } while (option != 10);
+        } while (optionCoordinator != 10);
         scanner.close(); 
     }
 
