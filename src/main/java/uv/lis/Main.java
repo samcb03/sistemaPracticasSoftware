@@ -26,7 +26,6 @@ public class Main {
 public static void main(String[] args) {
         Main app = new Main();
         Scanner scanner = new Scanner(System.in);
-
         User currentUser = app.login(scanner);
 
         if (currentUser != null) {

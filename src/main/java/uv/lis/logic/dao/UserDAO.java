@@ -271,7 +271,7 @@ public class UserDAO implements IUserDAO{
     public boolean inactivateStudent(Student student) {
         boolean isInactive = false;
         
-        String studentQuery = "UPDATE Alumno SET estado = 1 WHERE idUsuario = ?;";
+        String studentQuery = "UPDATE Alumno SET estado = 0 WHERE idUsuario = ?;";
 
         try (Connection databaseConnection = connectionManager.getConnection();
              PreparedStatement preparedStatement = databaseConnection.prepareStatement(studentQuery)) {
@@ -293,13 +293,13 @@ public class UserDAO implements IUserDAO{
     @Override
     public User authenticate(String identification, String password) {
         User userAuthenticate = null;
-        String userQuery = "SELECT u.idUsuario, u.contraseña, a.matricula, p.numeroPersonal,ad.usuario, p.rol " +
-                           "FROM Usuario u " +
-                           "LEFT JOIN Alumno a ON u.idUsuario = a.idUsuario " +
-                           "LEFT JOIN Profesor p ON u.idUsuario = p.idUsuario " +
-                           "LEFT JOIN Administrador ad ON u.idUsuario = ad.idUsuario " +
-                           "WHERE (a.matricula = ? OR p.numeroPersonal = ? OR ad.usuario = ?) " +
-                           "AND u.contraseña = ?";
+        String userQuery = "SELECT u.idUsuario, u.contraseña, a.matricula, p.numeroPersonal,ad.usuario, p.rol "
+            + "FROM Usuario u "
+            + "LEFT JOIN Alumno a ON u.idUsuario = a.idUsuario "
+            + "LEFT JOIN Profesor p ON u.idUsuario = p.idUsuario "
+            + "LEFT JOIN Administrador ad ON u.idUsuario = ad.idUsuario "
+            + "WHERE (a.matricula = ? OR p.numeroPersonal = ? OR ad.usuario = ?) "
+            + "AND u.contraseña = ?";
 
         try (Connection databasConnection = connectionManager.getConnection();
              PreparedStatement preparedStatement = databasConnection.prepareStatement(userQuery)){
