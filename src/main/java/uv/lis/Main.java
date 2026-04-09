@@ -104,67 +104,88 @@ public static void main(String[] args) {
         int option;
         do {
             System.out.println("1. Registrar profesor");
-            System.out.println("2. Actualizar profesor");
-            System.out.println("3. Inactivar profesor");
-            System.out.println("4. Salir");
+            System.out.println("2. Consultar profesor por numero de personal");
+            System.out.println("3. Salir");
 
             option = scanner.nextInt();
+            scanner.nextLine();
             switch (option) {
                 case 1:
                     Professor professor = new Professor();
-                    System.out.println("Nombre");
+                    System.out.println("Nombre: ");
+                    scanner.nextLine();
                     String firstName = scanner.nextLine();
-                    System.out.println("Apellido(s)");
+                    System.out.println("Apellido(s): ");
                     String lastName = scanner.nextLine();
-                    System.out.println("Contraseña");
+                    System.out.println("Contraseña: ");
                     String password = scanner.nextLine();
-                    System.out.println("Numero de personal");
+                    System.out.println("Numero de personal: ");
                     String idProfessor = scanner.nextLine();
-                    System.out.println("Rol (Profesor/Coordinador)");
-                    String userType = scanner.nextLine();
+                    System.out.println("¿Es coordinador? (si/no): ");
+                    String isCoordinatorInput = scanner.nextLine();
+                    boolean isCoordinator = isCoordinatorInput.equalsIgnoreCase("si"); 
 
                     professor.setFirstName(firstName);
                     professor.setLastName(lastName);
                     professor.setPassword(password);
                     professor.setPersonnelNumber(idProfessor);
-                    professor.setUserType(userType);
+                    professor.setIsCoordinator(isCoordinator);
+                    professor.setUserType(isCoordinator ? "Coordinador" : "Maestro");
 
-                    userDAO.registerUser(professor);
-                    break;
-                case 2:
-                    System.out.println("Escriba el numero de personal del profesor a actualizar");
-                    String searchNoPersonal = scanner.nextLine();
-                    Professor foundProfessor = userDAO.getProfessorById(searchNoPersonal);
-                    if (foundProfessor != null) {
-                        System.out.println("Profesor encontrado");
-                        System.out.println("Nombre" + foundProfessor.getFirstName());
-                        System.out.println("Apellido" + foundProfessor.getLastName());
-                        System.out.println("Numero de personal" + foundProfessor.getId());
+                    int generatedId = userDAO.registerUser(professor); 
+                    if (generatedId != -1) {
+                        professor.setId(generatedId);                   
+                        boolean registered = userDAO.registerProfessor(professor);
+                        if (registered) {
+                            System.out.println("Profesor registrado con éxito");
+                        } else {
+                            System.out.println("Error al registrar profesor.");
+                        }
+                    } else {
+                        System.out.println("Error al registrar usuario.");
                     }
                     break;
-                case 3:
-                    System.out.println("Ingrese el numero de personal del profesor a inactivar");
-                    String searchProfessor = scanner.nextLine();
-                    professor = userDAO.getProfessorById(searchProfessor);
-                        if (professor != null) {
-                            boolean inactive = userDAO.inactivateProfessor(professor);
-                            if (inactive) {
-                                System.out.println("El profesor se ha inactivado con exito");
-                            } else {
-                                System.out.println("No se pudo inactivar al profesor");
+                case 2:
+                    System.out.println("Escriba el numero de personal del profesor a consultar: ");
+                    String searchNoPersonal = scanner.nextLine();
+                    Professor foundProfessor = userDAO.getProfessorByPersonalNumber(searchNoPersonal);
+                    if (foundProfessor != null) {
+                        System.out.println("Profesor encontrado");
+                        System.out.println("Nombre: " + foundProfessor.getFirstName());
+                        System.out.println("Apellido: " + foundProfessor.getLastName());
+                        System.out.println("Numero de personal: " + foundProfessor.getPersonnelNumber());
+
+                            System.out.println("\n1. Actualizar profesor");
+                            System.out.println("2. Inactivar profesor");
+                            System.out.println("3. Regresar al menú");
+
+                            int professorOption = scanner.nextInt();
+                            scanner.nextLine();
+                            switch (professorOption) {
+                                case 1:
+                                    userDAO.modifyProfessor(foundProfessor);
+                                    break;
+                                case 2:
+                                    userDAO.inactivateProfessor(foundProfessor);
+                                    break;  
+                                case 3:
+                                    System.out.println("Regresando al menú principal...");
+                                    break;
+                                default:
+                                    System.out.println("Opción no válida");
                             }
-                        } else {
-                            System.out.println("Profesor no encontrado");
-                        }
+                    } else {
+                        System.out.println("Profesor no encontrado.");
+                    }
                     break;
-                case 4: 
+                case 3: 
                     System.out.println("Saliendo el programa");
                     break;
                 default:
                     System.out.println("Opcion invalida");
                     break;
             }
-        } while (option != 4);
+        } while (option != 3);
     }
 
     private void showCoordinatorMenu() {
