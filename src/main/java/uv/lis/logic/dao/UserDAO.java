@@ -137,7 +137,8 @@ public class UserDAO implements IUserDAO{
 
             if (preparedStament.executeUpdate() > NO_ROWS_AFFECTED) {
                 isModified = true;
-                LOGGER.log(Level.INFO, "Modificacion de profesor con numero de personal {0} exitosa.", professor.getPersonnelNumber());
+                LOGGER.log(Level.INFO, "Modificacion de profesor con numero de personal {0} exitosa.", 
+                    professor.getPersonnelNumber());
             }
 
         } catch (SQLException e) {
