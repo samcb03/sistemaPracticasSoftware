@@ -4,10 +4,12 @@ package uv.lis;
 import java.sql.Date;
 import java.util.Scanner;
 import uv.lis.logic.dao.AffiliatedOrganizationDAO;
+import uv.lis.logic.dao.ProfessorDAO;
 import uv.lis.logic.dao.ProjectDAO;
 import uv.lis.logic.dao.ProjectRequestDAO;
 import uv.lis.logic.dao.ProjectSupervisorDAO;
 import uv.lis.logic.dao.ReportDAO;
+import uv.lis.logic.dao.StudentDAO;
 import uv.lis.logic.dao.UserDAO;
 import uv.lis.logic.dto.AffiliatedOrganization;
 import uv.lis.logic.dto.Autoevaluation;
@@ -96,6 +98,7 @@ public static void main(String[] args) {
 
     private void showAdministratorMenu(Scanner scanner) {
         UserDAO userDAO = new UserDAO();
+        ProfessorDAO professorDAO = new ProfessorDAO();
         int option;
         do {
             System.out.println("1. Registrar profesor");
@@ -129,7 +132,7 @@ public static void main(String[] args) {
                     int generatedId = userDAO.registerUser(professor); 
                     if (generatedId != -1) {
                         professor.setId(generatedId);                   
-                        boolean registered = userDAO.registerProfessor(professor);
+                        boolean registered = professorDAO.registerProfessor(professor);
                         if (registered) {
                             System.out.println("Profesor registrado con éxito");
                         } else {
@@ -142,7 +145,7 @@ public static void main(String[] args) {
                 case 2:
                     System.out.println("Escriba el numero de personal del profesor a consultar: ");
                     String searchNoPersonal = scanner.nextLine();
-                    Professor foundProfessor = userDAO.getProfessorByPersonalNumber(searchNoPersonal);
+                    Professor foundProfessor = professorDAO.getProfessorByPersonalNumber(searchNoPersonal);
                     if (foundProfessor != null) {
                         System.out.println("Profesor encontrado");
                         System.out.println("Nombre: " + foundProfessor.getFirstName());
@@ -168,19 +171,19 @@ public static void main(String[] args) {
                                             System.out.println("Escriba el nuevo nombre: ");
                                             String newName = scanner.nextLine();
                                             foundProfessor.setFirstName(newName);
-                                            userDAO.modifyProfessor(foundProfessor);
+                                            professorDAO.modifyProfessor(foundProfessor);
                                             break;
                                         case 2:
                                             System.out.println("Escriba el nuevo apellido: ");
                                             String newLastName = scanner.nextLine();
                                             foundProfessor.setLastName(newLastName);
-                                            userDAO.modifyProfessor(foundProfessor);
+                                            professorDAO.modifyProfessor(foundProfessor);
                                             break;
                                         case 3:
                                             System.out.println("Escriba la nueva contraseña: ");
                                             String newPassword = scanner.nextLine();
                                             foundProfessor.setPassword(newPassword);
-                                            userDAO.modifyProfessor(foundProfessor);
+                                            professorDAO.modifyProfessor(foundProfessor);
                                             break;
                                         case 4:
                                             System.out.println("¿Es coordinador? (si/no): ");
@@ -188,14 +191,14 @@ public static void main(String[] args) {
                                             boolean isCoord = isCoordInput.equalsIgnoreCase("si");
                                             foundProfessor.setIsCoordinator(isCoord);
                                             foundProfessor.setUserType(isCoord ? "Coordinador" : "Maestro");
-                                            userDAO.modifyProfessor(foundProfessor);
+                                            professorDAO.modifyProfessor(foundProfessor);
                                             break;
                                         default:
                                             System.out.println("Opción no válida");
                                     }
                                     break;
                                 case 2:
-                                    boolean inactivated = userDAO.inactivateProfessor(foundProfessor);
+                                    boolean inactivated = professorDAO.inactivateProfessor(foundProfessor);
                                     if (inactivated) {
                                         System.out.println("Profesor inactivado con exito");
                                     } else {
@@ -224,6 +227,7 @@ public static void main(String[] args) {
 
     private void showCoordinatorMenu(Scanner scanner) {
         UserDAO userDAO = new UserDAO();
+        StudentDAO studentDAO = new StudentDAO();
         int optionCoordinator;
         do {
             System.out.println("1. Registrar alumno");
@@ -287,7 +291,7 @@ public static void main(String[] args) {
                     int generatedId = userDAO.registerUser(student); 
                     if (generatedId != -1) {
                         student.setId(generatedId);                   
-                        userDAO.registerStudent(student);
+                        studentDAO.registerStudent(student);
                     } else {
                         System.out.println("Error al registrar usuario.");
                     }
@@ -296,7 +300,7 @@ public static void main(String[] args) {
                     scanner.nextLine();
                     System.out.println("Escriba la matricula del alumno a consultar: ");
                     String searchId = scanner.nextLine();
-                    Student foundStudent = userDAO.getStudentById(searchId);
+                    Student foundStudent = studentDAO.getStudentById(searchId);
                     if (foundStudent != null) {
                         System.out.println("Alumno encontrado:");
                         System.out.println("Nombre: " + foundStudent.getFirstName());
@@ -355,13 +359,13 @@ public static void main(String[] args) {
                                     }
 
                                     if (modifyOption != 5) {
-                                        userDAO.modifyStudent(foundStudent);
+                                        studentDAO.modifyStudent(foundStudent);
                                     }
 
                                 } while (modifyOption != 5);
                                 break;
                             case 2:
-                                userDAO.inactivateStudent(foundStudent);
+                                studentDAO.inactivateStudent(foundStudent);
                                 break;
                             case 3:
                                 break;
@@ -710,7 +714,7 @@ public static void main(String[] args) {
                     ProjectRequestDAO requestDAO = new ProjectRequestDAO();
                     System.out.println("Escriba la matricula del alumno: ");
                     String studentId = scanner.nextLine();
-                    Student consultStudent = userDAO.getStudentById(studentId);
+                    Student consultStudent = studentDAO.getStudentById(studentId);
                     if (consultStudent != null) {
                         System.out.println("Alumno encontrado:");
                         System.out.println("Nombre: " + consultStudent.getFirstName());
