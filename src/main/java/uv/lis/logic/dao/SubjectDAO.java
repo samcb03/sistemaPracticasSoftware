@@ -7,9 +7,13 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import javax.management.OperationsException;
+
 import uv.lis.dataaccess.MySQLConnectionManager;
 import uv.lis.logic.contracts.ISubjectDAO;
 import uv.lis.logic.dto.Subject;
+import uv.lis.logic.exceptions.OperationException;
 
 
 public class SubjectDAO implements ISubjectDAO {
@@ -22,7 +26,7 @@ public class SubjectDAO implements ISubjectDAO {
     }
 
     @Override
-    public Subject getSubjectById(int foundNrc) { 
+    public Subject getSubjectById(int foundNrc) throws OperationException{ 
         String subjectQuery = "SELECT * FROM ExperienciaEducativa WHERE NRC = ?;";
 
         Subject subject = new Subject();
@@ -43,6 +47,8 @@ public class SubjectDAO implements ISubjectDAO {
                     subject.setNrc(nrc);
                     subject.setSubjectName(subjectName);
                     subject.setIdSchoolPeriod(idSchoolPeriod);
+                } else {
+                    throw new OperationException("No se encontró la Experiencia Educativa con NRC: " + foundNrc, null);
                 }
             }
             
@@ -50,13 +56,15 @@ public class SubjectDAO implements ISubjectDAO {
 
         } catch (SQLException e) {
             logger.log(Level.SEVERE, "Error al buscar la Experiencia Educativa con NRC: " + foundNrc, e);
+            throw new OperationException("No se pudo buscar la Experiencia Educativa. Intentelo mas tarde", null); 
+
         }
         
         return subject;
     }
 
     @Override
-    public boolean registerSubject(Subject subject) {
+    public boolean registerSubject(Subject subject) throws OperationException{
         boolean isRegistered = false;
         
         String subjectQuery = "INSERT INTO ExperienciaEducativa (NRC, nombreExperiencia, carrera, idPeriodoEscolar) " 
@@ -73,17 +81,20 @@ public class SubjectDAO implements ISubjectDAO {
             if (preparedStatement.executeUpdate() > NO_ROWS_AFFECTED) {
                 isRegistered = true;
                 logger.log(Level.INFO, "Experiencia Educativa registrada con éxito. NRC: {0}", subject.getNrc());
-            }
+            } else {
+                throw new OperationException("No se pudo registrar la Experiencia Educativa. Intentelo mas tarde", null);
+            } 
 
         } catch (SQLException e) {
             logger.log(Level.SEVERE, "Error al registrar la Experiencia Educativa con NRC: " + subject.getNrc(), e);
+            throw new OperationException("No se pudo registrar la Experiencia Educativa. Intentelo mas tarde", null);
         }
         
         return isRegistered;
     }
 
     @Override
-    public boolean modifySubject(Subject subject) {
+    public boolean modifySubject(Subject subject) throws OperationException{
         boolean isModified = false;
         
         String subjectQuery = "UPDATE ExperienciaEducativa SET nombreExperiencia = ?, carrera = ?, idPeriodoEscolar = ? " 
@@ -100,11 +111,14 @@ public class SubjectDAO implements ISubjectDAO {
             if (preparedStatement.executeUpdate() > NO_ROWS_AFFECTED) {
                 isModified = true;
                 logger.log(Level.INFO, "Experiencia Educativa modificada con éxito. NRC: {0}", subject.getNrc());
+            } else {
+                throw new OperationException("No se pudo modificar la Experiencia Educativa. Intentelo mas tarde", null);
             }
 
         } catch (SQLException e) {
             logger.log(Level.SEVERE, "Error al modificar la Experiencia Educativa con NRC: " 
                 + (subject != null ? subject.getNrc() : "null"), e);
+            throw new OperationException("No se pudo modificar la Experiencia Educativa con NRC: " + subject.getNrc() +". Intentelo mas tarde", null);
         }
         
         return isModified;

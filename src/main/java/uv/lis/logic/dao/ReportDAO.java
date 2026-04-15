@@ -15,6 +15,7 @@ import uv.lis.logic.dto.FinalReport;
 import uv.lis.logic.dto.MonthlyReport;
 import uv.lis.logic.dto.PartialReport;
 import uv.lis.logic.dto.Report;
+import uv.lis.logic.exceptions.OperationException;
 
 
 public class ReportDAO implements IReportDAO {
@@ -27,7 +28,7 @@ public class ReportDAO implements IReportDAO {
     }
 
     @Override
-    public List<Report> getReports() {
+    public List<Report> getReports() throws OperationException {
         List<Report> reports = new ArrayList<>();
         String reportQuery = "SELECT idReporte, descripcion, observaciones, actividad, matricula FROM Reporte";
         
@@ -47,13 +48,14 @@ public class ReportDAO implements IReportDAO {
 
         } catch (SQLException e) {
             LOGGER.log(Level.SEVERE, "Error de conexion con la base de datos", e);
+            throw new OperationException("No se pudo obtener los reportes. Intentelo mas tarde", null);
         }
 
         return reports;
     }
 
     @Override
-    public PartialReport getPartialReportById(int idPartialReport) {
+    public PartialReport getPartialReportById(int idPartialReport) throws OperationException {
         PartialReport report = null;
         String partialReportQuery = "SELECT r.idReporte, r.descripcion, r.observaciones, r.actividad, r.matricula, " 
             + "rp.tiempoPlaneado, rp.tiempoReal FROM ReporteParcial rp " 
@@ -75,17 +77,21 @@ public class ReportDAO implements IReportDAO {
                     report.setStudentId(resultSet.getString("matricula"));
                     report.setPlannedTime(resultSet.getInt("tiempoPlaneado"));
                     report.setRealTime(resultSet.getInt("tiempoReal"));
+                } else {
+                    LOGGER.log(Level.INFO, "No se encontró un reporte parcial con id {0}.", idPartialReport);
+                    throw new OperationException("No se encontró un reporte parcial con id: " + idPartialReport, null);
                 }
             }
         } catch (SQLException e) {
             LOGGER.log(Level.SEVERE, "Error de conexion con la base de datos", e);
+            throw new OperationException("Error al obtener el reporte parcial", null);
         }
 
         return report;
     }
 
     @Override
-    public boolean registerPartialReport(PartialReport partialReport) {
+    public boolean registerPartialReport(PartialReport partialReport) throws OperationException {
         boolean isRegistered = false;
 
         String reportQuery = "INSERT INTO Reporte (idReporte, descripcion, observaciones, actividad, matricula) "
@@ -129,12 +135,11 @@ public class ReportDAO implements IReportDAO {
         return isRegistered;
     }
 
-    public boolean registerMonthlyReport(MonthlyReport monthlyReport) {
+    public boolean registerMonthlyReport(MonthlyReport monthlyReport) throws OperationException {
         boolean isRegistered = false;
 
         String reportQuery = "INSERT INTO Reporte (idReporte, descripcion, observaciones, actividad, matricula) " +
                 "VALUES (?, ?, ?, ?, ?)";
-
         String monthlyQuery = "INSERT INTO ReporteMensual (idReporte, mes, horasReportadas) " +
                 "VALUES (?, ?, ?)";
 

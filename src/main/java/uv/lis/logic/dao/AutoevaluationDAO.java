@@ -10,6 +10,7 @@ import java.util.logging.Logger;
 import uv.lis.dataaccess.MySQLConnectionManager;
 import uv.lis.logic.contracts.IAutoevaluationDAO;
 import uv.lis.logic.dto.Autoevaluation;
+import uv.lis.logic.exceptions.OperationException;
 
 
 public class AutoevaluationDAO implements IAutoevaluationDAO {
@@ -22,7 +23,7 @@ public class AutoevaluationDAO implements IAutoevaluationDAO {
     }
 
     @Override
-    public boolean registerAutoevaluation(Autoevaluation autoevaluation) {
+    public boolean registerAutoevaluation(Autoevaluation autoevaluation) throws OperationException {
     boolean isRegistered = false;
 
     String query = "INSERT INTO Autoevaluacion (matricula, participacionProductiva, "
@@ -51,16 +52,21 @@ public class AutoevaluationDAO implements IAutoevaluationDAO {
             isRegistered = true;
             LOGGER.log(Level.INFO, "Autoevaluación registrada para el alumno {0}", 
                 autoevaluation.getIdStudent());
-        }
+        } else {
+            LOGGER.log(Level.WARNING, "No se pudo registrar la autoevaluación para el alumno {0}", 
+                autoevaluation.getIdStudent());
+            throw new OperationException("No se pudo registrar la autoevaluación para el alumno: " + autoevaluation.getIdStudent(), null);
+        }   
     } catch (SQLException e) {
         LOGGER.log(Level.SEVERE, "Error al registrar autoevaluación", e);
+        throw new OperationException("Error al registrar la autoevaluación", null);
     }
 
     return isRegistered;
     }
 
     @Override
-    public boolean existsByStudent(String studentId) {
+    public boolean existsByStudent(String studentId)  {
         boolean exists = false;
 
         String query = "SELECT 1 FROM Autoevaluacion WHERE matricula = ? LIMIT 1";

@@ -10,6 +10,7 @@ import java.util.logging.Logger;
 import uv.lis.dataaccess.MySQLConnectionManager;
 import uv.lis.logic.contracts.IAffiliatedOrganizationDAO;
 import uv.lis.logic.dto.AffiliatedOrganization;
+import uv.lis.logic.exceptions.OperationException;
 
 
 public class AffiliatedOrganizationDAO implements IAffiliatedOrganizationDAO{
@@ -22,7 +23,7 @@ public class AffiliatedOrganizationDAO implements IAffiliatedOrganizationDAO{
     }
 
     @Override
-    public AffiliatedOrganization getAffiliatedOrganizationById(int idAfilliatedOrganization) {
+    public AffiliatedOrganization getAffiliatedOrganizationById(int idAfilliatedOrganization) throws OperationException {
         AffiliatedOrganization affiliatedOrganization = null;
 
         String affiliatedOrganizationQuery = "SELECT * FROM organizacionVinculada " 
@@ -47,18 +48,22 @@ public class AffiliatedOrganizationDAO implements IAffiliatedOrganizationDAO{
                     affiliatedOrganization.setNumberOfDirectUsers(resultSet.getInt("numUsuariosDirectos"));
                     affiliatedOrganization.setNumberOfIndirectUsers(resultSet.getInt("numUsuariosIndirectos"));
 
-                }
+                } else {
+                    LOGGER.log(Level.INFO, "No se encontró una organización vinculada con el id {0}.", idAfilliatedOrganization);
+                    throw new OperationException("No se encontró una organización vinculada con el id: " + idAfilliatedOrganization, null);
+                }   
             }
 
         } catch (SQLException e) {
             LOGGER.log(Level.SEVERE, "Error de conexion con la base de datos",e);
+            throw new OperationException("Error al obtener la organización vinculada", null);
         }
 
         return affiliatedOrganization;   
     }
 
     @Override
-    public boolean registerAffiliatedOrganization(AffiliatedOrganization affiliatedOrganization) {
+    public boolean registerAffiliatedOrganization(AffiliatedOrganization affiliatedOrganization) throws OperationException {
         boolean isRegistered = false;
         String affiliatedOrganizationQuery = "INSERT INTO organizacionVinculada(nombreOV," 
             + "ciudad, estado, sector, correo, telefono, numUsuariosIndirectos,numUsuariosDirectos)" 
@@ -85,15 +90,20 @@ public class AffiliatedOrganizationDAO implements IAffiliatedOrganizationDAO{
                 }
                 isRegistered = true;
                 LOGGER.log(Level.INFO, "Registro de organizacion vinculada con ID {0} exitosa.", affiliatedOrganization.getId());
-            }
+            } else {
+                LOGGER.log(Level.WARNING, "No se pudo registrar la organización vinculada con nombre {0}.", affiliatedOrganization.getName());
+                throw new OperationException("No se pudo registrar la organización vinculada con nombre: " + affiliatedOrganization.getName(), null);
+            }   
         } catch (SQLException e) {
             LOGGER.log(Level.SEVERE, "Error de conexion con la base de datos",e);
+            throw new OperationException("Error al registrar la organización vinculada", null);
+
         }
         return isRegistered;
     }
 
     @Override
-    public boolean modifyAffiliatedOrganization(AffiliatedOrganization affiliatedOrganization) {
+    public boolean modifyAffiliatedOrganization(AffiliatedOrganization affiliatedOrganization) throws OperationException {
         boolean isModified = false;
 
         String afilliatedOrganizationQuery = "UPDATE organizacionVinculada SET nombreOv = ?, ciudad = ?, estado = ?, correo = ?, " 
@@ -113,17 +123,21 @@ public class AffiliatedOrganizationDAO implements IAffiliatedOrganizationDAO{
 
             if (preparedStatement.executeUpdate() > NO_ROWS_AFFECTED) {
                 isModified = true;
+            } else {
+                LOGGER.log(Level.WARNING, "No se pudo modificar la organización vinculada con ID {0}.", affiliatedOrganization.getId());
+                throw new OperationException("No se pudo modificar la organización vinculada con ID: " + affiliatedOrganization.getId(), null);     
             }
 
         } catch (SQLException e) {
             LOGGER.log(Level.SEVERE, "Error de conexion con la base de datos",e);
+            throw new OperationException("Error al modificar la organización vinculada", null);
         }
 
         return isModified;
     }
 
     @Override
-    public boolean inactivateAffiliatedOrganization(AffiliatedOrganization affiliatedOrganization) {
+    public boolean inactivateAffiliatedOrganization(AffiliatedOrganization affiliatedOrganization) throws OperationException {
         boolean isInactive = false;
 
         String afilliatedOrganizationQuery = "UPDATE organizacionVinculada SET estadoEnBD = '0' WHERE idOrganizacionVinculada = ?;";
@@ -135,10 +149,14 @@ public class AffiliatedOrganizationDAO implements IAffiliatedOrganizationDAO{
 
             if (preparedStatement.executeUpdate() > NO_ROWS_AFFECTED) {
                 isInactive = true;
+            } else {
+                LOGGER.log(Level.WARNING, "No se pudo inactivar la organización vinculada con ID {0}.", affiliatedOrganization.getId());
+                throw new OperationException("No se pudo inactivar la organización vinculada con ID: " + affiliatedOrganization.getId(), null);     
             }
 
         } catch (SQLException e) {
                LOGGER.log(Level.SEVERE, "Error de conexion con la base de datos",e);
+                throw new OperationException("Error al inactivar la organización vinculada", null);
         }
 
         return isInactive;

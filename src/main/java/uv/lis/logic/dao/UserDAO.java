@@ -10,6 +10,8 @@ import java.util.logging.Level;
 import uv.lis.dataaccess.MySQLConnectionManager;
 import uv.lis.logic.contracts.IUserDAO;
 import uv.lis.logic.dto.User;
+import uv.lis.logic.exceptions.OperationException;
+import uv.lis.logic.exceptions.AuthenticateException;
 
 
 public class UserDAO implements IUserDAO{
@@ -22,7 +24,7 @@ public class UserDAO implements IUserDAO{
     }
 
     @Override 
-    public int registerUser(User user) {
+    public int registerUser(User user) throws OperationException {
         int generatedId = -1;
         String userQuery = "INSERT INTO Usuario" 
             + "(nombre, apellidos, contraseña, rol) "
@@ -38,19 +40,26 @@ public class UserDAO implements IUserDAO{
             preparedStatement.setString(4, user.getUserType());
 
             if (preparedStatement.executeUpdate() > NO_ROWS_AFFECTED) {
-                ResultSet resultSet = preparedStatement.getGeneratedKeys();
-                if (resultSet.next()) { 
-                    generatedId = resultSet.getInt(1);
-                }
+            
+               try (ResultSet resultSet = preparedStatement.getGeneratedKeys()) {
+                    if (resultSet.next()) { 
+                        generatedId = resultSet.getInt(1);
+                    }
+                } 
+            } else {
+                throw new OperationException("No se pudo registrar al usuario. Intentelo mas tarde", null);
             }
-        } catch (SQLException e) {
-            LOGGER.log(Level.SEVERE, "Error de conexion con la base de datos",e);
         }
+        catch (SQLException e) {
+            LOGGER.log(Level.SEVERE, "Error de conexion con la base de datos", e);
+            throw new OperationException("No se pudo registrar al usuario. Intentelo mas tarde", e);
+        }
+
         return generatedId;
     }
 
     @Override
-    public User authenticate(String identification, String password) {
+    public User authenticate(String identification, String password) throws AuthenticateException {
         User userAuthenticate = null;
         String userQuery = "SELECT u.idUsuario, u.contraseña, a.matricula, p.numeroPersonal,ad.usuario, p.rol "
             + "FROM Usuario u "
@@ -83,13 +92,17 @@ public class UserDAO implements IUserDAO{
                                 userAuthenticate.setUserType("Coordinador");
                             } else {
                                 userAuthenticate.setUserType("Profesor");
-                            }
-                        }
+                            } 
+                        } 
+                    } else {
+                        throw new AuthenticateException("Usuario no encontrado, verifique sus datos", null);
                     }
                 }
             } catch (SQLException e) {
                 LOGGER.log(Level.SEVERE, "Error de autenticacion SQL", e);
+
+                throw new AuthenticateException("No disponible por el momento. Intentelo mas tarde", e);
             }   
             return userAuthenticate;
-    }
+        }
 }
