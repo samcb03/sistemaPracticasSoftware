@@ -10,6 +10,7 @@ import java.util.logging.Logger;
 import uv.lis.dataaccess.MySQLConnectionManager;
 import uv.lis.logic.contracts.IProfessorDAO;
 import uv.lis.logic.dto.Professor;
+import uv.lis.logic.exceptions.OperationException;
 
 
 public class ProfessorDAO extends UserDAO implements IProfessorDAO {
@@ -18,7 +19,7 @@ public class ProfessorDAO extends UserDAO implements IProfessorDAO {
     private MySQLConnectionManager connectionManager;
     
     @Override
-    public Professor getProfessorByPersonalNumber(String personnelNumber) {
+    public Professor getProfessorByPersonalNumber(String personnelNumber) throws OperationException {
         Professor professor = null;
         String professorQuery = "SELECT p.numeroPersonal, p.rol, u.nombre, u.apellidos "
             + "FROM Profesor p INNER JOIN Usuario u ON p.idUsuario = u.idUsuario WHERE p.numeroPersonal = ?";
@@ -38,18 +39,22 @@ public class ProfessorDAO extends UserDAO implements IProfessorDAO {
 
                     LOGGER.log(Level.INFO, "Busqueda de Profesor con numero de personal obtenido con exito", 
                         professor.getPersonnelNumber());
+                } else {
+                    LOGGER.log(Level.INFO, "No se encontro un profesor con el numero de personal {0}.", personnelNumber);
+                    throw new OperationException("No se encontró un profesor con el numero de personal: " + personnelNumber, null);
                 }
             }
 
         } catch (SQLException e) {
             LOGGER.log(Level.SEVERE, "Error de conexion con la base de datos",e);
+            throw new OperationException("Error al obtener el profesor", null);
         }
 
         return professor;
     }
 
     @Override
-    public boolean registerProfessor(Professor professor) {
+    public boolean registerProfessor(Professor professor) throws OperationException {
         boolean isRegistered = false;
         
         String proffesorQuery = "INSERT INTO Profesor (idUsuario, numeroPersonal, rol, estado) VALUES (?, ?, ?,?);";
@@ -71,17 +76,21 @@ public class ProfessorDAO extends UserDAO implements IProfessorDAO {
             if (preparedStatement.executeUpdate() > NO_ROWS_AFFECTED) {
                 isRegistered = true;
                 LOGGER.log(Level.INFO, "Registro de profesor con ID {0} exitosa.", professor.getPersonnelNumber());
+            } else {
+                LOGGER.log(Level.WARNING, "No se pudo registrar al profesor con numero de personal {0}.", professor.getPersonnelNumber());
+                throw new OperationException("No se pudo registrar al profesor con numero de personal: " + professor.getPersonnelNumber(), null);
             }
 
         } catch (SQLException e) {
             LOGGER.log(Level.SEVERE, "Error de conexion con la base de datos",e);
+            throw new OperationException("Error al registrar el profesor", null);
         }
         
         return isRegistered;
     }
 
     @Override
-    public boolean modifyProfessor(Professor professor) {
+    public boolean modifyProfessor(Professor professor) throws OperationException {
         boolean isModified = false;
 
         String proffesorQuery = "UPDATE Profesor p INNER JOIN Usuario u ON p.idUsuario = u.idUsuario SET p.rol = ?," 
@@ -104,17 +113,21 @@ public class ProfessorDAO extends UserDAO implements IProfessorDAO {
             if (preparedStament.executeUpdate() > NO_ROWS_AFFECTED) {
                 isModified = true;
                 LOGGER.log(Level.INFO, "Modificacion de profesor con numero de personal {0} exitosa.", professor.getPersonnelNumber());
+            } else {
+                LOGGER.log(Level.WARNING, "No se pudo modificar al profesor con numero de personal {0}.", professor.getPersonnelNumber());
+                throw new OperationException("No se pudo modificar al profesor con numero de personal: " + professor.getPersonnelNumber(), null);
             }
 
         } catch (SQLException e) {
             LOGGER.log(Level.SEVERE, "Error de conexion con la base de datos",e);
+            throw new OperationException("Error al modificar el profesor", null);
         }
 
         return isModified;
     }
 
     @Override
-    public boolean inactivateProfessor(Professor professor) {
+    public boolean inactivateProfessor(Professor professor) throws OperationException {
         boolean isInactived = false;
 
         String proffesorQuery = "UPDATE Profesor SET estado = 0 WHERE numeroPersonal = ?;";
@@ -128,10 +141,15 @@ public class ProfessorDAO extends UserDAO implements IProfessorDAO {
                 isInactived = true;
                 LOGGER.log(Level.INFO, "Inactivacion de profesor con numero de personal exitosa.", 
                     professor.getPersonnelNumber());
+            } else {
+                LOGGER.log(Level.WARNING, "No se pudo inactivar al profesor con numero de personal {0}.", professor.getPersonnelNumber());
+                throw new OperationException("No se pudo inactivar al profesor con numero de personal: " + professor.getPersonnelNumber(), null);
             }
 
         } catch (SQLException e) {
             LOGGER.log(Level.SEVERE, "Error de conexion con la base de datos",e);
+            throw new OperationException("Error al inactivar el profesor", null);
+
         }
 
         return isInactived;

@@ -3,11 +3,12 @@ package uv.lis.logic.contracts;
 
 import java.sql.SQLException;
 import uv.lis.logic.dto.Autoevaluation;
+import uv.lis.logic.exceptions.OperationException;
 
 
 public interface IAutoevaluationDAO {
-    boolean registerAutoevaluation(Autoevaluation autoevaluation) throws SQLException;
+    boolean registerAutoevaluation(Autoevaluation autoevaluation) throws SQLException, OperationException;
 
-    boolean existsByStudent(String studentId) throws SQLException;
+    boolean existsByStudent(String studentId) throws SQLException, OperationException;
     
 }

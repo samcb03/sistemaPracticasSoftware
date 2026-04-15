@@ -10,6 +10,7 @@ import java.util.logging.Logger;
 import uv.lis.dataaccess.MySQLConnectionManager;
 import uv.lis.logic.contracts.IStudentDAO;
 import uv.lis.logic.dto.Student;
+import uv.lis.logic.exceptions.OperationException;
 
 
 public class StudentDAO extends UserDAO implements IStudentDAO {
@@ -18,7 +19,7 @@ public class StudentDAO extends UserDAO implements IStudentDAO {
     private MySQLConnectionManager connectionManager;
 
     @Override
-    public Student getStudentById(String idStudent) { 
+    public Student getStudentById(String idStudent) throws OperationException { 
         Student student = null;
 
     String studentQuery = "SELECT e.idUsuario, e.matricula, u.nombre, u.apellidos, e.fechaNacimiento, e.genero," 
@@ -44,17 +45,19 @@ public class StudentDAO extends UserDAO implements IStudentDAO {
                         idStudent);
                 } else {
                     LOGGER.log(Level.INFO, "No se encontro un alumno con la matricula {0}.", idStudent);
+                    throw new OperationException("No se encontró un alumno con la matricula: " + idStudent, null);
                 }
             }
         } catch (SQLException e) {
             LOGGER.log(Level.SEVERE, "Error de conexion con la base de datos",e);
+            throw new OperationException("No se pudo buscar el alumno. Intentelo mas tarde", null);
         }
         
         return student;
     }
 
     @Override
-    public boolean registerStudent(Student student) {
+    public boolean registerStudent(Student student) throws OperationException {
         boolean isRegistered = false;
 
         String studentQuery = "INSERT INTO Alumno (idUsuario, matricula, fechaNacimiento, genero, lenguaIndigena," 
@@ -76,17 +79,20 @@ public class StudentDAO extends UserDAO implements IStudentDAO {
             if (preparedStatement.executeUpdate() > NO_ROWS_AFFECTED) {
                 isRegistered = true;
                 LOGGER.log(Level.INFO, "Registro de alumno con matricula {0} exitoso.", student.getIdStudent());
+            } else {
+                throw new OperationException("No se pudo registrar al alumno. Intentelo mas tarde", null);
             }
 
         } catch (SQLException e) {
             LOGGER.log(Level.SEVERE, "Error de conexion con la base de datos",e);
+            throw new OperationException("No se pudo registrar al alumno. Intentelo mas tarde", null);
         }
         
         return isRegistered;
     }
 
     @Override
-    public boolean modifyStudent(Student student) {
+    public boolean modifyStudent(Student student) throws OperationException {
         boolean isModified = false;
 
         String studentQuery = "UPDATE Alumno e " 
@@ -104,17 +110,20 @@ public class StudentDAO extends UserDAO implements IStudentDAO {
             if (preparedStatement.executeUpdate() > NO_ROWS_AFFECTED) {
                 isModified = true;
                 LOGGER.log(Level.INFO, "Modificacion de alumno con matricula {0} exitosa.", student.getIdStudent());
+            } else {
+                throw new OperationException("No se pudo modificar al alumno. Intentelo mas tarde", null);
             }
 
         } catch (SQLException e) {
             LOGGER.log(Level.SEVERE, "Error de conexion con la base de datos",e);
+            throw new OperationException("No se pudo modificar al alumno. Intentelo mas tarde", null);
         }
 
         return isModified;
     }
 
     @Override
-    public boolean inactivateStudent(Student student) {
+    public boolean inactivateStudent(Student student) throws OperationException {
         boolean isInactive = false;
         
         String studentQuery = "UPDATE Alumno SET estado = 0 WHERE idUsuario = ?;";
@@ -127,10 +136,13 @@ public class StudentDAO extends UserDAO implements IStudentDAO {
             if (preparedStatement.executeUpdate() > NO_ROWS_AFFECTED) {
                 isInactive = true;
                 LOGGER.log(Level.INFO, "Inactivacion de alumno con matricula exitosa.", student.getIdStudent());
+            } else {
+                throw new OperationException("No se pudo inactivar al alumno. Intentelo mas tarde", null);
             }
 
         } catch (SQLException e) {
             LOGGER.log(Level.SEVERE, "Error de conexion con la base de datos",e);
+            throw new OperationException("No se pudo inactivar al alumno. Intentelo mas tarde", null);
         }
 
         return isInactive;

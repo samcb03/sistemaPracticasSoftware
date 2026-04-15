@@ -13,6 +13,7 @@ import java.util.logging.Logger;
 import uv.lis.dataaccess.MySQLConnectionManager;
 import uv.lis.logic.contracts.IActivityDAO;
 import uv.lis.logic.dto.Activity;
+import uv.lis.logic.exceptions.OperationException;
 
 
 public class ActivityDAO implements IActivityDAO {
@@ -25,7 +26,7 @@ public class ActivityDAO implements IActivityDAO {
     }
 
     @Override
-    public List<Activity> getActivities() {
+    public List<Activity> getActivities() throws OperationException {
         List<Activity> activities = new ArrayList<>();
         String activityQuery = "SELECT * FROM Actividad;";
 
@@ -49,7 +50,7 @@ public class ActivityDAO implements IActivityDAO {
     }
 
     @Override
-    public List<Activity> getActivitiesById(int idActivity) {
+    public List<Activity> getActivitiesById(int idActivity) throws OperationException {
         List<Activity> activities = new ArrayList<>();
         String activityQuery = "SELECT * FROM Actividad WHERE idActividad = ?;";
 
@@ -69,12 +70,13 @@ public class ActivityDAO implements IActivityDAO {
             }
         } catch (SQLException e) {
             LOGGER.log(Level.SEVERE, "Error de conexion con la base de datos",e);
+            throw new OperationException("Error al obtener las actividades por ID", null);
         }
         return activities;
     }
 
     @Override
-    public boolean registerActivity(Activity activity) {
+    public boolean registerActivity(Activity activity) throws OperationException {
         boolean isRegistered = false;
         String activityQuery = "INSERT INTO Actividad(idActividad, nombreActividad, descripcionActividad, FechaInicio, " 
             + "FechaFinal) VALUES(?, ?, ?, ?, ?);";
@@ -94,15 +96,20 @@ public class ActivityDAO implements IActivityDAO {
             
             if (preparedStatement.executeUpdate() > NO_ROWS_AFFECTED) {
                 isRegistered = true;
-            }
+            } else {
+                LOGGER.log(Level.WARNING, "No se pudo registrar la actividad con ID {0}.", activity.getId());
+                throw new OperationException("No se pudo registrar la actividad con ID: " + activity.getId(), null);     
+            }   
         } catch (SQLException e) {
             LOGGER.log(Level.SEVERE, "Error de conexion con la base de datos",e);
+            throw new OperationException("Error al registrar la actividad", null);
+
         }
         return isRegistered;
     }
 
     @Override
-    public boolean modifyActivity(Activity activity) {
+    public boolean modifyActivity(Activity activity) throws OperationException {
         boolean isModified = false;
         String activityQuery = "UPDATE Actividad SET descripcionActividad = ?, FechaInicio = ?, FechaFin = ?" 
             + "WHERE idActividad = ?;";
@@ -121,9 +128,13 @@ public class ActivityDAO implements IActivityDAO {
             
             if (preparedStatement.executeUpdate() > NO_ROWS_AFFECTED) {
                 isModified = true;
+            } else {
+                LOGGER.log(Level.WARNING, "No se pudo modificar la actividad con ID {0}.", activity.getId());
+                throw new OperationException("No se pudo modificar la actividad con ID: " + activity.getId(), null);     
             }
         } catch (SQLException e) {
             LOGGER.log(Level.SEVERE, "Error de conexion con la base de datos",e);
+            throw new OperationException("Error al modificar la actividad", null);
         }
         return isModified;
     }
