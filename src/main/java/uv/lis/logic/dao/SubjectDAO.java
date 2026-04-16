@@ -80,12 +80,14 @@ public class SubjectDAO implements ISubjectDAO {
                 isRegistered = true;
                 logger.log(Level.INFO, "Experiencia Educativa registrada con éxito. NRC: {0}", subject.getNrc());
             } else {
-                throw new OperationException("No se pudo registrar la Experiencia Educativa. Intentelo mas tarde", null);
+                throw new OperationException("No se pudo registrar la Experiencia Educativa." 
+                    + "Intentelo mas tarde", null);
             } 
 
         } catch (SQLException e) {
             logger.log(Level.SEVERE, "Error al registrar la Experiencia Educativa con NRC: " + subject.getNrc(), e);
-            throw new OperationException("No se pudo registrar la Experiencia Educativa. Intentelo mas tarde", null);
+            throw new OperationException("No se pudo registrar la Experiencia Educativa. Intentelo mas tarde", 
+                null);
         }
         
         return isRegistered;

@@ -1,12 +1,12 @@
 package uv.lis.logic.dto;
 
 public class Report {
-
     private int id;
     private String description;
     private String observations;
     private String activity;
     private String studentId;
+    private float calification;
 
     public Report() {
         
@@ -58,5 +58,13 @@ public class Report {
 
     public void setStudentId(String studentId) {
         this.studentId = studentId;
+    }
+
+    public float getCalification() {
+        return calification;
+    }
+
+    public void setCalification(float calification) {
+        this.calification = calification;
     }
 }

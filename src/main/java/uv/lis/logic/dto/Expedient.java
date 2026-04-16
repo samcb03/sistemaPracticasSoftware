@@ -5,14 +5,12 @@ public class Expedient {
     private String name;
     private String typeDocument;
     private String url;
-    private String idStudent;
 
-    public Expedient(int id, String name, String typeDocument, String url, String idStudent) {
-        this.id = id;
+    public Expedient(String name, String typeDocument, String url) {
+        generateId();
         this.name = name;
         this.typeDocument = typeDocument;
         this.url = url;
-        this.idStudent = idStudent;
     }
 
     public int getId() {
@@ -46,10 +44,10 @@ public class Expedient {
     public void setUrl(String url) {
         this.url = url;
     }
-    public String getIdStudent() {
-        return idStudent;
-    }
-    public void setIdStudent(String idStudent) {
-        this.idStudent = idStudent;
+
+    private int counter = 1;
+    private void generateId() {
+        this.id = counter;
+        counter++;
     }
 }
