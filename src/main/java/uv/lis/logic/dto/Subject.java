@@ -6,6 +6,8 @@ public class Subject {
     private int nrc;
     private String subjectName;
     private int idSchoolPeriod;
+    private Professor professor;
+    private SchoolPeriod schoolPeriod;
 
     public Subject(){
 
@@ -44,4 +46,17 @@ public class Subject {
     public void setIdSchoolPeriod(int idSchoolPeriod) {
         this.idSchoolPeriod = idSchoolPeriod;
     }
+    public Professor getProfessor() {
+        return professor;
+    }
+    public void setProfessor(Professor professor) {
+        this.professor = professor;
+    }
+    public SchoolPeriod getSchoolPeriod() {
+        return schoolPeriod;
+    }
+    public void setSchoolPeriod(SchoolPeriod schoolPeriod) {
+        this.schoolPeriod = schoolPeriod;
+    }
+
 }

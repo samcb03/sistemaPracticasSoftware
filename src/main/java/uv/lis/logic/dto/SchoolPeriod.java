@@ -6,9 +6,9 @@ import java.sql.Date;
 public class SchoolPeriod {
     private int id;
     private Date startDate;
-    private Date endDate;
+    private Date endDate;        
 
-    public SchoolPeriod() {
+    public SchoolPeriod() {    
     }
 
     public SchoolPeriod(int id, Date startDate, Date endDate) {

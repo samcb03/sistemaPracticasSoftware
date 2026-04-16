@@ -21,11 +21,13 @@ import uv.lis.logic.dto.Project;
 import uv.lis.logic.dto.ProjectSupervisor;
 import uv.lis.logic.dto.Student;
 import uv.lis.logic.dto.User;
+import uv.lis.logic.exceptions.AuthenticateException;
+import uv.lis.logic.exceptions.OperationException;
 import uv.lis.logic.services.AutoevaluationService;
 
 
 public class Main {
-public static void main(String[] args) {
+public static void main(String[] args) throws AuthenticateException, OperationException {
         Main app = new Main();
         Scanner scanner = new Scanner(System.in);
         User currentUser = app.login(scanner);
@@ -50,7 +52,7 @@ public static void main(String[] args) {
         }
     }
 
-    private User login(Scanner scanner) {
+    private User login(Scanner scanner) throws AuthenticateException{
         UserDAO userDAO = new UserDAO();
         User loggedUser = null;
 
@@ -96,7 +98,7 @@ public static void main(String[] args) {
  
     }   
 
-    private void showAdministratorMenu(Scanner scanner) {
+    private void showAdministratorMenu(Scanner scanner) throws OperationException {
         UserDAO userDAO = new UserDAO();
         ProfessorDAO professorDAO = new ProfessorDAO();
         int option;
@@ -225,7 +227,7 @@ public static void main(String[] args) {
         } while (option != 3);
     }
 
-    private void showCoordinatorMenu(Scanner scanner) {
+    private void showCoordinatorMenu(Scanner scanner) throws OperationException {
         UserDAO userDAO = new UserDAO();
         StudentDAO studentDAO = new StudentDAO();
         int optionCoordinator;
@@ -735,7 +737,7 @@ public static void main(String[] args) {
         } while (optionCoordinator != 10);
     }
 
-    private void showStudentMenu(Scanner scanner) {
+    private void showStudentMenu(Scanner scanner) throws OperationException {
         int option;
         do {
             System.out.println("1. Solicitar proyecto");

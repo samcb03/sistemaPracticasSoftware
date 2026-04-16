@@ -8,8 +8,6 @@ import java.sql.SQLException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import javax.management.OperationsException;
-
 import uv.lis.dataaccess.MySQLConnectionManager;
 import uv.lis.logic.contracts.ISubjectDAO;
 import uv.lis.logic.dto.Subject;

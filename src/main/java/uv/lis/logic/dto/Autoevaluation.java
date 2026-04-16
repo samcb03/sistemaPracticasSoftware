@@ -18,25 +18,29 @@ public class Autoevaluation {
     private double finalScore;
     private String evaluationDate;
 
-    public Autoevaluation() {}
+    public Autoevaluation() {
 
-    public Autoevaluation(String idStudent, int[] answers) {
+    }
+
+    public Autoevaluation(String idStudent, int[] answers) throws IllegalArgumentException {
         this.idStudent = idStudent;
-        if (answers.length == 10) {
-            this.productiveParticipation = answers[0];
-            this.appliedKnowledge = answers[1];
-            this.confidenceInActivities = answers[2];
-            this.activitiesInterest = answers[3];
-            this.organizationSupport = answers[4];
+        if (answers == null || answers.length != 10) {
+            throw new IllegalArgumentException("Invalid number of answers. Expected 10.");
+        }
+        this.productiveParticipation = answers[0];
+        this.appliedKnowledge = answers[1];
+        this.confidenceInActivities = answers[2];
+        this.activitiesInterest = answers[3];
+        this.organizationSupport = answers[4];
             this.rulesAwareness = answers[5];
             this.supervisorGuidance = answers[6];
             this.effectiveMonitoring = answers[7];
             this.careerAlignment = answers[8];
             this.internshipImportance = answers[9];
-        }
-        calculateFinalScore();
-    }
 
+            calculateFinalScore();
+        }
+    
     public String getIdStudent() {
         return idStudent;
     }
@@ -142,10 +146,10 @@ public class Autoevaluation {
     }
 
     public void calculateFinalScore() {
-        int totalScore = productiveParticipation + appliedKnowledge + confidenceInActivities; 
+        double totalScore = productiveParticipation + appliedKnowledge + confidenceInActivities; 
         totalScore += activitiesInterest + organizationSupport + rulesAwareness; 
         totalScore += supervisorGuidance + effectiveMonitoring + careerAlignment;
         totalScore += internshipImportance;
-        this.finalScore = ((double) totalScore / MAX_POSSIBLE_SCORE) * PERCENTAGE_MULTIPLIER;
+        this.finalScore = (totalScore / MAX_POSSIBLE_SCORE) * PERCENTAGE_MULTIPLIER;
     }
 }

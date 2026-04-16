@@ -9,6 +9,6 @@ import uv.lis.logic.exceptions.OperationException;
 public interface IAutoevaluationDAO {
     boolean registerAutoevaluation(Autoevaluation autoevaluation) throws SQLException, OperationException;
 
-    boolean existsByStudent(String studentId) throws SQLException, OperationException;
+    boolean existsByStudent(String idStudent) throws OperationException;
     
 }

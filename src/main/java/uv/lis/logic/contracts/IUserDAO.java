@@ -1,7 +1,5 @@
 package uv.lis.logic.contracts;
 
-
-import java.sql.SQLException;
 import uv.lis.logic.dto.User;
 import uv.lis.logic.exceptions.AuthenticateException;
 import uv.lis.logic.exceptions.OperationException;

@@ -11,6 +11,7 @@ public class AffiliatedOrganization {
     private String phoneNumber;
     private int numberOfDirectUsers;
     private int numberOfIndirectUsers;
+    private ProjectSupervisor projectSupervisor;
     private int counter = 0;
 
     public AffiliatedOrganization(){
@@ -105,5 +106,12 @@ public class AffiliatedOrganization {
 
     private int generateId() {
         return counter++;
+    }
+    public ProjectSupervisor getProjectSupervisor() {
+        return projectSupervisor;
+    }
+
+    public void setProjectSupervisor(ProjectSupervisor projectSupervisor) {
+        this.projectSupervisor = projectSupervisor;
     }
 }
