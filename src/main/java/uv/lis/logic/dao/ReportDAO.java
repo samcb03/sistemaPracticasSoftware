@@ -79,7 +79,8 @@ public class ReportDAO implements IReportDAO {
                     report.setRealTime(resultSet.getInt("tiempoReal"));
                 } else {
                     LOGGER.log(Level.INFO, "No se encontró un reporte parcial con id {0}.", idPartialReport);
-                    throw new OperationException("No se encontró un reporte parcial con id: " + idPartialReport, null);
+                    throw new OperationException("No se encontró un reporte parcial con id: " + idPartialReport, 
+                        null);
                 }
             }
         } catch (SQLException e) {
@@ -216,7 +217,8 @@ public class ReportDAO implements IReportDAO {
             } catch (SQLException e) {
                 databaseConnection.rollback();
                 LOGGER.log(Level.SEVERE, "Error al modificar reporte parcial", e);
-                throw new OperationException("Error al modificar el reporte parcial. Intentelo mas tarde", null);
+                throw new OperationException("Error al modificar el reporte parcial. Intentelo mas tarde", 
+                    null);
             }
 
         } catch (SQLException e) {
@@ -228,7 +230,7 @@ public class ReportDAO implements IReportDAO {
     }
 
     @Override
-    public FinalReport getFinalReportById(int idFinalReport) {
+    public FinalReport getFinalReportById(int idFinalReport) throws OperationException{
         FinalReport report = null;
 
         String finalReportQuery = "SELECT r.idReporte, r.descripcion, r.observaciones, r.actividad, r.matricula, " +
@@ -256,6 +258,7 @@ public class ReportDAO implements IReportDAO {
             }
         } catch (SQLException e) {
             LOGGER.log(Level.SEVERE, "Error de conexion con la base de datos", e);
+            throw new OperationException("Error con la conexión de la base de datos", null);
         }
 
         return report;
@@ -354,5 +357,21 @@ public class ReportDAO implements IReportDAO {
         }
 
         return isModified;
+    }
+
+    @Override
+    public void evaluationReport(Report report) throws OperationException {
+        String evaluationQuery = "UPDATE Reporte SET calificacion = ? WHERE idReporte = ?";
+
+        try(Connection databaseConnection = connectionManager.getConnection()) {
+            try (PreparedStatement psReport = databaseConnection.prepareStatement(evaluationQuery)) {
+                psReport.setFloat(1, report.getCalification());
+                psReport.setInt(2, report.getId());
+
+                psReport.executeUpdate();
+            }
+        } catch (SQLException e) {
+            LOGGER.log(Level.SEVERE, "Error de conexion con la base de datos", e);
+        }
     }
 }

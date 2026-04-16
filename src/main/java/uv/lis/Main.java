@@ -2,7 +2,10 @@ package uv.lis;
 
 
 import java.sql.Date;
+import java.util.List;
 import java.util.Scanner;
+
+import uv.lis.logic.common.AutoevaluationCommon;
 import uv.lis.logic.dao.AffiliatedOrganizationDAO;
 import uv.lis.logic.dao.ProfessorDAO;
 import uv.lis.logic.dao.ProjectDAO;
@@ -19,11 +22,11 @@ import uv.lis.logic.dto.PartialReport;
 import uv.lis.logic.dto.Professor;
 import uv.lis.logic.dto.Project;
 import uv.lis.logic.dto.ProjectSupervisor;
+import uv.lis.logic.dto.Report;
 import uv.lis.logic.dto.Student;
 import uv.lis.logic.dto.User;
 import uv.lis.logic.exceptions.AuthenticateException;
 import uv.lis.logic.exceptions.OperationException;
-import uv.lis.logic.services.AutoevaluationService;
 
 
 public class Main {
@@ -78,24 +81,56 @@ public static void main(String[] args) throws AuthenticateException, OperationEx
     private void showProfessorMenu(Scanner scanner) {
         int option;
         do {
-            System.out.println("1. Registrar notificacion");
-            System.out.println("2. Evaluar Reporte");
-            System.out.println("3. Salir");
+            System.out.println("1. Evaluar Reporte");
+            System.out.println("2. Salir");
 
             option = scanner.nextInt();
             scanner.nextLine();
             switch (option) {
                 case 1:
-                    System.out.println("Función no disponible por el momento");
+                    ReportDAO reportDAO = new ReportDAO();
+                    try {
+                        
+                        List<Report> reports = reportDAO.getReports(); 
+
+                        if (reports.isEmpty()) {
+                            System.out.println("No hay reportes disponibles.");
+                        } else {
+                            System.out.println("--- Lista de Reportes ---");
+                            for (Report report : reports) {
+                                System.out.println("ID: " + report.getId() + " | Descripción: "
+                                     + report.getDescription());
+                            }
+                        }
+                        System.out.println("\nEscriba el tipo de reporte a evaluar(Parcial/Final): ");
+                        String type = scanner.nextLine();
+                        if (type.equals("Final")) {
+                            System.out.println("Escriba el ID del reporte final: ");
+                            int finalId = scanner.nextInt();
+                            FinalReport finalReport = reportDAO.getFinalReportById(finalId);
+                            System.out.println("Calificacion (1-10)");
+                            scanner.nextInt();
+                            reportDAO.evaluationReport(finalReport);
+                        } else if (type.equals("Parcial")) {
+                            System.out.println("Escriba el ID del reporte parcial: ");
+                            int partialId = scanner.nextInt();
+                            PartialReport partialReport = reportDAO.getPartialReportById(partialId);
+                            System.out.println("Calificacion (1-10)");
+                            scanner.nextInt();
+                            reportDAO.evaluationReport(partialReport);
+                        }
+                        scanner.nextInt();
+                    } catch (OperationException e) {
+                        e.getMessage();
+                    }
                     break;
                 case 2:
-                    System.out.println("Función no disponible por el momento");
+                    System.out.println("Saliendo...");
                     break;
                 default:
                     System.out.println("Opción no válida");
             }
-        } while (option != 3);
- 
+        } while (option != 2);
     }   
 
     private void showAdministratorMenu(Scanner scanner) throws OperationException {
@@ -240,8 +275,10 @@ public static void main(String[] args) throws AuthenticateException, OperationEx
             System.out.println("6. Consultar responsables técnicos");
             System.out.println("7. Registrar proyecto");
             System.out.println("8. Consultar proyectos");
-            System.out.println("9. Asignar proyecto a alumno");
-            System.out.println("10. Salir");
+            System.out.println("9. Asignar alumno a proyecto");
+            System.out.println("10. Registrar experiencia educativa");
+            System.out.println("11. Asignar alumno a EE");
+            System.out.println("12. Salir");
 
             optionCoordinator = scanner.nextInt();
             switch (optionCoordinator) {
@@ -729,12 +766,18 @@ public static void main(String[] args) throws AuthenticateException, OperationEx
                     }
                     break;
                 case 10:
+                    //registrar EE
+                    break;
+                case 11:
+                    //asignar alumno a EE
+                    break;
+                case 12:
                     System.out.println("Saliendo del programa...");
                     break;
                 default:
                     System.out.println("Opción no válida");
             }
-        } while (optionCoordinator != 10);
+        } while (optionCoordinator != 12);
     }
 
     private void showStudentMenu(Scanner scanner) throws OperationException {
@@ -860,7 +903,7 @@ public static void main(String[] args) throws AuthenticateException, OperationEx
 
                     break; 
                 case 3:
-                    AutoevaluationService autoevaluationService = new AutoevaluationService();
+                    AutoevaluationCommon autoevaluationService = new AutoevaluationCommon();
 
                     System.out.println("Matrícula del estudiante:");
                     String studentIdAutoevaluation = scanner.nextLine();

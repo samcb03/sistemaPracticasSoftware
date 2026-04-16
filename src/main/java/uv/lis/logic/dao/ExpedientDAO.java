@@ -59,11 +59,9 @@ public class ExpedientDAO implements IExpedientDAO {
              
             while (rs.next()) {
                 Expedient exp = new Expedient(
-                    rs.getInt("id"), 
                     rs.getString("nombre"),
                     rs.getString("tipo_documento"),
-                    rs.getString("direccion_archivo"),
-                    rs.getString("idStudent")
+                    rs.getString("direccion_archivo")
                 );
                 documents.add(exp);
             }
