@@ -179,7 +179,7 @@ public class ReportDAO implements IReportDAO {
     }
 
     @Override
-    public boolean modifyPartialReport(PartialReport partialReport) {
+    public boolean modifyPartialReport(PartialReport partialReport) throws OperationException {
         boolean isModified = false;
         
         String reportQuery = "UPDATE Reporte SET descripcion = ?, observaciones = ?, actividad = ?, matricula = ? " +
@@ -216,10 +216,12 @@ public class ReportDAO implements IReportDAO {
             } catch (SQLException e) {
                 databaseConnection.rollback();
                 LOGGER.log(Level.SEVERE, "Error al modificar reporte parcial", e);
+                throw new OperationException("Error al modificar el reporte parcial. Intentelo mas tarde", null);
             }
 
         } catch (SQLException e) {
             LOGGER.log(Level.SEVERE, "Error con la conexión de la base de datos", e);
+            throw new OperationException("Error con la conexión de la base de datos", e);
         }
 
         return isModified;
@@ -260,7 +262,7 @@ public class ReportDAO implements IReportDAO {
     }
 
     @Override
-    public boolean registerFinalReport(FinalReport finalReport) {
+    public boolean registerFinalReport(FinalReport finalReport) throws OperationException {
         boolean isRegistered = false;
         
         String reportQuery = "INSERT INTO Reporte (idReporte, descripcion, observaciones, actividad, matricula) " +
@@ -301,6 +303,7 @@ public class ReportDAO implements IReportDAO {
 
         } catch (SQLException e) {
             LOGGER.log(Level.SEVERE, "Error de conexion con la base de datos", e);
+            throw new OperationException("Error al registrar el reporte final", null);
         }
 
         return isRegistered;

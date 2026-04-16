@@ -16,11 +16,11 @@ public interface IReportDAO {
 
     boolean registerPartialReport(PartialReport partialReport) throws SQLException, OperationException;
 
-    boolean modifyPartialReport(PartialReport partialReport) throws SQLException;
+    boolean modifyPartialReport(PartialReport partialReport) throws SQLException, OperationException;
 
     FinalReport getFinalReportById(int idFinalReport) throws SQLException;
 
-    boolean registerFinalReport(FinalReport finalReport) throws SQLException;
+    boolean registerFinalReport(FinalReport finalReport) throws SQLException, OperationException;
 
     boolean modifyFinalReport(FinalReport finalReport) throws SQLException;
 }

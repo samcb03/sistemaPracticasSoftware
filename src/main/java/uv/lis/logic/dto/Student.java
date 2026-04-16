@@ -10,21 +10,22 @@ public class Student extends User {
     private int completedHours;
     private String gender;
     private boolean indigenousLanguage;
-    private String autoevaluation;
+    private Subject subject;
+    private Report report;
+    private Project project;
 
-    public Student(){
-
+    public Student() {
+        
     }
 
     public Student(int idUser, String firstName, String lastName, String password, String idStudent, Date birthDate, 
-            int completedHours, String gender, boolean indigenousLanguage, String autoevaluation) {
+            int completedHours, String gender, boolean indigenousLanguage) {
         super(idUser, firstName, lastName, password, "Alumno", true);
         this.idStudent = idStudent;
         this.birthDate = birthDate;
         this.completedHours = completedHours;
         this.gender = gender;
         this.indigenousLanguage = indigenousLanguage;
-        this.autoevaluation = autoevaluation;
     }
 
     public String getIdStudent() {
@@ -67,11 +68,27 @@ public class Student extends User {
         this.indigenousLanguage = indigenousLanguage;
     }
 
-    public String getAutoevaluation() {
-        return autoevaluation;
+    public Subject getSubject() {
+        return subject;
     }
 
-    public void setAutoevaluation(String autoevaluation) {
-        this.autoevaluation = autoevaluation;
+    public void setSubject(Subject subject) {
+        this.subject = subject;
+    }
+
+    public Report getReport() {
+        return report;
+    }
+
+    public void setReport(Report report) {
+        this.report = report;
+    }
+
+    public Project getProject() {
+        return project;
+    }
+
+    public void setProject(Project project) {
+        this.project = project;
     }
 }
