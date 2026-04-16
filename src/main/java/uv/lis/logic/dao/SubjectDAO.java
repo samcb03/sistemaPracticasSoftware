@@ -74,9 +74,8 @@ public class SubjectDAO implements ISubjectDAO {
         } catch (SQLException e) {
             LOGGER.log(Level.SEVERE, "Error de conexion con la base de datos", e);
             throw new OperationException("No se pudo obtener las Experiencias Educativas. Intentelo mas tarde", 
-                null);
+                e);
         }
-
         return subjects;
     }
 }

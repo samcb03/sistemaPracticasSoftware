@@ -1,5 +1,6 @@
 package uv.lis.logic.dto;
 
+import java.util.Objects;
 
 public class Professor extends User {
     private String personnelNumber;
@@ -29,5 +30,18 @@ public class Professor extends User {
 
     public void setIsCoordinator(boolean isCoordinator) {
         this.isCoordinator = isCoordinator;
+    }
+
+    @Override
+    public boolean equals(Object object) {
+        if (this == object) {
+            return true;
+        }
+        if (!(object instanceof Professor)) {
+            return false;
+        }
+        Professor other = (Professor) object;
+
+        return Objects.equals(this.personnelNumber, other.personnelNumber) && this.isCoordinator == other.isCoordinator;
     }
 }

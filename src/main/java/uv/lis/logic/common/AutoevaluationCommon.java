@@ -39,7 +39,8 @@ public class AutoevaluationCommon {
     }
 
     private boolean isInRange(int value) {
-        return value >= 1 && value <= 5;
+        boolean inRange = value >= 1 && value <= 5;
+        return inRange;
     }
 }
 
