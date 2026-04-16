@@ -4,7 +4,6 @@ package uv.lis;
 import java.sql.Date;
 import java.util.List;
 import java.util.Scanner;
-
 import uv.lis.logic.common.AutoevaluationCommon;
 import uv.lis.logic.dao.AffiliatedOrganizationDAO;
 import uv.lis.logic.dao.ProfessorDAO;
@@ -13,6 +12,7 @@ import uv.lis.logic.dao.ProjectRequestDAO;
 import uv.lis.logic.dao.ProjectSupervisorDAO;
 import uv.lis.logic.dao.ReportDAO;
 import uv.lis.logic.dao.StudentDAO;
+import uv.lis.logic.dao.SubjectDAO;
 import uv.lis.logic.dao.UserDAO;
 import uv.lis.logic.dto.AffiliatedOrganization;
 import uv.lis.logic.dto.Autoevaluation;
@@ -25,6 +25,7 @@ import uv.lis.logic.dto.ProjectSupervisor;
 import uv.lis.logic.dto.Report;
 import uv.lis.logic.dto.Student;
 import uv.lis.logic.dto.User;
+import uv.lis.logic.dto.Subject;
 import uv.lis.logic.exceptions.AuthenticateException;
 import uv.lis.logic.exceptions.OperationException;
 
@@ -89,8 +90,7 @@ public static void main(String[] args) throws AuthenticateException, OperationEx
             switch (option) {
                 case 1:
                     ReportDAO reportDAO = new ReportDAO();
-                    try {
-                        
+                    try {   
                         List<Report> reports = reportDAO.getReports(); 
 
                         if (reports.isEmpty()) {
@@ -766,10 +766,22 @@ public static void main(String[] args) throws AuthenticateException, OperationEx
                     }
                     break;
                 case 10:
-                    //registrar EE
+                    SubjectDAO subjectDAO = new SubjectDAO();
+                    System.out.println("NRC: ");
+                    int nrc = scanner.nextInt();
+                    System.out.println("Periodo escolar: ");
+                    String schoolPeriod = scanner.nextLine();
+                    Subject subject = new Subject(nrc, schoolPeriod);
+                    subjectDAO.registerSubject(subject);
                     break;
                 case 11:
-                    //asignar alumno a EE
+                    SubjectDAO subjectDAOSearcher = new SubjectDAO();
+                    try {
+                        subjectDAOSearcher.getAllSubjects();
+                    } catch (OperationException e) {
+                        e.getMessage();
+                    }
+                    
                     break;
                 case 12:
                     System.out.println("Saliendo del programa...");
