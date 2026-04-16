@@ -26,18 +26,18 @@ public class ExpedientDAO implements IExpedientDAO {
         String query = "INSERT INTO expediente (nombre, tipo_documento, direccion_archivo) VALUES (?, ?, ?)";
 
         try (Connection databaseConnection = connectionManager.getConnection();
-             PreparedStatement ps = databaseConnection.prepareStatement(query, Statement.RETURN_GENERATED_KEYS)) {
+             PreparedStatement preparedStatement = databaseConnection.prepareStatement(query, Statement.RETURN_GENERATED_KEYS)) {
 
-            ps.setString(1, expedient.getName());
-            ps.setString(2, expedient.getTypeDocument()); 
-            ps.setString(3, expedient.getUrl()); 
+            preparedStatement.setString(1, expedient.getName());
+            preparedStatement.setString(2, expedient.getTypeDocument()); 
+            preparedStatement.setString(3, expedient.getUrl()); 
             
-            int affectedRows = ps.executeUpdate();
+            int affectedRows = preparedStatement.executeUpdate();
             
             if (affectedRows > 0) {
-                try (ResultSet rs = ps.getGeneratedKeys()) {
-                    if (rs.next()) {
-                        generatedId = rs.getInt(1);
+                try (ResultSet resultSet = preparedStatement.getGeneratedKeys()) {
+                    if (resultSet.next()) {
+                        generatedId = resultSet.getInt(1);
                     }
                 }
             }
@@ -54,14 +54,14 @@ public class ExpedientDAO implements IExpedientDAO {
         String query = "SELECT id, nombre, tipo_documento, direccion_archivo FROM expediente";
 
         try (Connection databaseConnection = connectionManager.getConnection();
-             PreparedStatement ps = databaseConnection.prepareStatement(query);
-             ResultSet rs = ps.executeQuery()) {
+             PreparedStatement preparedStatement = databaseConnection.prepareStatement(query);
+             ResultSet resultSet = preparedStatement.executeQuery()) {
              
-            while (rs.next()) {
+            while (resultSet.next()) {
                 Expedient exp = new Expedient(
-                    rs.getString("nombre"),
-                    rs.getString("tipo_documento"),
-                    rs.getString("direccion_archivo")
+                    resultSet.getString("nombre"),
+                    resultSet.getString("tipo_documento"),
+                    resultSet.getString("direccion_archivo")
                 );
                 documents.add(exp);
             }
