@@ -1,5 +1,17 @@
 package src.test.java;
 
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+import java.sql.Connection;
+import java.sql.Date;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import uv.lis.dataaccess.MySQLConnectionManager;
@@ -7,12 +19,6 @@ import uv.lis.logic.dao.StudentDAO;
 import uv.lis.logic.dto.Student;
 import uv.lis.logic.exceptions.OperationException;
 
-import java.sql.*;
-
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
 public class StudentDAOTest {
 
@@ -35,9 +41,6 @@ public class StudentDAOTest {
         studentDAO = new StudentDAO(connectionManager);
     }
 
-    // ============================
-    // 🟢 TEST: getStudentById SUCCESS
-    // ============================
     @Test
     void testGetStudentByIdSuccess() throws Exception {
         when(connection.prepareStatement(anyString())).thenReturn(preparedStatement);
@@ -59,9 +62,6 @@ public class StudentDAOTest {
         assertEquals("Denisse", student.getFirstName());
     }
 
-    // ============================
-    // 🔴 TEST: getStudentById NOT FOUND
-    // ============================
     @Test
     void testGetStudentByIdNotFound() throws Exception {
         when(connection.prepareStatement(anyString())).thenReturn(preparedStatement);
@@ -74,9 +74,6 @@ public class StudentDAOTest {
         });
     }
 
-    // ============================
-    // 🟢 TEST: registerStudent SUCCESS
-    // ============================
     @Test
     void testRegisterStudentSuccess() throws Exception {
         when(connection.prepareStatement(anyString())).thenReturn(preparedStatement);
@@ -95,9 +92,6 @@ public class StudentDAOTest {
         assertTrue(result);
     }
 
-    // ============================
-    // 🔴 TEST: registerStudent ERROR
-    // ============================
     @Test
     void testRegisterStudentFail() throws Exception {
         when(connection.prepareStatement(anyString())).thenReturn(preparedStatement);
@@ -113,9 +107,6 @@ public class StudentDAOTest {
         });
     }
 
-    // ============================
-    // 🟢 TEST: modifyStudent SUCCESS
-    // ============================
     @Test
     void testModifyStudentSuccess() throws Exception {
         when(connection.prepareStatement(anyString())).thenReturn(preparedStatement);
@@ -132,9 +123,6 @@ public class StudentDAOTest {
         assertTrue(result);
     }
 
-    // ============================
-    // 🟢 TEST: inactivateStudent SUCCESS
-    // ============================
     @Test
     void testInactivateStudentSuccess() throws Exception {
         when(connection.prepareStatement(anyString())).thenReturn(preparedStatement);
