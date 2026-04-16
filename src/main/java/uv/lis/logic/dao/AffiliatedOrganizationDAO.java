@@ -49,8 +49,10 @@ public class AffiliatedOrganizationDAO implements IAffiliatedOrganizationDAO{
                     affiliatedOrganization.setNumberOfIndirectUsers(resultSet.getInt("numUsuariosIndirectos"));
 
                 } else {
-                    LOGGER.log(Level.INFO, "No se encontró una organización vinculada con el id {0}.", idAfilliatedOrganization);
-                    throw new OperationException("No se encontró una organización vinculada con el id: " + idAfilliatedOrganization, null);
+                    LOGGER.log(Level.INFO, "No se encontró una organización vinculada con el id {0}.", 
+                        idAfilliatedOrganization);
+                    throw new OperationException("No se encontró una organización vinculada con el id: " 
+                        + idAfilliatedOrganization, null);
                 }   
             }
 
@@ -70,7 +72,8 @@ public class AffiliatedOrganizationDAO implements IAffiliatedOrganizationDAO{
             + "VALUES (?, ?, ?, ?, ?, ?, ?, ?);";
 
         try (Connection databaseConnection = connectionManager.getConnection();
-            PreparedStatement preparedStatement = databaseConnection.prepareStatement(affiliatedOrganizationQuery, PreparedStatement.RETURN_GENERATED_KEYS)) {
+            PreparedStatement preparedStatement = databaseConnection.prepareStatement(affiliatedOrganizationQuery, 
+                PreparedStatement.RETURN_GENERATED_KEYS)) {
 
             preparedStatement.setString(1, affiliatedOrganization.getName());
             preparedStatement.setString(2, affiliatedOrganization.getCity());
