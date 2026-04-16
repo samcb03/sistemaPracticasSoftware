@@ -17,6 +17,9 @@ public class StudentDAO extends UserDAO implements IStudentDAO {
     private static final int NO_ROWS_AFFECTED = 0;
     private static final Logger LOGGER = Logger.getLogger(UserDAO.class.getName());
     private MySQLConnectionManager connectionManager;
+    public StudentDAO(MySQLConnectionManager connectionManager) {
+        this.connectionManager = connectionManager;
+    }
 
     @Override
     public Student getStudentById(String idStudent) throws OperationException { 
