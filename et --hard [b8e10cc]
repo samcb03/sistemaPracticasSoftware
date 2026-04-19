@@ -1,0 +1,59 @@
+[33me205765[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mCreacionExcepciones[m[33m, [m[1;31morigin/CreacionExcepciones[m[33m)[m HEAD@{0}: reset: moving to origin/CreacionExcepciones
+[33mb8e10cc[m HEAD@{1}: commit: Corrección de las excepciones propagadas y añación del test de actividad
+[33mc4bb71d[m[33m ([m[1;31morigin/main[m[33m, [m[1;31morigin/HEAD[m[33m)[m HEAD@{2}: reset: moving to HEAD
+[33mc4bb71d[m[33m ([m[1;31morigin/main[m[33m, [m[1;31morigin/HEAD[m[33m)[m HEAD@{3}: reset: moving to origin/main
+[33me205765[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mCreacionExcepciones[m[33m, [m[1;31morigin/CreacionExcepciones[m[33m)[m HEAD@{4}: reset: moving to HEAD
+[33me205765[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mCreacionExcepciones[m[33m, [m[1;31morigin/CreacionExcepciones[m[33m)[m HEAD@{5}: commit: Se añadió el userdaotest
+[33m57e2c04[m HEAD@{6}: pull origin main: Fast-forward
+[33ma5260ad[m HEAD@{7}: checkout: moving from CreacionExcepciones to CreacionExcepciones
+[33ma5260ad[m HEAD@{8}: commit: Actualizado
+[33m46ba041[m HEAD@{9}: checkout: moving from main to CreacionExcepciones
+[33m1a4ac4c[m[33m ([m[1;32mmain[m[33m)[m HEAD@{10}: checkout: moving from CreacionExcepciones to main
+[33m46ba041[m HEAD@{11}: pull origin main: Fast-forward
+[33m0968773[m HEAD@{12}: checkout: moving from main to CreacionExcepciones
+[33m1a4ac4c[m[33m ([m[1;32mmain[m[33m)[m HEAD@{13}: checkout: moving from CreacionExcepciones to main
+[33m0968773[m HEAD@{14}: commit: Agregacion de relaciones e implementacion del método para subir archivos
+[33m2968531[m HEAD@{15}: commit: Agregacion de excepciones personalizadas en todos los daos y en los contratos
+[33mc161c95[m HEAD@{16}: reset: moving to HEAD
+[33mc161c95[m HEAD@{17}: commit: Se agregó la excepción personalizada operaciónexception
+[33m478c2f2[m[33m ([m[1;32mRenameDomain[m[33m)[m HEAD@{18}: checkout: moving from RenameDomain to CreacionExcepciones
+[33m478c2f2[m[33m ([m[1;32mRenameDomain[m[33m)[m HEAD@{19}: pull origin main: Fast-forward
+[33mfc789ee[m HEAD@{20}: pull origin main: Fast-forward
+[33m1a79e6a[m[33m ([m[1;31morigin/RenameDomain[m[33m)[m HEAD@{21}: commit: Modificacion de Organizacion afiliada y proyecto en los métodos de registrar y consultar
+[33md0a716c[m HEAD@{22}: pull origin main: Fast-forward
+[33mbb32529[m HEAD@{23}: commit: Modificación en userDAO en los métodos modificar e inactivar profesor
+[33m4d2bb12[m HEAD@{24}: commit: Modificacion al menuAdministrador en los métodos registrar y consultar
+[33mfba0454[m HEAD@{25}: pull origin main: Fast-forward
+[33m88bee8e[m HEAD@{26}: commit: Update: Se modificó el método Authenticate en el UserDAO para que un administrador acceda
+[33m89b3a66[m HEAD@{27}: pull origin main: Fast-forward
+[33ma60d23a[m HEAD@{28}: checkout: moving from RenameDomain to RenameDomain
+[33ma60d23a[m HEAD@{29}: pull origin main: Fast-forward
+[33m47707bf[m HEAD@{30}: commit: "Modificación de USERDAO en el método Authenticate"
+[33mdde7c49[m HEAD@{31}: commit: Se modificó el metodo authentique y se añadió el menu del administrador
+[33m4f3e46f[m HEAD@{32}: checkout: moving from RenameDomain to RenameDomain
+[33m4f3e46f[m HEAD@{33}: pull origin main: Fast-forward
+[33m8ad6397[m HEAD@{34}: commit: Se añadió el login y un método para autenticar al usuario
+[33m282710e[m HEAD@{35}: pull origin main: Fast-forward
+[33mae29f8b[m HEAD@{36}: commit (merge): Merge branch 'RenameDomain' of https://github.com/samcb03/sistemaPracticasSoftware into RenameDomain
+[33m0affac5[m HEAD@{37}: commit: - Replaced printStackTrace() and System.out.println() with java.util.logging.Logger across DAO classes (ProjectSupervisor, Subject, User, PartialReport).
+[33mc2b8376[m HEAD@{38}: commit: - Replaced printStackTrace() and System.out.println() with java.util.logging.Logger across DAO classes (ProjectSupervisor, Subject, User, PartialReport).
+[33m994d96d[m HEAD@{39}: commit: - Replaced printStackTrace() and System.out.println() with java.util.logging.Logger across DAO classes (ProjectSupervisor, Subject, User, PartialReport).
+[33m1a4ac4c[m[33m ([m[1;32mmain[m[33m)[m HEAD@{40}: checkout: moving from main to RenameDomain
+[33m1a4ac4c[m[33m ([m[1;32mmain[m[33m)[m HEAD@{41}: pull origin main: Fast-forward
+[33m5fba65f[m HEAD@{42}: checkout: moving from RenameDomain to main
+[33m1a4ac4c[m[33m ([m[1;32mmain[m[33m)[m HEAD@{43}: pull origin main: Fast-forward
+[33mb34fa72[m HEAD@{44}: commit: Cambio de nombres de paquetes, variables y metodos
+[33me6eba43[m[33m ([m[1;31morigin/CreateDomainClass[m[33m, [m[1;32mCreateDomainClass[m[33m)[m HEAD@{45}: checkout: moving from CreateDomainClass to RenameDomain
+[33me6eba43[m[33m ([m[1;31morigin/CreateDomainClass[m[33m, [m[1;32mCreateDomainClass[m[33m)[m HEAD@{46}: commit: Fix syntax to match the standard in Activity, Project, Subject, and SchoolPeriod DAOs and DTOs
+[33m79c6831[m HEAD@{47}: pull origin main: Fast-forward
+[33m9d844e7[m HEAD@{48}: reset: moving to HEAD
+[33m9d844e7[m HEAD@{49}: commit (merge): Terminando el merge con los cambios de mi compañero
+[33m1575b31[m HEAD@{50}: commit: Create DAOs and interfaces for Activity, Subject, and SchoolPeriod
+[33ma5855d1[m HEAD@{51}: commit: Updates DTO classes: Activity, FinalReport, PartialReport, Report, SchoolPeriod, and Subject
+[33mefe6ead[m HEAD@{52}: pull origin CreateDomainClass: Fast-forward
+[33m3b0e8d0[m HEAD@{53}: commit: Creates the six classes in the domain package: Activity, Report, FinalReport, PartialReport, SchoolPeriod and Subject each one with their attributes, constructors, getters and setters
+[33m3dac62f[m HEAD@{54}: pull origin main: Fast-forward
+[33m404be13[m HEAD@{55}: pull origin main: Fast-forward
+[33m5fba65f[m HEAD@{56}: checkout: moving from CreateDomainClass to CreateDomainClass
+[33m5fba65f[m HEAD@{57}: checkout: moving from main to CreateDomainClass
+[33m5fba65f[m HEAD@{58}: clone: from https://github.com/dennys1020/sistemaPracticasSoftware.git

@@ -44,4 +44,9 @@ public class Professor extends User {
 
         return Objects.equals(this.personnelNumber, other.personnelNumber) && this.isCoordinator == other.isCoordinator;
     }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(personnelNumber,isCoordinator);
+    }
 }

@@ -24,20 +24,20 @@ public class ExpedientCommon {
     }
 
     public boolean uploadAndRegisterDocument(String enrollment, String documentName, String documentType, 
-            File sourceFile) throws OperationException {
+        File sourceFile) throws OperationException {
         if (enrollment == null || enrollment.trim().isEmpty()) {
             throw new OperationException("La matrícula del alumno es obligatoria para guardar un documento.", 
                 null);
         }
         if (sourceFile == null || !sourceFile.exists()) {
             throw new OperationException("No se ha seleccionado un archivo válido.", null);
-        }
+    }
 
         try {
             String finalUrl = fileManager.uploadDocument(enrollment, documentType, sourceFile);
             
             Expedient newDocument = new Expedient(documentName, documentType, finalUrl);
-            
+
             int generatedId = expedientDAO.saveDocument(newDocument);
 
             return generatedId > 0;
