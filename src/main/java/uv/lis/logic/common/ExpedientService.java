@@ -34,7 +34,7 @@ public class ExpedientService {
         try {
             String finalUrl = fileManager.uploadDocument(enrollment, documentType, sourceFile);
             
-            Expedient newDocument = new Expedient(0,enrollment,documentName, documentType, finalUrl,idStudent);
+            Expedient newDocument = new Expedient(0, enrollment, documentName, documentType, finalUrl, idStudent);
             
             int generatedId = expedientDAO.saveDocument(newDocument);
 
