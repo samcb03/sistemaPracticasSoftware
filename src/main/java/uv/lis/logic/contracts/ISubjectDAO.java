@@ -9,4 +9,8 @@ public interface ISubjectDAO {
     boolean registerSubject(Subject subject) throws OperationException;
 
     ArrayList<Subject> getAllSubjects() throws OperationException;
+  
+    boolean registerSubject(Subject subject) throws OperationException;
+
+    ArrayList<Subject> getAllSubjects() throws OperationException;
 }
