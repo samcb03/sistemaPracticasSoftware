@@ -38,7 +38,7 @@ public class StudentDAOTest {
 
         when(connectionManager.getConnection()).thenReturn(connection);
 
-        studentDAO = new StudentDAO(connectionManager);
+        studentDAO = new StudentDAO();
     }
 
     @Test
