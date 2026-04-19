@@ -26,7 +26,7 @@ public class ActivityDAO implements IActivityDAO {
     }
 
     @Override
-    public List<Activity> getActivities() throws OperationException {
+    public List<Activity> getAllActivities() throws OperationException {
         List<Activity> activities = new ArrayList<>();
         String activityQuery = "SELECT * FROM Actividad;";
 

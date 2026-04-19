@@ -9,9 +9,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
 import uv.lis.dataaccess.MySQLConnectionManager;
 import uv.lis.logic.contracts.IProjectRequestDAO;
 import uv.lis.logic.dto.Project;
+import uv.lis.logic.exceptions.OperationException;
 
 
 public class ProjectRequestDAO implements IProjectRequestDAO {
@@ -25,7 +27,7 @@ public class ProjectRequestDAO implements IProjectRequestDAO {
     }
 
     @Override
-    public int getActiveRequestCountByStudentId(String idStudent) throws SQLException {
+    public int getActiveRequestCountByStudentId(String idStudent) throws OperationException {
         int count = 0;
         String query = "SELECT COUNT(*) as total FROM Solicita_Proyecto WHERE matricula = ?;";
 
@@ -41,7 +43,7 @@ public class ProjectRequestDAO implements IProjectRequestDAO {
             }
         } catch (SQLException e) {
             LOGGER.log(Level.SEVERE, "Error al contar solicitudes del practicante", e);
-            throw e;
+            throw new OperationException("Actividad no encontrada",e);
         }
 
         return count;
@@ -110,7 +112,7 @@ public class ProjectRequestDAO implements IProjectRequestDAO {
     }
 
     @Override
-    public boolean hasAlreadyRequested(String idStudent, int idProject) throws SQLException {
+    public boolean hasAlreadyRequested(String idStudent, int idProject) throws OperationException {
         boolean hasRequested = false;
         String query = "SELECT COUNT(*) as total FROM Solicita_Proyecto WHERE matricula = ? AND idProyecto = ?;";
 
@@ -127,14 +129,14 @@ public class ProjectRequestDAO implements IProjectRequestDAO {
             }
         } catch (SQLException e) {
             LOGGER.log(Level.SEVERE, "Error al verificar solicitud existente", e);
-            throw e;
+            throw new OperationException("Error al verificar solicitud", e);
         }
 
         return hasRequested;
     }
 
     @Override
-    public boolean hasAvailableCapacity(int idProject) throws SQLException {
+    public boolean hasAvailableCapacity(int idProject) throws OperationException {
         boolean hasCapacity = false;
         String query = "SELECT p.cupo, COUNT(sp.matricula) as solicitudes FROM Proyecto p "
             + "LEFT JOIN Solicita_Proyecto sp ON p.idProyecto = sp.idProyecto WHERE p.idProyecto = ? "
@@ -154,40 +156,39 @@ public class ProjectRequestDAO implements IProjectRequestDAO {
             }
         } catch (SQLException e) {
             LOGGER.log(Level.SEVERE, "Error al verificar cupo del proyecto", e);
-            throw e;
+            throw new OperationException("No hay capacidad", e);
         }
         
         return hasCapacity;
     }
 
-    @Override
-    public boolean requestProject(String idStudent, int idProject) {
-        boolean isRegistered = false;
-        
-        if (validateProjectRequest(idStudent, idProject)) {
-            String query = "INSERT INTO Solicita_Proyecto (idProyecto, matricula, estatus) VALUES (?, ?, FALSE);";
+public boolean requestProject(String idStudent, int idProject) throws OperationException {
+    boolean isRegistered = false;
+    
+    if (validateProjectRequest(idStudent, idProject)) {
+        String query = "INSERT INTO Solicita_Proyecto (idProyecto, matricula, estatus) VALUES (?, ?, FALSE);";
 
-            try (Connection databaseConnection = connectionManager.getConnection();
-                PreparedStatement preparedStatement = databaseConnection.prepareStatement(query)) {
-                
-                preparedStatement.setInt(1, idProject);
-                preparedStatement.setString(2, idStudent);
+        try (Connection databaseConnection = connectionManager.getConnection();
+            PreparedStatement preparedStatement = databaseConnection.prepareStatement(query)) {
+            
+            preparedStatement.setInt(1, idProject);
+            preparedStatement.setString(2, idStudent);
 
-                if (preparedStatement.executeUpdate() > NO_ROWS_AFFECTED) {
-                    isRegistered = true;
-                    LOGGER.log(Level.INFO, "Solicitud de proyecto {0} por practicante {1} registrada exitosamente", 
-                        new Object[]{idProject, idStudent});
-                }
-            } catch (SQLException e) {
-                LOGGER.log(Level.SEVERE, "Error al registrar solicitud de proyecto", e);
+            if (preparedStatement.executeUpdate() > NO_ROWS_AFFECTED) {
+                isRegistered = true;
+                LOGGER.log(Level.INFO, "Solicitud de proyecto {0} por practicante {1} registrada exitosamente", 
+                    new Object[]{idProject, idStudent});
             }
+        } catch (SQLException e) {
+            LOGGER.log(Level.SEVERE, "Error al registrar solicitud de proyecto", e);
+            throw new OperationException("Error al registrar solicitud", e);
         }
-
-        return isRegistered;
     }
+    return isRegistered;
+}
 
     @Override
-    public boolean validateProjectRequest(String idStudent, int idProject) {
+    public boolean validateProjectRequest(String idStudent, int idProject) throws OperationException {
         boolean isValid = true;
         try {
             if (getActiveRequestCountByStudentId(idStudent) >= MAX_REQUESTS) {
@@ -207,8 +208,9 @@ public class ProjectRequestDAO implements IProjectRequestDAO {
                 isValid = false;
             }
   
-        } catch (SQLException e) {
+        } catch (OperationException e) {
             LOGGER.log(Level.SEVERE, "Error en validación de solicitud", e);
+            throw new OperationException("Error al validar solicitud", e);
         } 
         return isValid;
     }

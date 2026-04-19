@@ -215,6 +215,7 @@ class ProfessorDAOTest {
         when(connectionManager.getConnection()).thenReturn(databaseConnection);
         when(databaseConnection.prepareStatement(anyString())).thenReturn(preparedStatement);
         when(preparedStatement.executeUpdate()).thenReturn(0);
+        
 
         OperationException exceeption = assertThrows(OperationException.class, () ->
             professorDAO.inactivateProfessor(professor)
@@ -228,10 +229,10 @@ class ProfessorDAOTest {
 
         when(connectionManager.getConnection()).thenThrow(new SQLException("Fallo"));
 
-        OperationException exceeption = assertThrows(OperationException.class, () ->
+        OperationException exception = assertThrows(OperationException.class, () ->
             professorDAO.inactivateProfessor(professor)
         );
-        assertTrue(exceeption.getMessage().contains("Error al inactivar el profesor"));
+        assertTrue(exception.getMessage().contains("Error al inactivar el profesor"));
     }
 
     private Professor buildProfessor(String number, String name, String lastName, boolean isCoordinator) {
