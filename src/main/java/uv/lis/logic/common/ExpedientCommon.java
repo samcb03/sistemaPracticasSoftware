@@ -1,15 +1,16 @@
 package uv.lis.logic.common;
 
+
 import java.io.File;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
 import uv.lis.logic.contracts.IExpedientDAO;
 import uv.lis.logic.dao.ExpedientDAO;
 import uv.lis.logic.dto.Expedient;
 import uv.lis.logic.exceptions.OperationException;
 import uv.lis.logic.utils.FileManager;
+
 
 public class ExpedientCommon {
 
@@ -23,28 +24,32 @@ public class ExpedientCommon {
         this.fileManager = new FileManager();
     }
 
-    public boolean uploadAndRegisterDocument(String enrollment, String documentName, String documentType, 
-        File sourceFile) throws OperationException {
-        if (enrollment == null || enrollment.trim().isEmpty()) {
-            throw new OperationException("La matrícula del alumno es obligatoria para guardar un documento.", 
-                null);
+    public boolean uploadAndRegisterDocument(Expedient expedient, File sourceFile) throws OperationException {
+        if (expedient.getEnrollment() == null || expedient.getEnrollment().trim().isEmpty()) {
+            throw new OperationException("La matrícula del alumno es obligatoria para guardar un documento.",
+                 null);
         }
         if (sourceFile == null || !sourceFile.exists()) {
             throw new OperationException("No se ha seleccionado un archivo válido.", null);
-    }
+        }
 
         try {
-            String finalUrl = fileManager.uploadDocument(enrollment, documentType, sourceFile);
-            
-            Expedient newDocument = new Expedient(documentName, documentType, finalUrl);
+            String finalUrl = fileManager.uploadDocument(
+            expedient.getEnrollment(), 
+            expedient.getTypeDocument(), 
+            sourceFile);
 
-            int generatedId = expedientDAO.saveDocument(newDocument);
+            expedient.setUrl(finalUrl);
 
-            return generatedId > 0;
+            int generatedId = expedientDAO.saveDocument(expedient);
+
+            boolean wasRegistered = generatedId > 0;
+            return wasRegistered;
 
         } catch (OperationException e) {
-            LOGGER.log(Level.SEVERE, "Error en el proceso de subir y registrar el documento para {0}", enrollment);
-            throw e; 
+            LOGGER.log(Level.SEVERE, "Error en el proceso de subir y registrar el documento para {0}", 
+                expedient.getEnrollment());
+            throw new OperationException("Error en el proceso de subir y registrar el documento", e);
         }
     }
 

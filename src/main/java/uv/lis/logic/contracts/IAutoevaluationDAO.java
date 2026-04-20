@@ -9,5 +9,4 @@ public interface IAutoevaluationDAO {
     boolean registerAutoevaluation(Autoevaluation autoevaluation) throws OperationException;
 
     boolean existsByStudent(String idStudent) throws OperationException;
-    
 }

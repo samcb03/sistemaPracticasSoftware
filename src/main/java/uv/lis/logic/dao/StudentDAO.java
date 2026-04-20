@@ -58,7 +58,7 @@ public class StudentDAO extends UserDAO implements IStudentDAO {
             }
         } catch (SQLException e) {
             LOGGER.log(Level.SEVERE, "Error de conexion con la base de datos",e);
-            throw new OperationException("No se pudo buscar el alumno. Intentelo mas tarde", null);
+            throw new OperationException("No se pudo buscar el alumno. Intentelo mas tarde", e);
         }
         
         return student;
@@ -93,7 +93,7 @@ public class StudentDAO extends UserDAO implements IStudentDAO {
 
         } catch (SQLException e) {
             LOGGER.log(Level.SEVERE, "Error de conexion con la base de datos",e);
-            throw new OperationException("No se pudo registrar al alumno. Intentelo mas tarde", null);
+            throw new OperationException("No se pudo registrar al alumno. Intentelo mas tarde", e);
         }
         
         return isRegistered;
@@ -124,7 +124,7 @@ public class StudentDAO extends UserDAO implements IStudentDAO {
 
         } catch (SQLException e) {
             LOGGER.log(Level.SEVERE, "Error de conexion con la base de datos",e);
-            throw new OperationException("No se pudo modificar al alumno. Intentelo mas tarde", null);
+            throw new OperationException("No se pudo modificar al alumno. Intentelo mas tarde", e);
         }
 
         return isModified;
@@ -150,7 +150,7 @@ public class StudentDAO extends UserDAO implements IStudentDAO {
 
         } catch (SQLException e) {
             LOGGER.log(Level.SEVERE, "Error de conexion con la base de datos",e);
-            throw new OperationException("No se pudo inactivar al alumno. Intentelo mas tarde", null);
+            throw new OperationException("No se pudo inactivar al alumno. Intentelo mas tarde", e);
         }
 
         return isInactive;

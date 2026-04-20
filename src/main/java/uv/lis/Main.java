@@ -443,14 +443,14 @@ public static void main(String[] args) throws AuthenticateException, OperationEx
                     organization.setNumberOfIndirectUsers(indirectUsers);
                     
 
-                    organizationDAO.registerAffiliatedOrganization(organization);
+                    organizationDAO.registerOrganization(organization);
                     System.out.println("Organización registrada con éxito");
                     break;
                 case 4:
                     AffiliatedOrganizationDAO organizationSearcherDAO = new AffiliatedOrganizationDAO();
                     System.out.println("Escriba el numero de identificacion de la organizacion a consultar: ");
                     int searchOrganizationId = scanner.nextInt();
-                    AffiliatedOrganization foundOrganization = organizationSearcherDAO.getAffiliatedOrganizationById(searchOrganizationId);
+                    AffiliatedOrganization foundOrganization = organizationSearcherDAO.getOrganizationById(searchOrganizationId);
                         if (foundOrganization != null) {
                             System.out.println("Organización encontrada:");
                             System.out.println("Nombre: " + foundOrganization.getName());
@@ -485,43 +485,43 @@ public static void main(String[] args) throws AuthenticateException, OperationEx
                                         System.out.println("Escriba el nuevo nombre: ");
                                         String newName = scanner.nextLine();
                                         foundOrganization.setName(newName);
-                                        organizationSearcherDAO.modifyAffiliatedOrganization(foundOrganization);
+                                        organizationSearcherDAO.modifyOrganization(foundOrganization);
                                         break;
                                     case 2:
                                         System.out.println("Escriba la nueva ciudad: ");
                                         String newCity = scanner.nextLine();
                                         foundOrganization.setCity(newCity);
-                                        organizationSearcherDAO.modifyAffiliatedOrganization(foundOrganization);
+                                        organizationSearcherDAO.modifyOrganization(foundOrganization);
                                         break;
                                     case 3:
                                         System.out.println("Escriba el nuevo estado: ");
                                         String newState = scanner.nextLine();
                                         foundOrganization.setState(newState);
-                                        organizationSearcherDAO.modifyAffiliatedOrganization(foundOrganization);
+                                        organizationSearcherDAO.modifyOrganization(foundOrganization);
                                         break;
                                     case 4:
                                         System.out.println("Escriba el nuevo correo electrónico: ");
                                         String newEmail = scanner.nextLine();
                                         foundOrganization.setEmail(newEmail);
-                                        organizationSearcherDAO.modifyAffiliatedOrganization(foundOrganization);
+                                        organizationSearcherDAO.modifyOrganization(foundOrganization);
                                         break;
                                     case 5:
                                         System.out.println("Escriba el nuevo número telefónico: ");
                                         String newPhoneNumber = scanner.nextLine();
                                         foundOrganization.setPhoneNumber(newPhoneNumber);
-                                        organizationSearcherDAO.modifyAffiliatedOrganization(foundOrganization);
+                                        organizationSearcherDAO.modifyOrganization(foundOrganization);
                                         break;
                                     case 6:
                                         System.out.println("Escriba el nuevo número de usuarios directos: ");
                                         int newDirectUsers = scanner.nextInt();
                                         foundOrganization.setNumberOfDirectUsers(newDirectUsers);
-                                        organizationSearcherDAO.modifyAffiliatedOrganization(foundOrganization);
+                                        organizationSearcherDAO.modifyOrganization(foundOrganization);
                                         break;
                                     case 7:
                                         System.out.println("Escriba el nuevo número de usuarios indirectos: ");
                                         int newIndirectUsers = scanner.nextInt();
                                         foundOrganization.setNumberOfIndirectUsers(newIndirectUsers);
-                                        organizationSearcherDAO.modifyAffiliatedOrganization(foundOrganization);
+                                        organizationSearcherDAO.modifyOrganization(foundOrganization);
                                         break;
                                     case 8:
                                         System.out.println("Cancelando modificación...");
@@ -531,7 +531,7 @@ public static void main(String[] args) throws AuthenticateException, OperationEx
                                     }
                                     break;
                             case 2:
-                                boolean inactivated = organizationSearcherDAO.inactivateAffiliatedOrganization(foundOrganization);
+                                boolean inactivated = organizationSearcherDAO.inactivateOrganization(foundOrganization);
                                     if (inactivated) {
                                         System.out.println("Organización inactivada con éxito");
                                     } else {
