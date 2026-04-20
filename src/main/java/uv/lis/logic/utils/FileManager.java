@@ -16,14 +16,14 @@ public class FileManager {
     
     private static final Logger LOGGER = Logger.getLogger(FileManager.class.getName());
 
-    public String uploadDocument(String enrollment, String documentType, File sourceFile) throws OperationException {
+    public String uploadDocument(String documentName, String documentType, File sourceFile, String idStudent) throws OperationException {
         
         if (sourceFile == null || !sourceFile.exists()) {
             throw new OperationException("El archivo de origen no existe o es nulo.", null);
         }
         
         try {
-            Path userDir = Paths.get("src", "main", "resources", "expedientes", enrollment);
+            Path userDir = Paths.get("src", "main", "resources", "expedientes", idStudent);
             Files.createDirectories(userDir);
 
             Path destination = userDir.resolve(documentType + ".pdf");
@@ -33,8 +33,8 @@ public class FileManager {
             return destination.toString();
             
         } catch (IOException e) {
-            LOGGER.log(Level.SEVERE, "Error subiendo el documento para el alumno " + enrollment, e);
-            throw new OperationException("No se pudo guardar el archivo físico en el servidor.", e);
+            LOGGER.log(Level.SEVERE, "Error subiendo el documento para el alumno " + idStudent, e);
+            throw new OperationException("No se pudo guardar el archivo ", e);
         }
     }
 }
