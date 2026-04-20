@@ -2,7 +2,6 @@ package uv.lis.logic.common;
 
 
 import java.util.List;
-
 import uv.lis.logic.dao.AutoevaluationDAO;
 import uv.lis.logic.dto.Autoevaluation;
 import uv.lis.logic.exceptions.OperationException;

@@ -70,7 +70,7 @@ public class ActivityDAO implements IActivityDAO {
             }
         } catch (SQLException e) {
             LOGGER.log(Level.SEVERE, "Error de conexion con la base de datos",e);
-            throw new OperationException("Error al obtener las actividades por ID", null);
+            throw new OperationException("Error al obtener las actividades por ID", e);
         }
         return activities;
     }
@@ -102,7 +102,7 @@ public class ActivityDAO implements IActivityDAO {
             }   
         } catch (SQLException e) {
             LOGGER.log(Level.SEVERE, "Error de conexion con la base de datos",e);
-            throw new OperationException("Error al registrar la actividad", null);
+            throw new OperationException("Error al registrar la actividad", e);
 
         }
         return isRegistered;
@@ -111,7 +111,8 @@ public class ActivityDAO implements IActivityDAO {
     @Override
     public boolean modifyActivity(Activity activity) throws OperationException {
         boolean isModified = false;
-        String activityQuery = "UPDATE Actividad SET descripcionActividad = ?, FechaInicio = ?, FechaFin = ?" 
+        String activityQuery = "UPDATE Actividad" 
+            + "SET descripcionActividad = ?, FechaInicio = ?, FechaFin = ?" 
             + "WHERE idActividad = ?;";
 
         if (activity == null) {
@@ -134,7 +135,7 @@ public class ActivityDAO implements IActivityDAO {
             }
         } catch (SQLException e) {
             LOGGER.log(Level.SEVERE, "Error de conexion con la base de datos",e);
-            throw new OperationException("Error al modificar la actividad", null);
+            throw new OperationException("Error al modificar la actividad", e);
         }
         return isModified;
     }
