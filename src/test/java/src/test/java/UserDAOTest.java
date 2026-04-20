@@ -6,7 +6,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-
 import uv.lis.dataaccess.MySQLConnectionManager;
 import uv.lis.logic.dao.UserDAO;
 import uv.lis.logic.dto.User;
@@ -17,13 +16,13 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
+
 
 @ExtendWith(MockitoExtension.class)
 class UserDAOTest {
@@ -60,7 +59,8 @@ class UserDAOTest {
         when(resultSet.next()).thenReturn(true);
         when(resultSet.getInt(1)).thenReturn(42);
 
-        assertEquals(42, userDAO.registerUser(builderUser("Juan", "Pérez", "password12", "Estudiante")));
+        assertEquals(42, userDAO.registerUser(builderUser("Juan", "Pérez", 
+            "password12", "Estudiante")));
     }
 
     @Test
@@ -69,7 +69,8 @@ class UserDAOTest {
         when(preparedStatement.executeUpdate()).thenReturn(0);
 
         OperationException exception = assertThrows(OperationException.class, () ->
-            userDAO.registerUser(builderUser("Juan", "Pérez", "password12", "Estudiante"))
+            userDAO.registerUser(builderUser("Juan", "Pérez", "password12",
+                 "Estudiante"))
         );
         assertTrue(exception.getMessage().contains("No se pudo registrar al usuario"));
     }
@@ -79,7 +80,8 @@ class UserDAOTest {
         when(connectionManager.getConnection()).thenThrow(new SQLException("Fallo"));
 
         OperationException exception = assertThrows(OperationException.class, () ->
-            userDAO.registerUser(builderUser("Juan", "Pérez", "password12", "Estudiante"))
+            userDAO.registerUser(builderUser("Juan", "Pérez", "password12", 
+                "Estudiante"))
         );
         assertTrue(exception.getMessage().contains("No se pudo registrar al usuario"));
     }

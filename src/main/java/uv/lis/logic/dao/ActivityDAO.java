@@ -70,8 +70,8 @@ public class ActivityDAO implements IActivityDAO {
                 activities.add(new Activity(id, activityName, activityDescription, startDate, endDate));
             }
         } catch (SQLException e) {
-            LOGGER.log(Level.SEVERE, "Error de conexion con la base de datos",e);
-            throw new OperationException("Error al obtener las actividades por ID", null);
+            LOGGER.log(Level.SEVERE, "Error de conexion con la base de datos", e);
+            throw new OperationException("Error al obtener las actividades", e);
         }
         return activities;
     }
@@ -104,7 +104,7 @@ public class ActivityDAO implements IActivityDAO {
             }   
         } catch (SQLException e) {
             LOGGER.log(Level.SEVERE, "Error de conexion con la base de datos",e);
-            throw new OperationException("Error al registrar la actividad", null);
+            throw new OperationException("Error al registrar la actividad", e);
 
         }
         return isRegistered;
@@ -137,7 +137,7 @@ public class ActivityDAO implements IActivityDAO {
             }
         } catch (SQLException e) {
             LOGGER.log(Level.SEVERE, "Error de conexion con la base de datos",e);
-            throw new OperationException("Error al modificar la actividad", null);
+            throw new OperationException("Error al modificar la actividad", e);
         }
         return isModified;
     }

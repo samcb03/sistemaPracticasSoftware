@@ -55,11 +55,12 @@ public class AutoevaluationDAO implements IAutoevaluationDAO {
         } else {
             LOGGER.log(Level.WARNING, "No se pudo registrar la autoevaluación para el alumno {0}", 
                 autoevaluation.getIdStudent());
-            throw new OperationException("No se pudo registrar la autoevaluación para el alumno: " + autoevaluation.getIdStudent(), null);
+            throw new OperationException("No se pudo registrar la autoevaluación para el alumno: " 
+                + autoevaluation.getIdStudent(), null);
         }   
     } catch (SQLException e) {
         LOGGER.log(Level.SEVERE, "Error al registrar autoevaluación", e);
-        throw new OperationException("Error al registrar la autoevaluación", null);
+        throw new OperationException("Error al registrar la autoevaluación", e);
     }
 
     return isRegistered;
@@ -81,7 +82,7 @@ public class AutoevaluationDAO implements IAutoevaluationDAO {
 
         } catch (SQLException e) {
             LOGGER.log(Level.SEVERE, "Error verificando la existencia de la autoevaluación", e);
-            throw new OperationException("Error al verificar la existencia de la autoevaluación", null);
+            throw new OperationException("Error al verificar la existencia de la autoevaluación", e);
         }
 
         return exists;

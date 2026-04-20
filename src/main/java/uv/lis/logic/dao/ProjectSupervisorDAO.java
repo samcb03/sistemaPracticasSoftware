@@ -47,7 +47,7 @@ public class ProjectSupervisorDAO implements IProjectSupervisorDAO {
 
         } catch (SQLException e) {
             LOGGER.log(Level.SEVERE, "Error buscando al supervisor", e);
-            throw new OperationException("Error al buscar al supervisor", null);
+            throw new OperationException("Error al buscar al supervisor", e);
         }
 
         return supervisor;
@@ -78,7 +78,7 @@ public class ProjectSupervisorDAO implements IProjectSupervisorDAO {
 
         } catch (SQLException e){
             LOGGER.log(Level.SEVERE, "Error de conexión con la base de datos al registrar", e);
-            throw new OperationException("Error al registrar al supervisor del proyecto", null);
+            throw new OperationException("Error al registrar al supervisor del proyecto", e);
         }
 
         return isRegistered;
@@ -103,13 +103,15 @@ public class ProjectSupervisorDAO implements IProjectSupervisorDAO {
                 isModified = true;
                 LOGGER.log(Level.INFO, "Supervisor modificado exitosamente");
             } else {
-                LOGGER.log(Level.WARNING, "No se pudo modificar al supervisor del proyecto con ID {0}", projectSupervisor.getId());
-                throw new OperationException("No se pudo modificar al supervisor del proyecto con ID: " + projectSupervisor.getId(), null);
+                LOGGER.log(Level.WARNING, "No se pudo modificar al supervisor del proyecto con ID {0}", 
+                    projectSupervisor.getId());
+                throw new OperationException("No se pudo modificar al supervisor del proyecto con ID: " 
+                    + projectSupervisor.getId(), null);
             }
 
         } catch (SQLException e) {
             LOGGER.log(Level.SEVERE, "Error al modificar al supervisor", e);
-            throw new OperationException("Error al modificar al supervisor del proyecto", null);
+            throw new OperationException("Error al modificar al supervisor del proyecto", e);
         }
 
         return isModified;
@@ -130,13 +132,15 @@ public class ProjectSupervisorDAO implements IProjectSupervisorDAO {
                 isInactive = true;
                 LOGGER.log(Level.INFO, "Supervisor dado de baja exitosamente");
             } else {
-                LOGGER.log(Level.WARNING, "No se pudo dar de baja al supervisor del proyecto con ID {0}", projectSupervisor.getId());
-                throw new OperationException("No se pudo dar de baja al supervisor del proyecto con ID: " + projectSupervisor.getId(), null);
+                LOGGER.log(Level.WARNING, "No se pudo dar de baja al supervisor del proyecto con ID {0}", 
+                    projectSupervisor.getId());
+                throw new OperationException("No se pudo dar de baja al supervisor del proyecto con ID: " 
+                    + projectSupervisor.getId(), null);
             }
 
         } catch (SQLException e) {
             LOGGER.log(Level.SEVERE, "Error al dar de baja al supervisor", e);
-            throw new OperationException("Error al dar de baja al supervisor del proyecto", null);
+            throw new OperationException("Error al dar de baja al supervisor del proyecto", e);
         }
 
         return isInactive;

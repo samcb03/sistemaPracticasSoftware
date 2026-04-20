@@ -1,5 +1,6 @@
 package uv.lis.logic.contracts;
 
+
 import uv.lis.logic.dto.User;
 import uv.lis.logic.exceptions.AuthenticateException;
 import uv.lis.logic.exceptions.OperationException;

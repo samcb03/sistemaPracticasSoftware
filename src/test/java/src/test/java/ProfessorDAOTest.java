@@ -7,7 +7,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -18,7 +17,6 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-
 import uv.lis.dataaccess.MySQLConnectionManager;
 import uv.lis.logic.dao.ProfessorDAO;
 import uv.lis.logic.dto.Professor;
@@ -50,19 +48,19 @@ class ProfessorDAOTest {
         field.set(professorDAO, connectionManager);
     }
 
-@Test
-void getProfessorByPersonalNumber_successful_returnsProfessor() throws Exception {
-    when(connectionManager.getConnection()).thenReturn(databaseConnection);
-    when(databaseConnection.prepareStatement(anyString())).thenReturn(preparedStatement);
-    when(preparedStatement.executeQuery()).thenReturn(resultSet);
-    when(resultSet.next()).thenReturn(true);
-    when(resultSet.getString("numeroPersonal")).thenReturn("UV-001");
-    when(resultSet.getString("nombre")).thenReturn("Juan");
-    when(resultSet.getString("apellidos")).thenReturn("Pérez");
+    @Test
+    void getProfessorByPersonalNumber_successful_returnsProfessor() throws Exception {
+        when(connectionManager.getConnection()).thenReturn(databaseConnection);
+        when(databaseConnection.prepareStatement(anyString())).thenReturn(preparedStatement);
+        when(preparedStatement.executeQuery()).thenReturn(resultSet);
+        when(resultSet.next()).thenReturn(true);
+        when(resultSet.getString("numeroPersonal")).thenReturn("UV-001");
+        when(resultSet.getString("nombre")).thenReturn("Juan");
+        when(resultSet.getString("apellidos")).thenReturn("Pérez");
 
-    assertEquals(buildProfessor("UV-001", "Juan", "Pérez", false), 
-        professorDAO.getProfessorByPersonalNumber("UV-001"));
-}
+        assertEquals(buildProfessor("UV-001", "Juan", "Pérez", false), 
+            professorDAO.getProfessorByPersonalNumber("UV-001"));
+    }
 
     @Test
     void getProfessorByPersonalNumber_notFound_throwsOperationException() throws Exception {
