@@ -1,56 +1,54 @@
 package src.test.java;
 
-
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
-import uv.lis.dataaccess.MySQLConnectionManager;
-import uv.lis.logic.dao.AutoevaluationDAO;
-import uv.lis.logic.dao.ProfessorDAO;
-import uv.lis.logic.exceptions.OperationException;
-import java.lang.reflect.Field;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import uv.lis.logic.dto.Autoevaluation;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 
+public class AutoevaluationDAOTest {
 
-@ExtendWith(MockitoExtension.class)
-class AutoevaluationDAOTest {
-
-    @Mock
-    private MySQLConnectionManager connectionManager;
-
-    @Mock
-    private Connection databaseConnection;
-
-    @Mock
-    private PreparedStatement preparedStatement;
-
-    @Mock
-    private ResultSet resultSet;
-
-    private AutoevaluationDAO autoevaluationDAO;
-
-    @BeforeEach
-    void setUp() throws Exception {
-        autoevaluationDAO = new AutoevaluationDAO();
-        Field field = AutoevaluationDAO.class.getDeclaredField("connectionManager");
-        field.setAccessible(true);
-        field.set(autoevaluationDAO, connectionManager);
+    @Test
+    void constructor_nullAnswer_throwsIllegalArguments() {
+        assertThrows(IllegalArgumentException.class, () ->
+             new Autoevaluation("S013322",null)
+        );
+    }
+     @Test
+    void constructor_wrongNumberOfAnswers_throwsIllegalArgumentException() {
+        assertThrows(IllegalArgumentException.class, () ->
+            new Autoevaluation("S200123", new int[]{1, 2, 3})
+        );
     }
 
-    //TODO Implementación de las pruebas de AutoevaluacionDAO
+    @Test
+    void constructor_validAnswers_setsIdStudent() {
+        Autoevaluation autoevaluation = new Autoevaluation("S200123", 
+        new int[]{5, 5, 5, 5, 5, 5, 5, 5, 5, 5});
 
+        assertEquals("S200123", autoevaluation.getIdStudent());
+    }
 
+    @Test
+    void calculateFinalScore_allFives_returns100Percent() {
+        Autoevaluation autoevaluation = new Autoevaluation("S200123", 
+        new int[]{5, 5, 5, 5, 5, 5, 5, 5, 5, 5});
+
+        assertEquals(100.0, autoevaluation.getFinalScore());
+    }
+
+    @Test
+    void calculateFinalScore_allZeros_returns0Percent() {
+        Autoevaluation autoevaluation = new Autoevaluation("S200123", 
+        new int[]{0, 0, 0, 0, 0, 0, 0, 0, 0, 0});
+
+        assertEquals(0.0, autoevaluation.getFinalScore());
+    }
+
+    @Test
+    void calculateFinalScore_mixed_returnsCorrectPercent() {
+        Autoevaluation autoevaluation = new Autoevaluation("S200123", 
+        new int[]{5, 5, 5, 5, 5, 5, 5, 5, 5, 0});
+
+        assertEquals(90.0, autoevaluation.getFinalScore());
+    }
 }
