@@ -49,7 +49,7 @@ public class SubjectDAO implements ISubjectDAO {
         } catch (SQLException e) {
             LOGGER.log(Level.SEVERE, "Error al registrar la Experiencia Educativa con NRC: " + subject.getNrc(), e);
             throw new OperationException("No se pudo registrar la Experiencia Educativa. Intentelo mas tarde", 
-                null);
+                e);
         }
         
         return isRegistered;

@@ -48,7 +48,7 @@ public class ProjectDAO implements IProjectDAO{
             databaseConnection.close();
         } catch (SQLException e) {
             LOGGER.log(Level.SEVERE, "Error de conexion con la base de datos",e);
-            throw new OperationException("Error al obtener los proyectos", null);
+            throw new OperationException("Error al obtener los proyectos", e);
         }
         return projects;
     }
@@ -59,7 +59,8 @@ public class ProjectDAO implements IProjectDAO{
         String projectQuery = "SELECT * FROM Proyecto WHERE idProyecto = ?;";
 
         try (Connection databaseConnection = connectionManager.getConnection();
-            PreparedStatement preparedStatement = databaseConnection.prepareStatement(projectQuery, PreparedStatement.RETURN_GENERATED_KEYS)) {
+            PreparedStatement preparedStatement = databaseConnection.prepareStatement(projectQuery, 
+                PreparedStatement.RETURN_GENERATED_KEYS)) {
 
             preparedStatement.setInt(1, idProject);
             
@@ -79,7 +80,7 @@ public class ProjectDAO implements IProjectDAO{
             }
         } catch (SQLException e) {
             LOGGER.log(Level.SEVERE, "Error al consultar proyecto", e);
-            throw new OperationException("Error al consultar el proyecto", null);
+            throw new OperationException("Error al consultar el proyecto", e);
         }
         return project;
     }
@@ -88,12 +89,13 @@ public class ProjectDAO implements IProjectDAO{
     public boolean registerProject(Project project) throws OperationException {
         boolean isRegistered = false;
 
-        String projectQuery = "INSERT INTO Proyecto(nombre, " + 
-        "descripcion, cupo, metodologiaProyecto, objetivo,estado)" +
-        " VALUES(?, ?, ?, ?, ?, ?);";
+        String projectQuery = "INSERT INTO Proyecto(nombre, "  
+        + "descripcion, cupo, metodologiaProyecto, objetivo,estado)" 
+        + " VALUES(?, ?, ?, ?, ?, ?);";
 
         try (Connection databaseConnection = connectionManager.getConnection();
-            PreparedStatement preparedStatement = databaseConnection.prepareStatement(projectQuery, PreparedStatement.RETURN_GENERATED_KEYS)) {
+            PreparedStatement preparedStatement = databaseConnection.prepareStatement(projectQuery, 
+                PreparedStatement.RETURN_GENERATED_KEYS)) {
             
             preparedStatement.setString(1, project.getName());
             preparedStatement.setString(2, project.getDescription());
@@ -113,12 +115,13 @@ public class ProjectDAO implements IProjectDAO{
                 LOGGER.log(Level.INFO, "Proyecto con ID {0} registrado con éxito.", project.getId());
             } else {
                 LOGGER.log(Level.WARNING, "No se pudo registrar el proyecto.");
-                throw new OperationException("No se pudo registrar el proyecto. Intentelo mas tarde", null);
+                throw new OperationException("No se pudo registrar el proyecto. Intentelo mas tarde", 
+                    null);
             }
 
         } catch (SQLException e) {
             LOGGER.log(Level.SEVERE, "Error de conexion con la base de datos",e);
-            throw new OperationException("Error de conexion con la base de datos", null);
+            throw new OperationException("Error de conexion con la base de datos", e);
 
         }
         return isRegistered;
@@ -153,7 +156,7 @@ public boolean modifyProject(Project project) throws OperationException {
         }
     } catch (SQLException e) {
         LOGGER.log(Level.SEVERE, "Error de conexion con la base de datos", e);
-        throw new OperationException("Error de conexion con la base de datos", null);
+        throw new OperationException("Error de conexion con la base de datos", e);
     }
 
     return isModified;
@@ -179,7 +182,7 @@ public boolean modifyProject(Project project) throws OperationException {
 
         } catch (SQLException e) {
                LOGGER.log(Level.SEVERE, "Error de conexion con la base de datos",e);
-               throw new OperationException("Error de conexion con la base de datos", null);
+               throw new OperationException("Error de conexion con la base de datos", e);
         }
 
         return isInactive;

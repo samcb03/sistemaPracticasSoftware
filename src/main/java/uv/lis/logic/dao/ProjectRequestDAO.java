@@ -9,7 +9,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
 import uv.lis.dataaccess.MySQLConnectionManager;
 import uv.lis.logic.contracts.IProjectRequestDAO;
 import uv.lis.logic.dto.Project;
@@ -43,14 +42,14 @@ public class ProjectRequestDAO implements IProjectRequestDAO {
             }
         } catch (SQLException e) {
             LOGGER.log(Level.SEVERE, "Error al contar solicitudes del practicante", e);
-            throw new OperationException("Actividad no encontrada",e);
+            throw new OperationException("Error al contar solicitudes del practicante",e);
         }
 
         return count;
     }
 
     @Override
-    public List<Project> getAvailableProjects() {
+    public List<Project> getAvailableProjects() throws OperationException{
          List<Project> projects = new ArrayList<>();
         String query = "SELECT p.*, " 
             + "(p.cupo - COALESCE(COUNT(sp.matricula), 0)) as cupoDisponible FROM Proyecto p " 
@@ -75,13 +74,14 @@ public class ProjectRequestDAO implements IProjectRequestDAO {
             }
         } catch (SQLException e) {
             LOGGER.log(Level.SEVERE, "Error al obtener proyectos disponibles", e);
+            throw new OperationException("Error al obtener proyectos disponibles", e);
         }
 
         return projects;
     }
 
     @Override
-    public List<Project> getRequestedProjectsByStudentId(String idStudent) {
+    public List<Project> getRequestedProjectsByStudentId(String idStudent) throws OperationException {
         List<Project> projects = new ArrayList<>();
         String query = "SELECT p.* FROM Proyecto p INNER JOIN Solicita_Proyecto sp ON p.idProyecto = sp.idProyecto " 
             + "WHERE sp.matricula = ?;";
@@ -106,6 +106,7 @@ public class ProjectRequestDAO implements IProjectRequestDAO {
             }
         } catch (SQLException e) {
             LOGGER.log(Level.SEVERE, "Error al obtener proyectos solicitados", e);
+            throw new OperationException("Error al verificar solicitud", e);
         }
 
         return projects;
@@ -216,7 +217,7 @@ public boolean requestProject(String idStudent, int idProject) throws OperationE
     }
 
     @Override
-    public boolean assignStudentToProject(String idStudent, int idProject) {
+    public boolean assignStudentToProject(String idStudent, int idProject) throws OperationException {
         boolean isAssigned = false;
         String query = "UPDATE Solicita_Proyecto SET estatus = TRUE WHERE matricula = ? AND idProyecto = ?;";
 
@@ -233,6 +234,7 @@ public boolean requestProject(String idStudent, int idProject) throws OperationE
             }
         } catch (SQLException e) {
             LOGGER.log(Level.SEVERE, "Error al asignar practicante al proyecto", e);
+            throw new OperationException("Error al asignar practicante al proyecto", e);
         }
 
         return isAssigned;
