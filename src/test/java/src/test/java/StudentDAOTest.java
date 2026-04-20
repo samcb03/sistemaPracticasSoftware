@@ -2,7 +2,6 @@ package src.test.java;
 
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -51,16 +50,18 @@ public class StudentDAOTest {
         when(resultSet.getString("matricula")).thenReturn("S123");
         when(resultSet.getString("nombre")).thenReturn("Denisse");
         when(resultSet.getString("apellidos")).thenReturn("Reyes");
+        when(resultSet.getString("contraseña")).thenReturn("123456");
         when(resultSet.getDate("fechaNacimiento")).thenReturn(new Date(System.currentTimeMillis()));
         when(resultSet.getString("genero")).thenReturn("Femenino");
         when(resultSet.getBoolean("lenguaIndigena")).thenReturn(false);
 
-        Student student = studentDAO.getStudentById("S123");
+        Student expectedStudent = new Student(1, "Denisse", "Reyes", "123456", 
+            "S123", new Date(System.currentTimeMillis()), 0, "Femenino", 
+            false);
 
-        assertNotNull(student);
-        assertEquals("S123", student.getIdStudent());
-        assertEquals("Denisse", student.getFirstName());
+        assertEquals(expectedStudent, studentDAO.getStudentById("S123"));
     }
+
 
     @Test
     void testGetStudentByIdNotFound() throws Exception {

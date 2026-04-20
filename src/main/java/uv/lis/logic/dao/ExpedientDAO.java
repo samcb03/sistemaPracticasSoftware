@@ -1,5 +1,6 @@
 package uv.lis.logic.dao;
 
+
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -14,6 +15,7 @@ import uv.lis.dataaccess.MySQLConnectionManager;
 
 
 public class ExpedientDAO implements IExpedientDAO {
+    private static final int NO_ROWS_AFFECTED = 0;
     private MySQLConnectionManager connectionManager;
 
     public ExpedientDAO() {
@@ -35,7 +37,7 @@ public class ExpedientDAO implements IExpedientDAO {
             
             int affectedRows = preparedStatement.executeUpdate();
             
-            if (affectedRows > 0) {
+            if (affectedRows > NO_ROWS_AFFECTED) {
                 try (ResultSet resultSet = preparedStatement.getGeneratedKeys()) {
                     if (resultSet.next()) {
                         generatedId = resultSet.getInt(1);
@@ -59,13 +61,13 @@ public class ExpedientDAO implements IExpedientDAO {
              ResultSet resultSet = preparedStatement.executeQuery()) {
              
             while (resultSet.next()) {
-                Expedient exp = new Expedient(
+                Expedient expedient = new Expedient(
                     resultSet.getString("nombre"),
                     resultSet.getString("tipoDocumento"),
                     resultSet.getString("url"),
                     resultSet.getString("matricula")
                 );
-                documents.add(exp);
+                documents.add(expedient);
             }
         } catch (SQLException e) {
             throw new OperationException("No se pudieron obtener los documentos", e);

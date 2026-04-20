@@ -2,6 +2,7 @@ package uv.lis.logic.dto;
 
 
 import java.util.Date;
+import java.util.Objects;
 
 
 public class Student extends User {
@@ -90,5 +91,23 @@ public class Student extends User {
 
     public void setProject(Project project) {
         this.project = project;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        } 
+        if (obj == null || getClass() != obj.getClass()) {
+            return false;
+        }
+        
+        Student other = (Student) obj;
+        return getId() == other.getId()
+            && Objects.equals(idStudent, other.idStudent)
+            && Objects.equals(getFirstName(), other.getFirstName())
+            && Objects.equals(getLastName(), other.getLastName())
+            && Objects.equals(gender, other.gender)
+            && indigenousLanguage == other.indigenousLanguage;
     }
 }

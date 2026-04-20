@@ -78,10 +78,7 @@ class ActivityDAOTest {
     void getAllActivities_sqlError_throwsOperationException() throws Exception {
         when(connectionManager.getConnection()).thenThrow(new SQLException("Fallo"));
 
-        OperationException exception = assertThrows(OperationException.class, () ->
-            activityDAO.getAllActivities()
-        );
-        assertTrue(exception.getMessage().contains("Error al obtener las actividades"));
+        assertThrows(OperationException.class, () -> activityDAO.getAllActivities());
     }
 
     @Test

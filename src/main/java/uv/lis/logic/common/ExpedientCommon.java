@@ -32,17 +32,18 @@ public class ExpedientCommon {
         }
         if (sourceFile == null || !sourceFile.exists()) {
             throw new OperationException("No se ha seleccionado un archivo válido.", null);
-    }
+        }
 
         try {
             String finalUrl = fileManager.uploadDocument(documentName, documentType,
             sourceFile,idStudent);
             
-            Expedient newDocument = new Expedient(documentName, documentType, finalUrl,idStudent);
+            Expedient newDocument = new Expedient(documentName, documentType, finalUrl, idStudent);
 
             int generatedId = expedientDAO.saveDocument(newDocument);
 
-            return generatedId > 0;
+            boolean wasRegistered = generatedId > 0;
+            return wasRegistered;
 
         } catch (OperationException e) {
             LOGGER.log(Level.SEVERE, "Error en el proceso de subir y registrar el documento para {0}", idStudent);

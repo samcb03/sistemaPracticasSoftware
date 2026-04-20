@@ -6,11 +6,11 @@ import uv.lis.logic.exceptions.OperationException;
 
 
 public interface IAffiliatedOrganizationDAO {
-    public AffiliatedOrganization getAffiliatedOrganizationById(int idAfilliatedOrganization) throws OperationException;
+    public AffiliatedOrganization getOrganizationById(int idAfilliatedOrganization) throws OperationException;
 
-    boolean registerAffiliatedOrganization(AffiliatedOrganization affiliatedOrganization) throws OperationException;
+    boolean registerOrganization(AffiliatedOrganization affiliatedOrganization) throws OperationException;
 
-    boolean modifyAffiliatedOrganization(AffiliatedOrganization affiliatedOrganization) throws OperationException;
+    boolean modifyOrganization(AffiliatedOrganization affiliatedOrganization) throws OperationException;
 
-    boolean inactivateAffiliatedOrganization(AffiliatedOrganization affiliatedOrganization) throws OperationException;
+    boolean inactivateOrganization(AffiliatedOrganization affiliatedOrganization) throws OperationException;
 }

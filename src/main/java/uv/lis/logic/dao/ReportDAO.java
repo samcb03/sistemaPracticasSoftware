@@ -48,7 +48,7 @@ public class ReportDAO implements IReportDAO {
 
         } catch (SQLException e) {
             LOGGER.log(Level.SEVERE, "Error de conexion con la base de datos", e);
-            throw new OperationException("No se pudo obtener los reportes. Intentelo mas tarde", null);
+            throw new OperationException("No se pudo obtener los reportes. Intentelo mas tarde", e);
         }
 
         return reports;
@@ -85,7 +85,7 @@ public class ReportDAO implements IReportDAO {
             }
         } catch (SQLException e) {
             LOGGER.log(Level.SEVERE, "Error de conexion con la base de datos", e);
-            throw new OperationException("Error al obtener el reporte parcial", null);
+            throw new OperationException("Error al obtener el reporte parcial", e);
         }
 
         return report;
@@ -113,12 +113,12 @@ public class ReportDAO implements IReportDAO {
 
                 preparedStatementReport.executeUpdate();
 
-                try (PreparedStatement psPartial = databaseConnection.prepareStatement(partialQuery)) {
-                    psPartial.setInt(1, partialReport.getId());
-                    psPartial.setInt(2, partialReport.getPlannedTime());
-                    psPartial.setInt(3, partialReport.getRealTime());
+                try (PreparedStatement preparedStatementPartial = databaseConnection.prepareStatement(partialQuery)) {
+                    preparedStatementPartial.setInt(1, partialReport.getId());
+                    preparedStatementPartial.setInt(2, partialReport.getPlannedTime());
+                    preparedStatementPartial.setInt(3, partialReport.getRealTime());
 
-                    psPartial.executeUpdate();
+                    preparedStatementPartial.executeUpdate();
                 }
 
                 databaseConnection.commit();
@@ -131,6 +131,7 @@ public class ReportDAO implements IReportDAO {
 
         } catch (SQLException e) {
             LOGGER.log(Level.SEVERE, "Error al registrar reporte parcial", e);
+            throw new OperationException("Error al registrar el reporte parcial", e);
         }
 
         return isRegistered;
@@ -139,10 +140,10 @@ public class ReportDAO implements IReportDAO {
     public boolean registerMonthlyReport(MonthlyReport monthlyReport) throws OperationException {
         boolean isRegistered = false;
 
-        String reportQuery = "INSERT INTO Reporte (idReporte, descripcion, observaciones, actividad, matricula) " +
-                "VALUES (?, ?, ?, ?, ?)";
-        String monthlyQuery = "INSERT INTO ReporteMensual (idReporte, mes, horasReportadas) " +
-                "VALUES (?, ?, ?)";
+        String reportQuery = "INSERT INTO Reporte (idReporte, descripcion, observaciones, actividad, matricula) "
+                + "VALUES (?, ?, ?, ?, ?)";
+        String monthlyQuery = "INSERT INTO ReporteMensual (idReporte, mes, horasReportadas) "
+                + "VALUES (?, ?, ?)";
 
         try (Connection databaseConnection = connectionManager.getConnection()) {
             databaseConnection.setAutoCommit(false);
@@ -174,6 +175,7 @@ public class ReportDAO implements IReportDAO {
 
         } catch (SQLException e) {
             LOGGER.log(Level.SEVERE, "Error al registrar reporte mensual", e);
+            throw new OperationException("Error al registrar reporte mensual", e);
         }
 
         return isRegistered;
@@ -183,30 +185,30 @@ public class ReportDAO implements IReportDAO {
     public boolean modifyPartialReport(PartialReport partialReport) throws OperationException {
         boolean isModified = false;
         
-        String reportQuery = "UPDATE Reporte SET descripcion = ?, observaciones = ?, actividad = ?, matricula = ? " +
-                "WHERE idReporte = ?";
+        String reportQuery = "UPDATE Reporte SET descripcion = ?, observaciones = ?, actividad = ?, matricula = ? "
+                + "WHERE idReporte = ?";
         
-        String partialQuery = "UPDATE ReporteParcial SET tiempoPlaneado = ?, tiempoReal = ? " +
-                "WHERE idReporte = ?";
+        String partialQuery = "UPDATE ReporteParcial SET tiempoPlaneado = ?, tiempoReal = ? "
+                + "WHERE idReporte = ?";
 
         try (Connection databaseConnection = connectionManager.getConnection()) {
             databaseConnection.setAutoCommit(false);
 
-            try (PreparedStatement psReport = databaseConnection.prepareStatement(reportQuery)) {
-                psReport.setString(1, partialReport.getDescription());
-                psReport.setString(2, partialReport.getObservations());
-                psReport.setString(3, partialReport.getActivity());
-                psReport.setString(4, partialReport.getStudentId());
-                psReport.setInt(5, partialReport.getId());
+            try (PreparedStatement preparedStatementReport = databaseConnection.prepareStatement(reportQuery)) {
+                preparedStatementReport.setString(1, partialReport.getDescription());
+                preparedStatementReport.setString(2, partialReport.getObservations());
+                preparedStatementReport.setString(3, partialReport.getActivity());
+                preparedStatementReport.setString(4, partialReport.getStudentId());
+                preparedStatementReport.setInt(5, partialReport.getId());
 
-                psReport.executeUpdate();
+                preparedStatementReport.executeUpdate();
 
-                try (PreparedStatement psPartial = databaseConnection.prepareStatement(partialQuery)) {
-                    psPartial.setInt(1, partialReport.getPlannedTime());
-                    psPartial.setInt(2, partialReport.getRealTime());
-                    psPartial.setInt(3, partialReport.getId());
+                try (PreparedStatement preparedStatementPartial = databaseConnection.prepareStatement(partialQuery)) {
+                    preparedStatementPartial.setInt(1, partialReport.getPlannedTime());
+                    preparedStatementPartial.setInt(2, partialReport.getRealTime());
+                    preparedStatementPartial.setInt(3, partialReport.getId());
 
-                    if (psPartial.executeUpdate() > NO_ROWS_AFFECTED) {
+                    if (preparedStatementPartial.executeUpdate() > NO_ROWS_AFFECTED) {
                         databaseConnection.commit();
                         isModified = true;
                     } else {
@@ -233,11 +235,11 @@ public class ReportDAO implements IReportDAO {
     public FinalReport getFinalReportById(int idFinalReport) throws OperationException{
         FinalReport report = null;
 
-        String finalReportQuery = "SELECT r.idReporte, r.descripcion, r.observaciones, r.actividad, r.matricula, " +
-                "rf.porcentajeAvance, rf.ResultadoEntregable " +
-                "FROM ReporteFinal rf " +
-                "INNER JOIN Reporte r ON rf.idReporte = r.idReporte " +
-                "WHERE rf.idReporte = ?";
+        String finalReportQuery = "SELECT r.idReporte, r.descripcion, r.observaciones, r.actividad, r.matricula, " 
+                + "rf.porcentajeAvance, rf.ResultadoEntregable " 
+                + "FROM ReporteFinal rf " 
+                + "INNER JOIN Reporte r ON rf.idReporte = r.idReporte " 
+                + "WHERE rf.idReporte = ?";
 
         try (Connection databaseConnection = connectionManager.getConnection();
              PreparedStatement preparedStatement = databaseConnection.prepareStatement(finalReportQuery)) {
@@ -258,7 +260,7 @@ public class ReportDAO implements IReportDAO {
             }
         } catch (SQLException e) {
             LOGGER.log(Level.SEVERE, "Error de conexion con la base de datos", e);
-            throw new OperationException("Error con la conexión de la base de datos", null);
+            throw new OperationException("Error con la conexión de la base de datos", e);
         }
 
         return report;
@@ -268,40 +270,38 @@ public class ReportDAO implements IReportDAO {
     public boolean registerFinalReport(FinalReport finalReport) throws OperationException {
         boolean isRegistered = false;
         
-        String reportQuery = "INSERT INTO Reporte (idReporte, descripcion, observaciones, actividad, matricula) " +
-                "VALUES (?, ?, ?, ?, ?)";
+        String reportQuery = "INSERT INTO Reporte (idReporte, descripcion, observaciones, actividad, matricula) " 
+                + "VALUES (?, ?, ?, ?, ?)";
         
-        String finalReportQuery = "INSERT INTO ReporteFinal (idReporte, porcentajeAvance, ResultadoEntregable) " +
-                "VALUES (?, ?, ?)";
+        String finalReportQuery = "INSERT INTO ReporteFinal (idReporte, porcentajeAvance, ResultadoEntregable) " 
+                + "VALUES (?, ?, ?)";
 
         try (Connection databaseConnection = connectionManager.getConnection()) {
             databaseConnection.setAutoCommit(false);
 
-            try (PreparedStatement psReport = databaseConnection.prepareStatement(reportQuery)) {
-                psReport.setInt(1, finalReport.getId());
-                psReport.setString(2, finalReport.getDescription());
-                psReport.setString(3, finalReport.getObservations());
-                psReport.setString(4, finalReport.getActivity());
-                psReport.setString(5, finalReport.getStudentId());
+            try (PreparedStatement preparedStatementReport = databaseConnection.prepareStatement(reportQuery)) {
+                preparedStatementReport.setInt(1, finalReport.getId());
+                preparedStatementReport.setString(2, finalReport.getDescription());
+                preparedStatementReport.setString(3, finalReport.getObservations());
+                preparedStatementReport.setString(4, finalReport.getActivity());
+                preparedStatementReport.setString(5, finalReport.getStudentId());
 
-                psReport.executeUpdate();
+                preparedStatementReport.executeUpdate();
 
-                try (PreparedStatement psFinal = databaseConnection.prepareStatement(finalReportQuery)) {
-                    psFinal.setInt(1, finalReport.getId());
-                    psFinal.setInt(2, finalReport.getAdvancePercentage());
-                    psFinal.setString(3, finalReport.getResult());
+                try (PreparedStatement preparedStatementFinal = databaseConnection.prepareStatement(finalReportQuery)) {
+                    preparedStatementFinal.setInt(1, finalReport.getId());
+                    preparedStatementFinal.setInt(2, finalReport.getAdvancePercentage());
+                    preparedStatementFinal.setString(3, finalReport.getResult());
 
-                    if (psFinal.executeUpdate() > NO_ROWS_AFFECTED) {
+                    if (preparedStatementFinal.executeUpdate() > NO_ROWS_AFFECTED) {
                         databaseConnection.commit();
                         isRegistered = true;
-                    } else {
-                        databaseConnection.rollback();
                     }
                 }
 
             } catch (SQLException e) {
-                databaseConnection.rollback();
                 LOGGER.log(Level.SEVERE, "Error al registrar reporte final", e);
+                throw new OperationException("Error al registrar reporte final", e);
             }
 
         } catch (SQLException e) {
@@ -313,43 +313,40 @@ public class ReportDAO implements IReportDAO {
     }
 
     @Override
-    public boolean modifyFinalReport(FinalReport finalReport) {
+    public boolean modifyFinalReport(FinalReport finalReport) throws OperationException {
         boolean isModified = false;
 
-        String reportQuery = "UPDATE Reporte SET descripcion = ?, observaciones = ?, actividad = ?, matricula = ? " +
-                "WHERE idReporte = ?";
+        String reportQuery = "UPDATE Reporte SET descripcion = ?, observaciones = ?, actividad = ?, matricula = ? "
+                + "WHERE idReporte = ?";
         
-        String finalReportQuery = "UPDATE ReporteFinal SET porcentajeAvance = ?, ResultadoEntregable = ? " +
-                "WHERE idReporte = ?";
+        String finalReportQuery = "UPDATE ReporteFinal SET porcentajeAvance = ?, ResultadoEntregable = ? " 
+                + "WHERE idReporte = ?";
 
         try (Connection databaseConnection = connectionManager.getConnection()) {
-            databaseConnection.setAutoCommit(false);
 
-            try (PreparedStatement psReport = databaseConnection.prepareStatement(reportQuery)) {
-                psReport.setString(1, finalReport.getDescription());
-                psReport.setString(2, finalReport.getObservations());
-                psReport.setString(3, finalReport.getActivity());
-                psReport.setString(4, finalReport.getStudentId());
-                psReport.setInt(5, finalReport.getId());
+            try (PreparedStatement preparedStatementReport = databaseConnection.prepareStatement(reportQuery)) {
+                preparedStatementReport.setString(1, finalReport.getDescription());
+                preparedStatementReport.setString(2, finalReport.getObservations());
+                preparedStatementReport.setString(3, finalReport.getActivity());
+                preparedStatementReport.setString(4, finalReport.getStudentId());
+                preparedStatementReport.setInt(5, finalReport.getId());
 
-                psReport.executeUpdate();
+                preparedStatementReport.executeUpdate();
 
-                try (PreparedStatement psFinal = databaseConnection.prepareStatement(finalReportQuery)) {
-                    psFinal.setInt(1, finalReport.getAdvancePercentage());
-                    psFinal.setString(2, finalReport.getResult());
-                    psFinal.setInt(3, finalReport.getId());
+                try (PreparedStatement preparedStatementFinal = databaseConnection.prepareStatement(finalReportQuery)) {
+                    preparedStatementFinal.setInt(1, finalReport.getAdvancePercentage());
+                    preparedStatementFinal.setString(2, finalReport.getResult());
+                    preparedStatementFinal.setInt(3, finalReport.getId());
 
-                    if (psFinal.executeUpdate() > NO_ROWS_AFFECTED) {
+                    if (preparedStatementFinal.executeUpdate() > NO_ROWS_AFFECTED) {
                         databaseConnection.commit();
                         isModified = true;
-                    } else {
-                        databaseConnection.rollback();
                     }
                 }
 
             } catch (SQLException e) {
-                databaseConnection.rollback();
                 LOGGER.log(Level.SEVERE, "Error al modificar reporte final", e);
+                throw new OperationException("Error al modificar reporte final", e);
             }
 
         } catch (SQLException e) {
@@ -364,14 +361,15 @@ public class ReportDAO implements IReportDAO {
         String evaluationQuery = "UPDATE Reporte SET calificacion = ? WHERE idReporte = ?";
 
         try(Connection databaseConnection = connectionManager.getConnection()) {
-            try (PreparedStatement psReport = databaseConnection.prepareStatement(evaluationQuery)) {
-                psReport.setFloat(1, report.getCalification());
-                psReport.setInt(2, report.getId());
+            try (PreparedStatement preparedStatementReport = databaseConnection.prepareStatement(evaluationQuery)) {
+                preparedStatementReport.setFloat(1, report.getCalification());
+                preparedStatementReport.setInt(2, report.getId());
 
-                psReport.executeUpdate();
+                preparedStatementReport.executeUpdate();
             }
         } catch (SQLException e) {
             LOGGER.log(Level.SEVERE, "Error de conexion con la base de datos", e);
+            throw new OperationException("Error de conexion con la base de datos", e);
         }
     }
 }

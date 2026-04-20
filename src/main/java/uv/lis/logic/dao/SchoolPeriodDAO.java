@@ -43,7 +43,8 @@ public class SchoolPeriodDAO implements ISchoolPeriodDAO{
                     schoolPeriod.setStartDate(startDate);
                     schoolPeriod.setEndDate(enDate);
                 } else {
-                    throw new OperationException("No se encontró el periodo escolar con id: " + foundIdSchoolPeriod, null);
+                    throw new OperationException("No se encontró el periodo escolar con id: " 
+                        + foundIdSchoolPeriod, null);
                 }
             }
             
@@ -70,11 +71,12 @@ public class SchoolPeriodDAO implements ISchoolPeriodDAO{
             if (preparedStatement.executeUpdate() > NO_ROWS_AFFECTED){
                 isRegistered = true;
             } else {
-                throw new OperationException("No se pudo registrar el periodo escolar. Intentelo mas tarde", null);
+                throw new OperationException("No se pudo registrar el periodo escolar. Intentelo mas tarde", 
+                    null);
             }
         } catch (SQLException e) {
             logger.log(Level.SEVERE, "Error de conexion con la base de datos",e);
-            throw new OperationException("Error al registrar el periodo escolar", null);
+            throw new OperationException("Error al registrar el periodo escolar", e);
         }
         return isRegistered;
     }
@@ -95,11 +97,12 @@ public class SchoolPeriodDAO implements ISchoolPeriodDAO{
             if (preparedStatement.executeUpdate() > NO_ROWS_AFFECTED) {
                 isModified = true;
             } else {
-                throw new OperationException("No se pudo modificar el periodo escolar. Intentelo mas tarde", null);
+                throw new OperationException("No se pudo modificar el periodo escolar. Intentelo mas tarde",
+                    null);
             }
         } catch (SQLException e) {
             logger.log(Level.SEVERE, "Error de conexion con la base de datos",e);
-            throw new OperationException("Error al modificar el periodo escolar", null);
+            throw new OperationException("Error al modificar el periodo escolar", e);
         }
         return isModified;
     }
@@ -117,7 +120,7 @@ public class SchoolPeriodDAO implements ISchoolPeriodDAO{
             }
         } catch (SQLException e) {
             logger.log(Level.SEVERE, "Error validando periodo escolar", e);
-            throw new OperationException("Error al validar el periodo escolar", null);
+            throw new OperationException("Error al validar el periodo escolar", e);
         }
     }
 }

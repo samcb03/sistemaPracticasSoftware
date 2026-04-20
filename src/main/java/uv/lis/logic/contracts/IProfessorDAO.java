@@ -1,7 +1,9 @@
 package uv.lis.logic.contracts;
 
+
 import uv.lis.logic.dto.Professor;
 import uv.lis.logic.exceptions.OperationException;
+
 
 public interface IProfessorDAO {
     Professor getProfessorByPersonalNumber(String idProfessor) throws OperationException;
