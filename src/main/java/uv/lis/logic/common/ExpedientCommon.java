@@ -38,9 +38,9 @@ public class ExpedientCommon {
             String finalUrl = fileManager.uploadDocument(documentName, documentType,
             sourceFile,idStudent);
             
-            Expedient newDocument = new Expedient(documentName, documentType, finalUrl,idStudent);
+            Expedient newDocument = new Expedient(documentName, documentType, finalUrl, idStudent);
 
-            int generatedId = expedientDAO.saveDocument(expedient);
+            int generatedId = expedientDAO.saveDocument(newDocument);
 
             boolean wasRegistered = generatedId > 0;
             return wasRegistered;
