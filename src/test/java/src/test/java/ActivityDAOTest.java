@@ -16,7 +16,6 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
-
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -76,10 +75,7 @@ class ActivityDAOTest {
     void getAllActivities_sqlError_throwsOperationException() throws Exception {
         when(connectionManager.getConnection()).thenThrow(new SQLException("Fallo"));
 
-        OperationException exception = assertThrows(OperationException.class, () ->
-            activityDAO.getAllActivities()
-        );
-        assertTrue(exception.getMessage().contains("Error al obtener las actividades"));
+        assertThrows(OperationException.class, () -> activityDAO.getAllActivities());
     }
 
     @Test

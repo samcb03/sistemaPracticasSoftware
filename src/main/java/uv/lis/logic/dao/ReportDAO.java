@@ -113,12 +113,12 @@ public class ReportDAO implements IReportDAO {
 
                 preparedStatementReport.executeUpdate();
 
-                try (PreparedStatement psPartial = databaseConnection.prepareStatement(partialQuery)) {
-                    psPartial.setInt(1, partialReport.getId());
-                    psPartial.setInt(2, partialReport.getPlannedTime());
-                    psPartial.setInt(3, partialReport.getRealTime());
+                try (PreparedStatement preparedStatementPartial = databaseConnection.prepareStatement(partialQuery)) {
+                    preparedStatementPartial.setInt(1, partialReport.getId());
+                    preparedStatementPartial.setInt(2, partialReport.getPlannedTime());
+                    preparedStatementPartial.setInt(3, partialReport.getRealTime());
 
-                    psPartial.executeUpdate();
+                    preparedStatementPartial.executeUpdate();
                 }
 
                 databaseConnection.commit();
@@ -203,12 +203,12 @@ public class ReportDAO implements IReportDAO {
 
                 preparedStatementReport.executeUpdate();
 
-                try (PreparedStatement psPartial = databaseConnection.prepareStatement(partialQuery)) {
-                    psPartial.setInt(1, partialReport.getPlannedTime());
-                    psPartial.setInt(2, partialReport.getRealTime());
-                    psPartial.setInt(3, partialReport.getId());
+                try (PreparedStatement preparedStatementPartial = databaseConnection.prepareStatement(partialQuery)) {
+                    preparedStatementPartial.setInt(1, partialReport.getPlannedTime());
+                    preparedStatementPartial.setInt(2, partialReport.getRealTime());
+                    preparedStatementPartial.setInt(3, partialReport.getId());
 
-                    if (psPartial.executeUpdate() > NO_ROWS_AFFECTED) {
+                    if (preparedStatementPartial.executeUpdate() > NO_ROWS_AFFECTED) {
                         databaseConnection.commit();
                         isModified = true;
                     } else {

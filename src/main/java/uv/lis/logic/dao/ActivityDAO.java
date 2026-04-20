@@ -45,6 +45,7 @@ public class ActivityDAO implements IActivityDAO {
             }
         } catch (SQLException e) {
             LOGGER.log(Level.SEVERE, "Error de conexion con la base de datos",e);
+            throw new OperationException("Error de conexion con la base de datos", e);
         }
         return activities;
     }
@@ -69,8 +70,8 @@ public class ActivityDAO implements IActivityDAO {
                 activities.add(new Activity(id, activityName, activityDescription, startDate, endDate));
             }
         } catch (SQLException e) {
-            LOGGER.log(Level.SEVERE, "Error de conexion con la base de datos",e);
-            throw new OperationException("Error al obtener las actividades por ID", e);
+            LOGGER.log(Level.SEVERE, "Error de conexion con la base de datos", e);
+            throw new OperationException("Error al obtener las actividades", e);
         }
         return activities;
     }

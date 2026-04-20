@@ -1,5 +1,6 @@
 package uv.lis.logic.dto;
 
+import java.util.Objects;
 
 public class AffiliatedOrganization {
     private int id;
@@ -113,5 +114,26 @@ public class AffiliatedOrganization {
 
     public void setProjectSupervisor(ProjectSupervisor projectSupervisor) {
         this.projectSupervisor = projectSupervisor;
+    }
+
+    @Override
+    public boolean equals(Object object) {
+        if (this == object) {
+            return true;
+        }
+        if (object == null || getClass() != object.getClass()) {
+            return false;
+        }
+        
+        AffiliatedOrganization other = (AffiliatedOrganization) object;
+        return id == other.id
+            && Objects.equals(name, other.name)
+            && Objects.equals(city, other.city)
+            && Objects.equals(state, other.state)
+            && Objects.equals(sector, other.sector)
+            && Objects.equals(email, other.email)
+            && Objects.equals(phoneNumber, other.phoneNumber)
+            && numberOfDirectUsers == other.numberOfDirectUsers
+            && numberOfIndirectUsers == other.numberOfIndirectUsers;
     }
 }

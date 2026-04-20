@@ -22,6 +22,10 @@ public class AffiliatedOrganizationDAO implements IAffiliatedOrganizationDAO{
         this.connectionManager = new MySQLConnectionManager();
     }
 
+    public AffiliatedOrganizationDAO(MySQLConnectionManager connectionManager) {
+        this.connectionManager = connectionManager;
+    }
+    
     @Override
     public AffiliatedOrganization getOrganizationById(int idAfilliatedOrganization) throws OperationException {
         AffiliatedOrganization affiliatedOrganization = null;
