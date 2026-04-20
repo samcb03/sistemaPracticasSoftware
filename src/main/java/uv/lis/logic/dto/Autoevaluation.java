@@ -27,11 +27,11 @@ public class Autoevaluation {
         if (answers == null || answers.length != 10) {
             throw new IllegalArgumentException("Invalid number of answers. Expected 10.");
         }
-        this.productiveParticipation = answers[0];
-        this.appliedKnowledge = answers[1];
-        this.confidenceInActivities = answers[2];
-        this.activitiesInterest = answers[3];
-        this.organizationSupport = answers[4];
+            this.productiveParticipation = answers[0];
+            this.appliedKnowledge = answers[1];
+            this.confidenceInActivities = answers[2];
+            this.activitiesInterest = answers[3];
+            this.organizationSupport = answers[4];
             this.rulesAwareness = answers[5];
             this.supervisorGuidance = answers[6];
             this.effectiveMonitoring = answers[7];

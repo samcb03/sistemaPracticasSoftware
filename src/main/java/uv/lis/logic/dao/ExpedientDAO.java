@@ -23,14 +23,15 @@ public class ExpedientDAO implements IExpedientDAO {
     @Override
     public int saveDocument(Expedient expedient) throws OperationException {
         int generatedId = -1;
-        String query = "INSERT INTO expediente (nombre, tipo_documento, direccion_archivo) VALUES (?, ?, ?)";
+        String documentQuery = "INSERT INTO expediente (nombre, tipoDocumento,url, matricula) VALUES (?, ?, ?,?)";
 
         try (Connection databaseConnection = connectionManager.getConnection();
-             PreparedStatement preparedStatement = databaseConnection.prepareStatement(query, Statement.RETURN_GENERATED_KEYS)) {
+             PreparedStatement preparedStatement = databaseConnection.prepareStatement(documentQuery, Statement.RETURN_GENERATED_KEYS)) {
 
             preparedStatement.setString(1, expedient.getName());
             preparedStatement.setString(2, expedient.getTypeDocument()); 
             preparedStatement.setString(3, expedient.getUrl()); 
+            preparedStatement.setString(4, expedient.getIdStudent());
             
             int affectedRows = preparedStatement.executeUpdate();
             
@@ -51,22 +52,23 @@ public class ExpedientDAO implements IExpedientDAO {
     @Override
     public List<Expedient> getAllDocuments() throws OperationException {
         List<Expedient> documents = new ArrayList<>();
-        String query = "SELECT id, nombre, tipo_documento, direccion_archivo FROM expediente";
+        String expedientQuery = "SELECT nombre, tipoDocumento, url, matricula FROM expediente";
 
         try (Connection databaseConnection = connectionManager.getConnection();
-             PreparedStatement preparedStatement = databaseConnection.prepareStatement(query);
+             PreparedStatement preparedStatement = databaseConnection.prepareStatement(expedientQuery);
              ResultSet resultSet = preparedStatement.executeQuery()) {
              
             while (resultSet.next()) {
                 Expedient exp = new Expedient(
                     resultSet.getString("nombre"),
-                    resultSet.getString("tipo_documento"),
-                    resultSet.getString("direccion_archivo")
+                    resultSet.getString("tipoDocumento"),
+                    resultSet.getString("url"),
+                    resultSet.getString("matricula")
                 );
                 documents.add(exp);
             }
         } catch (SQLException e) {
-            throw new OperationException("Error de SQL al recuperar los documentos.", e);
+            throw new OperationException("No se pudieron obtener los documentos", e);
         }
         
         return documents;
