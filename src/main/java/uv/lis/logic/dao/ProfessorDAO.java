@@ -48,7 +48,7 @@ public class ProfessorDAO extends UserDAO implements IProfessorDAO {
             }
 
         } catch (SQLException e) {
-            LOGGER.log(Level.SEVERE, "Error de conexion con la base de datos",e);
+            LOGGER.log(Level.SEVERE, "Error de conexion con la base de datos", e);
             throw new OperationException("Error al obtener el profesor", e);
         }
 
