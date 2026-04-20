@@ -1,15 +1,17 @@
 package src.test.java;
 
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.when;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import uv.lis.dataaccess.MySQLConnectionManager;
-import uv.lis.logic.dao.ActivityDAO;
-import uv.lis.logic.dto.Activity;
-import uv.lis.logic.exceptions.OperationException;
 import java.lang.reflect.Field;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -17,15 +19,15 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.when;
+import uv.lis.dataaccess.MySQLConnectionManager;
+import uv.lis.logic.dao.ActivityDAO;
+import uv.lis.logic.dto.Activity;
+import uv.lis.logic.exceptions.OperationException;
 
 
 @ExtendWith(MockitoExtension.class)
 class ActivityDAOTest {
+
     @Mock
     private MySQLConnectionManager connectionManager;
 
@@ -140,7 +142,7 @@ class ActivityDAOTest {
         OperationException exception = assertThrows(OperationException.class, () ->
             activityDAO.registerActivity(activity)
         );
-        assertTrue(exception.getMessage().contains("Error al registrar la actividad"));
+        assertTrue(exception.getMessage().contains("No se pudo registrar la actividad"));
     }
 
     @Test
@@ -179,7 +181,7 @@ class ActivityDAOTest {
         OperationException exception = assertThrows(OperationException.class, () ->
             activityDAO.modifyActivity(activity)
         );
-        assertTrue(exception.getMessage().contains("Error al modificar la actividad"));
+        assertTrue(exception.getMessage().contains("No se pudo modificar la actividad"));
     }
 
     @Test
