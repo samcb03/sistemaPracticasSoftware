@@ -26,7 +26,8 @@ public class ExpedientCommon {
 
     public boolean uploadAndRegisterDocument(Expedient expedient, File sourceFile) throws OperationException {
         if (expedient.getEnrollment() == null || expedient.getEnrollment().trim().isEmpty()) {
-            throw new OperationException("La matrícula del alumno es obligatoria para guardar un documento.", null);
+            throw new OperationException("La matrícula del alumno es obligatoria para guardar un documento.",
+                 null);
         }
         if (sourceFile == null || !sourceFile.exists()) {
             throw new OperationException("No se ha seleccionado un archivo válido.", null);
