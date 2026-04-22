@@ -1,18 +1,18 @@
 package uv.lis.GUI;
 
+
 import uv.lis.logic.dto.Professor;
 import uv.lis.logic.exceptions.OperationException;
 import uv.lis.logic.dao.ProfessorDAO;
 import uv.lis.logic.dao.UserDAO;
-
 import java.net.URL;
 import java.util.ResourceBundle;
-
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
 import javafx.stage.Stage;
+
 
 public class FXMLRegisterProfessorController implements Initializable {
 
