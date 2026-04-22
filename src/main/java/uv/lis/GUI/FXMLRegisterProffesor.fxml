@@ -4,13 +4,13 @@
 <?import javafx.geometry.Insets?>
 
 <VBox xmlns:fx="http://javafx.com/fxml"
-      fx:controller="uv.lis.gui.controllers.RegisterProfessorController"
+      fx:controller="uv.lis.GUI.FXMLRegisterProfessorController"
       spacing="20"
       style="-fx-padding: 30; -fx-background-color: #f5f5f5;">
 
     <Label text="Registrar Profesor"
            style="-fx-font-size: 20; -fx-font-weight: bold; -fx-text-fill: #333333;"/>
-+
+
     <GridPane hgap="15" vgap="15">
 
         <Label text="Número personal:" 
@@ -53,7 +53,6 @@
 
     </GridPane>
 
-    <!-- Botones -->
     <HBox spacing="10">
         <Button text="Registrar"
                 onAction="#handleRegister"
