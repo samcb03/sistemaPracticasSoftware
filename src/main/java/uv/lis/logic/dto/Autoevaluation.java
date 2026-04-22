@@ -1,5 +1,6 @@
 package uv.lis.logic.dto;
 
+import java.util.Objects;
 
 public class Autoevaluation {
     private static final int MAX_POSSIBLE_SCORE = 50;
@@ -151,5 +152,22 @@ public class Autoevaluation {
         totalScore += supervisorGuidance + effectiveMonitoring + careerAlignment;
         totalScore += internshipImportance;
         this.finalScore = (totalScore / MAX_POSSIBLE_SCORE) * PERCENTAGE_MULTIPLIER;
+    }
+    @Override
+    public boolean equals(Object object) {
+        if (this == object) {
+            return true;
+        }
+        if (!(object instanceof Autoevaluation)) {
+            return false;
+        }
+        Autoevaluation other = (Autoevaluation) object;
+
+        return Objects.equals(this.idStudent, other.idStudent);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(idStudent,idStudent);
     }
 }
