@@ -314,15 +314,12 @@ public static void main(String[] args) throws AuthenticateException, OperationEx
                         default:
                             gender = "Desconocido";
                     }
-                    System.out.println("¿Habla alguna lengua indígena? (true/false): ");
-                    boolean indigenousLanguage = scanner.nextBoolean();
                     student.setFirstName(firstName);
                     student.setLastName(lastName);
                     student.setPassword(password);
                     student.setIdStudent(idStudent);
                     student.setBirthDate(birthDate);
                     student.setGender(gender);
-                    student.setIndigenousLanguage(indigenousLanguage);
                     student.setUserType("Alumno");
                     student.setInactive(false);
 
@@ -347,7 +344,6 @@ public static void main(String[] args) throws AuthenticateException, OperationEx
                         System.out.println("Matricula: " + foundStudent.getIdStudent());
                         System.out.println("Fecha de nacimiento: " + foundStudent.getBirthDate());
                         System.out.println("Género: " + foundStudent.getGender());
-                        System.out.println("Habla alguna lengua indígena: " + foundStudent.hasIndigenousLanguage());
                         System.out.println("Horas completadas: " + foundStudent.getCompletedHours());
                         System.out.println("\n1. Actualizar alumno");
                         System.out.println("2. Inactivar alumno");
@@ -361,8 +357,7 @@ public static void main(String[] args) throws AuthenticateException, OperationEx
                                     System.out.println("1. Nombre");
                                     System.out.println("2. Apellidos");
                                     System.out.println("3. Género");
-                                    System.out.println("4. Lengua indígena");
-                                    System.out.println("5. Salir");
+                                    System.out.println("4. Salir");
 
                                     modifyOption = scanner.nextInt();
                                     scanner.nextLine();
@@ -384,12 +379,6 @@ public static void main(String[] args) throws AuthenticateException, OperationEx
                                             break;
 
                                         case 4:
-                                            System.out.println("¿Habla lengua indígena? (true/false):");
-                                            foundStudent.setIndigenousLanguage(scanner.nextBoolean());
-                                            scanner.nextLine();
-                                            break;
-
-                                        case 5:
                                             System.out.println("Saliendo...");
                                             break;
 
@@ -397,11 +386,11 @@ public static void main(String[] args) throws AuthenticateException, OperationEx
                                             System.out.println("Opción no válida");
                                     }
 
-                                    if (modifyOption != 5) {
+                                    if (modifyOption != 4) {
                                         studentDAO.modifyStudent(foundStudent);
                                     }
 
-                                } while (modifyOption != 5);
+                                } while (modifyOption != 4);
                                 break;
                             case 2:
                                 studentDAO.inactivateStudent(foundStudent);
