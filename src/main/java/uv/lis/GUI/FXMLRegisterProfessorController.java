@@ -1,93 +1,167 @@
 package uv.lis.GUI;
 
-import javafx.fxml.FXML;
-import javafx.scene.control.Alert;
-import javafx.scene.control.CheckBox;
-import javafx.scene.control.PasswordField;
-import javafx.scene.control.TextField;
+import uv.lis.logic.dto.Professor;
+import uv.lis.logic.exceptions.OperationException;
 import uv.lis.logic.dao.ProfessorDAO;
 import uv.lis.logic.dao.UserDAO;
-import uv.lis.logic.dto.Professor;
-import uv.lis.logic.dto.User;
-import uv.lis.logic.exceptions.OperationException;
 
-public class FXMLRegisterProfessorController {
+import java.net.URL;
+import java.util.ResourceBundle;
 
-    @FXML private TextField txtPersonnelNumber;
+import javafx.collections.FXCollections;
+import javafx.fxml.FXML;
+import javafx.fxml.Initializable;
+import javafx.scene.control.*;
+import javafx.stage.Stage;
+
+public class FXMLRegisterProfessorController implements Initializable {
+
+    @FXML private Button buttonBack;
+    @FXML private Button buttonRegister;
+
     @FXML private TextField txtFirstName;
     @FXML private TextField txtLastName;
     @FXML private PasswordField txtPassword;
-    @FXML private CheckBox chkIsCoordinator;
+    @FXML private TextField txtPersonnelNumber;
 
-    private ProfessorDAO professorDAO;
+    @FXML private ComboBox<String> comboBoxCoordinator;
+    @FXML private Label labelError;
+
     private UserDAO userDAO;
+    private ProfessorDAO professorDAO;
 
-    public void initialize() {
-        this.professorDAO = new ProfessorDAO();
-        this.userDAO = new UserDAO();
+    @Override
+    public void initialize(URL url, ResourceBundle resourceBundle) {
+        userDAO = new UserDAO();
+        professorDAO = new ProfessorDAO();
+
+        comboBoxCoordinator.setItems(
+                FXCollections.observableArrayList("Si", "No")
+        );
     }
 
     @FXML
-    private void handleRegister() {
-        String personnelNumber = txtPersonnelNumber.getText().trim();
+    public void validateFields() {
+
         String firstName = txtFirstName.getText().trim();
         String lastName = txtLastName.getText().trim();
         String password = txtPassword.getText().trim();
-        boolean isCoordinator = chkIsCoordinator.isSelected();
+        String personnelNumber = txtPersonnelNumber.getText().trim();
 
-        if (personnelNumber.isEmpty() || firstName.isEmpty() 
-                || lastName.isEmpty() || password.isEmpty()) {
-            showAlert(Alert.AlertType.ERROR, "Error", 
-                "Todos los campos son obligatorios.");
+        if (firstName.isEmpty() || firstName.length() > 50) {
+            showError("El nombre no puede estar vacío o tener más de 50 caracteres");
             return;
         }
 
+        if (!firstName.matches("[\\p{L}\\s]+")) {
+            showError("El nombre solo acepta letras");
+            return;
+        }
+
+        if (lastName.isEmpty() || lastName.length() > 50) {
+            showError("Los apellidos no pueden estar vacíos o tener más de 50 caracteres");
+            return;
+        }
+
+        if (!lastName.matches("[\\p{L}\\s]+")) {
+            showError("Los apellidos solo aceptan letras");
+            return;
+        }
+
+        if (password.isEmpty() || password.length() < 6) {
+            showError("La contraseña debe tener al menos 6 caracteres");
+            return;
+        }
+
+        if (personnelNumber.isEmpty()) {
+            showError("El número de personal es obligatorio");
+            return;
+        }
+
+        if (comboBoxCoordinator.getValue() == null) {
+            showError("Seleccione si es coordinador o no");
+            return;
+        }
+
+        labelError.setText("");
+        registerProfessor();
+    }
+
+    private void registerProfessor() {
+
+        Professor professor = buildProfessor();
+
         try {
-            User user = new User();
-            user.setFirstName(firstName);
-            user.setLastName(lastName);
-            user.setPassword(password);
-            user.setUserType(isCoordinator ? "Coordinador" : "Maestro");
+            int generatedId = userDAO.registerUser(professor);
 
-            int generatedId = userDAO.registerUser(user);
+            if (generatedId != -1) {
+                professor.setId(generatedId);
 
-            Professor professor = new Professor();
-            professor.setId(generatedId);
-            professor.setPersonnelNumber(personnelNumber);
-            professor.setFirstName(firstName);
-            professor.setLastName(lastName);
-            professor.setIsCoordinator(isCoordinator);
+                boolean result = professorDAO.registerProfessor(professor);
 
-            boolean result = professorDAO.registerProfessor(professor);
-
-            if (result) {
-                showAlert(Alert.AlertType.INFORMATION, "Éxito",
-                    "Profesor registrado exitosamente.");
-                clearFields();
+                if (result) {
+                    showSuccess("Profesor registrado correctamente");
+                    clearFields();
+                } else {
+                    showError("Error al registrar profesor");
+                }
+            } else {
+                showError("Error registrando usuario");
             }
+
         } catch (OperationException e) {
-            showAlert(Alert.AlertType.ERROR, "Error", e.getMessage());
+            showError(e.getMessage());
         }
     }
 
-    @FXML
-    private void handleCancel() {
-        clearFields();
+    private Professor buildProfessor() {
+
+        Professor professor = new Professor();
+
+        professor.setFirstName(txtFirstName.getText().trim());
+        professor.setLastName(txtLastName.getText().trim());
+        professor.setPassword(txtPassword.getText().trim());
+
+        professor.setPersonnelNumber(txtPersonnelNumber.getText().trim());
+
+        boolean isCoordinator =
+                comboBoxCoordinator.getValue().equals("Si");
+
+        professor.setIsCoordinator(isCoordinator);
+
+        professor.setUserType(isCoordinator ? "Coordinador" : "Maestro");
+        professor.setInactive(false);
+
+        return professor;
     }
 
     private void clearFields() {
-        txtPersonnelNumber.clear();
         txtFirstName.clear();
         txtLastName.clear();
         txtPassword.clear();
-        chkIsCoordinator.setSelected(false);
+        txtPersonnelNumber.clear();
+        comboBoxCoordinator.setValue(null);
     }
 
-    private void showAlert(Alert.AlertType type, String title, String message) {
-        Alert alert = new Alert(type);
-        alert.setTitle(title);
+    private void showError(String message) {
+        labelError.setText(message);
+        labelError.setStyle("-fx-text-fill: red;");
+    }
+
+    private void showSuccess(String message) {
+        labelError.setText(message);
+        labelError.setStyle("-fx-text-fill: green;");
+
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setTitle("Éxito");
         alert.setHeaderText(null);
         alert.setContentText(message);
         alert.showAndWait();
+    }
+
+    @FXML
+    public void goBack() {
+        Stage stage = (Stage) buttonBack.getScene().getWindow();
+        stage.close();
     }
 }
