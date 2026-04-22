@@ -55,23 +55,23 @@ public class FXMLRegisterStudentController implements Initializable {
         String studentId = txtStudentId.getText().trim();
  
         if (firstName.isEmpty() || firstName.length() > 50) {
-            showError("No puede estar vacio o tener mas de 50 caracteres");
+            showError("El nombre no puede estar vacio o tener mas de 50 caracteres");
             return;
         }
         if (!firstName.matches("[\\p{L}\\s]+")) {
-            showError("Solo se aceptan letras");
+            showError("El nombre solo acepta letras");
             return;
         }
         if (lastName.isEmpty() || lastName.length() > 50) {
-            showError("No puede estar vacio o tener mas de 50 caracteres");
+            showError("Los apellidos no pueden estar vacios o tener mas de 50 caracteres");
             return;
         }
         if (!lastName.matches("[\\p{L}\\s]+")) {
-            showError("Solo se aceptan letras");
+            showError("Los apellidos solo aceptan letras");
             return;
         }
         if (password.isEmpty() || password.length() < 6) {
-            showError("Necesita 6 caracteres");
+            showError("La contraseña necesita 6 caracteres");
             return;
         }
         if (studentId.isEmpty() || studentId.length() != 9) {
