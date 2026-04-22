@@ -1,6 +1,7 @@
 package uv.lis.logic.dto;
 
 import java.util.ArrayList;
+import java.util.Objects;
 
 public class Project {
     private int id;
@@ -18,7 +19,10 @@ public class Project {
         
     }
 
-    public Project(String name, String methodology, int capacity, String objective, String description, ArrayList<Activity> activities, String idStudent) {
+    public Project(String name, String methodology, int capacity, 
+        String objective, String description, 
+        ArrayList<Activity> activities, String idStudent) {
+
         this.id = generateId();
         this.name = name;
         this.methodology = methodology;
@@ -96,5 +100,24 @@ public class Project {
     }
     public void setIdStudent(String idStudent) {
         this.idStudent = idStudent;
+    }
+
+
+    @Override
+    public boolean equals(Object object) {
+        if(this == object) {
+            return true;
+        }
+        if(!(object instanceof Project)) {
+            return false;
+        }
+            Project other = (Project) object;
+            return Objects.equals(this.id, other.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id);
+
     }
 }

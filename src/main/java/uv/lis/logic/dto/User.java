@@ -1,5 +1,6 @@
 package uv.lis.logic.dto;
 
+
 public class User {
     private int id;
     private String firstName;

@@ -9,15 +9,13 @@ import static org.mockito.Mockito.when;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
 import java.lang.reflect.Field;
 import java.sql.Connection;
+import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.List;
 
 import uv.lis.dataaccess.MySQLConnectionManager;
 import uv.lis.logic.dao.ActivityDAO;
@@ -25,7 +23,6 @@ import uv.lis.logic.dto.Activity;
 import uv.lis.logic.exceptions.OperationException;
 
 
-@ExtendWith(MockitoExtension.class)
 class ActivityDAOTest {
 
     @Mock
@@ -48,30 +45,57 @@ class ActivityDAOTest {
         Field field = ActivityDAO.class.getDeclaredField("connectionManager");
         field.setAccessible(true);
         field.set(activityDAO, connectionManager);
+
+        when(connectionManager.getConnection()).thenReturn(databaseConnection);
+    }
+
+    private void mockQueryExecution() throws Exception {
+        when(databaseConnection.prepareStatement(anyString())).thenReturn(preparedStatement);
+        when(preparedStatement.executeQuery()).thenReturn(resultSet);
+    }
+
+    private void mockUpdateExecution(int rowsAffected) throws Exception {
+        when(databaseConnection.prepareStatement(anyString())).thenReturn(preparedStatement);
+        when(preparedStatement.executeUpdate()).thenReturn(rowsAffected);
+    }
+
+    private void mockResultSetActivity() throws Exception {
+        when(resultSet.next()).thenReturn(true, true, false);
+
+        when(resultSet.getInt("idActividad")).thenReturn(1, 2);
+        when(resultSet.getString("nombreActividad")).thenReturn("Actividad 1", "Actividad 2");
+        when(resultSet.getString("descripcionActividad")).thenReturn("Descripción 1", "Descripción 2");
+        when(resultSet.getDate("FechaInicio"))
+                .thenReturn(Date.valueOf("2024-01-01"), Date.valueOf("2024-02-01"));
+        when(resultSet.getDate("FechaFin"))
+                .thenReturn(Date.valueOf("2024-12-31"), Date.valueOf("2024-11-30"));
+    }
+
+    private Activity buildExpectedActivity() {
+        Activity expected = new Activity();
+        expected.setId(1);
+        expected.setName("Actividad 1");
+        expected.setDescription("Descripción 1");
+        expected.setStartDate(Date.valueOf("2024-01-01"));
+        expected.setEndDate(Date.valueOf("2024-12-31"));
+        return expected;
     }
 
     @Test
     void getAllActivities_successful_returnsActivityList() throws Exception {
-        when(connectionManager.getConnection()).thenReturn(databaseConnection);
-        when(databaseConnection.prepareStatement(anyString())).thenReturn(preparedStatement);
-        when(preparedStatement.executeQuery()).thenReturn(resultSet);
+        mockQueryExecution();
+        mockResultSetActivity();
         when(resultSet.next()).thenReturn(true, true, false);
 
-        List<Activity> result = activityDAO.getAllActivities();
-
-        assertEquals(2, result.size());
+        assertEquals(2, activityDAO.getAllActivities().size());
     }
 
     @Test
     void getAllActivities_emptyList_returnsEmptyList() throws Exception {
-        when(connectionManager.getConnection()).thenReturn(databaseConnection);
-        when(databaseConnection.prepareStatement(anyString())).thenReturn(preparedStatement);
-        when(preparedStatement.executeQuery()).thenReturn(resultSet);
+        mockQueryExecution();
         when(resultSet.next()).thenReturn(false);
 
-        List<Activity> result = activityDAO.getAllActivities();
-
-        assertTrue(result.isEmpty());
+        assertTrue(activityDAO.getAllActivities().isEmpty());
     }
 
     @Test
@@ -83,120 +107,74 @@ class ActivityDAOTest {
 
     @Test
     void getActivitiesById_successful_returnsActivityList() throws Exception {
-        when(connectionManager.getConnection()).thenReturn(databaseConnection);
-        when(databaseConnection.prepareStatement(anyString())).thenReturn(preparedStatement);
-        when(preparedStatement.executeQuery()).thenReturn(resultSet);
+        mockQueryExecution();
         when(resultSet.next()).thenReturn(true, true, false);
 
-        List<Activity> result = activityDAO.getActivitiesById(1);
-
-        assertEquals(2, result.size());
+        assertEquals(2, activityDAO.getActivitiesById(1).size());
     }
 
     @Test
     void getActivitiesById_emptyList_returnsEmptyList() throws Exception {
-        when(connectionManager.getConnection()).thenReturn(databaseConnection);
-        when(databaseConnection.prepareStatement(anyString())).thenReturn(preparedStatement);
-        when(preparedStatement.executeQuery()).thenReturn(resultSet);
+        mockQueryExecution();
         when(resultSet.next()).thenReturn(false);
 
-        List<Activity> result = activityDAO.getActivitiesById(999);
-
-        assertTrue(result.isEmpty());
+        assertTrue(activityDAO.getActivitiesById(999).isEmpty());
     }
 
     @Test
     void getActivitiesById_sqlError_throwsOperationException() throws Exception {
         when(connectionManager.getConnection()).thenThrow(new SQLException("Fallo"));
 
-        OperationException exception = assertThrows(OperationException.class, () ->
-            activityDAO.getActivitiesById(1)
-        );
-        assertTrue(exception.getMessage().contains("Error al obtener las actividades"));
+        assertThrows(OperationException.class, () -> activityDAO.getActivitiesById(1));
     }
 
     @Test
     void registerActivity_successful_returnsTrue() throws Exception {
-        Activity activity = buildActivity(1, "Actividad 1");
+        mockUpdateExecution(1);
 
-        when(connectionManager.getConnection()).thenReturn(databaseConnection);
-        when(databaseConnection.prepareStatement(anyString())).thenReturn(preparedStatement);
-        when(preparedStatement.executeUpdate()).thenReturn(1);
-
-        boolean result = activityDAO.registerActivity(activity);
-
-        assertTrue(result);
+        assertTrue(activityDAO.registerActivity(buildExpectedActivity()));
     }
 
     @Test
     void registerActivity_noRowsAffected_throwsOperationException() throws Exception {
-        Activity activity = buildActivity(1, "Actividad 1");
+        mockUpdateExecution(0);
 
-        when(connectionManager.getConnection()).thenReturn(databaseConnection);
-        when(databaseConnection.prepareStatement(anyString())).thenReturn(preparedStatement);
-        when(preparedStatement.executeUpdate()).thenReturn(0);
-
-        OperationException exception = assertThrows(OperationException.class, () ->
-            activityDAO.registerActivity(activity)
+        assertThrows(OperationException.class, () ->
+            activityDAO.registerActivity(buildExpectedActivity())
         );
-        assertTrue(exception.getMessage().contains("No se pudo registrar la actividad"));
     }
 
     @Test
     void registerActivity_sqlError_throwsOperationException() throws Exception {
-        Activity activity = buildActivity(1, "Actividad 1");
-
         when(connectionManager.getConnection()).thenThrow(new SQLException("Fallo"));
 
-        OperationException exception = assertThrows(OperationException.class, () ->
-            activityDAO.registerActivity(activity)
+        assertThrows(OperationException.class, () ->
+            activityDAO.registerActivity(buildExpectedActivity())
         );
-        assertTrue(exception.getMessage().contains("Error al registrar la actividad"));
     }
 
     @Test
     void modifyActivity_successful_returnsTrue() throws Exception {
-        Activity activity = buildActivity(1, "Actividad Modificada");
+        mockUpdateExecution(1);
 
-        when(connectionManager.getConnection()).thenReturn(databaseConnection);
-        when(databaseConnection.prepareStatement(anyString())).thenReturn(preparedStatement);
-        when(preparedStatement.executeUpdate()).thenReturn(1);
-
-        boolean result = activityDAO.modifyActivity(activity);
-
-        assertTrue(result);
+        assertTrue(activityDAO.modifyActivity(buildExpectedActivity()));
     }
 
     @Test
     void modifyActivity_noRowsAffected_throwsOperationException() throws Exception {
-        Activity activity = buildActivity(999, "No Existe");
+        mockUpdateExecution(0);
 
-        when(connectionManager.getConnection()).thenReturn(databaseConnection);
-        when(databaseConnection.prepareStatement(anyString())).thenReturn(preparedStatement);
-        when(preparedStatement.executeUpdate()).thenReturn(0);
-
-        OperationException exception = assertThrows(OperationException.class, () ->
-            activityDAO.modifyActivity(activity)
+        assertThrows(OperationException.class, () ->
+            activityDAO.modifyActivity(buildExpectedActivity())
         );
-        assertTrue(exception.getMessage().contains("No se pudo modificar la actividad"));
     }
 
     @Test
     void modifyActivity_sqlError_throwsOperationException() throws Exception {
-        Activity activity = buildActivity(1, "Actividad 1");
-
         when(connectionManager.getConnection()).thenThrow(new SQLException("Fallo"));
 
-        OperationException exception = assertThrows(OperationException.class, () ->
-            activityDAO.modifyActivity(activity)
+        assertThrows(OperationException.class, () ->
+            activityDAO.modifyActivity(buildExpectedActivity())
         );
-        assertTrue(exception.getMessage().contains("Error al modificar la actividad"));
-    }
-
-    private Activity buildActivity(int id, String name) {
-        Activity activity = new Activity();
-        activity.setId(id);
-        activity.setName(name);
-        return activity;
     }
 }

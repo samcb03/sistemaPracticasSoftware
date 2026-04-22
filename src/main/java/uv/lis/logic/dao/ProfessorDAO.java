@@ -17,6 +17,10 @@ public class ProfessorDAO extends UserDAO implements IProfessorDAO {
     private static final int NO_ROWS_AFFECTED = 0;
     private static final Logger LOGGER = Logger.getLogger(UserDAO.class.getName());
     private MySQLConnectionManager connectionManager;
+
+    public ProfessorDAO() {
+        this.connectionManager = new MySQLConnectionManager();
+    }
     
     @Override
     public Professor getProfessorByPersonalNumber(String personnelNumber) throws OperationException {
