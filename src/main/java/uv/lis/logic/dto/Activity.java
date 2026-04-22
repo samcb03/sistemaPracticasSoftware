@@ -2,6 +2,7 @@ package uv.lis.logic.dto;
 
 
 import java.sql.Date;
+import java.util.Objects;
 
 public class Activity {
     private int id;
@@ -59,5 +60,24 @@ public class Activity {
 
     public void setEndDate(Date endDate) {
         this.endDate = endDate;
+    }
+
+    
+    @Override
+    public boolean equals(Object object) {
+        if (this == object) {
+            return true;
+        }
+        if (!(object instanceof Professor)) {
+            return false;
+        }
+        Activity other = (Activity) object;
+
+        return Objects.equals(this.id, other.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id);
     }
 }

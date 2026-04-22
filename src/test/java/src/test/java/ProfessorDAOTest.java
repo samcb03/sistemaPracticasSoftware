@@ -9,9 +9,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
 import java.lang.reflect.Field;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -23,7 +21,6 @@ import uv.lis.logic.dto.Professor;
 import uv.lis.logic.exceptions.OperationException;
 
 
-@ExtendWith(MockitoExtension.class)
 class ProfessorDAOTest {
 
     @Mock
@@ -216,7 +213,7 @@ class ProfessorDAOTest {
     }
 
     @Test
-    void inactivateProfessor_sqlError_throwsOperationException() throws Exception {
+    void inactivate_Professor_sqlError_throwsOperationException() throws Exception {
         Professor professor = buildProfessor("UV-001", "Ana", "García", false);
 
         when(connectionManager.getConnection()).thenThrow(new SQLException("Fallo"));

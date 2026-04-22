@@ -22,6 +22,10 @@ public class AutoevaluationDAO implements IAutoevaluationDAO {
         this.connectionManager = new MySQLConnectionManager();
     }
 
+    public AutoevaluationDAO(MySQLConnectionManager connectionManager) {
+        this.connectionManager = connectionManager;
+    }
+
     @Override
     public boolean registerAutoevaluation(Autoevaluation autoevaluation) throws OperationException {
     boolean isRegistered = false;
