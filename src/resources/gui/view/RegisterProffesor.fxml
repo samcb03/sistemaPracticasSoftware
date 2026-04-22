@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
+
+<VBox xmlns:fx="http://javafx.com/fxml"
+      fx:controller="uv.lis.gui.controllers.RegisterProfessorController"
+      spacing="20"
+      style="-fx-padding: 30; -fx-background-color: #f5f5f5;">
+
+    <Label text="Registrar Profesor"
+           style="-fx-font-size: 20; -fx-font-weight: bold; -fx-text-fill: #333333;"/>
++
+    <GridPane hgap="15" vgap="15">
+
+        <Label text="Número personal:" 
+               GridPane.rowIndex="0" GridPane.columnIndex="0"
+               style="-fx-font-weight: bold;"/>
+        <TextField fx:id="txtPersonnelNumber"
+                   promptText="Ej: UV-001"
+                   prefWidth="250"
+                   GridPane.rowIndex="0" GridPane.columnIndex="1"/>
+
+        <Label text="Nombre:"
+               GridPane.rowIndex="1" GridPane.columnIndex="0"
+               style="-fx-font-weight: bold;"/>
+        <TextField fx:id="txtFirstName"
+                   promptText="Ej: Juan"
+                   prefWidth="250"
+                   GridPane.rowIndex="1" GridPane.columnIndex="1"/>
+
+        <Label text="Apellidos:"
+               GridPane.rowIndex="2" GridPane.columnIndex="0"
+               style="-fx-font-weight: bold;"/>
+        <TextField fx:id="txtLastName"
+                   promptText="Ej: Pérez López"
+                   prefWidth="250"
+                   GridPane.rowIndex="2" GridPane.columnIndex="1"/>
+
+        <Label text="Contraseña:"
+               GridPane.rowIndex="3" GridPane.columnIndex="0"
+               style="-fx-font-weight: bold;"/>
+        <PasswordField fx:id="txtPassword"
+                       promptText="Contraseña"
+                       prefWidth="250"
+                       GridPane.rowIndex="3" GridPane.columnIndex="1"/>
+
+        <Label text="¿Es coordinador?:"
+               GridPane.rowIndex="4" GridPane.columnIndex="0"
+               style="-fx-font-weight: bold;"/>
+        <CheckBox fx:id="chkIsCoordinator"
+                  GridPane.rowIndex="4" GridPane.columnIndex="1"/>
+
+    </GridPane>
+
+    <!-- Botones -->
+    <HBox spacing="10">
+        <Button text="Registrar"
+                onAction="#handleRegister"
+                prefWidth="120"
+                style="-fx-background-color: #4CAF50; -fx-text-fill: white; 
+                       -fx-font-weight: bold; -fx-cursor: hand;"/>
+        <Button text="Cancelar"
+                onAction="#handleCancel"
+                prefWidth="120"
+                style="-fx-background-color: #f44336; -fx-text-fill: white; 
+                       -fx-font-weight: bold; -fx-cursor: hand;"/>
+    </HBox>
+
+</VBox>
