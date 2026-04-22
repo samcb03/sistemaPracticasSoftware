@@ -47,7 +47,6 @@ public class StudentDAO extends UserDAO implements IStudentDAO {
                     student.setLastName(resultSet.getString("apellidos"));
                     student.setBirthDate(resultSet.getDate("fechaNacimiento"));
                     student.setGender(resultSet.getString("genero"));
-                    student.setIndigenousLanguage(resultSet.getBoolean("lenguaIndigena"));
 
                     LOGGER.log(Level.INFO, "Busqueda de responsable de proyecto con matricula {0} exitosa.", 
                         idStudent);
@@ -68,8 +67,8 @@ public class StudentDAO extends UserDAO implements IStudentDAO {
     public boolean registerStudent(Student student) throws OperationException {
         boolean isRegistered = false;
 
-        String studentQuery = "INSERT INTO Alumno (idUsuario, matricula, fechaNacimiento, genero, lenguaIndigena," 
-            + "estado) VALUES (?, ?, ?, ?, ?, ?);";
+        String studentQuery = "INSERT INTO Alumno (idUsuario, matricula, fechaNacimiento, genero," 
+            + "estado) VALUES (?, ?, ?, ?, ?);";
 
         try (Connection databaseConnection = connectionManager.getConnection();
              PreparedStatement preparedStatement = databaseConnection.prepareStatement(studentQuery)) {
@@ -81,8 +80,7 @@ public class StudentDAO extends UserDAO implements IStudentDAO {
 
             preparedStatement.setDate(3, sqlBirthDate);
             preparedStatement.setString(4, student.getGender());
-            preparedStatement.setBoolean(5, student.hasIndigenousLanguage());
-            preparedStatement.setBoolean(6, student.isInactive());
+            preparedStatement.setBoolean(5, student.isInactive());
 
             if (preparedStatement.executeUpdate() > NO_ROWS_AFFECTED) {
                 isRegistered = true;

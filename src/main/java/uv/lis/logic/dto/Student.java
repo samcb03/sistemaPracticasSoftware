@@ -10,7 +10,6 @@ public class Student extends User {
     private Date birthDate;
     private int completedHours;
     private String gender;
-    private boolean indigenousLanguage;
     private Subject subject;
     private Report report;
     private Project project;
@@ -20,13 +19,12 @@ public class Student extends User {
     }
 
     public Student(int idUser, String firstName, String lastName, String password, String idStudent, Date birthDate, 
-            int completedHours, String gender, boolean indigenousLanguage) {
+            int completedHours, String gender) {
         super(idUser, firstName, lastName, password, "Alumno", true);
         this.idStudent = idStudent;
         this.birthDate = birthDate;
         this.completedHours = completedHours;
         this.gender = gender;
-        this.indigenousLanguage = indigenousLanguage;
     }
 
     public String getIdStudent() {
@@ -61,13 +59,6 @@ public class Student extends User {
         this.gender = gender;
     }
 
-    public boolean hasIndigenousLanguage() {
-        return indigenousLanguage;
-    }
-
-    public void setIndigenousLanguage(boolean indigenousLanguage) {
-        this.indigenousLanguage = indigenousLanguage;
-    }
 
     public Subject getSubject() {
         return subject;
@@ -107,7 +98,6 @@ public class Student extends User {
             && Objects.equals(idStudent, other.idStudent)
             && Objects.equals(getFirstName(), other.getFirstName())
             && Objects.equals(getLastName(), other.getLastName())
-            && Objects.equals(gender, other.gender)
-            && indigenousLanguage == other.indigenousLanguage;
+            && Objects.equals(gender, other.gender);
     }
 }

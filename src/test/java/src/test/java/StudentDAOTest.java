@@ -56,8 +56,7 @@ public class StudentDAOTest {
         when(resultSet.getBoolean("lenguaIndigena")).thenReturn(false);
 
         Student expectedStudent = new Student(1, "Denisse", "Reyes", "123456", 
-            "S123", new Date(System.currentTimeMillis()), 0, "Femenino", 
-            false);
+            "S123", new Date(System.currentTimeMillis()), 0, "Femenino");
 
         assertEquals(expectedStudent, studentDAO.getStudentById("S123"));
     }
@@ -85,7 +84,6 @@ public class StudentDAOTest {
         student.setIdStudent("S123");
         student.setBirthDate(new java.util.Date());
         student.setGender("Femenino");
-        student.setIndigenousLanguage(false);
         student.setInactive(false);
 
         boolean result = studentDAO.registerStudent(student);
