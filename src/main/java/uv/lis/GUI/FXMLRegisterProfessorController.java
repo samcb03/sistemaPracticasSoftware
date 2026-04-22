@@ -1,19 +1,17 @@
-package uv.lis.GUI.controller;
+package uv.lis.GUI;
 
 import javafx.fxml.FXML;
 import javafx.scene.control.Alert;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
-import uv.lis.logic.contracts.IProfessorDAO;
-import uv.lis.logic.contracts.IUserDAO;
 import uv.lis.logic.dao.ProfessorDAO;
 import uv.lis.logic.dao.UserDAO;
 import uv.lis.logic.dto.Professor;
 import uv.lis.logic.dto.User;
 import uv.lis.logic.exceptions.OperationException;
 
-public class RegisterProfessorController {
+public class FXMLRegisterProfessorController {
 
     @FXML private TextField txtPersonnelNumber;
     @FXML private TextField txtFirstName;
@@ -21,8 +19,8 @@ public class RegisterProfessorController {
     @FXML private PasswordField txtPassword;
     @FXML private CheckBox chkIsCoordinator;
 
-    private IProfessorDAO professorDAO;
-    private IUserDAO userDAO;
+    private ProfessorDAO professorDAO;
+    private UserDAO userDAO;
 
     public void initialize() {
         this.professorDAO = new ProfessorDAO();
@@ -45,7 +43,6 @@ public class RegisterProfessorController {
         }
 
         try {
-            // 1. Registrar usuario
             User user = new User();
             user.setFirstName(firstName);
             user.setLastName(lastName);
@@ -54,7 +51,6 @@ public class RegisterProfessorController {
 
             int generatedId = userDAO.registerUser(user);
 
-            // 2. Registrar profesor
             Professor professor = new Professor();
             professor.setId(generatedId);
             professor.setPersonnelNumber(personnelNumber);
