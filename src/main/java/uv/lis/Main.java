@@ -1,9 +1,14 @@
 package uv.lis;
 
 
-import java.sql.Date;
+
 import java.util.List;
 import java.util.Scanner;
+import javafx.application.Application;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
+import javafx.stage.Stage;
 import uv.lis.logic.common.AutoevaluationCommon;
 import uv.lis.logic.dao.AffiliatedOrganizationDAO;
 import uv.lis.logic.dao.ProfessorDAO;
@@ -30,8 +35,9 @@ import uv.lis.logic.exceptions.AuthenticateException;
 import uv.lis.logic.exceptions.OperationException;
 
 
-public class Main {
+public class Main extends Application{
 public static void main(String[] args) throws AuthenticateException, OperationException {
+        launch(args);
         Main app = new Main();
         Scanner scanner = new Scanner(System.in);
         User currentUser = app.login(scanner);
@@ -263,7 +269,6 @@ public static void main(String[] args) throws AuthenticateException, OperationEx
     }
 
     private void showCoordinatorMenu(Scanner scanner) throws OperationException {
-        UserDAO userDAO = new UserDAO();
         StudentDAO studentDAO = new StudentDAO();
         int optionCoordinator;
         do {
@@ -283,54 +288,7 @@ public static void main(String[] args) throws AuthenticateException, OperationEx
             optionCoordinator = scanner.nextInt();
             switch (optionCoordinator) {
                 case 1:
-                    scanner.nextLine();
-                    Student student = new Student();
-                    System.out.println("Nombre: ");
-                    String firstName = scanner.nextLine();
-                    System.out.println("Apellidos: ");
-                    String lastName = scanner.nextLine();
-                    System.out.println("Contraseña: ");
-                    String password = scanner.nextLine();
-                    System.out.println("Matricula: ");
-                    String idStudent = scanner.nextLine();
-                    System.out.println("Fecha de nacimiento (YYYY-MM-DD): ");
-                    Date birthDate = Date.valueOf(scanner.nextLine());
-                    System.out.println("Genero: ");
-                    System.out.println("1. Masculino");
-                    System.out.println("2. Femenino");
-                    System.out.println("3. Otro");
-                    int genderOption = scanner.nextInt();
-                    String gender;
-                    switch (genderOption) {
-                        case 1:
-                            gender = "Masculino";
-                            break;
-                        case 2:
-                            gender = "Femenino";
-                            break;
-                        case 3:
-                            gender = "Otro";
-                            break;
-                        default:
-                            gender = "Desconocido";
-                    }
-                    student.setFirstName(firstName);
-                    student.setLastName(lastName);
-                    student.setPassword(password);
-                    student.setIdStudent(idStudent);
-                    student.setBirthDate(birthDate);
-                    student.setGender(gender);
-                    student.setUserType("Alumno");
-                    student.setInactive(false);
-
-                    student.setIdentification(idStudent); 
-                    int generatedId = userDAO.registerUser(student); 
-                    if (generatedId != -1) {
-                        student.setId(generatedId);                   
-                        studentDAO.registerStudent(student);
-                    } else {
-                        System.out.println("Error al registrar usuario.");
-                    }
+                    
                     break;
                 case 2:
                     scanner.nextLine();
@@ -965,5 +923,16 @@ public static void main(String[] args) throws AuthenticateException, OperationEx
                     System.out.println("Opción no válida");
             }
         } while (option != 4);
+    }
+
+    @Override
+    public void start(Stage stage) throws Exception {
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("/uv/lis/GUI/FXMLRegisterStudent.fxml"));
+        Parent root = loader.load();
+
+        Scene scene = new Scene(root);
+        stage.setScene(scene);
+        stage.setTitle("Registro de estudiante");
+        stage.show();
     }
 }
