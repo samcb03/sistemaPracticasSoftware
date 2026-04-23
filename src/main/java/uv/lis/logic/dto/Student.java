@@ -85,15 +85,15 @@ public class Student extends User {
     }
 
     @Override
-    public boolean equals(Object obj) {
-        if (this == obj) {
+    public boolean equals(Object object) {
+        if (this == object) {
             return true;
         } 
-        if (obj == null || getClass() != obj.getClass()) {
+        if (object == null || getClass() != object.getClass()) {
             return false;
         }
         
-        Student other = (Student) obj;
+        Student other = (Student) object;
         return getId() == other.getId()
             && Objects.equals(idStudent, other.idStudent)
             && Objects.equals(getFirstName(), other.getFirstName())

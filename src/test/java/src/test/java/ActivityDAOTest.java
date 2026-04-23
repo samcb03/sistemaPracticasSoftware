@@ -10,6 +10,8 @@ import static org.mockito.Mockito.when;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
+
 import java.lang.reflect.Field;
 import java.sql.Connection;
 import java.sql.Date;
@@ -41,6 +43,8 @@ class ActivityDAOTest {
 
     @BeforeEach
     void setUp() throws Exception {
+        MockitoAnnotations.openMocks(this);
+
         activityDAO = new ActivityDAO();
         Field field = ActivityDAO.class.getDeclaredField("connectionManager");
         field.setAccessible(true);
