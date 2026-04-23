@@ -1,4 +1,4 @@
-package uv.lis.GUI;
+package uv.lis.GUI.controller;
  
 
 import uv.lis.logic.dto.Student;

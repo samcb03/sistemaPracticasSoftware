@@ -1,122 +1,100 @@
 package uv.lis;
 
-
-import java.sql.Date;
-import java.util.Scanner;
+import javafx.scene.control.TextInputControl;
 import java.util.regex.Pattern;
 
-
 public class InputValidator {
+
     private static final Pattern REPEATED_CHARS = Pattern.compile("(.)\\1{3,}");
+    private static final Pattern ONLY_LETTERS = Pattern.compile("[\\p{L}\\s]+");
+    private static final Pattern EMAIL_PATTERN = Pattern.compile("^[\\w._%+\\-]+@[\\w.\\-]+\\.[a-zA-Z]{2,}$");
+    private static final Pattern PHONE_PATTERN = Pattern.compile("^[0-9]{7,15}$");
 
-    public static String readText(Scanner scanner, String prompt) {
-        while (true) {
-            System.out.print(prompt);
-            String input = scanner.nextLine().trim();
+    public static String validateName(TextInputControl input, String fieldName, int maxLength) {
+        String text = (input.getText() == null) ? "" : input.getText().trim();
 
-            if (input.isEmpty()) {
-                System.out.println("  El campo no puede estar vacío. Intente de nuevo.");
-                continue;
-            }
-            if (REPEATED_CHARS.matcher(input).find()) {
-                System.out.println("  El valor contiene caracteres repetidos consecutivos (ej: \"aaaa\"). Intente de nuevo.");
-                continue;
-            }
-            return input;
+        if (text.isEmpty()) {
+            return fieldName + " no puede estar vacío";
         }
-    }
-
-    public static String readId(Scanner scanner, String prompt) {
-        while (true) {
-            System.out.print(prompt);
-            String input = scanner.nextLine().trim();
-
-            if (input.isEmpty()) {
-                System.out.println("  El campo no puede estar vacío. Intente de nuevo.");
-                continue;
-            }
-            return input;
+        if (text.length() > maxLength) {
+            return fieldName + " no puede tener más de " + maxLength + " caracteres";
         }
-    }
-
-    public static String readEmail(Scanner scanner, String prompt) {
-        while (true) {
-            System.out.print(prompt);
-            String input = scanner.nextLine().trim();
-
-            if (input.isEmpty()) {
-                System.out.println("  El correo no puede estar vacío. Intente de nuevo.");
-                continue;
-            }
-            if (!input.contains("@") || !input.contains(".")) {
-                System.out.println("  El correo no tiene un formato válido (debe contener '@' y '.'). Intente de nuevo.");
-                continue;
-            }
-            return input;
+        if (!ONLY_LETTERS.matcher(text).matches()) {
+            return fieldName + " solo acepta letras";
         }
-    }
-
-    public static int readInt(Scanner scanner, String prompt) {
-        while (true) {
-            System.out.print(prompt);
-            String raw = scanner.nextLine().trim();
-
-            if (raw.isEmpty()) {
-                System.out.println("  El campo no puede estar vacío. Intente de nuevo.");
-                continue;
-            }
-            try {
-                return Integer.parseInt(raw);
-            } catch (NumberFormatException e) {
-                System.out.println("  El campo debe contener un número entero. Intente de nuevo.");
-            }
+        if (REPEATED_CHARS.matcher(text).find()) {
+            return fieldName + " contiene caracteres repetidos inválidos";
         }
+        return null;
     }
 
-    public static int readIntInRange(Scanner scanner, String prompt, int min, int max) {
-        while (true) {
-            int value = readInt(scanner, prompt);
-            if (value < min || value > max) {
-                System.out.println("  El valor debe estar entre " + min + " y " + max + ". Intente de nuevo.");
-            } else {
-                return value;
-            }
+    public static String validatePassword(TextInputControl input) {
+        String text = (input.getText() == null) ? "" : input.getText();
+
+        if (text.isEmpty()) {
+            return "La contraseña no puede estar vacía";
         }
-    }
-
-    public static int readMenuOption(Scanner scanner, int max) {
-        return readIntInRange(scanner, "Opción: ", 1, max);
-    }
-
-    public static boolean readBoolean(Scanner scanner, String prompt) {
-        while (true) {
-            System.out.print(prompt + " (si/no): ");
-            String input = scanner.nextLine().trim().toLowerCase();
-
-            if (input.equals("si") || input.equals("sí")) {
-                return true;
-            } else if (input.equals("no")) {
-                return false;
-            } else {
-                System.out.println("  Respuesta no válida. Escriba 'si' o 'no'.");
-            }
+        if (text.length() < 6) {
+            return "La contraseña debe tener al menos 6 caracteres";
         }
+        return null;
     }
 
-    public static Date readDate(Scanner scanner, String prompt) {
-        while (true) {
-            System.out.print(prompt + " (YYYY-MM-DD): ");
-            String input = scanner.nextLine().trim();
+    public static String validateRequired(TextInputControl input, String fieldName) {
+        String text = (input.getText() == null) ? "" : input.getText().trim();
 
-            if (input.isEmpty()) {
-                System.out.println("  La fecha no puede estar vacía. Intente de nuevo.");
-                continue;
+        if (text.isEmpty()) {
+            return fieldName + " es obligatorio";
+        }
+        return null;
+    }
+
+    public static String validateEmail(TextInputControl input) {
+        String text = (input.getText() == null) ? "" : input.getText().trim();
+
+        if (text.isEmpty()) {
+            return "El correo electrónico no puede estar vacío";
+        }
+        if (!EMAIL_PATTERN.matcher(text).matches()) {
+            return "El correo electrónico no tiene un formato válido";
+        }
+        return null;
+    }
+
+    public static String validatePhoneNumber(TextInputControl input) {
+        String text = (input.getText() == null) ? "" : input.getText().trim();
+
+        if (text.isEmpty()) {
+            return "El número de teléfono no puede estar vacío";
+        }
+        if (!PHONE_PATTERN.matcher(text).matches()) {
+            return "El número de teléfono solo acepta entre 7 y 15 dígitos";
+        }
+        return null;
+    }
+
+    public static String validatePositiveInteger(TextInputControl input, String fieldName) {
+        String text = (input.getText() == null) ? "" : input.getText().trim();
+
+        if (text.isEmpty()) {
+            return fieldName + " no puede estar vacío";
+        }
+        try {
+            int value = Integer.parseInt(text);
+            if (value < 0) {
+                return fieldName + " debe ser un número positivo";
             }
-            try {
-                return Date.valueOf(input);
-            } catch (IllegalArgumentException e) {
-                System.out.println("  Formato de fecha inválido. Use YYYY-MM-DD (ej: 2000-05-20).");
-            }
+        } catch (NumberFormatException e) {
+            return fieldName + " debe ser un número entero válido";
+        }
+        return null;
+    }
+
+    public static void showAlertStyle(TextInputControl input, boolean hasError) {
+        if (hasError) {
+            input.setStyle("-fx-border-color: #e74c3c; -fx-border-width: 2px;");
+        } else {
+            input.setStyle("");
         }
     }
 }

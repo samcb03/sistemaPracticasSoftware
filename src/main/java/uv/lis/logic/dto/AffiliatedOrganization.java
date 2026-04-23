@@ -15,7 +15,7 @@ public class AffiliatedOrganization {
     private ProjectSupervisor projectSupervisor;
     private int counter = 0;
 
-    public AffiliatedOrganization(){
+    public AffiliatedOrganization(){       
         
     }
    

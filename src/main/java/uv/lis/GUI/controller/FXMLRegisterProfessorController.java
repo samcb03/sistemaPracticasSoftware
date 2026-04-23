@@ -1,8 +1,9 @@
-package uv.lis.GUI;
+package uv.lis.GUI.controller;
 
 
 import uv.lis.logic.dto.Professor;
 import uv.lis.logic.exceptions.OperationException;
+import uv.lis.InputValidator;
 import uv.lis.logic.dao.ProfessorDAO;
 import uv.lis.logic.dao.UserDAO;
 import java.net.URL;
@@ -42,39 +43,29 @@ public class FXMLRegisterProfessorController implements Initializable {
 
     @FXML
     public void validateFields() {
+        String error;
 
-        String firstName = txtFirstName.getText().trim();
-        String lastName = txtLastName.getText().trim();
-        String password = txtPassword.getText().trim();
-        String personnelNumber = txtPersonnelNumber.getText().trim();
-
-        if (firstName.isEmpty() || firstName.length() > 50) {
-            showError("El nombre no puede estar vacío o tener más de 50 caracteres");
+        error = InputValidator.validateName(txtFirstName, "El nombre", 50);
+        if (error != null) {
+            showError(error);
             return;
         }
 
-        if (!firstName.matches("[\\p{L}\\s]+")) {
-            showError("El nombre solo acepta letras");
+        error = InputValidator.validateName(txtLastName, "Los apellidos", 50);
+        if (error != null) {
+            showError(error);
             return;
         }
 
-        if (lastName.isEmpty() || lastName.length() > 50) {
-            showError("Los apellidos no pueden estar vacíos o tener más de 50 caracteres");
+        error = InputValidator.validatePassword(txtPassword);
+        if (error != null) {
+            showError(error);
             return;
         }
 
-        if (!lastName.matches("[\\p{L}\\s]+")) {
-            showError("Los apellidos solo aceptan letras");
-            return;
-        }
-
-        if (password.isEmpty() || password.length() < 6) {
-            showError("La contraseña debe tener al menos 6 caracteres");
-            return;
-        }
-
-        if (personnelNumber.isEmpty()) {
-            showError("El número de personal es obligatorio");
+        error = InputValidator.validateRequired(txtPersonnelNumber, "El número de personal");
+        if (error != null) {
+            showError(error);
             return;
         }
 
@@ -128,8 +119,11 @@ public class FXMLRegisterProfessorController implements Initializable {
                 comboBoxCoordinator.getValue().equals("Si");
 
         professor.setIsCoordinator(isCoordinator);
-
-        professor.setUserType(isCoordinator ? "Coordinador" : "Maestro");
+        if(isCoordinator) {
+            professor.setUserType("Coordinador");
+        } else {
+            professor.setUserType("Profesor");
+        }
         professor.setInactive(false);
 
         return professor;
