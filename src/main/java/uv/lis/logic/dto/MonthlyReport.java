@@ -29,4 +29,23 @@ public class MonthlyReport extends Report {
     public void setReportedHours(int reportedHours) {
         this.reportedHours = reportedHours;
     }
+
+    @Override
+    public boolean equals(Object object) {
+        if (this == object) {
+            return true;
+        }
+
+        if (object == null || getClass() != object.getClass()) {
+            return false;
+        }
+
+        if (!super.equals(object)) 
+            return false;
+
+        MonthlyReport other = (MonthlyReport) object;
+        return month == other.month 
+        && reportedHours == other.reportedHours;
+        }
+    
 }

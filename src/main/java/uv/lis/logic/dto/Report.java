@@ -1,5 +1,7 @@
 package uv.lis.logic.dto;
 
+import java.util.Objects;
+
 public class Report {
     private int id;
     private String description;
@@ -66,5 +68,23 @@ public class Report {
 
     public void setCalification(float calification) {
         this.calification = calification;
+    }
+
+        @Override
+    public boolean equals(Object object) {
+        if (this == object) {
+            return true;
+        }
+        if (object == null || getClass() != object.getClass()) {
+            return false;
+        }
+        
+        Report other = (Report) object;
+        return id == other.id
+            && Objects.equals(description, other.description)
+            && Objects.equals(observations, other.observations)
+            && Objects.equals(activity, other.activity)
+            && Objects.equals(studentId, other.studentId)
+            && calification == calification;
     }
 }

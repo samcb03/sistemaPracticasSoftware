@@ -1,5 +1,6 @@
 package uv.lis.logic.dto;
 
+import java.util.Objects;
 
 public class FinalReport extends Report {
     private int advancePercentage;
@@ -35,4 +36,22 @@ public class FinalReport extends Report {
     public void setResult(String result) {
         this.result = result;
     }
+
+    @Override
+    public boolean equals(Object object) {
+        if (this == object) {
+            return true;
+        }
+
+        if (object == null || getClass() != object.getClass()) {
+            return false;
+        }
+
+        if (!super.equals(object)) 
+            return false;
+
+        FinalReport other = (FinalReport) object;
+        return advancePercentage == other.advancePercentage 
+        && Objects.equals(result, other.result);
+        }
 }

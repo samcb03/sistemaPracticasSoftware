@@ -153,21 +153,28 @@ public class Autoevaluation {
         totalScore += internshipImportance;
         this.finalScore = (totalScore / MAX_POSSIBLE_SCORE) * PERCENTAGE_MULTIPLIER;
     }
+
     @Override
     public boolean equals(Object object) {
         if (this == object) {
             return true;
         }
-        if (!(object instanceof Autoevaluation)) {
+        if (object == null || getClass() != object.getClass()) {
             return false;
         }
+        
         Autoevaluation other = (Autoevaluation) object;
-
-        return Objects.equals(this.idStudent, other.idStudent);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(idStudent,idStudent);
+        return Objects.equals(idStudent,other.idStudent)
+        && productiveParticipation == other.productiveParticipation
+        && appliedKnowledge == other.appliedKnowledge
+        && confidenceInActivities == other.confidenceInActivities
+        && activitiesInterest == other.activitiesInterest
+        && organizationSupport == other.organizationSupport
+        && rulesAwareness == other.rulesAwareness
+        && supervisorGuidance == other.supervisorGuidance
+        && effectiveMonitoring == other.effectiveMonitoring
+        && careerAlignment == other.careerAlignment
+        && internshipImportance == other.internshipImportance
+        && finalScore == other.finalScore;
     }
 }

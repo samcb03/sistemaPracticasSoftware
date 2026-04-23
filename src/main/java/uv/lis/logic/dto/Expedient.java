@@ -1,5 +1,7 @@
 package uv.lis.logic.dto;
 
+import java.util.Objects;
+
 public class Expedient {
     private String name;
     private String typeDocument;
@@ -44,6 +46,22 @@ public class Expedient {
 
     public void setIdStudent(String idStudent) {
         this.idStudent = idStudent;
+    }
+
+    @Override
+    public boolean equals(Object object) {
+        if (this == object) {
+            return true;
+        }
+        if (object == null || getClass() != object.getClass()) {
+            return false;
+        }
+        
+        Expedient other = (Expedient) object;
+        return name == other.name
+        && Objects.equals(typeDocument, other.typeDocument)
+        && Objects.equals(url, other.url)
+        && Objects.equals(idStudent, other.idStudent);
     }
 
 }
