@@ -22,6 +22,10 @@ public class ProfessorDAO extends UserDAO implements IProfessorDAO {
         this.connectionManager = new MySQLConnectionManager();
     }
     
+    public ProfessorDAO(MySQLConnectionManager connectionManager) {
+        this.connectionManager = connectionManager;
+    }
+    
     @Override
     public Professor getProfessorByPersonalNumber(String personnelNumber) throws OperationException {
         Professor professor = null;
