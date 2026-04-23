@@ -105,7 +105,7 @@ public class FXMLRegisterStudentController implements Initializable {
                 showError("Error registrando al usuario");
             }
         } catch (OperationException e) {
-            e.getMessage();
+            showError(e.getMessage());
         }
         
     }
