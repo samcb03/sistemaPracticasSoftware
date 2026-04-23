@@ -10,6 +10,8 @@ import static org.mockito.Mockito.when;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
+
 import java.lang.reflect.Field;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -39,6 +41,7 @@ class ProfessorDAOTest {
 
     @BeforeEach
     void setUp() throws Exception {
+        MockitoAnnotations.openMocks(this);
         professorDAO = new ProfessorDAO();
         Field field = ProfessorDAO.class.getDeclaredField("connectionManager");
         field.setAccessible(true);
@@ -66,10 +69,10 @@ class ProfessorDAOTest {
         when(preparedStatement.executeQuery()).thenReturn(resultSet);
         when(resultSet.next()).thenReturn(false);
 
-        OperationException exceeption = assertThrows(OperationException.class, () ->
+        OperationException exception = assertThrows(OperationException.class, () ->
             professorDAO.getProfessorByPersonalNumber("UV-999")
         );
-        assertTrue(exceeption.getMessage().contains("UV-999"));
+        assertTrue(exception.getMessage().contains("UV-999"));
     }
 
     @Test
