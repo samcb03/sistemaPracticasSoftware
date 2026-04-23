@@ -57,16 +57,16 @@ public class FXMLRegisterStudentController implements Initializable {
 
     @FXML
     public void validateFields() {
-        Optional<String> error = getFirstValidationError();
-        if (error.isPresent()) {
-            showError(error.get());
+        Optional<String> message = getValidationMessage();
+        if (message.isPresent()) {
+            showMessage(message.get());
         } else {
             labelError.setText("");
             registerStudent();
         }
     }
 
-    private Optional<String> getFirstValidationError() {
+    private Optional<String> getValidationMessage() {
         return Stream.of(
             validateFirstName(txtFirstName.getText().trim()),
             validateLastName(txtLastName.getText().trim()),
@@ -81,71 +81,71 @@ public class FXMLRegisterStudentController implements Initializable {
     }
 
     private Optional<String> validateFirstName(String firstName) {
-        Optional<String> error;
+        Optional<String> message;
         if (firstName.isEmpty() || firstName.length() > MAX_NAME_LENGTH) {
-            error = Optional.of("El nombre no puede estar vacío o tener más de "
+            message = Optional.of("El nombre no puede estar vacío o tener más de "
                 + MAX_NAME_LENGTH + " caracteres");
         } else if (!firstName.matches(LETTERS_ONLY_REGEX)) {
-            error = Optional.of("El nombre solo acepta letras");
+            message = Optional.of("El nombre solo acepta letras");
         } else {
-            error = Optional.empty();
+            message = Optional.empty();
         }
-        return error;
+        return message;
     }
 
     private Optional<String> validateLastName(String lastName) {
-        Optional<String> error;
+        Optional<String> message;
         if (lastName.isEmpty() || lastName.length() > MAX_NAME_LENGTH) {
-            error = Optional.of("Los apellidos no pueden estar vacíos o tener más de "
+            message = Optional.of("Los apellidos no pueden estar vacíos o tener más de "
                 + MAX_NAME_LENGTH + " caracteres");
         } else if (!lastName.matches(LETTERS_ONLY_REGEX)) {
-            error = Optional.of("Los apellidos solo aceptan letras");
+            message = Optional.of("Los apellidos solo aceptan letras");
         } else {
-            error = Optional.empty();
+            message = Optional.empty();
         }
-        return error;
+        return message;
     }
 
     private Optional<String> validatePassword(String password) {
-        Optional<String> error;
+        Optional<String> message;
         if (password.isEmpty() || password.length() < MIN_PASSWORD_LENGTH) {
-            error = Optional.of("La contraseña necesita al menos "
+            message = Optional.of("La contraseña necesita al menos "
                 + MIN_PASSWORD_LENGTH + " caracteres");
         } else {
-            error = Optional.empty();
+            message = Optional.empty();
         }
-        return error;
+        return message;
     }
 
     private Optional<String> validateStudentId(String studentId) {
-        Optional<String> error;
+        Optional<String> message;
         if (studentId.isEmpty() || studentId.length() != STUDENT_ID_LENGTH) {
-            error = Optional.of("La matrícula debe tener exactamente "
+            message = Optional.of("La matrícula debe tener exactamente "
                 + STUDENT_ID_LENGTH + " caracteres");
         } else {
-            error = Optional.empty();
+            message = Optional.empty();
         }
-        return error;
+        return message;
     }
 
     private Optional<String> validateBirthDate() {
-        Optional<String> error;
+        Optional<String> message;
         if (datePickerBirthDate.getValue() == null) {
-            error = Optional.of("Seleccione una fecha de nacimiento");
+            message = Optional.of("Seleccione una fecha de nacimiento");
         } else {
-            error = Optional.empty();
+            message = Optional.empty();
         }
-        return error;
+        return message;
     }
 
     private Optional<String> validateGender() {
-        Optional<String> error;
+        Optional<String> message;
         if (comboBoxGender.getValue() == null) {
-            error = Optional.of("Seleccione un género");
+            message = Optional.of("Seleccione un género");
         } else {
-            error = Optional.empty();
+            message = Optional.empty();
         }
-        return error;
+        return message;
     }
 
     private void registerStudent() {
@@ -154,18 +154,22 @@ public class FXMLRegisterStudentController implements Initializable {
             int generatedId = userDAO.registerUser(student);
             handleRegistrationResult(student, generatedId);
         } catch (OperationException e) {
-            showError(e.getMessage());
+            showMessage(e.getMessage());
         }
     }
 
-    private void handleRegistrationResult(Student student, int generatedId) throws OperationException {
+    private void handleRegistrationResult(Student student, int generatedId) {
         if (generatedId != NO_USER_GENERATED) {
             student.setId(generatedId);
-            studentDAO.registerStudent(student);
-            showSuccess("Estudiante registrado correctamente");
-            clearFields();
+            try {
+                studentDAO.registerStudent(student);
+                showSuccess("Estudiante registrado correctamente");
+                clearFields();
+            } catch (OperationException e) {
+                showMessage(e.getMessage());
+            }
         } else {
-            showError("Error registrando al usuario");
+            showMessage("Error registrando al usuario");
         }
     }
 
@@ -192,7 +196,7 @@ public class FXMLRegisterStudentController implements Initializable {
         comboBoxGender.setValue(null);
     }
 
-    private void showError(String message) {
+    private void showMessage(String message) {
         labelError.setText(message);
     }
 

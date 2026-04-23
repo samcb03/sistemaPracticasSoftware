@@ -1,5 +1,6 @@
 package uv.lis.GUI.controller;
 
+
 import uv.lis.logic.dto.AffiliatedOrganization;
 import uv.lis.logic.exceptions.OperationException;
 import uv.lis.logic.dao.AffiliatedOrganizationDAO;
@@ -15,9 +16,11 @@ import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
 
+
 public class FXMLRegisterAffiliedOrganization implements Initializable {
 
     private static final int MAX_NAME_LENGTH = 50;
+    private static final int MIN_POSITIVE_INTEGER = 0;
     private static final String LETTERS_ONLY_REGEX = "[\\p{L}\\s]+";
     private static final String EMAIL_REGEX = "^[\\w._%+\\-]+@[\\w.\\-]+\\.[a-zA-Z]{2,}$";
     private static final String PHONE_REGEX = "^[0-9]{7,15}$";
@@ -62,8 +65,10 @@ public class FXMLRegisterAffiliedOrganization implements Initializable {
             validateRequired(txtSector.getText().trim(), "El sector"),
             validateEmail(txtEmail.getText().trim()),
             validatePhoneNumber(txtPhoneNumber.getText().trim()),
-            validatePositiveInteger(txtNumberOfDirectUsers.getText().trim(), "El número de usuarios directos"),
-            validatePositiveInteger(txtNumberOfIndirectUsers.getText().trim(), "El número de usuarios indirectos")
+            validatePositiveInteger(txtNumberOfDirectUsers.getText().trim(), 
+                "El número de usuarios directos"),
+            validatePositiveInteger(txtNumberOfIndirectUsers.getText().trim(), 
+                "El número de usuarios indirectos")
         )
         .filter(Optional::isPresent)
         .map(Optional::get)
@@ -71,53 +76,66 @@ public class FXMLRegisterAffiliedOrganization implements Initializable {
     }
 
     private Optional<String> validateName(String value, String fieldName) {
+        Optional<String> message;
         if (value.isEmpty() || value.length() > MAX_NAME_LENGTH) {
-            return Optional.of(fieldName + " no puede estar vacío o tener más de "
+            message = Optional.of(fieldName + " no puede estar vacío o tener más de "
                 + MAX_NAME_LENGTH + " caracteres");
         } else if (!value.matches(LETTERS_ONLY_REGEX)) {
-            return Optional.of(fieldName + " solo acepta letras");
+            message = Optional.of(fieldName + " solo acepta letras");
+        } else {
+            message = Optional.empty();
         }
-        return Optional.empty();
+        return message;
     }
 
     private Optional<String> validateRequired(String value, String fieldName) {
+        Optional<String> message;
         if (value.isEmpty()) {
-            return Optional.of(fieldName + " es obligatorio");
+            message = Optional.of(fieldName + " es obligatorio");
+        } else {
+            message = Optional.empty();
         }
-        return Optional.empty();
+        return message;
     }
 
     private Optional<String> validateEmail(String value) {
+        Optional<String> message;
         if (value.isEmpty()) {
-            return Optional.of("El correo electrónico no puede estar vacío");
+            message = Optional.of("El correo electrónico no puede estar vacío");
         } else if (!value.matches(EMAIL_REGEX)) {
-            return Optional.of("El correo electrónico no tiene un formato válido");
+            message = Optional.of("El correo electrónico no tiene un formato válido");
+        } else {
+            message = Optional.empty();
         }
-        return Optional.empty();
+        return message;
     }
 
     private Optional<String> validatePhoneNumber(String value) {
+        Optional<String> message;
         if (value.isEmpty()) {
-            return Optional.of("El número de teléfono no puede estar vacío");
+            message = Optional.of("El número de teléfono no puede estar vacío");
         } else if (!value.matches(PHONE_REGEX)) {
-            return Optional.of("El número de teléfono solo acepta entre 7 y 15 dígitos");
+            message = Optional.of("El número de teléfono solo acepta entre 7 y 15 dígitos");
+        } else {
+            message = Optional.empty();
         }
-        return Optional.empty();
+        return message;
     }
 
     private Optional<String> validatePositiveInteger(String value, String fieldName) {
+        Optional<String> message = Optional.empty();
         if (value.isEmpty()) {
-            return Optional.of(fieldName + " no puede estar vacío");
+            message = Optional.of(fieldName + " no puede estar vacío");
         }
         try {
             int number = Integer.parseInt(value);
-            if (number < 0) {
-                return Optional.of(fieldName + " debe ser un número positivo");
+            if (number < MIN_POSITIVE_INTEGER) {
+                message = Optional.of(fieldName + " debe ser un número positivo");
             }
         } catch (NumberFormatException e) {
-            return Optional.of(fieldName + " debe ser un número entero válido");
+            message = Optional.of(fieldName + " debe ser un número entero válido");
         }
-        return Optional.empty();
+        return message;
     }
 
     private void registerAffiliatedOrganization() {
