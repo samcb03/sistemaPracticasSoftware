@@ -27,9 +27,9 @@ import javafx.stage.Stage;
 public class FXMLRegisterStudentController implements Initializable {
 
     private static final int MAX_NAME_LENGTH = 50;
-    private static final int MIN_PASSWORD_LENGTH = 6;
     private static final int STUDENT_ID_LENGTH = 9;
     private static final String LETTERS_ONLY_REGEX = "[\\p{L}\\s]+";
+    private static final String PASSWORD_REGEX = "^(?=.*[A-Z])(?=.*[a-z])(?=.*[0-9])(?=.*[!@#$%^&*]).{12,}$";
     private static final String USER_TYPE_STUDENT = "Student";
     private static final int NO_USER_GENERATED = -1;
 
@@ -107,13 +107,12 @@ public class FXMLRegisterStudentController implements Initializable {
     }
 
     private Optional<String> validatePassword(String password) {
-        Optional<String> message;
-        if (password.isEmpty() || password.length() < MIN_PASSWORD_LENGTH) {
-            message = Optional.of("La contraseña necesita al menos "
-                + MIN_PASSWORD_LENGTH + " caracteres");
-        } else {
-            message = Optional.empty();
-        }
+        Optional<String> message = Optional.empty();
+        if (password.isEmpty()) {
+            message = Optional.of("La contraseña no puede estar vacía");
+        } else if(!password.matches(PASSWORD_REGEX)) {
+            message = Optional.of("La contraseña no tiene un formato válido");
+        } 
         return message;
     }
 

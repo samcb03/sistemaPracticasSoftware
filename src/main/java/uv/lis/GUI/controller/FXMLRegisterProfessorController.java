@@ -21,7 +21,7 @@ public class FXMLRegisterProfessorController implements Initializable {
 
     private static final int MAX_FIRST_NAME_LENGTH = 50;
     private static final int MAX_LAST_NAME_LENGHT = 150;
-    private static final String PASSWORD_REGEX = "^(?=.*[A-Z])(?=.*[a-z])(?=.*[0-9])(?=.*[!@#$%^&*]).{8,}$";
+    private static final String PASSWORD_REGEX = "^(?=.*[A-Z])(?=.*[a-z])(?=.*[0-9])(?=.*[!@#$%^&*]).{12,}$";
     private static final String LETTERS_ONLY_REGEX = "[\\p{L}\\s]+";
     private static final String ONLY_NUMBERS = "\\d+";
 
