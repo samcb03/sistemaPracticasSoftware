@@ -37,16 +37,12 @@ public class Professor extends User {
         if (this == object) {
             return true;
         }
-        if (!(object instanceof Professor)) {
+        if (object == null || getClass() != object.getClass()) {
             return false;
         }
+        
         Professor other = (Professor) object;
-
-        return Objects.equals(this.personnelNumber, other.personnelNumber) && this.isCoordinator == other.isCoordinator;
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(personnelNumber,isCoordinator);
+        return personnelNumber == other.personnelNumber
+            && Objects.equals(isCoordinator, other.isCoordinator);
     }
 }

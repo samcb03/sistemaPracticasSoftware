@@ -68,16 +68,15 @@ public class Activity {
         if (this == object) {
             return true;
         }
-        if (!(object instanceof Professor)) {
+        if (object == null || getClass() != object.getClass()) {
             return false;
         }
+        
         Activity other = (Activity) object;
-
-        return Objects.equals(this.id, other.id);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id);
+        return id == other.id
+        && Objects.equals(name, other.name)
+        && Objects.equals(description, other.description)
+        && Objects.equals(startDate, other.startDate)
+        && Objects.equals(endDate, other.endDate);
     }
 }

@@ -1,5 +1,6 @@
 package uv.lis.logic.dto;
 
+
 public class PartialReport extends Report {
 
     private int plannedTime;
@@ -31,4 +32,22 @@ public class PartialReport extends Report {
     public void setRealTime(int realTime) {
         this.realTime = realTime;
     }
+
+    @Override
+    public boolean equals(Object object) {
+        if (this == object) {
+            return true;
+        }
+
+        if (object == null || getClass() != object.getClass()) {
+            return false;
+        }
+
+        if (!super.equals(object)) 
+            return false;
+
+        PartialReport other = (PartialReport) object;
+        return plannedTime == other.plannedTime 
+        && realTime == other.realTime;
+        }
 }

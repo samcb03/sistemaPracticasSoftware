@@ -1,5 +1,6 @@
 package uv.lis.logic.dto;
 
+import java.util.Objects;
 
 public class User {
     private int id;
@@ -76,5 +77,24 @@ public class User {
 
     public void setInactive(boolean isInactive) {
         this.isInactive = isInactive;
+    }
+
+    @Override
+    public boolean equals(Object object) {
+        if (this == object) {
+            return true;
+        }
+        if (object == null || getClass() != object.getClass()) {
+            return false;
+        }
+        
+        User other = (User) object;
+        return id == other.id
+            && Objects.equals(firstName, other.firstName)
+            && Objects.equals(lastName, other.lastName)
+            && Objects.equals(password, other.password)
+            && Objects.equals(identification, other.identification)
+            && Objects.equals(userType, other.userType)
+            && Objects.equals(isInactive, other.isInactive);
     }
 }

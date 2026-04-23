@@ -1,19 +1,18 @@
 package uv.lis.logic.dto;
 
+import java.util.Objects;
 
 public class ProjectSupervisor {
     private int id;
     private String name;
     private String email;
     private String position;
-    private int counter = 0;
 
     public ProjectSupervisor(){
 
     }
     
     public ProjectSupervisor(String name, String lastName, String email, String position) {
-        this.id = generateId();
         this.name = name;
         this.position = position;
         this.email = email;
@@ -50,8 +49,20 @@ public class ProjectSupervisor {
     public void setEmail(String email) {
         this.email = email;
     }
-    
-    private int generateId() {
-        return counter++;
+
+        @Override
+    public boolean equals(Object object) {
+        if (this == object) {
+            return true;
+        }
+        if (object == null || getClass() != object.getClass()) {
+            return false;
+        }
+        
+        ProjectSupervisor other = (ProjectSupervisor) object;
+        return id == other.id
+            && Objects.equals(name, other.name)
+            && Objects.equals(email, other.email)
+            && Objects.equals(position, other.position);
     }
 }

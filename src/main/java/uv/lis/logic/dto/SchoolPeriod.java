@@ -42,22 +42,19 @@ public class SchoolPeriod {
         this.endDate = endDate;
     }
 
-   @Override
+    @Override
     public boolean equals(Object object) {
         if (this == object) {
             return true;
         }
-        if (!(object instanceof SchoolPeriod)) {
+        if (object == null || getClass() != object.getClass()) {
             return false;
         }
+        
         SchoolPeriod other = (SchoolPeriod) object;
-
-        return Objects.equals(this.id, other.id);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id);
+        return id == other.id
+            && Objects.equals(startDate, other.startDate)
+            && Objects.equals(endDate, other.endDate);
     }
 
     }

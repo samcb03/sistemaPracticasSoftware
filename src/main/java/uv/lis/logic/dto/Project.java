@@ -10,7 +10,6 @@ public class Project {
     private int capacity;
     private String objective;
     private String description;
-    private int counter = 0;
     private ArrayList<Activity> activities;
     private AffiliatedOrganization affiliatedOrganization;
     private String idStudent;
@@ -23,7 +22,6 @@ public class Project {
         String objective, String description, 
         ArrayList<Activity> activities, String idStudent) {
 
-        this.id = generateId();
         this.name = name;
         this.methodology = methodology;
         this.capacity = capacity;
@@ -85,9 +83,6 @@ public class Project {
         return activities;
     }
     
-    private int generateId() {
-        return ++counter;
-    }
     public AffiliatedOrganization getAffiliatedOrganization() {
         return affiliatedOrganization;
     }
@@ -105,19 +100,22 @@ public class Project {
 
     @Override
     public boolean equals(Object object) {
-        if(this == object) {
+        if (this == object) {
             return true;
         }
-        if(!(object instanceof Project)) {
+        if (object == null || getClass() != object.getClass()) {
             return false;
         }
-            Project other = (Project) object;
-            return Objects.equals(this.id, other.id);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id);
-
+        
+        Project other = (Project) object;
+        return id == other.id
+            && Objects.equals(name, other.name)
+            && Objects.equals(methodology, other.methodology)
+            && capacity == other.capacity
+            && Objects.equals(objective, other.objective)
+            && Objects.equals(description, other.description)
+            && Objects.equals(activities, other.activities)
+            && Objects.equals(affiliatedOrganization, other.affiliatedOrganization)
+            && Objects.equals(idStudent, other.idStudent);
     }
 }

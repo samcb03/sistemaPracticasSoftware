@@ -1,5 +1,6 @@
 package uv.lis.logic.dto;
 
+import java.util.Objects;
 
 public class Subject {
     private final static String CAREER = "Ingenieria de Software";
@@ -47,6 +48,22 @@ public class Subject {
 
     public void setSchoolPeriod(String schoolPeriod) {
         this.schoolPeriod = schoolPeriod;
+    }
+
+    @Override
+    public boolean equals(Object object) {
+        if (this == object) {
+            return true;
+        }
+        if (object == null || getClass() != object.getClass()) {
+            return false;
+        }
+        
+        Subject other = (Subject) object;
+        return nrc == other.nrc
+            && Objects.equals(nrc, other.nrc)
+            && Objects.equals(professor, other.professor)
+            && Objects.equals(schoolPeriod, other.schoolPeriod);
     }
 
 }
