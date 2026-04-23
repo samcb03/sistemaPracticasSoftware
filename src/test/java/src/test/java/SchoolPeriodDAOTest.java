@@ -1,5 +1,6 @@
 package src.test.java;
 
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
@@ -20,13 +21,6 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-class SchoolPeriodDAOTest {
-
-    @Mock 
-    private PreparedStatement preparedStatement;
-
-    @Mock 
-    private ResultSet resultSet;
 
 class SchoolPeriodDAOTest {
 
