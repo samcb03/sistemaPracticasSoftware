@@ -18,6 +18,10 @@ public class SchoolPeriodDAO implements ISchoolPeriodDAO{
     private static final int NO_ROWS_AFFECTED = 0; 
     private static final Logger logger = Logger.getLogger(SchoolPeriodDAO.class.getName());
     private MySQLConnectionManager connectionManager;
+
+    public SchoolPeriodDAO(MySQLConnectionManager connectionManager) {
+        this.connectionManager = connectionManager;
+    }
     
     public SchoolPeriodDAO() {
         this.connectionManager = new MySQLConnectionManager();
