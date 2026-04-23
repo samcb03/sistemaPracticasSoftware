@@ -20,6 +20,13 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
+class SchoolPeriodDAOTest {
+
+    @Mock 
+    private PreparedStatement preparedStatement;
+
+    @Mock 
+    private ResultSet resultSet;
 
 class SchoolPeriodDAOTest {
 

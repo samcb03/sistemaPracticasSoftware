@@ -6,17 +6,16 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
 import java.lang.reflect.Field;
 import java.sql.Connection;
 import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-
 import uv.lis.dataaccess.MySQLConnectionManager;
 import uv.lis.logic.dao.ActivityDAO;
 import uv.lis.logic.dto.Activity;
@@ -41,6 +40,8 @@ class ActivityDAOTest {
 
     @BeforeEach
     void setUp() throws Exception {
+        MockitoAnnotations.openMocks(this);
+
         activityDAO = new ActivityDAO();
         Field field = ActivityDAO.class.getDeclaredField("connectionManager");
         field.setAccessible(true);

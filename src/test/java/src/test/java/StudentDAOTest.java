@@ -5,7 +5,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import java.sql.Connection;
 import java.sql.Date;
@@ -13,6 +12,8 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
 import uv.lis.dataaccess.MySQLConnectionManager;
 import uv.lis.logic.dao.StudentDAO;
 import uv.lis.logic.dto.Student;
@@ -20,24 +21,19 @@ import uv.lis.logic.exceptions.OperationException;
 
 
 public class StudentDAOTest {
-
-    private MySQLConnectionManager connectionManager;
-    private Connection connection;
-    private PreparedStatement preparedStatement;
-    private ResultSet resultSet;
-
     private StudentDAO studentDAO;
+
+    @Mock private MySQLConnectionManager connectionManager;
+    @Mock private Connection connection;
+    @Mock private PreparedStatement preparedStatement;
+    @Mock private ResultSet resultSet;
 
     @BeforeEach
     void setUp() throws Exception {
-        connectionManager = mock(MySQLConnectionManager.class);
-        connection = mock(Connection.class);
-        preparedStatement = mock(PreparedStatement.class);
-        resultSet = mock(ResultSet.class);
+        MockitoAnnotations.openMocks(this); 
 
         when(connectionManager.getConnection()).thenReturn(connection);
-
-        studentDAO = new StudentDAO();
+        studentDAO = new StudentDAO(connectionManager);
     }
 
     @Test
@@ -53,7 +49,6 @@ public class StudentDAOTest {
         when(resultSet.getString("contraseña")).thenReturn("123456");
         when(resultSet.getDate("fechaNacimiento")).thenReturn(new Date(System.currentTimeMillis()));
         when(resultSet.getString("genero")).thenReturn("Femenino");
-        when(resultSet.getBoolean("lenguaIndigena")).thenReturn(false);
 
         Student expectedStudent = new Student(1, "Denisse", "Reyes", "123456", 
             "S123", new Date(System.currentTimeMillis()), 0, "Femenino");
