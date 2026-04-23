@@ -17,7 +17,7 @@ public class Main extends Application {
     public void start(Stage stage) throws Exception {
 
         FXMLLoader loaderStudent = new FXMLLoader(
-            getClass().getResource("/uv/lis/GUI/FXMLRegisterStudent.fxml")
+            getClass().getResource("/uv/lis/GUI/view/FXMLRegisterStudent.fxml")
         );
         Stage stageStudent = new Stage();
         stageStudent.setTitle("Registro de Estudiante");
@@ -25,7 +25,7 @@ public class Main extends Application {
         stageStudent.show();
 
         FXMLLoader loaderProfessor = new FXMLLoader(
-            getClass().getResource("/uv/lis/GUI/FXMLRegisterProfessor.fxml")
+            getClass().getResource("/uv/lis/GUI/view/FXMLRegisterProfessor.fxml")
         );
         Stage stageProfessor = new Stage();
         stageProfessor.setTitle("Registro de Profesor");
@@ -33,7 +33,7 @@ public class Main extends Application {
         stageProfessor.show();
 
         FXMLLoader loaderOrganization = new FXMLLoader(
-            getClass().getResource("/uv/lis/GUI/FXMLRegisterAffiliedOrganization.fxml")
+            getClass().getResource("/uv/lis/GUI/view/FXMLRegisterAffiliedOrganization.fxml")
         );
         Stage stageOrganization = new Stage();
         stageOrganization.setTitle("Registro de Organización Vinculada");
@@ -41,7 +41,7 @@ public class Main extends Application {
         stageOrganization.show();
 
         FXMLLoader loaderProject = new FXMLLoader(
-            getClass().getResource("/uv/lis/GUI/FXMLRegisterProject.fxml")
+            getClass().getResource("/uv/lis/GUI/view/FXMLRegisterProject.fxml")
         );
         Stage stageProject = new Stage();
         stageProject.setTitle("Registro de Proyecto");

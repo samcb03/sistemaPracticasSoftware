@@ -24,6 +24,7 @@ public class FXMLRegisterProfessorController implements Initializable {
     private static final String PASSWORD_REGEX = "^(?=.*[A-Z])(?=.*[a-z])(?=.*[0-9])(?=.*[!@#$%^&*]).{12,}$";
     private static final String LETTERS_ONLY_REGEX = "[\\p{L}\\s]+";
     private static final String ONLY_NUMBERS = "\\d+";
+    private static final int INVALID_ID = -1;
 
     @FXML private Button buttonBack;
     @FXML private Button buttonRegister;
@@ -120,7 +121,7 @@ public class FXMLRegisterProfessorController implements Initializable {
         try {
             int generatedId = userDAO.registerUser(professor);
 
-            if (generatedId != -1) {
+            if (generatedId != INVALID_ID) {
                 professor.setId(generatedId);
 
                 boolean result = professorDAO.registerProfessor(professor);
