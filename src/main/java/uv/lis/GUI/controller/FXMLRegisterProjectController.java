@@ -71,7 +71,7 @@ public class FXMLRegisterProjectController implements Initializable {
         Optional<String> error;
         if (name.isEmpty() || name.length() > MAX_NAME_LENGTH) {
             error = Optional.of("El nombre no puede estar vacío o tener más de "
-                    + MAX_NAME_LENGTH + " caracteres");
+                + MAX_NAME_LENGTH + " caracteres");
         } else {
             error = Optional.empty();
         }
