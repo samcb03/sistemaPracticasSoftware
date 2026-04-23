@@ -67,7 +67,7 @@
                           layoutX="160.0" layoutY="217.0"
                           prefHeight="25.0" prefWidth="250.0" />
 
-                <Label fx:id="labelError"
+                <Label fx:id="labelMessage"
                        layoutX="30.0" layoutY="300.0"
                        prefWidth="390.0"
                        style="-fx-text-fill: red;">
