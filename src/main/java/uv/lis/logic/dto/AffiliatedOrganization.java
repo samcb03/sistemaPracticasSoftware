@@ -17,6 +17,7 @@ public class AffiliatedOrganization {
 
     public AffiliatedOrganization(){
         
+        
     }
    
     public AffiliatedOrganization(String name, String city,

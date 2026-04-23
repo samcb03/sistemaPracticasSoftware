@@ -19,7 +19,7 @@ public class StudentDAO extends UserDAO implements IStudentDAO {
     private MySQLConnectionManager connectionManager;
 
     public StudentDAO(){
-
+        this.connectionManager = new MySQLConnectionManager();
     }
     
     public StudentDAO(MySQLConnectionManager connectionManager) {

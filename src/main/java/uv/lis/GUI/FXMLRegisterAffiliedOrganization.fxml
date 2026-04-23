@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.Pane?>
+<?import javafx.scene.text.Font?>
+
+<AnchorPane prefHeight="520.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1"
+    fx:controller="uv.lis.GUI.controller.FXMLRegisterAffiliedOrganization">
+    <children>
+
+        <Label layoutY="-1.0" prefHeight="20.0" prefWidth="600.0" style="-fx-background-color: #a8c8e8;
+            -fx-border-color: BLACK;" text="Registrar Organización Vinculada" />
+
+        <Label layoutX="148.0" layoutY="29.0" text="Registrar Nueva Organización Vinculada">
+            <font><Font name="System Bold" size="20.0" /></font>
+        </Label>
+
+        <Pane layoutX="75.0" layoutY="60.0" prefHeight="430.0" prefWidth="450.0" style="
+            -fx-background-color: #cce4f7; -fx-background-radius: 20;">
+            <children>
+
+                <Label layoutX="120.0" layoutY="21.0" text="Información de la organización">
+                    <font><Font name="System Bold" size="15.0" /></font>
+                </Label>
+
+                <Label layoutX="30.0" layoutY="60.0" text="Nombre:">
+                    <font><Font size="13.0" /></font>
+                </Label>
+                <TextField fx:id="txtName" layoutX="200.0" layoutY="57.0" prefHeight="25.0" prefWidth="220.0" />
+
+                <Label layoutX="30.0" layoutY="100.0" text="Ciudad:">
+                    <font><Font size="13.0" /></font>
+                </Label>
+                <TextField fx:id="txtCity" layoutX="200.0" layoutY="97.0" prefHeight="25.0" prefWidth="220.0" />
+
+                <Label layoutX="30.0" layoutY="140.0" text="Estado:">
+                    <font><Font size="13.0" /></font>
+                </Label>
+                <TextField fx:id="txtState" layoutX="200.0" layoutY="137.0" prefHeight="25.0" prefWidth="220.0" />
+
+                <Label layoutX="30.0" layoutY="180.0" text="Sector:">
+                    <font><Font size="13.0" /></font>
+                </Label>
+                <TextField fx:id="txtSector" layoutX="200.0" layoutY="177.0" prefHeight="25.0" prefWidth="220.0" />
+
+                <Label layoutX="30.0" layoutY="220.0" text="Correo electrónico:">
+                    <font><Font size="13.0" /></font>
+                </Label>
+                <TextField fx:id="txtEmail" layoutX="200.0" layoutY="217.0" prefHeight="25.0" prefWidth="220.0" />
+
+                <Label layoutX="30.0" layoutY="260.0" text="Teléfono:">
+                    <font><Font size="13.0" /></font>
+                </Label>
+                <TextField fx:id="txtPhoneNumber" layoutX="200.0" layoutY="257.0" prefHeight="25.0" prefWidth="220.0" />
+
+                <Label layoutX="30.0" layoutY="300.0" text="Usuarios directos:">
+                    <font><Font size="13.0" /></font>
+                </Label>
+                <TextField fx:id="txtNumberOfDirectUsers" layoutX="200.0" layoutY="297.0" prefHeight="25.0" prefWidth="220.0" />
+
+                <Label layoutX="30.0" layoutY="340.0" text="Usuarios indirectos:">
+                    <font><Font size="13.0" /></font>
+                </Label>
+                <TextField fx:id="txtNumberOfIndirectUsers" layoutX="200.0" layoutY="337.0" prefHeight="25.0" prefWidth="220.0" />
+
+                <Label fx:id="labelError" layoutX="30.0" layoutY="375.0" prefWidth="390.0" style="-fx-text-fill: red;">
+                    <font><Font size="11.0" /></font>
+                </Label>
+
+                <Button fx:id="buttonRegister" layoutX="81.0" layoutY="395.0" mnemonicParsing="false"
+                    onAction="#validateFields" prefHeight="28.0" prefWidth="180.0"
+                    style="-fx-background-color: white;" text="Registrar Organización" />
+
+                <Button fx:id="buttonBack" layoutX="290.0" layoutY="395.0" mnemonicParsing="false"
+                    onAction="#goBack" prefHeight="28.0" prefWidth="80.0"
+                    style="-fx-background-color: white;" text="Cancelar" />
+
+            </children>
+        </Pane>
+
+    </children>
+</AnchorPane>
