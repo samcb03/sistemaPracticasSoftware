@@ -1,5 +1,6 @@
 package uv.lis.GUI.controller;
 
+
 import uv.lis.logic.dto.AffiliatedOrganization;
 import uv.lis.logic.exceptions.OperationException;
 import uv.lis.InputValidator;
@@ -13,6 +14,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
+
 
 public class FXMLRegisterAffiliedOrganization implements Initializable {
 

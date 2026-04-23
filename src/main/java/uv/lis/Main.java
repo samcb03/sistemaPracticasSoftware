@@ -39,5 +39,13 @@ public class Main extends Application {
         stageOrganization.setTitle("Registro de Organización Vinculada");
         stageOrganization.setScene(new Scene(loaderOrganization.load()));
         stageOrganization.show();
+
+        FXMLLoader loaderProject = new FXMLLoader(
+            getClass().getResource("/uv/lis/GUI/FXMLRegisterProject.fxml")
+        );
+        Stage stageProject = new Stage();
+        stageProject.setTitle("Registro de Proyecto");
+        stageProject.setScene(new Scene(loaderProject.load()));
+        stageProject.show();
     }
 }
