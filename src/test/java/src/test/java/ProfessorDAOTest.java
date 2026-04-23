@@ -216,7 +216,7 @@ class ProfessorDAOTest {
     }
 
     @Test
-    void inactivate_Professor_sqlError_throwsOperationException() throws Exception {
+    void inactivateProfessor_sqlError_throwsOperationException() throws Exception {
         Professor professor = buildProfessor("UV-001", "Ana", "García", false);
 
         when(connectionManager.getConnection()).thenThrow(new SQLException("Fallo"));

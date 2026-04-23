@@ -76,14 +76,14 @@ class AutoevaluationDAOTest {
     }
 
     @Test
-    void testRegisterAutoevaluationSuccess() throws Exception {
+    void registerAutoevaluation_successful_returnsTrue() throws Exception {
         mockUpdateExecution(1);
 
         assertTrue(autoevaluationDAO.registerAutoevaluation(buildExpectedAutoevaluation()));
     }
 
     @Test
-    void testRegisterAutoevaluationFailed() throws Exception {
+    void registerAutoevaluation_failure_returnsFalse() throws Exception {
         mockUpdateExecution(0);
 
         assertThrows(OperationException.class, () ->
@@ -92,7 +92,7 @@ class AutoevaluationDAOTest {
     }
 
     @Test
-    void testRegisterAutoevaluationDatabaseError() throws Exception {
+    void registerAutoevaluation_sqlError_returnsOperationException() throws Exception {
         when(connection.prepareStatement(anyString())).thenThrow(new SQLException("DB error"));
 
         assertThrows(OperationException.class, () ->
@@ -101,7 +101,7 @@ class AutoevaluationDAOTest {
     }
 
     @Test
-    void testExistsByStudentSuccess() throws Exception {
+    void existsByStudent_succesful_returnsTrue() throws Exception {
         mockQueryExecution();
         mockResultSetAutoevaluation();
 
@@ -109,7 +109,7 @@ class AutoevaluationDAOTest {
     }
 
     @Test
-    void testExistsByStudentNotFound() throws Exception {
+    void existsByStudent_failure_returnsFalse() throws Exception {
         mockQueryExecution();
         when(resultSet.next()).thenReturn(false);
 
@@ -117,7 +117,7 @@ class AutoevaluationDAOTest {
     }
 
     @Test
-    void testExistsByStudentDatabaseError() throws Exception {
+    void existsByStudent_sqlError_returnsOperationException() throws Exception {
         when(connection.prepareStatement(anyString())).thenThrow(new SQLException("DB error"));
 
         assertThrows(OperationException.class, () ->

@@ -37,7 +37,7 @@ public class StudentDAOTest {
     }
 
     @Test
-    void testGetStudentByIdSuccess() throws Exception {
+    void getStudentById_successful_returnsStudent() throws Exception {
         when(connection.prepareStatement(anyString())).thenReturn(preparedStatement);
         when(preparedStatement.executeQuery()).thenReturn(resultSet);
 
@@ -58,7 +58,7 @@ public class StudentDAOTest {
 
 
     @Test
-    void testGetStudentByIdNotFound() throws Exception {
+    void getStudentById_failure_returnsOperationException() throws Exception {
         when(connection.prepareStatement(anyString())).thenReturn(preparedStatement);
         when(preparedStatement.executeQuery()).thenReturn(resultSet);
 
@@ -70,7 +70,7 @@ public class StudentDAOTest {
     }
 
     @Test
-    void testRegisterStudentSuccess() throws Exception {
+    void registerStudent_successful_returnsTrue() throws Exception {
         when(connection.prepareStatement(anyString())).thenReturn(preparedStatement);
         when(preparedStatement.executeUpdate()).thenReturn(1);
 
@@ -87,7 +87,7 @@ public class StudentDAOTest {
     }
 
     @Test
-    void testRegisterStudentFail() throws Exception {
+    void registerStudent_failure_returnsFalse() throws Exception {
         when(connection.prepareStatement(anyString())).thenReturn(preparedStatement);
         when(preparedStatement.executeUpdate()).thenReturn(0);
 
@@ -102,7 +102,7 @@ public class StudentDAOTest {
     }
 
     @Test
-    void testModifyStudentSuccess() throws Exception {
+    void modifyStudent_successful_returnsTrue() throws Exception {
         when(connection.prepareStatement(anyString())).thenReturn(preparedStatement);
         when(preparedStatement.executeUpdate()).thenReturn(1);
 
@@ -118,7 +118,7 @@ public class StudentDAOTest {
     }
 
     @Test
-    void testInactivateStudentSuccess() throws Exception {
+    void inactivateStudent_successful_returnsTrue() throws Exception {
         when(connection.prepareStatement(anyString())).thenReturn(preparedStatement);
         when(preparedStatement.executeUpdate()).thenReturn(1);
 

@@ -68,7 +68,7 @@ class SchoolPeriodDAOTest {
     }
 
     @Test
-    void testGetSchoolPeriodByIdSuccess() throws Exception {
+    void getSchoolPeriodById_success_returnsSchoolPeriod() throws Exception {
         mockQueryExecution();
         mockResultSetSchoolPeriod();
 
@@ -78,7 +78,7 @@ class SchoolPeriodDAOTest {
     }
 
     @Test
-    void testGetSchoolPeriodByIdNotFound() throws Exception {
+    void getSchoolPeriodById_failure_returnsOperationException() throws Exception {
         mockQueryExecution();
         when(resultSet.next()).thenReturn(false);
 
@@ -87,7 +87,7 @@ class SchoolPeriodDAOTest {
     }
 
     @Test
-    void testGetSchoolPeriodByIdDatabaseError() throws Exception {
+    void getSchoolPeriodById_sqlError_returnsOperationException() throws Exception {
         when(connection.prepareStatement(anyString())).thenThrow(new SQLException("DB error"));
 
         assertThrows(OperationException.class,
@@ -95,7 +95,7 @@ class SchoolPeriodDAOTest {
     }
 
     @Test
-    void testRegisterSchoolPeriodSuccess() throws Exception {
+    void registerSchoolPeriod_success_returnsTrue() throws Exception {
         mockUpdateExecution(1);
 
         SchoolPeriod schoolPeriodToRegister = buildExpectedSchoolPeriod();
@@ -104,7 +104,7 @@ class SchoolPeriodDAOTest {
     }
 
     @Test
-    void testRegisterSchoolPeriodFailed() throws Exception {
+    void registerSchoolPeriod_failure_returnsOperationException() throws Exception {
         mockUpdateExecution(0);
 
         SchoolPeriod schoolPeriodToRegister = buildExpectedSchoolPeriod();
@@ -114,7 +114,7 @@ class SchoolPeriodDAOTest {
     }
 
     @Test
-    void testRegisterSchoolPeriodDatabaseError() throws Exception {
+    void registerSchoolPeriod_sqlError_returnsOperationException() throws Exception {
         when(connection.prepareStatement(anyString())).thenThrow(new SQLException("DB error"));
 
         SchoolPeriod schoolPeriodToRegister = buildExpectedSchoolPeriod();
@@ -124,7 +124,7 @@ class SchoolPeriodDAOTest {
     }
 
     @Test
-    void testModifySchoolPeriodSuccess() throws Exception {
+    void modifySchoolPeriod_success_returnsTrue() throws Exception {
         mockUpdateExecution(1);
 
         SchoolPeriod schoolPeriodToModify = buildExpectedSchoolPeriod();
@@ -133,7 +133,7 @@ class SchoolPeriodDAOTest {
     }
 
     @Test
-    void testModifySchoolPeriodFailed() throws Exception {
+    void modifySchoolPeriod_failure_returnsOperationException() throws Exception {
         mockUpdateExecution(0);
 
         SchoolPeriod schoolPeriodToModify = buildExpectedSchoolPeriod();
@@ -143,7 +143,7 @@ class SchoolPeriodDAOTest {
     }
 
     @Test
-    void testModifySchoolPeriodDatabaseError() throws Exception {
+    void modifySchoolPeriod_sqlError_returnsOperationException() throws Exception {
         when(connection.prepareStatement(anyString())).thenThrow(new SQLException("DB error"));
 
         SchoolPeriod schoolPeriodToModify = buildExpectedSchoolPeriod();
@@ -153,7 +153,7 @@ class SchoolPeriodDAOTest {
     }
 
     @Test
-    void testExistsSchoolPeriodTrue() throws Exception {
+    void existsSchoolPeriod_succesful_returnsTrue() throws Exception {
         mockQueryExecution();
         when(resultSet.next()).thenReturn(true);
 
@@ -161,7 +161,7 @@ class SchoolPeriodDAOTest {
     }
 
     @Test
-    void testExistsSchoolPeriodFalse() throws Exception {
+    void existsSchoolPeriod_failure_returnsFalse() throws Exception {
         mockQueryExecution();
         when(resultSet.next()).thenReturn(false);
 
@@ -169,7 +169,7 @@ class SchoolPeriodDAOTest {
     }
 
     @Test
-    void testExistsSchoolPeriodDatabaseError() throws Exception {
+    void existsSchoolPeriod_sqlError_returnsOperationException() throws Exception {
         when(connection.prepareStatement(anyString())).thenThrow(new SQLException("DB error"));
 
         assertThrows(OperationException.class,

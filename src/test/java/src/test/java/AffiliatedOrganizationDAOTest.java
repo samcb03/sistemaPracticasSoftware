@@ -78,7 +78,7 @@ class AffiliatedOrganizationDAOTest {
     }
 
     @Test
-    void testGetOrganizationByIdSuccess() throws Exception {
+    void getOrganizationById_succesful_returnsOrganization() throws Exception {
         mockQueryExecution();
         mockResultSetOrganization();
 
@@ -88,7 +88,7 @@ class AffiliatedOrganizationDAOTest {
     }
 
     @Test
-    void testGetOrganizationByIdNotFound() throws Exception {
+    void getOrganizationById_failure_returnsOperationException() throws Exception {
         mockQueryExecution();
         when(resultSet.next()).thenReturn(false);
 
@@ -97,7 +97,7 @@ class AffiliatedOrganizationDAOTest {
     }
 
     @Test
-    void testGetOrganizationByIdDatabaseError() throws Exception {
+    void getOrganizationById_sqlError_returnsOperationException() throws Exception {
         when(connection.prepareStatement(anyString())).thenThrow(new SQLException("DB error"));
 
         assertThrows(OperationException.class, 
@@ -105,7 +105,7 @@ class AffiliatedOrganizationDAOTest {
     }
 
     @Test
-    void testRegisterOrganizationSuccess() throws Exception {
+    void registerOrganization_succesful_returnsTrue() throws Exception {
         mockUpdateExecution(1);
         when(preparedStatement.getGeneratedKeys()).thenReturn(resultSet);
         when(resultSet.next()).thenReturn(true);
@@ -117,7 +117,7 @@ class AffiliatedOrganizationDAOTest {
     }
 
     @Test
-    void testRegisterOrganizationFailed() throws Exception {
+    void registerOrganization_failure_returnsFalse() throws Exception {
         mockUpdateExecution(0);
 
         AffiliatedOrganization organizationToRegister = buildExpectedOrganization();
@@ -127,7 +127,7 @@ class AffiliatedOrganizationDAOTest {
     }
 
     @Test
-    void testRegisterOrganizationDatabaseError() throws Exception {
+    void registerOrganization_sqlError_returnsOperationException() throws Exception {
         when(connection.prepareStatement(anyString(), anyInt())).thenThrow(new SQLException("DB error"));
 
         AffiliatedOrganization organizationToRegister = buildExpectedOrganization();
@@ -137,7 +137,7 @@ class AffiliatedOrganizationDAOTest {
     }
 
     @Test
-    void testModifyOrganizationSuccess() throws Exception {
+    void modifyOrganization_succesful_returnsAffiliatedOrganization() throws Exception {
         when(connection.prepareStatement(anyString())).thenReturn(preparedStatement);
         when(preparedStatement.executeUpdate()).thenReturn(1);
 
@@ -147,7 +147,7 @@ class AffiliatedOrganizationDAOTest {
     }
 
     @Test
-    void testModifyOrganizationFailed() throws Exception {
+    void modifyOrganization_failure_returnsAffiliatedOrganization() throws Exception {
         when(connection.prepareStatement(anyString())).thenReturn(preparedStatement);
         when(preparedStatement.executeUpdate()).thenReturn(0);
 
@@ -158,7 +158,12 @@ class AffiliatedOrganizationDAOTest {
     }
 
     @Test
-    void testInactivateOrganizationSuccess() throws Exception {
+    void modifyOrganization_sqlError_returnsOperationException() throws Exception {
+
+    }
+
+    @Test
+    void inactivateOrganization_succesful_returnsTrue() throws Exception {
         when(connection.prepareStatement(anyString())).thenReturn(preparedStatement);
         when(preparedStatement.executeUpdate()).thenReturn(1);
 
@@ -168,7 +173,7 @@ class AffiliatedOrganizationDAOTest {
     }
 
     @Test
-    void testInactivateOrganizationFailed() throws Exception {
+    void inactivateOrganization_failure_returnsFalse() throws Exception {
         when(connection.prepareStatement(anyString())).thenReturn(preparedStatement);
         when(preparedStatement.executeUpdate()).thenReturn(0);
 
@@ -176,5 +181,10 @@ class AffiliatedOrganizationDAOTest {
 
         assertThrows(OperationException.class, 
             () -> affiliatedOrganizationDAO.inactivateOrganization(organizationToInactivate));
+    }
+
+    @Test
+    void inactivateOrganization_sqlError_returnsOperationException() throws Exception {
+
     }
 }
