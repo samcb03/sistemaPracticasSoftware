@@ -1,5 +1,6 @@
 package uv.lis.GUI.controller;
 
+
 import uv.lis.logic.dto.Project;
 import uv.lis.logic.exceptions.OperationException;
 import uv.lis.logic.dao.ProjectDAO;
@@ -16,6 +17,7 @@ import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.Pane;
 import javafx.stage.Stage;
+
 
 public class FXMLRegisterProjectController implements Initializable {
 
@@ -45,16 +47,16 @@ public class FXMLRegisterProjectController implements Initializable {
 
     @FXML
     public void validateFields() {
-        Optional<String> error = getFirstValidationError();
-        if (error.isPresent()) {
-            showError(error.get());
+        Optional<String> message = getValidationMessage();
+        if (message.isPresent()) {
+            showMessage(message.get());
         } else {
             labelError.setText("");
             registerProject();
         }
     }
 
-    private Optional<String> getFirstValidationError() {
+    private Optional<String> getValidationMessage() {
         return Stream.of(
             validateName(txtName.getText().trim()),
             validateMethodology(txtMethodology.getText().trim()),
@@ -68,72 +70,72 @@ public class FXMLRegisterProjectController implements Initializable {
     }
 
     private Optional<String> validateName(String name) {
-        Optional<String> error;
+        Optional<String> message;
         if (name.isEmpty() || name.length() > MAX_NAME_LENGTH) {
-            error = Optional.of("El nombre no puede estar vacío o tener más de "
+            message = Optional.of("El nombre no puede estar vacío o tener más de "
                 + MAX_NAME_LENGTH + " caracteres");
         } else {
-            error = Optional.empty();
+            message = Optional.empty();
         }
-        return error;
+        return message;
     }
 
     private Optional<String> validateMethodology(String methodology) {
-        Optional<String> error;
+        Optional<String> message;
         if (methodology.isEmpty() || methodology.length() > MAX_METHODOLOGY_LENGTH) {
-            error = Optional.of("La metodología no puede estar vacía o tener más de "
+            message = Optional.of("La metodología no puede estar vacía o tener más de "
                     + MAX_METHODOLOGY_LENGTH + " caracteres");
         } else {
-            error = Optional.empty();
+            message = Optional.empty();
         }
-        return error;
+        return message;
     }
 
     private Optional<String> validateCapacity(String capacityStr) {
-        Optional<String> error;
+        Optional<String> message;
         if (capacityStr.isEmpty()) {
-            error = Optional.of("El cupo no puede estar vacío");
+            message = Optional.of("El cupo no puede estar vacío");
         } else {
-            error = validateCapacityValue(capacityStr);
+            message = validateCapacityValue(capacityStr);
         }
-        return error;
+        return message;
     }
 
     private Optional<String> validateCapacityValue(String capacityStr) {
-        Optional<String> error;
+        Optional<String> message;
         try {
             int capacity = Integer.parseInt(capacityStr);
             if (capacity < MIN_CAPACITY) {
-                error = Optional.of("El cupo debe ser un número mayor a 0");
+                message = Optional.of("El cupo debe ser un número mayor a 0");
             } else {
-                error = Optional.empty();
+                message = Optional.empty();
             }
         } catch (NumberFormatException e) {
-            error = Optional.of("El cupo debe ser un número válido");
+            message = Optional.of("El cupo debe ser un número válido");
         }
-        return error;
+        return message;
     }
 
     private Optional<String> validateObjective(String objective) {
-        Optional<String> error;
+        Optional<String> message;
         if (objective.isEmpty() || objective.length() > MAX_OBJECTIVE_LENGTH) {
-            error = Optional.of("El objetivo no puede estar vacío o tener más de "
+            message = Optional.of("El objetivo no puede estar vacío o tener más de "
                     + MAX_OBJECTIVE_LENGTH + " caracteres");
         } else {
-            error = Optional.empty();
+            message = Optional.empty();
         }
-        return error;
+        return message;
     }
 
     private Optional<String> validateDescription(String description) {
-        Optional<String> error;
+        Optional<String> message;
         if (description.isEmpty() || description.length() > MAX_DESCRIPTION_LENGTH) {
-            error = Optional.of("La descripción no puede estar vacía o tener más de "
-                    + MAX_DESCRIPTION_LENGTH + " caracteres");
+            message = Optional.of("La descripción no puede estar vacía o tener más de "
+                + MAX_DESCRIPTION_LENGTH + " caracteres");
         } else {
-            error = Optional.empty();
+            message = Optional.empty();
         }
-        return error;
+        return message;
     }
 
     private void registerProject() {
@@ -142,7 +144,7 @@ public class FXMLRegisterProjectController implements Initializable {
             boolean registered = projectDAO.registerProject(project);
             handleRegistrationResult(registered);
         } catch (OperationException e) {
-            showError(e.getMessage());
+            showMessage(e.getMessage());
         }
     }
 
@@ -151,7 +153,7 @@ public class FXMLRegisterProjectController implements Initializable {
             showSuccess("Proyecto registrado correctamente");
             clearFields();
         } else {
-            showError("Error al registrar el proyecto");
+            showMessage("Error al registrar el proyecto");
         }
     }
 
@@ -173,7 +175,7 @@ public class FXMLRegisterProjectController implements Initializable {
         txtDescription.clear();
     }
 
-    private void showError(String message) {
+    private void showMessage(String message) {
         labelError.setText(message);
     }
 
