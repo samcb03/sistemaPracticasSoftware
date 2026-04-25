@@ -106,7 +106,7 @@ public class AffiliatedOrganizationDAO implements IAffiliatedOrganizationDAO{
             }   
         } catch (SQLException e) {
             LOGGER.log(Level.SEVERE, "Error de conexion con la base de datos",e);
-            throw new OperationException("Error al registrar la organización vinculada", e);
+            throw new OperationException("No se pudo registrar la Organizacion. Intentelo mas tarde", e);
 
         }
         return isRegistered;
