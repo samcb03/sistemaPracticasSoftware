@@ -4,9 +4,9 @@ package uv.lis.GUI.controller;
 import uv.lis.logic.dto.Project;
 import uv.lis.logic.exceptions.OperationException;
 import uv.lis.logic.dao.ProjectDAO;
-import uv.lis.logic.dto.AffiliatedOrganization;
 import uv.lis.logic.dao.AffiliatedOrganizationDAO;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.Optional;
 import java.util.ResourceBundle;
 import java.util.stream.Stream;
@@ -19,7 +19,6 @@ import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
-import javafx.scene.layout.Pane;
 import javafx.stage.Stage;
 import static uv.lis.logic.utils.InputValidator.MAX_TEXT_LENGTH;
 import static uv.lis.logic.utils.InputValidator.MIN_POSITIVE_INTEGER;
@@ -38,15 +37,18 @@ public class FXMLRegisterProjectController implements Initializable {
     @FXML private ComboBox<String> comboBoxOrganizationName;
 
     private ProjectDAO projectDAO;
-    private AffiliatedOrganization affiliatedOrganization;
+    private AffiliatedOrganizationDAO affiliatedOrganizationDAO;
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
         projectDAO = new ProjectDAO();
-
-        comboBoxOrganizationName.setItems(
-            FXCollections.observableArrayList(affiliatedOrganization.getAllOrganizationNames)
-        );
+        affiliatedOrganizationDAO = new AffiliatedOrganizationDAO();
+        try {
+            ArrayList<String> names = affiliatedOrganizationDAO.getAllOrganizationNames();
+            comboBoxOrganizationName.setItems(FXCollections.observableArrayList(names));
+        } catch (OperationException e) {
+                showMessage(e.getMessage());
+        }
     }
 
     @FXML

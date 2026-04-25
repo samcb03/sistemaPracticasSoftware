@@ -5,6 +5,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import uv.lis.dataaccess.MySQLConnectionManager;
@@ -180,4 +181,22 @@ public class AffiliatedOrganizationDAO implements IAffiliatedOrganizationDAO{
         return isInactive;
     }
 
+    public ArrayList<String> getAllOrganizationNames() throws OperationException{
+        String afilliatedOrganizationQuery = "SELECT nombreOV FROM OrganizacionVinculada";
+        ArrayList<String> organizationNames = new ArrayList<>();
+
+        try (Connection databaseConnection = connectionManager.getConnection();
+             PreparedStatement preparedStatement = databaseConnection.prepareStatement(afilliatedOrganizationQuery)) {
+                try (ResultSet resultSet = preparedStatement.executeQuery()) {
+                    while (resultSet.next()) {
+                        organizationNames.add(resultSet.getString("nombreOV"));
+                    } 
+            }
+        } catch (SQLException e) {
+               LOGGER.log(Level.SEVERE, "Error de conexion con la base de datos",e);
+                throw new OperationException("Error al conseguir la organización vinculada", e);
+        }
+
+        return organizationNames;
+    }
 }
