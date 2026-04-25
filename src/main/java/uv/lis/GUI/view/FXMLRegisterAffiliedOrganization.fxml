@@ -29,42 +29,42 @@
                 <Label layoutX="30.0" layoutY="60.0" text="Nombre:">
                     <font><Font size="13.0" /></font>
                 </Label>
-                <TextField fx:id="txtName" layoutX="200.0" layoutY="57.0" prefHeight="25.0" prefWidth="220.0" />
+                <TextField fx:id="textFieldName" layoutX="200.0" layoutY="57.0" prefHeight="25.0" prefWidth="220.0" />
 
                 <Label layoutX="30.0" layoutY="100.0" text="Ciudad:">
                     <font><Font size="13.0" /></font>
                 </Label>
-                <TextField fx:id="txtCity" layoutX="200.0" layoutY="97.0" prefHeight="25.0" prefWidth="220.0" />
+                <TextField fx:id="textFieldCity" layoutX="200.0" layoutY="97.0" prefHeight="25.0" prefWidth="220.0" />
 
                 <Label layoutX="30.0" layoutY="140.0" text="Estado:">
                     <font><Font size="13.0" /></font>
                 </Label>
-                <TextField fx:id="txtState" layoutX="200.0" layoutY="137.0" prefHeight="25.0" prefWidth="220.0" />
+                <TextField fx:id="textFieldState" layoutX="200.0" layoutY="137.0" prefHeight="25.0" prefWidth="220.0" />
 
                 <Label layoutX="30.0" layoutY="180.0" text="Sector:">
                     <font><Font size="13.0" /></font>
                 </Label>
-                <TextField fx:id="txtSector" layoutX="200.0" layoutY="177.0" prefHeight="25.0" prefWidth="220.0" />
+                <TextField fx:id="textFieldSector" layoutX="200.0" layoutY="177.0" prefHeight="25.0" prefWidth="220.0" />
 
                 <Label layoutX="30.0" layoutY="220.0" text="Correo electrónico:">
                     <font><Font size="13.0" /></font>
                 </Label>
-                <TextField fx:id="txtEmail" layoutX="200.0" layoutY="217.0" prefHeight="25.0" prefWidth="220.0" />
+                <TextField fx:id="textFieldEmail" layoutX="200.0" layoutY="217.0" prefHeight="25.0" prefWidth="220.0" />
 
                 <Label layoutX="30.0" layoutY="260.0" text="Teléfono:">
                     <font><Font size="13.0" /></font>
                 </Label>
-                <TextField fx:id="txtPhoneNumber" layoutX="200.0" layoutY="257.0" prefHeight="25.0" prefWidth="220.0" />
+                <TextField fx:id="textFieldPhoneNumber" layoutX="200.0" layoutY="257.0" prefHeight="25.0" prefWidth="220.0" />
 
                 <Label layoutX="30.0" layoutY="300.0" text="Usuarios directos:">
                     <font><Font size="13.0" /></font>
                 </Label>
-                <TextField fx:id="txtNumberOfDirectUsers" layoutX="200.0" layoutY="297.0" prefHeight="25.0" prefWidth="220.0" />
+                <TextField fx:id="textFieldNumberOfDirectUsers" layoutX="200.0" layoutY="297.0" prefHeight="25.0" prefWidth="220.0" />
 
                 <Label layoutX="30.0" layoutY="340.0" text="Usuarios indirectos:">
                     <font><Font size="13.0" /></font>
                 </Label>
-                <TextField fx:id="txtNumberOfIndirectUsers" layoutX="200.0" layoutY="337.0" prefHeight="25.0" prefWidth="220.0" />
+                <TextField fx:id="textFieldNumberOfIndirectUsers" layoutX="200.0" layoutY="337.0" prefHeight="25.0" prefWidth="220.0" />
 
                 <Label fx:id="labelError" layoutX="30.0" layoutY="375.0" prefWidth="390.0" style="-fx-text-fill: red;">
                     <font><Font size="11.0" /></font>

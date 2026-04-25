@@ -30,10 +30,10 @@ public class FXMLRegisterProfessorController implements Initializable {
 
     @FXML private Button buttonBack;
     @FXML private Button buttonRegister;
-    @FXML private TextField txtFirstName;
-    @FXML private TextField txtLastName;
-    @FXML private PasswordField txtPassword;
-    @FXML private TextField txtPersonnelNumber;
+    @FXML private TextField textFieldFirstName;
+    @FXML private TextField textFieldLastName;
+    @FXML private PasswordField textFieldPassword;
+    @FXML private TextField textFieldPersonnelNumber;
     @FXML private ComboBox<String> comboBoxCoordinator;
     
     @FXML private Label labelMessage;
@@ -64,10 +64,10 @@ public class FXMLRegisterProfessorController implements Initializable {
 
    private Optional<String> getFirstValidationMessage() {
         return Stream.of(
-            validateFirstName(txtFirstName.getText().trim(), "El nombre"),
-            validateLastName(txtLastName.getText().trim(), "El apellido"),
-            validatePassword(txtPassword.getText().trim(),"La contraseña"),
-            validatePersonnelNumber(txtPersonnelNumber.getText().trim(), "El numero de personal")
+            validateFirstName(textFieldFirstName.getText().trim(), "El nombre"),
+            validateLastName(textFieldLastName.getText().trim(), "El apellido"),
+            validatePassword(textFieldPassword.getText().trim(),"La contraseña"),
+            validatePersonnelNumber(textFieldPersonnelNumber.getText().trim(), "El numero de personal")
         )
         .filter(Optional::isPresent)
         .map(Optional::get)
@@ -147,11 +147,11 @@ public class FXMLRegisterProfessorController implements Initializable {
 
         Professor professor = new Professor();
 
-        professor.setFirstName(txtFirstName.getText().trim());
-        professor.setLastName(txtLastName.getText().trim());
-        professor.setPassword(txtPassword.getText().trim());
+        professor.setFirstName(textFieldFirstName.getText().trim());
+        professor.setLastName(textFieldLastName.getText().trim());
+        professor.setPassword(textFieldPassword.getText().trim());
 
-        professor.setPersonnelNumber(txtPersonnelNumber.getText().trim());
+        professor.setPersonnelNumber(textFieldPersonnelNumber.getText().trim());
 
         boolean isCoordinator =
                 comboBoxCoordinator.getValue().equals("Si");
@@ -168,10 +168,10 @@ public class FXMLRegisterProfessorController implements Initializable {
     }
 
     private void clearFields() {
-        txtFirstName.clear();
-        txtLastName.clear();
-        txtPassword.clear();
-        txtPersonnelNumber.clear();
+        textFieldFirstName.clear();
+        textFieldLastName.clear();
+        textFieldPassword.clear();
+        textFieldPersonnelNumber.clear();
         comboBoxCoordinator.setValue(null);
     }
 

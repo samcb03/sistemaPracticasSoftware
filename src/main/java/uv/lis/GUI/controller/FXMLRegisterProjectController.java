@@ -29,14 +29,12 @@ public class FXMLRegisterProjectController implements Initializable {
 
     @FXML private Button buttonBack;
     @FXML private Button buttonRegister;
-    @FXML private Pane panelForm;
-    @FXML private Label labelTitle;
     @FXML private Label labelError;
-    @FXML private TextField txtName;
-    @FXML private TextField txtMethodology;
-    @FXML private TextField txtCapacity;
-    @FXML private TextField txtObjective;
-    @FXML private TextArea txtDescription;
+    @FXML private TextField textFieldName;
+    @FXML private TextField textFieldMethodology;
+    @FXML private TextField textFieldCapacity;
+    @FXML private TextField textFieldObjective;
+    @FXML private TextArea textFieldDescription;
     @FXML private ComboBox<String> comboBoxOrganizationName;
 
     private ProjectDAO projectDAO;
@@ -64,11 +62,11 @@ public class FXMLRegisterProjectController implements Initializable {
 
     private Optional<String> getValidationMessage() {
         return Stream.of(
-            validateName(txtName.getText().trim()),
-            validateMethodology(txtMethodology.getText().trim()),
-            validateCapacity(txtCapacity.getText().trim()),
-            validateObjective(txtObjective.getText().trim()),
-            validateDescription(txtDescription.getText().trim())
+            validateName(textFieldName.getText().trim()),
+            validateMethodology(textFieldMethodology.getText().trim()),
+            validateCapacity(textFieldCapacity.getText().trim()),
+            validateObjective(textFieldObjective.getText().trim()),
+            validateDescription(textFieldDescription.getText().trim())
         )
         .filter(Optional::isPresent)
         .map(Optional::get)
@@ -165,20 +163,20 @@ public class FXMLRegisterProjectController implements Initializable {
 
     private Project buildProject() {
         Project project = new Project();
-        project.setName(txtName.getText().trim());
-        project.setMethodology(txtMethodology.getText().trim());
-        project.setCapacity(Integer.parseInt(txtCapacity.getText().trim()));
-        project.setObjective(txtObjective.getText().trim());
-        project.setDescription(txtDescription.getText().trim());
+        project.setName(textFieldName.getText().trim());
+        project.setMethodology(textFieldMethodology.getText().trim());
+        project.setCapacity(Integer.parseInt(textFieldCapacity.getText().trim()));
+        project.setObjective(textFieldObjective.getText().trim());
+        project.setDescription(textFieldDescription.getText().trim());
         return project;
     }
 
     private void clearFields() {
-        txtName.clear();
-        txtMethodology.clear();
-        txtCapacity.clear();
-        txtObjective.clear();
-        txtDescription.clear();
+        textFieldName.clear();
+        textFieldMethodology.clear();
+        textFieldCapacity.clear();
+        textFieldObjective.clear();
+        textFieldDescription.clear();
     }
 
     private void showMessage(String message) {

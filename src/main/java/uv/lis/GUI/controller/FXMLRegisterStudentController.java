@@ -20,7 +20,6 @@ import javafx.scene.control.DatePicker;
 import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
-import javafx.scene.layout.Pane;
 import javafx.stage.Stage;
 import static uv.lis.logic.utils.InputValidator.MAX_TEXT_LENGTH;
 import static uv.lis.logic.utils.InputValidator.STUDENT_ID_LENGTH;
@@ -35,13 +34,11 @@ public class FXMLRegisterStudentController implements Initializable {
 
     @FXML private Button buttonBack;
     @FXML private Button buttonRegister;
-    @FXML private Pane panelForm;
-    @FXML private Label labelTitle;
     @FXML private Label labelError;
-    @FXML private TextField txtFirstName;
-    @FXML private TextField txtLastName;
-    @FXML private PasswordField txtPassword;
-    @FXML private TextField txtStudentId;
+    @FXML private TextField textFieldFirstName;
+    @FXML private TextField textFieldLastName;
+    @FXML private PasswordField textFieldPassword;
+    @FXML private TextField textFieldStudentId;
     @FXML private DatePicker datePickerBirthDate;
     @FXML private ComboBox<String> comboBoxGender;
 
@@ -68,10 +65,10 @@ public class FXMLRegisterStudentController implements Initializable {
 
     private Optional<String> getValidationMessage() {
         return Stream.of(
-            validateFirstName(txtFirstName.getText().trim()),
-            validateLastName(txtLastName.getText().trim()),
-            validatePassword(txtPassword.getText().trim()),
-            validateStudentId(txtStudentId.getText().trim()),
+            validateFirstName(textFieldFirstName.getText().trim()),
+            validateLastName(textFieldLastName.getText().trim()),
+            validatePassword(textFieldPassword.getText().trim()),
+            validateStudentId(textFieldStudentId.getText().trim()),
             validateBirthDate(),
             validateGender()
         )
@@ -174,23 +171,23 @@ public class FXMLRegisterStudentController implements Initializable {
 
     private Student buildStudent() {
         Student student = new Student();
-        student.setFirstName(txtFirstName.getText().trim());
-        student.setLastName(txtLastName.getText().trim());
-        student.setPassword(txtPassword.getText().trim());
-        student.setIdStudent(txtStudentId.getText().trim());
+        student.setFirstName(textFieldFirstName.getText().trim());
+        student.setLastName(textFieldLastName.getText().trim());
+        student.setPassword(textFieldPassword.getText().trim());
+        student.setIdStudent(textFieldStudentId.getText().trim());
         student.setBirthDate(Date.valueOf(datePickerBirthDate.getValue()));
         student.setGender(comboBoxGender.getValue());
         student.setUserType(USER_TYPE_STUDENT);
         student.setInactive(false);
-        student.setIdentification(txtStudentId.getText().trim());
+        student.setIdentification(textFieldStudentId.getText().trim());
         return student;
     }
 
     private void clearFields() {
-        txtFirstName.clear();
-        txtLastName.clear();
-        txtPassword.clear();
-        txtStudentId.clear();
+        textFieldFirstName.clear();
+        textFieldLastName.clear();
+        textFieldPassword.clear();
+        textFieldStudentId.clear();
         datePickerBirthDate.setValue(null);
         comboBoxGender.setValue(null);
     }

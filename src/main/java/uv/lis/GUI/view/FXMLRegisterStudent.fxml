@@ -19,11 +19,11 @@
         <Label layoutY="-1.0" prefHeight="20.0" prefWidth="600.0" style="-fx-background-color: orange; 
             -fx-border-color: BLACK;" text="Registrar Estudiante" />
 
-        <Label fx:id="labelTitle" layoutX="171.0" layoutY="29.0" text="Registrar Nuevo Estudiante">
+        <Label layoutX="171.0" layoutY="29.0" text="Registrar Nuevo Estudiante">
             <font><Font name="System Bold" size="20.0" /></font>
         </Label>
 
-        <Pane fx:id="panelForm" layoutX="75.0" layoutY="60.0" prefHeight="390.0" prefWidth="450.0" style="
+        <Pane layoutX="75.0" layoutY="60.0" prefHeight="390.0" prefWidth="450.0" style="
             -fx-background-color: #ffaf9c; -fx-background-radius: 20;">
             <children>
 
@@ -34,22 +34,22 @@
                 <Label layoutX="30.0" layoutY="60.0" text="Nombre:">
                     <font><Font size="13.0" /></font>
                 </Label>
-                <TextField fx:id="txtFirstName" layoutX="160.0" layoutY="57.0" prefHeight="25.0" prefWidth="250.0" />
+                <TextField fx:id="textFieldFirstName" layoutX="160.0" layoutY="57.0" prefHeight="25.0" prefWidth="250.0" />
 
                 <Label layoutX="30.0" layoutY="100.0" text="Apellido(s):">
                     <font><Font size="13.0" /></font>
                 </Label>
-                <TextField fx:id="txtLastName" layoutX="160.0" layoutY="97.0" prefHeight="25.0" prefWidth="250.0" />
+                <TextField fx:id="textFieldLastName" layoutX="160.0" layoutY="97.0" prefHeight="25.0" prefWidth="250.0" />
 
                 <Label layoutX="30.0" layoutY="140.0" text="Contraseña:">
                     <font><Font size="13.0" /></font>
                 </Label>
-                <PasswordField fx:id="txtPassword" layoutX="160.0" layoutY="137.0" prefHeight="25.0" prefWidth="250.0" />
+                <PasswordField fx:id="textFieldPassword" layoutX="160.0" layoutY="137.0" prefHeight="25.0" prefWidth="250.0" />
 
                 <Label layoutX="30.0" layoutY="180.0" text="Matricula:">
                     <font><Font size="13.0" /></font>
                 </Label>
-                <TextField fx:id="txtStudentId" layoutX="160.0" layoutY="177.0" prefHeight="25.0" prefWidth="250.0" />
+                <TextField fx:id="textFieldStudentId" layoutX="160.0" layoutY="177.0" prefHeight="25.0" prefWidth="250.0" />
 
                 <Label layoutX="30.0" layoutY="220.0" text="Fecha de Nacimiento:">
                     <font><Font size="13.0" /></font>

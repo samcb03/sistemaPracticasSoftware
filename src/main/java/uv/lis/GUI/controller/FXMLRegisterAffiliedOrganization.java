@@ -26,14 +26,14 @@ public class FXMLRegisterAffiliedOrganization implements Initializable {
     @FXML private Button buttonBack;
     @FXML private Button buttonRegister;
 
-    @FXML private TextField txtName;
-    @FXML private TextField txtCity;
-    @FXML private TextField txtState;
-    @FXML private TextField txtSector;
-    @FXML private TextField txtEmail;
-    @FXML private TextField txtPhoneNumber;
-    @FXML private TextField txtNumberOfDirectUsers;
-    @FXML private TextField txtNumberOfIndirectUsers;
+    @FXML private TextField textFieldName;
+    @FXML private TextField textFieldCity;
+    @FXML private TextField textFieldState;
+    @FXML private TextField textFieldSector;
+    @FXML private TextField textFieldEmail;
+    @FXML private TextField textFieldPhoneNumber;
+    @FXML private TextField textFieldNumberOfDirectUsers;
+    @FXML private TextField textFieldNumberOfIndirectUsers;
 
     @FXML private Label labelError;
 
@@ -57,15 +57,15 @@ public class FXMLRegisterAffiliedOrganization implements Initializable {
 
     private Optional<String> getFirstValidationError() {
         return Stream.of(
-            validateName(txtName.getText().trim(), "El nombre"),
-            validateName(txtCity.getText().trim(), "La ciudad"),
-            validateName(txtState.getText().trim(), "El estado"),
-            validateRequired(txtSector.getText().trim(), "El sector"),
-            validateEmail(txtEmail.getText().trim()),
-            validatePhoneNumber(txtPhoneNumber.getText().trim()),
-            validatePositiveInteger(txtNumberOfDirectUsers.getText().trim(), 
+            validateName(textFieldName.getText().trim(), "El nombre"),
+            validateName(textFieldCity.getText().trim(), "La ciudad"),
+            validateName(textFieldState.getText().trim(), "El estado"),
+            validateRequired(textFieldSector.getText().trim(), "El sector"),
+            validateEmail(textFieldEmail.getText().trim()),
+            validatePhoneNumber(textFieldPhoneNumber.getText().trim()),
+            validatePositiveInteger(textFieldNumberOfDirectUsers.getText().trim(), 
                 "El número de usuarios directos"),
-            validatePositiveInteger(txtNumberOfIndirectUsers.getText().trim(), 
+            validatePositiveInteger(textFieldNumberOfIndirectUsers.getText().trim(), 
                 "El número de usuarios indirectos")
         )
         .filter(Optional::isPresent)
@@ -153,26 +153,26 @@ public class FXMLRegisterAffiliedOrganization implements Initializable {
 
     private AffiliatedOrganization buildOrganization() {
         AffiliatedOrganization organization = new AffiliatedOrganization();
-        organization.setName(txtName.getText().trim());
-        organization.setCity(txtCity.getText().trim());
-        organization.setState(txtState.getText().trim());
-        organization.setSector(txtSector.getText().trim());
-        organization.setEmail(txtEmail.getText().trim());
-        organization.setPhoneNumber(txtPhoneNumber.getText().trim());
-        organization.setNumberOfDirectUsers(Integer.parseInt(txtNumberOfDirectUsers.getText().trim()));
-        organization.setNumberOfIndirectUsers(Integer.parseInt(txtNumberOfIndirectUsers.getText().trim()));
+        organization.setName(textFieldName.getText().trim());
+        organization.setCity(textFieldCity.getText().trim());
+        organization.setState(textFieldState.getText().trim());
+        organization.setSector(textFieldSector.getText().trim());
+        organization.setEmail(textFieldEmail.getText().trim());
+        organization.setPhoneNumber(textFieldPhoneNumber.getText().trim());
+        organization.setNumberOfDirectUsers(Integer.parseInt(textFieldNumberOfDirectUsers.getText().trim()));
+        organization.setNumberOfIndirectUsers(Integer.parseInt(textFieldNumberOfIndirectUsers.getText().trim()));
         return organization;
     }
 
     private void clearFields() {
-        txtName.clear();
-        txtCity.clear();
-        txtState.clear();
-        txtSector.clear();
-        txtEmail.clear();
-        txtPhoneNumber.clear();
-        txtNumberOfDirectUsers.clear();
-        txtNumberOfIndirectUsers.clear();
+        textFieldName.clear();
+        textFieldCity.clear();
+        textFieldState.clear();
+        textFieldSector.clear();
+        textFieldEmail.clear();
+        textFieldPhoneNumber.clear();
+        textFieldNumberOfDirectUsers.clear();
+        textFieldNumberOfIndirectUsers.clear();
     }
 
     private void showError(String message) {

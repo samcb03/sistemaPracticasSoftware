@@ -22,14 +22,14 @@
                style="-fx-background-color: orange; -fx-border-color: BLACK;"
                text="Registrar Profesor" />
 
-        <Label fx:id="labelTitle" layoutX="185.0" layoutY="29.0"
+        <Label layoutX="185.0" layoutY="29.0"
                text="Registrar Nuevo Profesor">
             <font>
                 <Font name="System Bold" size="20.0" />
             </font>
         </Label>
 
-        <Pane fx:id="panelForm" layoutX="75.0" layoutY="60.0"
+        <Pane layoutX="75.0" layoutY="60.0"
               prefHeight="390.0" prefWidth="450.0"
               style="-fx-background-color: #ffaf9c; -fx-background-radius: 20;">
 
@@ -43,22 +43,22 @@
                 </Label>
 
                 <Label layoutX="30.0" layoutY="60.0" text="Nombre:" />
-                <TextField fx:id="txtFirstName"
+                <TextField fx:id= "textFieldFirstName"
                            layoutX="160.0" layoutY="57.0"
                            prefHeight="25.0" prefWidth="250.0" />
 
                 <Label layoutX="30.0" layoutY="100.0" text="Apellido(s):" />
-                <TextField fx:id="txtLastName"
+                <TextField fx:id="textFieldLastName"
                            layoutX="160.0" layoutY="97.0"
                            prefHeight="25.0" prefWidth="250.0" />
 
                 <Label layoutX="30.0" layoutY="140.0" text="Contraseña:" />
-                <PasswordField fx:id="txtPassword"
+                <PasswordField fx:id="textFieldPassword"
                                layoutX="160.0" layoutY="137.0"
                                prefHeight="25.0" prefWidth="250.0" />
 
                 <Label layoutX="30.0" layoutY="180.0" text="No. Personal:" />
-                <TextField fx:id="txtPersonnelNumber"
+                <TextField fx:id="textFieldPersonnelNumber"
                            layoutX="160.0" layoutY="177.0"
                            prefHeight="25.0" prefWidth="250.0" />
 
