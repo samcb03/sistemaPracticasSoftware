@@ -4,14 +4,19 @@ package uv.lis.GUI.controller;
 import uv.lis.logic.dto.Project;
 import uv.lis.logic.exceptions.OperationException;
 import uv.lis.logic.dao.ProjectDAO;
+import uv.lis.logic.dto.AffiliatedOrganization;
+import uv.lis.logic.dao.AffiliatedOrganizationDAO;
 import java.net.URL;
 import java.util.Optional;
 import java.util.ResourceBundle;
 import java.util.stream.Stream;
+
+import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
+import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
@@ -37,12 +42,19 @@ public class FXMLRegisterProjectController implements Initializable {
     @FXML private TextField txtCapacity;
     @FXML private TextField txtObjective;
     @FXML private TextArea txtDescription;
+    @FXML private ComboBox<String> comboBoxOrganizationName;
 
     private ProjectDAO projectDAO;
+    private AffiliatedOrganization affiliatedOrganization;
+    private AffiliatedOrganizationDAO affiliatedOrganizationDAO;
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
         projectDAO = new ProjectDAO();
+
+        comboBoxOrganizationName.setItems(
+            FXCollections.observableArrayList(affiliatedOrganization.getAllOrganizationNames)
+        );
     }
 
     @FXML
