@@ -10,7 +10,6 @@ import java.net.URL;
 import java.util.Optional;
 import java.util.ResourceBundle;
 import java.util.stream.Stream;
-
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -22,15 +21,11 @@ import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.Pane;
 import javafx.stage.Stage;
+import static uv.lis.logic.utils.InputValidator.MAX_TEXT_LENGTH;
+import static uv.lis.logic.utils.InputValidator.MIN_POSITIVE_INTEGER;
 
 
 public class FXMLRegisterProjectController implements Initializable {
-
-    private static final int MAX_NAME_LENGTH = 100;
-    private static final int MAX_METHODOLOGY_LENGTH = 100;
-    private static final int MAX_OBJECTIVE_LENGTH = 255;
-    private static final int MAX_DESCRIPTION_LENGTH = 500;
-    private static final int MIN_CAPACITY = 1;
 
     @FXML private Button buttonBack;
     @FXML private Button buttonRegister;
@@ -46,7 +41,6 @@ public class FXMLRegisterProjectController implements Initializable {
 
     private ProjectDAO projectDAO;
     private AffiliatedOrganization affiliatedOrganization;
-    private AffiliatedOrganizationDAO affiliatedOrganizationDAO;
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
@@ -83,9 +77,9 @@ public class FXMLRegisterProjectController implements Initializable {
 
     private Optional<String> validateName(String name) {
         Optional<String> message;
-        if (name.isEmpty() || name.length() > MAX_NAME_LENGTH) {
+        if (name.isEmpty() || name.length() > MAX_TEXT_LENGTH) {
             message = Optional.of("El nombre no puede estar vacío o tener más de "
-                + MAX_NAME_LENGTH + " caracteres");
+                + MAX_TEXT_LENGTH + " caracteres");
         } else {
             message = Optional.empty();
         }
@@ -94,9 +88,9 @@ public class FXMLRegisterProjectController implements Initializable {
 
     private Optional<String> validateMethodology(String methodology) {
         Optional<String> message;
-        if (methodology.isEmpty() || methodology.length() > MAX_METHODOLOGY_LENGTH) {
+        if (methodology.isEmpty() || methodology.length() > MAX_TEXT_LENGTH) {
             message = Optional.of("La metodología no puede estar vacía o tener más de "
-                    + MAX_METHODOLOGY_LENGTH + " caracteres");
+                    + MAX_TEXT_LENGTH + " caracteres");
         } else {
             message = Optional.empty();
         }
@@ -117,7 +111,7 @@ public class FXMLRegisterProjectController implements Initializable {
         Optional<String> message;
         try {
             int capacity = Integer.parseInt(capacityStr);
-            if (capacity < MIN_CAPACITY) {
+            if (capacity < MIN_POSITIVE_INTEGER) {
                 message = Optional.of("El cupo debe ser un número mayor a 0");
             } else {
                 message = Optional.empty();
@@ -130,9 +124,9 @@ public class FXMLRegisterProjectController implements Initializable {
 
     private Optional<String> validateObjective(String objective) {
         Optional<String> message;
-        if (objective.isEmpty() || objective.length() > MAX_OBJECTIVE_LENGTH) {
+        if (objective.isEmpty() || objective.length() > MAX_TEXT_LENGTH) {
             message = Optional.of("El objetivo no puede estar vacío o tener más de "
-                    + MAX_OBJECTIVE_LENGTH + " caracteres");
+                    + MAX_TEXT_LENGTH + " caracteres");
         } else {
             message = Optional.empty();
         }
@@ -141,9 +135,9 @@ public class FXMLRegisterProjectController implements Initializable {
 
     private Optional<String> validateDescription(String description) {
         Optional<String> message;
-        if (description.isEmpty() || description.length() > MAX_DESCRIPTION_LENGTH) {
+        if (description.isEmpty() || description.length() > MAX_TEXT_LENGTH) {
             message = Optional.of("La descripción no puede estar vacía o tener más de "
-                + MAX_DESCRIPTION_LENGTH + " caracteres");
+                + MAX_TEXT_LENGTH + " caracteres");
         } else {
             message = Optional.empty();
         }

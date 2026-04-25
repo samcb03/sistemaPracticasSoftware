@@ -22,16 +22,16 @@ import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.Pane;
 import javafx.stage.Stage;
+import static uv.lis.logic.utils.InputValidator.MAX_TEXT_LENGTH;
+import static uv.lis.logic.utils.InputValidator.STUDENT_ID_LENGTH;
+import static uv.lis.logic.utils.InputValidator.LETTERS_ONLY_REGEX;
+import static uv.lis.logic.utils.InputValidator.PASSWORD_REGEX;
+import static uv.lis.logic.utils.InputValidator.INVALID_ID;;
 
 
 public class FXMLRegisterStudentController implements Initializable {
 
-    private static final int MAX_NAME_LENGTH = 50;
-    private static final int STUDENT_ID_LENGTH = 9;
-    private static final String LETTERS_ONLY_REGEX = "[\\p{L}\\s]+";
-    private static final String PASSWORD_REGEX = "^(?=.*[A-Z])(?=.*[a-z])(?=.*[0-9])(?=.*[!@#$%^&*]).{12,}$";
     private static final String USER_TYPE_STUDENT = "Student";
-    private static final int NO_USER_GENERATED = -1;
 
     @FXML private Button buttonBack;
     @FXML private Button buttonRegister;
@@ -82,9 +82,9 @@ public class FXMLRegisterStudentController implements Initializable {
 
     private Optional<String> validateFirstName(String firstName) {
         Optional<String> message;
-        if (firstName.isEmpty() || firstName.length() > MAX_NAME_LENGTH) {
+        if (firstName.isEmpty() || firstName.length() > MAX_TEXT_LENGTH) {
             message = Optional.of("El nombre no puede estar vacío o tener más de "
-                + MAX_NAME_LENGTH + " caracteres");
+                + MAX_TEXT_LENGTH + " caracteres");
         } else if (!firstName.matches(LETTERS_ONLY_REGEX)) {
             message = Optional.of("El nombre solo acepta letras");
         } else {
@@ -95,9 +95,9 @@ public class FXMLRegisterStudentController implements Initializable {
 
     private Optional<String> validateLastName(String lastName) {
         Optional<String> message;
-        if (lastName.isEmpty() || lastName.length() > MAX_NAME_LENGTH) {
+        if (lastName.isEmpty() || lastName.length() > MAX_TEXT_LENGTH) {
             message = Optional.of("Los apellidos no pueden estar vacíos o tener más de "
-                + MAX_NAME_LENGTH + " caracteres");
+                + MAX_TEXT_LENGTH + " caracteres");
         } else if (!lastName.matches(LETTERS_ONLY_REGEX)) {
             message = Optional.of("Los apellidos solo aceptan letras");
         } else {
@@ -158,7 +158,7 @@ public class FXMLRegisterStudentController implements Initializable {
     }
 
     private void handleRegistrationResult(Student student, int generatedId) {
-        if (generatedId != NO_USER_GENERATED) {
+        if (generatedId != INVALID_ID) {
             student.setId(generatedId);
             try {
                 studentDAO.registerStudent(student);

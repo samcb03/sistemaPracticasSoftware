@@ -9,22 +9,24 @@ import java.net.URL;
 import java.util.Optional;
 import java.util.ResourceBundle;
 import java.util.stream.Stream;
-
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.scene.control.*;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Button;
+import javafx.scene.control.ComboBox;
+import javafx.scene.control.Label;
+import javafx.scene.control.PasswordField;
+import javafx.scene.control.TextField;
 import javafx.stage.Stage;
+import static uv.lis.logic.utils.InputValidator.MAX_TEXT_LENGTH;
+import static uv.lis.logic.utils.InputValidator.PASSWORD_REGEX;
+import static uv.lis.logic.utils.InputValidator.LETTERS_ONLY_REGEX;
+import static uv.lis.logic.utils.InputValidator.ONLY_NUMBERS_REGEX;
+import static uv.lis.logic.utils.InputValidator.INVALID_ID;
 
 
 public class FXMLRegisterProfessorController implements Initializable {
-
-    private static final int MAX_FIRST_NAME_LENGTH = 50;
-    private static final int MAX_LAST_NAME_LENGHT = 150;
-    private static final String PASSWORD_REGEX = "^(?=.*[A-Z])(?=.*[a-z])(?=.*[0-9])(?=.*[!@#$%^&*]).{12,}$";
-    private static final String LETTERS_ONLY_REGEX = "[\\p{L}\\s]+";
-    private static final String ONLY_NUMBERS = "\\d+";
-    private static final int INVALID_ID = -1;
 
     @FXML private Button buttonBack;
     @FXML private Button buttonRegister;
@@ -74,9 +76,9 @@ public class FXMLRegisterProfessorController implements Initializable {
 
     private Optional<String> validateFirstName(String firstName, String field) {
         Optional<String> message = Optional.empty();
-        if (firstName.isEmpty() || firstName.length() > MAX_FIRST_NAME_LENGTH) {
+        if (firstName.isEmpty() || firstName.length() > MAX_TEXT_LENGTH) {
             message = Optional.of("El nombre no puede estar vacío o tener más de "
-                + MAX_FIRST_NAME_LENGTH + " caracteres");
+                + MAX_TEXT_LENGTH + " caracteres");
         } else if(!firstName.matches(LETTERS_ONLY_REGEX)){
             message = Optional.of("El nombre solo pueden contener letras");
         }
@@ -85,9 +87,9 @@ public class FXMLRegisterProfessorController implements Initializable {
 
     private Optional<String> validateLastName(String lastName, String field) {
         Optional<String> message;
-        if(lastName.isEmpty() || lastName.length() > MAX_LAST_NAME_LENGHT) {
+        if(lastName.isEmpty() || lastName.length() > MAX_TEXT_LENGTH) {
             message = Optional.of("El apellido no puede estar vacío o tener más de "
-                + MAX_LAST_NAME_LENGHT + " caracteres");
+                + MAX_TEXT_LENGTH + " caracteres");
         } else {
             message = Optional.empty();
         }
@@ -108,7 +110,7 @@ public class FXMLRegisterProfessorController implements Initializable {
         Optional<String> message = Optional.empty();
         if (personnelNumber.isEmpty()) {
             message = Optional.of("El numero de personal no puede estar vacío");
-        } else if (!personnelNumber.matches(ONLY_NUMBERS)){
+        } else if (!personnelNumber.matches(ONLY_NUMBERS_REGEX)){
             message = Optional.of("El numero de personal no tiene un formato válido");
         }
         return message;

@@ -15,16 +15,14 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
+import static uv.lis.logic.utils.InputValidator.MAX_TEXT_LENGTH;
+import static uv.lis.logic.utils.InputValidator.MIN_POSITIVE_INTEGER;
+import static uv.lis.logic.utils.InputValidator.LETTERS_ONLY_REGEX;
+import static uv.lis.logic.utils.InputValidator.EMAIL_REGEX;
+import static uv.lis.logic.utils.InputValidator.PHONE_REGEX;
 
 
 public class FXMLRegisterAffiliedOrganization implements Initializable {
-
-    private static final int MAX_NAME_LENGTH = 50;
-    private static final int MIN_POSITIVE_INTEGER = 0;
-    private static final String LETTERS_ONLY_REGEX = "[\\p{L}\\s]+";
-    private static final String EMAIL_REGEX = "^[\\w._%+\\-]+@[\\w.\\-]+\\.[a-zA-Z]{2,}$";
-    private static final String PHONE_REGEX = "^[0-9]{7,15}$";
-
     @FXML private Button buttonBack;
     @FXML private Button buttonRegister;
 
@@ -77,9 +75,9 @@ public class FXMLRegisterAffiliedOrganization implements Initializable {
 
     private Optional<String> validateName(String value, String fieldName) {
         Optional<String> message;
-        if (value.isEmpty() || value.length() > MAX_NAME_LENGTH) {
+        if (value.isEmpty() || value.length() > MAX_TEXT_LENGTH) {
             message = Optional.of(fieldName + " no puede estar vacío o tener más de "
-                + MAX_NAME_LENGTH + " caracteres");
+                + MAX_TEXT_LENGTH + " caracteres");
         } else if (!value.matches(LETTERS_ONLY_REGEX)) {
             message = Optional.of(fieldName + " solo acepta letras");
         } else {
