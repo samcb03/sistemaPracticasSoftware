@@ -121,7 +121,7 @@ public class ProjectDAO implements IProjectDAO{
 
         } catch (SQLException e) {
             LOGGER.log(Level.SEVERE, "Error de conexion con la base de datos",e);
-            throw new OperationException("Error de conexion con la base de datos", e);
+            throw new OperationException("No se pudo registrar el proyecto. Intentelo más tarde", e);
 
         }
         return isRegistered;
@@ -156,7 +156,7 @@ public boolean modifyProject(Project project) throws OperationException {
         }
     } catch (SQLException e) {
         LOGGER.log(Level.SEVERE, "Error de conexion con la base de datos", e);
-        throw new OperationException("Error de conexion con la base de datos", e);
+        throw new OperationException("No se pudo modificar el proyecto. Intentelo más tarde", e);
     }
 
     return isModified;
@@ -182,7 +182,7 @@ public boolean modifyProject(Project project) throws OperationException {
 
         } catch (SQLException e) {
                LOGGER.log(Level.SEVERE, "Error de conexion con la base de datos",e);
-               throw new OperationException("Error de conexion con la base de datos", e);
+               throw new OperationException("No se pudo inactivar el proyecto. Intentelo más tarde", e);
         }
 
         return isInactive;

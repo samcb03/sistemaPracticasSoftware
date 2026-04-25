@@ -99,7 +99,7 @@ public class FXMLRegisterProfessorController implements Initializable {
         if (password.isEmpty()) {
             message = Optional.of("La contraseña no puede estar vacía");
         } else if(!password.matches(PASSWORD_REGEX)) {
-            message = Optional.of("La contraseña no tiene un formato válido");
+            message = Optional.of("La contraseña debe tener una mayúscula, un carácter especial y un número");
         } 
         return message;
     }
