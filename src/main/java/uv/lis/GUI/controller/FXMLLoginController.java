@@ -17,11 +17,12 @@ import javafx.stage.Stage;
 import uv.lis.logic.dao.UserDAO;
 import uv.lis.logic.dto.User;
 import uv.lis.logic.exceptions.AuthenticateException;
+import static uv.lis.logic.utils.InputValidator.PASSWORD_REGEX;
 
 public class FXMLLoginController implements Initializable{
 
 
-    @FXML private Button bLogin;
+    @FXML private Button buttonLogin;
     @FXML private TextField txtIdentification;
     @FXML private PasswordField fieldPassword;
     @FXML private Label labelError;
@@ -85,7 +86,7 @@ public class FXMLLoginController implements Initializable{
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource(FXML));
             Parent root = loader.load();
-            Stage stage = (Stage) bLogin.getScene().getWindow();
+            Stage stage = (Stage) buttonLogin.getScene().getWindow();
             stage.setScene(new Scene(root));
             stage.show();
         } catch (IOException e) {
