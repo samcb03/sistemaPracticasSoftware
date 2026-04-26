@@ -35,15 +35,17 @@ public class FXMLLoginController implements Initializable{
         this.userDAO = new UserDAO();
     }
 
-    @FXML 
+    @FXML
     public void handleLogin() {
         String identification = txtIdentification.getText().trim();
         String password = fieldPassword.getText();
 
         if (identification.isEmpty()) {
             showError("La identificación no puede estar vacía");
-        } else if(password.isEmpty()) {
+        } else if (password.isEmpty()) {
             showError("La contraseña no puede estar vacía");
+        } else if (!password.matches(PASSWORD_REGEX)) {
+            showError("La contraseña debe tener una mayúscula, un carácter especial y un número");
         } else {
             try {
                 user = userDAO.authenticate(identification, password);
@@ -92,4 +94,3 @@ public class FXMLLoginController implements Initializable{
         }
     }
 }
-
