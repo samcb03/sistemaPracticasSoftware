@@ -22,7 +22,7 @@ import static uv.lis.logic.utils.InputValidator.EMAIL_REGEX;
 import static uv.lis.logic.utils.InputValidator.PHONE_REGEX;
 
 
-public class FXMLRegisterAffiliedOrganization implements Initializable {
+public class FXMLRegisterAffiliedOrganizationController implements Initializable {
     @FXML private Button buttonBack;
     @FXML private Button buttonRegister;
 

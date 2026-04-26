@@ -15,37 +15,11 @@ public class Main extends Application {
 
     @Override
     public void start(Stage stage) throws Exception {
-
-        FXMLLoader loaderStudent = new FXMLLoader(
-            getClass().getResource("/uv/lis/GUI/view/FXMLRegisterStudent.fxml")
+        FXMLLoader loader = new FXMLLoader(
+            getClass().getResource("/uv/lis/GUI/view/FXMLLogin.fxml")
         );
-        Stage stageStudent = new Stage();
-        stageStudent.setTitle("Registro de Estudiante");
-        stageStudent.setScene(new Scene(loaderStudent.load()));
-        stageStudent.show();
-
-        FXMLLoader loaderProfessor = new FXMLLoader(
-            getClass().getResource("/uv/lis/GUI/view/FXMLRegisterProfessor.fxml")
-        );
-        Stage stageProfessor = new Stage();
-        stageProfessor.setTitle("Registro de Profesor");
-        stageProfessor.setScene(new Scene(loaderProfessor.load()));
-        stageProfessor.show();
-
-        FXMLLoader loaderOrganization = new FXMLLoader(
-            getClass().getResource("/uv/lis/GUI/view/FXMLRegisterAffiliedOrganization.fxml")
-        );
-        Stage stageOrganization = new Stage();
-        stageOrganization.setTitle("Registro de Organización Vinculada");
-        stageOrganization.setScene(new Scene(loaderOrganization.load()));
-        stageOrganization.show();
-
-        FXMLLoader loaderProject = new FXMLLoader(
-            getClass().getResource("/uv/lis/GUI/view/FXMLRegisterProject.fxml")
-        );
-        Stage stageProject = new Stage();
-        stageProject.setTitle("Registro de Proyecto");
-        stageProject.setScene(new Scene(loaderProject.load()));
-        stageProject.show();
+        stage.setTitle("Sistema de Practicas");
+        stage.setScene(new Scene(loader.load()));
+        stage.show();
     }
 }
