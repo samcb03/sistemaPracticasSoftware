@@ -17,8 +17,7 @@ import uv.lis.logic.dto.User;
 public class FXMLAdministratorMenuController implements Initializable {
 
     @FXML private Button buttonRegisterProfessor;
-    @FXML private Button buttonModifyProfessor;
-    @FXML private Button buttonInactivateProfessor;
+    @FXML private Button buttonConsultProfessor;
 
     private User user;
 
@@ -36,13 +35,8 @@ public class FXMLAdministratorMenuController implements Initializable {
     }
 
     @FXML
-    public void goToModifyProfessor() {
-        navigateTo("/uv/lis/GUI/view/FXMLModifyProfessor.fxml");
-    }
-
-    @FXML
-    public void goToInactivateProfessor() {
-        navigateTo("/uv/lis/GUI/view/FXMLInactivateProfessor.fxml");
+    public void goToConsultProfessor() {
+        navigateTo("/uv/lis/GUI/view/FXMLConsultProfessor.fxml");
     }
 
     private void navigateTo(String fxml) {

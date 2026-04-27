@@ -19,7 +19,7 @@ public final class InputValidator {
     public static final String ONLY_NUMBERS_REGEX = "\\d+";
     public static final String EMAIL_REGEX = "^[\\w._%+\\-]+@[\\w.\\-]+\\.[a-zA-Z]{2,}$";
     public static final String PHONE_REGEX = "^[0-9]{7,15}$";
-    public static final String PASSWORD_REGEX = "^(?=.*[A-Z])(?=.*[a-z])(?=.*[0-9])(?=.*[!@#$%^&*]).{12,}$";
+    public static final String PASSWORD_REGEX = "^(?=.*[A-Z])(?=.*[a-z])(?=.*[0-9])(?=.*[!@#$%^&*_]).{12,}$";
 
     public static Optional<String> validateLettersOnly(String fieldValue, String fieldName) {
         Optional<String> validationResult;

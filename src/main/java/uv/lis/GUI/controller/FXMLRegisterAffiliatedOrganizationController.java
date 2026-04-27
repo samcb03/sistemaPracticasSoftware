@@ -20,7 +20,7 @@ import static uv.lis.logic.utils.InputValidator.validatePhoneNumber;
 import static uv.lis.logic.utils.InputValidator.validatePositiveInteger;
 
 
-public class FXMLRegisterAffiliedOrganizationController extends RegisterController {
+public class FXMLRegisterAffiliatedOrganizationController extends RegisterController {
 
     @FXML private Button buttonBack;
     @FXML private Label labelError;
