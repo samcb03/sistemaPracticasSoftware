@@ -6,7 +6,7 @@
 <?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
 
-<StackPane style="-fx-background-color: #F5F4F0;" xmlns="http://javafx.com/javafx/26" xmlns:fx="http://javafx.com/fxml/1" fx:controller="uv.lis.GUI.controller.FXMLAdministratorMenuController">
+<StackPane style="-fx-background-color: #F5F4F0;" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="uv.lis.GUI.controller.FXMLAdministratorMenuController">
 
     <VBox alignment="CENTER" spacing="16">
 
@@ -18,9 +18,7 @@
 
             <Button fx:id="buttonRegisterProfessor" maxWidth="Infinity" onAction="#goToRegisterProfessor" style="-fx-background-color: #87CEEB;              -fx-text-fill: #FFFFFF; -fx-font-size: 14;              -fx-font-weight: bold; -fx-background-radius: 8;              -fx-pref-height: 44; -fx-cursor: hand;" text="Registrar Profesor" textFill="WHITE" />
 
-            <Button fx:id="buttonModifyProfessor" maxWidth="Infinity" onAction="#goToModifyProfessor" style="-fx-background-color: #87CEEB;              -fx-text-fill: #FFFFFF; -fx-font-size: 14;              -fx-font-weight: bold; -fx-background-radius: 8;              -fx-pref-height: 44; -fx-cursor: hand;" text="Modificar Profesor" />
-
-            <Button fx:id="buttonInactivateProfessor" maxWidth="Infinity" onAction="#goToInactivateProfessor" style="-fx-background-color: #87CEEB;              -fx-text-fill: #FFFFFF; -fx-font-size: 14;              -fx-font-weight: bold; -fx-background-radius: 8;              -fx-pref-height: 44; -fx-cursor: hand;" text="Inactivar Profesor" textFill="WHITE" />
+            <Button fx:id="buttonConsultProfessor" maxWidth="Infinity" onAction="#goToConsultProfessor" style="-fx-background-color: #87CEEB;              -fx-text-fill: #FFFFFF; -fx-font-size: 14;              -fx-font-weight: bold; -fx-background-radius: 8;              -fx-pref-height: 44; -fx-cursor: hand;" text="Consultar Profesor" />
 
         </VBox>
     </VBox>
