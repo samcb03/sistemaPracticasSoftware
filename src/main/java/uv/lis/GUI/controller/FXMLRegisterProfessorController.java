@@ -63,7 +63,11 @@ public class FXMLRegisterProfessorController extends RegisterController {
             validateText(textFieldPersonnelNumber.getText().trim(), "El número de personal"),
             validateComboBox(comboBoxCoordinator.getValue(), "una opción de coordinador")
         );
-        return validationStream.filter(Optional::isPresent).map(Optional::get).findFirst();
+        Optional<String> firstError = validationStream
+            .filter(Optional::isPresent)
+            .map(Optional::get)
+            .findFirst();
+        return firstError;
     }
 
     private void registerProfessor() {

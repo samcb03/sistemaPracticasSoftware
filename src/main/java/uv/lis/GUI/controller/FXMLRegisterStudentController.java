@@ -66,7 +66,11 @@ public class FXMLRegisterStudentController extends RegisterController {
             validateBirthDate(),
             validateComboBox(comboBoxGender.getValue(), "un género")
         );
-        return validationStream.filter(Optional::isPresent).map(Optional::get).findFirst();
+        Optional<String> firstError = validationStream
+            .filter(Optional::isPresent)
+            .map(Optional::get)
+            .findFirst();
+        return firstError;
     }
 
     private Optional<String> validateBirthDate() {

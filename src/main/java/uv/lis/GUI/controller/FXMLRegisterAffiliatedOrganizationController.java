@@ -60,7 +60,11 @@ public class FXMLRegisterAffiliatedOrganizationController extends RegisterContro
             validatePositiveInteger(textFieldNumberOfIndirectUsers.getText().trim(), 
                 "El número de usuarios indirectos")
         );
-        return validationStream.filter(Optional::isPresent).map(Optional::get).findFirst();
+       Optional<String> firstError = validationStream
+            .filter(Optional::isPresent)
+            .map(Optional::get)
+            .findFirst();
+        return firstError;
     }
 
     private void registerAffiliatedOrganization() {

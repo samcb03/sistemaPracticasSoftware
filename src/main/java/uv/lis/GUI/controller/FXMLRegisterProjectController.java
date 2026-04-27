@@ -67,7 +67,11 @@ public class FXMLRegisterProjectController extends RegisterController {
             validateText(textFieldObjective.getText().trim(), "El objetivo"),
             validateText(textAreaDescription.getText().trim(), "La descripción")
         );
-        return validationStream.filter(Optional::isPresent).map(Optional::get).findFirst();
+        Optional<String> firstError = validationStream
+            .filter(Optional::isPresent)
+            .map(Optional::get)
+            .findFirst();
+        return firstError;
     }
 
     private void registerProject() {
