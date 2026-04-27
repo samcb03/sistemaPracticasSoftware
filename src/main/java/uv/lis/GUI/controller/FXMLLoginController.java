@@ -3,6 +3,7 @@ package uv.lis.GUI.controller;
 
 import java.io.IOException;
 import java.net.URL;
+import java.util.Optional;
 import java.util.ResourceBundle;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -17,81 +18,96 @@ import javafx.stage.Stage;
 import uv.lis.logic.dao.UserDAO;
 import uv.lis.logic.dto.User;
 import uv.lis.logic.exceptions.AuthenticateException;
-import static uv.lis.logic.utils.InputValidator.PASSWORD_REGEX;
+import static uv.lis.logic.utils.InputValidator.validatePassword;
 
-public class FXMLLoginController implements Initializable{
 
+public class FXMLLoginController implements Initializable {
 
     @FXML private Button buttonLogin;
-    @FXML private TextField txtIdentification;
+    @FXML private TextField textFieldIdentification;
     @FXML private PasswordField fieldPassword;
     @FXML private Label labelError;
 
     private UserDAO userDAO;
-    private User user;
-
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        this.userDAO = new UserDAO();
+        userDAO = new UserDAO();
     }
 
     @FXML
     public void handleLogin() {
-        String identification = txtIdentification.getText().trim();
+        String identification = textFieldIdentification.getText().trim();
         String password = fieldPassword.getText();
-
-        if (identification.isEmpty()) {
-            showError("La identificación no puede estar vacía");
-        } else if (password.isEmpty()) {
-            showError("La contraseña no puede estar vacía");
-        } else if (!password.matches(PASSWORD_REGEX)) {
-            showError("La contraseña debe tener una mayúscula, un carácter especial y un número");
+        Optional<String> credentialError = validateCredentials(identification, password);
+        if (credentialError.isPresent()) {
+            showError(credentialError.get());
         } else {
-            try {
-                user = userDAO.authenticate(identification, password);
-                navigateTO(user.getUserType());
-            } catch (AuthenticateException e) {
-                showError(e.getMessage());
-            }
+            authenticateUser(identification, password);
         }
     }
 
-    private void showError(String message) {
-        labelError.setText(message);
-        labelError.setStyle("-fx-text-fill: red;");
+    private Optional<String> validateCredentials(String identification, String password) {
+        Optional<String> validationResult;
+        if (identification.isEmpty()) {
+            validationResult = Optional.of("La identificación no puede estar vacía");
+        } else {
+            validationResult = validatePassword(password);
+        }
+        return validationResult;
     }
 
-    private void navigateTO(String userType) {
-        String FXML = null;
+    private void authenticateUser(String identification, String password) {
+        try {
+            User authenticatedUser = userDAO.authenticate(identification, password);
+            navigateToUserMenu(authenticatedUser.getUserType());
+        } catch (AuthenticateException authException) {
+            showError(authException.getMessage());
+        }
+    }
 
+    private void navigateToUserMenu(String userType) {
+        Optional<String> fxmlPath = resolveFxmlPath(userType);
+        fxmlPath.ifPresent(this::loadScene);
+    }
+
+    private Optional<String> resolveFxmlPath(String userType) {
+        Optional<String> fxmlPath;
         switch (userType) {
             case "Estudiante":
-                FXML = "/uv/lis/GUI/view/FXMLStudentMenu.fxml";
+                fxmlPath = Optional.of("/uv/lis/GUI/view/FXMLStudentMenu.fxml");
                 break;
             case "Profesor":
-                FXML = "/uv/lis/GUI/view/FXMLProffesorMenu.fxml";
+                fxmlPath = Optional.of("/uv/lis/GUI/view/FXMLProfessorMenu.fxml");
                 break;
             case "Coordinador":
-                FXML = "/uv/lis/GUI/view/FXMLCoordinatorMenu.fxml";
+                fxmlPath = Optional.of("/uv/lis/GUI/view/FXMLCoordinatorMenu.fxml");
                 break;
             case "Administrador":
-                FXML = "/uv/lis/GUI/view/FXMLAdministratorMenu.fxml";
+                fxmlPath = Optional.of("/uv/lis/GUI/view/FXMLAdministratorMenu.fxml");
                 break;
             default:
                 showError("Usuario no reconocido");
+                fxmlPath = Optional.empty();
                 break;
         }
-        if(FXML != null){
+        return fxmlPath;
+    }
+
+    private void loadScene(String fxmlPath) {
         try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource(FXML));
-            Parent root = loader.load();
-            Stage stage = (Stage) buttonLogin.getScene().getWindow();
-            stage.setScene(new Scene(root));
-            stage.show();
-        } catch (IOException e) {
+            FXMLLoader sceneLoader = new FXMLLoader(getClass().getResource(fxmlPath));
+            Parent sceneRoot = sceneLoader.load();
+            Stage currentStage = (Stage) buttonLogin.getScene().getWindow();
+            currentStage.setScene(new Scene(sceneRoot));
+            currentStage.show();
+        } catch (IOException ioException) {
             showError("Error al cargar la pantalla.");
         }
-        }
+    }
+
+    private void showError(String errorMessage) {
+        labelError.setText(errorMessage);
+        labelError.setStyle("-fx-text-fill: red;");
     }
 }

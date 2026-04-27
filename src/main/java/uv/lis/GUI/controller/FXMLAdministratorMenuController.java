@@ -1,5 +1,6 @@
 package uv.lis.GUI.controller;
 
+
 import java.io.IOException;
 import java.net.URL;
 import java.util.ResourceBundle;
@@ -11,6 +12,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.stage.Stage;
 import uv.lis.logic.dto.User;
+
 
 public class FXMLAdministratorMenuController implements Initializable {
 

@@ -3,6 +3,7 @@ package uv.lis.GUI.controller;
 
 import uv.lis.logic.dto.Student;
 import uv.lis.logic.exceptions.OperationException;
+import uv.lis.GUI.RegisterController;
 import uv.lis.logic.dao.StudentDAO;
 import uv.lis.logic.dao.UserDAO;
 import java.net.URL;
@@ -12,28 +13,25 @@ import java.util.ResourceBundle;
 import java.util.stream.Stream;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
-import javafx.fxml.Initializable;
-import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.DatePicker;
 import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
-import javafx.stage.Stage;
-import static uv.lis.logic.utils.InputValidator.MAX_TEXT_LENGTH;
+import static uv.lis.logic.utils.InputValidator.INVALID_ID;
 import static uv.lis.logic.utils.InputValidator.STUDENT_ID_LENGTH;
-import static uv.lis.logic.utils.InputValidator.LETTERS_ONLY_REGEX;
-import static uv.lis.logic.utils.InputValidator.PASSWORD_REGEX;
-import static uv.lis.logic.utils.InputValidator.INVALID_ID;;
+import static uv.lis.logic.utils.InputValidator.validateLettersOnly;
+import static uv.lis.logic.utils.InputValidator.validatePassword;
+import static uv.lis.logic.utils.InputValidator.validateExactLength;
+import static uv.lis.logic.utils.InputValidator.validateComboBox;
 
 
-public class FXMLRegisterStudentController implements Initializable {
+public class FXMLRegisterStudentController extends RegisterController {
 
     private static final String USER_TYPE_STUDENT = "Student";
 
     @FXML private Button buttonBack;
-    @FXML private Button buttonRegister;
     @FXML private Label labelError;
     @FXML private TextField textFieldFirstName;
     @FXML private TextField textFieldLastName;
@@ -50,163 +48,76 @@ public class FXMLRegisterStudentController implements Initializable {
         userDAO = new UserDAO();
         studentDAO = new StudentDAO();
         comboBoxGender.setItems(FXCollections.observableArrayList("Hombre", "Mujer", "Otro"));
+        setupControls(labelError, buttonBack);
     }
 
     @FXML
     public void validateFields() {
-        Optional<String> message = getValidationMessage();
-        if (message.isPresent()) {
-            showMessage(message.get());
-        } else {
-            labelError.setText("");
-            registerStudent();
-        }
+        Optional<String> firstValidationError = getFirstValidationError();
+        handleValidation(firstValidationError, this::registerStudent);
     }
 
-    private Optional<String> getValidationMessage() {
-        return Stream.of(
-            validateFirstName(textFieldFirstName.getText().trim()),
-            validateLastName(textFieldLastName.getText().trim()),
+    private Optional<String> getFirstValidationError() {
+        Stream<Optional<String>> validationStream = Stream.of(
+            validateLettersOnly(textFieldFirstName.getText().trim(), "El nombre"),
+            validateLettersOnly(textFieldLastName.getText().trim(), "Los apellidos"),
             validatePassword(textFieldPassword.getText().trim()),
-            validateStudentId(textFieldStudentId.getText().trim()),
+            validateExactLength(textFieldStudentId.getText().trim(), STUDENT_ID_LENGTH, "La matrícula"),
             validateBirthDate(),
-            validateGender()
-        )
-        .filter(Optional::isPresent)
-        .map(Optional::get)
-        .findFirst();
-    }
-
-    private Optional<String> validateFirstName(String firstName) {
-        Optional<String> message;
-        if (firstName.isEmpty() || firstName.length() > MAX_TEXT_LENGTH) {
-            message = Optional.of("El nombre no puede estar vacío o tener más de "
-                + MAX_TEXT_LENGTH + " caracteres");
-        } else if (!firstName.matches(LETTERS_ONLY_REGEX)) {
-            message = Optional.of("El nombre solo acepta letras");
-        } else {
-            message = Optional.empty();
-        }
-        return message;
-    }
-
-    private Optional<String> validateLastName(String lastName) {
-        Optional<String> message;
-        if (lastName.isEmpty() || lastName.length() > MAX_TEXT_LENGTH) {
-            message = Optional.of("Los apellidos no pueden estar vacíos o tener más de "
-                + MAX_TEXT_LENGTH + " caracteres");
-        } else if (!lastName.matches(LETTERS_ONLY_REGEX)) {
-            message = Optional.of("Los apellidos solo aceptan letras");
-        } else {
-            message = Optional.empty();
-        }
-        return message;
-    }
-
-    private Optional<String> validatePassword(String password) {
-        Optional<String> message = Optional.empty();
-        if (password.isEmpty()) {
-            message = Optional.of("La contraseña no puede estar vacía");
-        } else if(!password.matches(PASSWORD_REGEX)) {
-            message = Optional.of("La contraseña no tiene un formato válido");
-        } 
-        return message;
-    }
-
-    private Optional<String> validateStudentId(String studentId) {
-        Optional<String> message;
-        if (studentId.isEmpty() || studentId.length() != STUDENT_ID_LENGTH) {
-            message = Optional.of("La matrícula debe tener exactamente "
-                + STUDENT_ID_LENGTH + " caracteres");
-        } else {
-            message = Optional.empty();
-        }
-        return message;
+            validateComboBox(comboBoxGender.getValue(), "un género")
+        );
+        return validationStream.filter(Optional::isPresent).map(Optional::get).findFirst();
     }
 
     private Optional<String> validateBirthDate() {
-        Optional<String> message;
+        Optional<String> validationResult;
         if (datePickerBirthDate.getValue() == null) {
-            message = Optional.of("Seleccione una fecha de nacimiento");
+            validationResult = Optional.of("Seleccione una fecha de nacimiento");
         } else {
-            message = Optional.empty();
+            validationResult = Optional.empty();
         }
-        return message;
-    }
-
-    private Optional<String> validateGender() {
-        Optional<String> message;
-        if (comboBoxGender.getValue() == null) {
-            message = Optional.of("Seleccione un género");
-        } else {
-            message = Optional.empty();
-        }
-        return message;
+        return validationResult;
     }
 
     private void registerStudent() {
         Student student = buildStudent();
         try {
-            int generatedId = userDAO.registerUser(student);
-            handleRegistrationResult(student, generatedId);
-        } catch (OperationException e) {
-            showMessage(e.getMessage());
-        }
-    }
-
-    private void handleRegistrationResult(Student student, int generatedId) {
-        if (generatedId != INVALID_ID) {
-            student.setId(generatedId);
-            try {
+            int generatedUserId = userDAO.registerUser(student);
+            if (generatedUserId != INVALID_ID) {
+                student.setId(generatedUserId);
                 studentDAO.registerStudent(student);
                 showSuccess("Estudiante registrado correctamente");
                 clearFields();
-            } catch (OperationException e) {
-                showMessage(e.getMessage());
+            } else {
+                showError("Error al registrar el usuario");
             }
-        } else {
-            showMessage("Error registrando al usuario");
+        } catch (OperationException operationException) {
+            showError(operationException.getMessage());
         }
     }
 
     private Student buildStudent() {
+        String studentId = textFieldStudentId.getText().trim();
         Student student = new Student();
         student.setFirstName(textFieldFirstName.getText().trim());
         student.setLastName(textFieldLastName.getText().trim());
         student.setPassword(textFieldPassword.getText().trim());
-        student.setIdStudent(textFieldStudentId.getText().trim());
+        student.setIdStudent(studentId);
         student.setBirthDate(Date.valueOf(datePickerBirthDate.getValue()));
         student.setGender(comboBoxGender.getValue());
         student.setUserType(USER_TYPE_STUDENT);
         student.setInactive(false);
-        student.setIdentification(textFieldStudentId.getText().trim());
+        student.setIdentification(studentId);
         return student;
     }
 
-    private void clearFields() {
+    @Override
+    public void clearFields() {
         textFieldFirstName.clear();
         textFieldLastName.clear();
         textFieldPassword.clear();
         textFieldStudentId.clear();
         datePickerBirthDate.setValue(null);
         comboBoxGender.setValue(null);
-    }
-
-    private void showMessage(String message) {
-        labelError.setText(message);
-    }
-
-    private void showSuccess(String message) {
-        Alert alert = new Alert(Alert.AlertType.INFORMATION);
-        alert.setTitle("Éxito");
-        alert.setHeaderText(null);
-        alert.setContentText(message);
-        alert.showAndWait();
-    }
-
-    @FXML
-    public void goBack() {
-        Stage stage = (Stage) buttonBack.getScene().getWindow();
-        stage.close();
     }
 }
