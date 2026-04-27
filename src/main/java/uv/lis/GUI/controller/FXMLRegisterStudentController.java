@@ -3,7 +3,7 @@ package uv.lis.GUI.controller;
 
 import uv.lis.logic.dto.Student;
 import uv.lis.logic.exceptions.OperationException;
-import uv.lis.GUI.RegisterController;
+import uv.lis.GUI.ValidationAbstract;
 import uv.lis.logic.dao.StudentDAO;
 import uv.lis.logic.dao.UserDAO;
 import java.net.URL;
@@ -27,7 +27,7 @@ import static uv.lis.logic.utils.InputValidator.validateExactLength;
 import static uv.lis.logic.utils.InputValidator.validateComboBox;
 
 
-public class FXMLRegisterStudentController extends RegisterController {
+public class FXMLRegisterStudentController extends ValidationAbstract {
 
     private static final String USER_TYPE_STUDENT = "Student";
 

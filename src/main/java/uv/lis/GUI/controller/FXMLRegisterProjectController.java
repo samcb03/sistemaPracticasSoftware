@@ -4,7 +4,7 @@ package uv.lis.GUI.controller;
 import uv.lis.logic.dto.Project;
 import uv.lis.logic.exceptions.OperationException;
 import uv.lis.logic.dao.ProjectDAO;
-import uv.lis.GUI.RegisterController;
+import uv.lis.GUI.ValidationAbstract;
 import uv.lis.logic.dao.AffiliatedOrganizationDAO;
 import java.net.URL;
 import java.util.ArrayList;
@@ -22,7 +22,7 @@ import static uv.lis.logic.utils.InputValidator.validateText;
 import static uv.lis.logic.utils.InputValidator.validatePositiveInteger;
 
 
-public class FXMLRegisterProjectController extends RegisterController {
+public class FXMLRegisterProjectController extends ValidationAbstract {
 
     @FXML private Button buttonBack;
     @FXML private Label labelError;

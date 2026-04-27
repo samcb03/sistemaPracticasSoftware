@@ -3,7 +3,7 @@ package uv.lis.GUI.controller;
 
 import uv.lis.logic.dto.Professor;
 import uv.lis.logic.exceptions.OperationException;
-import uv.lis.GUI.RegisterController;
+import uv.lis.GUI.ValidationAbstract;
 import uv.lis.logic.dao.ProfessorDAO;
 import uv.lis.logic.dao.UserDAO;
 import java.net.URL;
@@ -24,7 +24,7 @@ import static uv.lis.logic.utils.InputValidator.validatePassword;
 import static uv.lis.logic.utils.InputValidator.validateComboBox;
 
 
-public class FXMLRegisterProfessorController extends RegisterController {
+public class FXMLRegisterProfessorController extends ValidationAbstract {
 
     private static final String COORDINATOR_OPTION = "Si";
     private static final String COORDINATOR_USER_TYPE = "Coordinador";

@@ -34,16 +34,6 @@ public final class InputValidator {
         return validationResult;
     }
 
-    public static Optional<String> validateRequired(String fieldValue, String fieldName) {
-        Optional<String> validationResult;
-        if (fieldValue.isEmpty()) {
-            validationResult = Optional.of(fieldName + " es obligatorio");
-        } else {
-            validationResult = Optional.empty();
-        }
-        return validationResult;
-    }
-
     public static Optional<String> validateText(String fieldValue, String fieldName) {
         Optional<String> validationResult;
         if (fieldValue.isEmpty() || fieldValue.length() > MAX_TEXT_LENGTH) {

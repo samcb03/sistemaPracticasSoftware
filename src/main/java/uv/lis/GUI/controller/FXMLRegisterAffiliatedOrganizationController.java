@@ -3,7 +3,7 @@ package uv.lis.GUI.controller;
 
 import uv.lis.logic.dto.AffiliatedOrganization;
 import uv.lis.logic.exceptions.OperationException;
-import uv.lis.GUI.RegisterController;
+import uv.lis.GUI.ValidationAbstract;
 import uv.lis.logic.dao.AffiliatedOrganizationDAO;
 import java.net.URL;
 import java.util.Optional;
@@ -14,13 +14,12 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import static uv.lis.logic.utils.InputValidator.validateLettersOnly;
-import static uv.lis.logic.utils.InputValidator.validateRequired;
 import static uv.lis.logic.utils.InputValidator.validateEmail;
 import static uv.lis.logic.utils.InputValidator.validatePhoneNumber;
 import static uv.lis.logic.utils.InputValidator.validatePositiveInteger;
 
 
-public class FXMLRegisterAffiliatedOrganizationController extends RegisterController {
+public class FXMLRegisterAffiliatedOrganizationController extends ValidationAbstract {
 
     @FXML private Button buttonBack;
     @FXML private Label labelError;
@@ -52,7 +51,7 @@ public class FXMLRegisterAffiliatedOrganizationController extends RegisterContro
             validateLettersOnly(textFieldName.getText().trim(), "El nombre"),
             validateLettersOnly(textFieldCity.getText().trim(), "La ciudad"),
             validateLettersOnly(textFieldState.getText().trim(), "El estado"),
-            validateRequired(textFieldSector.getText().trim(), "El sector"),
+            validateLettersOnly(textFieldSector.getText().trim(), "El sector"),
             validateEmail(textFieldEmail.getText().trim()),
             validatePhoneNumber(textFieldPhoneNumber.getText().trim()),
             validatePositiveInteger(textFieldNumberOfDirectUsers.getText().trim(), 
