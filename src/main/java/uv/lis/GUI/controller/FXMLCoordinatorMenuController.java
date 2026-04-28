@@ -1,6 +1,5 @@
 package uv.lis.GUI.controller;
 
-
 import java.io.IOException;
 import java.net.URL;
 import java.util.ResourceBundle;
@@ -11,10 +10,10 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.stage.Stage;
+import uv.lis.GUI.MenuAbstract;
 import uv.lis.logic.dto.User;
 
-
-public class FXMLCoordinatorMenuController implements Initializable{
+public class FXMLCoordinatorMenuController extends MenuAbstract implements Initializable {
 
     @FXML private Button buttonRegisterStudent;
     @FXML private Button buttonConsultStudent;
@@ -24,6 +23,7 @@ public class FXMLCoordinatorMenuController implements Initializable{
     @FXML private Button buttonConsultSupervisor;
     @FXML private Button buttonRegisterProject;
     @FXML private Button buttonConsultProject;
+    @FXML private Button buttonLogOut;
 
     private User user;
 
@@ -35,56 +35,48 @@ public class FXMLCoordinatorMenuController implements Initializable{
     public void initialize(URL location, ResourceBundle resources) {
     }
 
-    @FXML
-    public void goToRegisterStudent() {
-        navigateTo("/uv/lis/GUI/view/FXMLRegisterStudent.fxml");
+    @FXML public void goToRegisterStudent() { 
+        navigateTo("/uv/lis/GUI/view/FXMLRegisterStudent.fxml"); 
+    }
+
+    @FXML public void goToConsultStudent() { 
+        navigateTo("/uv/lis/GUI/view/FXMLConsultStudent.fxml"); 
+    }
+
+    @FXML public void goToRegisterOrganization() { 
+        navigateTo("/uv/lis/GUI/view/FXMLRegisterAffiliatedOrganization.fxml"); 
+    }
+
+    @FXML public void goToConsultOrganization() { 
+        navigateTo("/uv/lis/GUI/view/FXMLConsultAffiliatedOrganization.fxml"); 
+    }
+
+    @FXML public void goToRegisterSupervisor() { 
+        navigateTo("/uv/lis/GUI/view/FXMLRegisterSupervisor.fxml"); 
+    }
+
+    @FXML public void goToConsultSupervisor() { 
+        navigateTo("/uv/lis/GUI/view/FXMLConsultSupervisor.fxml"); 
+    }
+
+    @FXML public void goToRegisterProject() { 
+        navigateTo("/uv/lis/GUI/view/FXMLRegisterProject.fxml"); 
+    }
+
+    @FXML public void goToConsultProject() { 
+        navigateTo("/uv/lis/GUI/view/FXMLConsultSProject.fxml"); 
     }
 
     @FXML
-    public void goToConsultStudent() {
-        navigateTo("/uv/lis/GUI/view/FXMLConsultStudent.fxml");
-    }
-
-    @FXML
-    public void goToRegisterOrganization() {
-        navigateTo("/uv/lis/GUI/view/FXMLRegisterAffiliatedOrganization.fxml");
-    }
-
-    @FXML
-    public void goToConsultOrganization() {
-        navigateTo("/uv/lis/GUI/view/FXMLConsultAffiliedOrganization.fxml");
-    }
-
-    @FXML
-    public void goToRegisterSupervisor() {
-        navigateTo("/uv/lis/GUI/view/FXMLRegisterSupervisor.fxml");
-    }
-
-    @FXML
-    public void goToConsultSupervisor() {
-        navigateTo("/uv/lis/GUI/view/FXMLConsultSupervisor.fxml");
-    }
-
-    @FXML
-    public void goToRegisterProject() {
-        navigateTo("/uv/lis/GUI/view/FXMLRegisterProject.fxml");
-    }
-
-    @FXML
-    public void goToConsultProject() {
-        navigateTo("/uv/lis/GUI/view/FXMLConsultSProject.fxml");
-    }
-
-    private void navigateTo(String fxml) {
+    public void logOut() {
         try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource(fxml));
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/uv/lis/GUI/view/FXMLLogin.fxml"));
             Parent root = loader.load();
-            Stage stage = new Stage();
+            Stage stage = (Stage) buttonLogOut.getScene().getWindow();
             stage.setScene(new Scene(root));
             stage.show();
         } catch (IOException e) {
-            e.printStackTrace();
+            showError("Error al cerrar sesión.");
         }
     }
-
 }

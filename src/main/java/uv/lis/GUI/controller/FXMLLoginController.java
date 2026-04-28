@@ -1,9 +1,7 @@
 package uv.lis.GUI.controller;
 
-
 import java.io.IOException;
 import java.net.URL;
-import java.util.Optional;
 import java.util.ResourceBundle;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -18,96 +16,77 @@ import javafx.stage.Stage;
 import uv.lis.logic.dao.UserDAO;
 import uv.lis.logic.dto.User;
 import uv.lis.logic.exceptions.AuthenticateException;
-import static uv.lis.logic.utils.InputValidator.validatePassword;
-
 
 public class FXMLLoginController implements Initializable {
 
-    @FXML private Button buttonLogin;
     @FXML private TextField textFieldIdentification;
-    @FXML private PasswordField fieldPassword;
+    @FXML private PasswordField passwordField;
     @FXML private Label labelError;
+    @FXML private Button buttonLogin;
 
     private UserDAO userDAO;
+    private User user;
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        userDAO = new UserDAO();
+        this.userDAO = new UserDAO();
     }
 
     @FXML
     public void handleLogin() {
         String identification = textFieldIdentification.getText().trim();
-        String password = fieldPassword.getText();
-        Optional<String> credentialError = validateCredentials(identification, password);
-        if (credentialError.isPresent()) {
-            showError(credentialError.get());
-        } else {
-            authenticateUser(identification, password);
-        }
-    }
+        String password = passwordField.getText();
 
-    private Optional<String> validateCredentials(String identification, String password) {
-        Optional<String> validationResult;
         if (identification.isEmpty()) {
-            validationResult = Optional.of("La identificación no puede estar vacía");
+            showError("La identificación no puede estar vacía");
+        } else if (password.isEmpty()) {
+            showError("La contraseña no puede estar vacía");
         } else {
-            validationResult = validatePassword(password);
-        }
-        return validationResult;
-    }
-
-    private void authenticateUser(String identification, String password) {
-        try {
-            User authenticatedUser = userDAO.authenticate(identification, password);
-            navigateToUserMenu(authenticatedUser.getUserType());
-        } catch (AuthenticateException authException) {
-            showError(authException.getMessage());
+            try {
+                user = userDAO.authenticate(identification, password);
+                navigateTO(user.getUserType());
+            } catch (AuthenticateException e) {
+                showError(e.getMessage());
+            }
         }
     }
 
-    private void navigateToUserMenu(String userType) {
-        Optional<String> fxmlPath = resolveFxmlPath(userType);
-        fxmlPath.ifPresent(this::loadScene);
+    private void showError(String message) {
+        labelError.setText(message);
+        labelError.setStyle("-fx-text-fill: red;");
     }
 
-    private Optional<String> resolveFxmlPath(String userType) {
-        Optional<String> fxmlPath;
+    private void navigateTO(String userType) {
+        String fxml = null;
+
         switch (userType) {
             case "Estudiante":
-                fxmlPath = Optional.of("/uv/lis/GUI/view/FXMLStudentMenu.fxml");
+                fxml = "/uv/lis/GUI/view/FXMLStudentMenu.fxml";
                 break;
             case "Profesor":
-                fxmlPath = Optional.of("/uv/lis/GUI/view/FXMLProfessorMenu.fxml");
+                fxml = "/uv/lis/GUI/view/FXMLProfessorMenu.fxml";
                 break;
             case "Coordinador":
-                fxmlPath = Optional.of("/uv/lis/GUI/view/FXMLCoordinatorMenu.fxml");
+                fxml = "/uv/lis/GUI/view/FXMLCoordinatorMenu.fxml";
                 break;
             case "Administrador":
-                fxmlPath = Optional.of("/uv/lis/GUI/view/FXMLAdministratorMenu.fxml");
+                fxml = "/uv/lis/GUI/view/FXMLAdministratorMenu.fxml";
                 break;
             default:
                 showError("Usuario no reconocido");
-                fxmlPath = Optional.empty();
                 break;
         }
-        return fxmlPath;
-    }
 
-    private void loadScene(String fxmlPath) {
-        try {
-            FXMLLoader sceneLoader = new FXMLLoader(getClass().getResource(fxmlPath));
-            Parent sceneRoot = sceneLoader.load();
-            Stage currentStage = (Stage) buttonLogin.getScene().getWindow();
-            currentStage.setScene(new Scene(sceneRoot));
-            currentStage.show();
-        } catch (IOException ioException) {
-            showError("Error al cargar la pantalla.");
+        if (fxml != null) {
+            try {
+                FXMLLoader loader = new FXMLLoader(getClass().getResource(fxml));
+                Parent root = loader.load();
+                Stage stage = (Stage) buttonLogin.getScene().getWindow();
+                stage.setScene(new Scene(root));
+                stage.show();
+            } catch (IOException e) {
+                showError("Error al cargar la pantalla.");
+            }
         }
-    }
-
-    private void showError(String errorMessage) {
-        labelError.setText(errorMessage);
-        labelError.setStyle("-fx-text-fill: red;");
     }
 }
