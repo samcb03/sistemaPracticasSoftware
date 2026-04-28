@@ -7,45 +7,47 @@
 <?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
 
-<StackPane style="-fx-background-color: #F5F4F0;"
-           xmlns="http://javafx.com/javafx"
+<StackPane xmlns="http://javafx.com/javafx"
            xmlns:fx="http://javafx.com/fxml"
-           fx:controller="uv.lis.GUI.controller.FXMLAdministratorMenuController">
+           fx:controller="uv.lis.GUI.controller.FXMLStudentMenuController"
+           style="-fx-background-color: #F5F4F0;">
 
     <VBox alignment="CENTER" spacing="16">
 
-        <VBox maxWidth="360" minWidth="360" spacing="12"
+        <VBox spacing="12"
               style="-fx-background-color: white;
                      -fx-background-radius: 12;
                      -fx-border-color: #E0DED8;
                      -fx-border-width: 0.5;
                      -fx-border-radius: 12;
-                     -fx-padding: 40 32 40 32;">
+                     -fx-padding: 40 32 40 32;"
+              maxWidth="360"
+              minWidth="360">
 
-            <Label text="Menu Administrador"
+            <Label text="Menu Estudiante"
                    style="-fx-font-size: 24;
-                          -fx-text-fill: #1A1A1A;">
+                          -fx-text-fill: #000000;">
                 <VBox.margin><Insets bottom="16"/></VBox.margin>
             </Label>
 
-            <Button fx:id="buttonRegisterProfessor"
-                    text="Registrar Profesor"
-                    onAction="#goToRegisterProfessor"
+            <Button fx:id="buttonSolicityProject"
+                    text="Solicitar Proyecto"
+                    onAction="#goToSolicityProject"
                     maxWidth="Infinity"
                     style="-fx-background-color: #87CEEB;
-                           -fx-text-fill: #FFFFFF;
+                           -fx-text-fill: #ffffff;
                            -fx-font-size: 14;
                            -fx-font-weight: bold;
                            -fx-background-radius: 8;
                            -fx-pref-height: 44;
                            -fx-cursor: hand;"/>
 
-            <Button fx:id="buttonConsultProfessor"
-                    text="Consultar Profesor"
-                    onAction="#goToConsultProfessor"
+            <Button fx:id="buttonNotifications"
+                    text="Notificaciones"
+                    onAction="#goToNotifications"
                     maxWidth="Infinity"
                     style="-fx-background-color: #87CEEB;
-                           -fx-text-fill: #FFFFFF;
+                           -fx-text-fill: #ffffff;
                            -fx-font-size: 14;
                            -fx-font-weight: bold;
                            -fx-background-radius: 8;
@@ -61,7 +63,7 @@
                     onAction="#logOut"
                     maxWidth="Infinity"
                     style="-fx-background-color: #E74C3C;
-                           -fx-text-fill: #FFFFFF;
+                           -fx-text-fill: #ffffff;
                            -fx-font-size: 14;
                            -fx-font-weight: bold;
                            -fx-background-radius: 8;

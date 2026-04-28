@@ -181,6 +181,8 @@ public class AffiliatedOrganizationDAO implements IAffiliatedOrganizationDAO{
         return isInactive;
     }
 
+
+    @Override
     public ArrayList<String> getAllOrganizationNames() throws OperationException{
         String afilliatedOrganizationQuery = "SELECT nombreOV FROM OrganizacionVinculada";
         ArrayList<String> organizationNames = new ArrayList<>();

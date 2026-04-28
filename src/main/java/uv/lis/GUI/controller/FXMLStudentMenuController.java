@@ -13,10 +13,10 @@ import javafx.stage.Stage;
 import uv.lis.GUI.MenuAbstract;
 import uv.lis.logic.dto.User;
 
-public class FXMLAdministratorMenuController extends MenuAbstract implements Initializable {
+public class FXMLStudentMenuController extends MenuAbstract implements Initializable {
 
-    @FXML private Button buttonRegisterProfessor;
-    @FXML private Button buttonConsultProfessor;
+    @FXML private Button buttonSolicityProject;
+    @FXML private Button buttonNotifications;
     @FXML private Button buttonLogOut;
 
     private User user;
@@ -29,14 +29,14 @@ public class FXMLAdministratorMenuController extends MenuAbstract implements Ini
     public void initialize(URL location, ResourceBundle resources) {
     }
 
-   @FXML
-    public void goToRegisterProfessor() {
-        navigateTo("/uv/lis/GUI/view/FXMLRegisterProfessor.fxml");
+    @FXML
+    public void goToSolicityProject() {
+        navigateTo("/uv/lis/GUI/view/FXMLSolicityProject.fxml");
     }
 
     @FXML
-    public void goToConsultProfessor() {
-        navigateTo("/uv/lis/GUI/view/FXMLConsultProfessor.fxml");
+    public void goToNotifications() {
+        navigateTo("/uv/lis/GUI/view/FXMLNotifications.fxml");
     }
 
     @FXML
