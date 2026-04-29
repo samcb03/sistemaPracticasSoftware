@@ -1,6 +1,8 @@
 package uv.lis.logic.dto;
 
+
 import java.util.Objects;
+
 
 public class Professor extends User {
     private String personnelNumber;
@@ -10,8 +12,9 @@ public class Professor extends User {
         
     }
    
-    public Professor(int idUser, String firstName, String lastName,String password, String personnelNumber, boolean isCoordinator) {
-        super(idUser, firstName, lastName, password, "Profesor", true);
+    public Professor(int idUser, String firstName, String lastName, String password, String email, int roleId, 
+            boolean isInactive, String personnelNumber, boolean isCoordinator) {
+        super(idUser, firstName, lastName, password, email, roleId, isInactive);
         this.personnelNumber = personnelNumber;
         this.isCoordinator = isCoordinator;
     }

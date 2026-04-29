@@ -1,5 +1,6 @@
 package uv.lis.GUI.controller;
 
+
 import java.io.IOException;
 import java.net.URL;
 import java.util.ResourceBundle;
@@ -16,6 +17,7 @@ import javafx.stage.Stage;
 import uv.lis.logic.dao.UserDAO;
 import uv.lis.logic.dto.User;
 import uv.lis.logic.exceptions.AuthenticateException;
+
 
 public class FXMLLoginController implements Initializable {
 
@@ -44,7 +46,7 @@ public class FXMLLoginController implements Initializable {
         } else {
             try {
                 user = userDAO.authenticate(identification, password);
-                navigateTO(user.getUserType());
+                navigateTO(user.getRoleId());
             } catch (AuthenticateException e) {
                 showError(e.getMessage());
             }
@@ -56,20 +58,20 @@ public class FXMLLoginController implements Initializable {
         labelError.setStyle("-fx-text-fill: red;");
     }
 
-    private void navigateTO(String userType) {
+    private void navigateTO(int userRoleId) {
         String fxml = null;
 
-        switch (userType) {
-            case "Estudiante":
+        switch (userRoleId) {
+            case 1:
                 fxml = "/uv/lis/GUI/view/FXMLStudentMenu.fxml";
                 break;
-            case "Profesor":
+            case 2:
                 fxml = "/uv/lis/GUI/view/FXMLProfessorMenu.fxml";
                 break;
-            case "Coordinador":
+            case 3:
                 fxml = "/uv/lis/GUI/view/FXMLCoordinatorMenu.fxml";
                 break;
-            case "Administrador":
+            case 4:
                 fxml = "/uv/lis/GUI/view/FXMLAdministratorMenu.fxml";
                 break;
             default:
