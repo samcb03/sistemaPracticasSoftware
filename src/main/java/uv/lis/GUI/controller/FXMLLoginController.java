@@ -21,7 +21,7 @@ import uv.lis.logic.exceptions.AuthenticateException;
 
 public class FXMLLoginController implements Initializable {
 
-    @FXML private TextField textFieldIdentification;
+    @FXML private TextField textFieldEmail;
     @FXML private PasswordField passwordField;
     @FXML private Label labelError;
     @FXML private Button buttonLogin;
@@ -36,16 +36,16 @@ public class FXMLLoginController implements Initializable {
 
     @FXML
     public void handleLogin() {
-        String identification = textFieldIdentification.getText().trim();
+        String email = textFieldEmail.getText().trim();
         String password = passwordField.getText();
 
-        if (identification.isEmpty()) {
-            showError("La identificación no puede estar vacía");
+        if (email.isEmpty()) {
+            showError("El correo electrónico no puede estar vacío");
         } else if (password.isEmpty()) {
             showError("La contraseña no puede estar vacía");
         } else {
             try {
-                user = userDAO.authenticate(identification, password);
+                user = userDAO.authenticate(email, password);
                 navigateTO(user.getRoleId());
             } catch (AuthenticateException e) {
                 showError(e.getMessage());
