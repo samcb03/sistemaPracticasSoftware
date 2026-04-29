@@ -32,12 +32,12 @@ fx:controller="uv.lis.GUI.controller.FXMLLoginController">
             <VBox.margin><Insets bottom="28" /></VBox.margin>
             </Label>
 
-            <Label fx:id="labelIdentification" style="-fx-font-size: 11;                           
-            -fx-text-fill: #888880;-fx-font-weight: bold;" text="IDENTIFICACION">
+            <Label fx:id="labelEmail" style="-fx-font-size: 11;                           
+            -fx-text-fill: #888880;-fx-font-weight: bold;" text="CORREO ELECTRÓNICO">
             <VBox.margin><Insets bottom="6" /></VBox.margin>
             </Label>
 
-            <TextField fx:id="textFieldIdentification" promptText="Matricula / No. Personal / Usuario" style="-fx-background-color: #F5F4F0;                               
+            <TextField fx:id="textFieldEmail" promptText="Correo electrónico" style="-fx-background-color: #F5F4F0;                               
             -fx-border-color: #C8C6C0;                               
             -fx-border-width: 0.5;                               
             -fx-border-radius: 8;                               
