@@ -27,8 +27,8 @@ public class UserDAO implements IUserDAO{
     public int registerUser(User user) throws OperationException {
         int generatedId = -1;
         String userQuery = "INSERT INTO Usuario" 
-            + "(nombre, apellidos, contraseña, rol) "
-            + "VALUES (?, ?, ?, ?);";
+            + "(nombre, apellidos, contraseña, email, idRol) "
+            + "VALUES (?, ?, ?, ?, ?);";
 
         try (Connection databaseConnection = connectionManager.getConnection();
             PreparedStatement preparedStatement = databaseConnection.prepareStatement(userQuery,
@@ -37,7 +37,8 @@ public class UserDAO implements IUserDAO{
             preparedStatement.setString(1, user.getFirstName());
             preparedStatement.setString(2, user.getLastName());
             preparedStatement.setString(3, user.getPassword());
-            preparedStatement.setString(4, user.getUserType());
+            preparedStatement.setString(4, user.getEmail());
+            preparedStatement.setInt(5, user.getRoleId());
 
             if (preparedStatement.executeUpdate() > NO_ROWS_AFFECTED) {
             
@@ -47,7 +48,8 @@ public class UserDAO implements IUserDAO{
                     }
                 } 
             } else {
-                throw new OperationException("No se pudo registrar al usuario. Intentelo mas tarde", null);
+                throw new OperationException("No se pudo registrar al usuario. Intentelo mas tarde", 
+                    null);
             }
         }
         catch (SQLException e) {
@@ -61,12 +63,12 @@ public class UserDAO implements IUserDAO{
     @Override
     public User authenticate(String email, String password) throws AuthenticateException {
         User userAuthenticate = null;
-        String userQuery = "SELECT u.idUsuario, u.contraseña,u.email, ru.nombreRol "
+        String userQuery = "SELECT u.idUsuario, u.contraseña, u.email, u.idRol, ru.nombreRol "
             + "FROM Usuario u "
             + "LEFT JOIN Alumno a ON u.idUsuario = a.idUsuario "
             + "LEFT JOIN Profesor p ON u.idUsuario = p.idUsuario "
             + "LEFT JOIN Administrador ad ON u.idUsuario = ad.idUsuario " 
-            + "LEFT JOIN Rol_Usuario ru ON u.idRol = ru.idRol"
+            + "LEFT JOIN Rol_Usuario ru ON u.idRol = ru.idRol "
             + "WHERE u.email = ? "
             + "AND u.contraseña = ?";
 
@@ -82,10 +84,11 @@ public class UserDAO implements IUserDAO{
                         userAuthenticate.setEmail(email);
 
                         if(resultSet.getString("nombreRol") != null) {
-                            userAuthenticate.setUserType(resultSet.getString("nombreRol")); 
+                            userAuthenticate.setRoleId(resultSet.getInt("idRol")); 
                         }
                     } else {
-                        throw new AuthenticateException("Usuario no encontrado, verifique sus datos", null);
+                        throw new AuthenticateException("Usuario no encontrado, verifique sus datos", 
+                            null);
                     }
                 }
             } catch (SQLException e) {

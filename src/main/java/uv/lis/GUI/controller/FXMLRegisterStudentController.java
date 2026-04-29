@@ -29,7 +29,7 @@ import static uv.lis.logic.utils.InputValidator.validateComboBox;
 
 public class FXMLRegisterStudentController extends ValidationAbstract {
 
-    private static final String USER_TYPE_STUDENT = "Student";
+    private static final int USER_TYPE_STUDENT = 1;
 
     @FXML private Button buttonBack;
     @FXML private Label labelError;
@@ -109,9 +109,8 @@ public class FXMLRegisterStudentController extends ValidationAbstract {
         student.setIdStudent(studentId);
         student.setBirthDate(Date.valueOf(datePickerBirthDate.getValue()));
         student.setGender(comboBoxGender.getValue());
-        student.setUserType(USER_TYPE_STUDENT);
+        student.setRoleId(USER_TYPE_STUDENT);
         student.setInactive(false);
-        student.setIdentification(studentId);
         return student;
     }
 

@@ -1,6 +1,8 @@
 package uv.lis.logic.dto;
 
+
 import java.util.Objects;
+
 
 public class User {
     private int id;
@@ -8,19 +10,20 @@ public class User {
     private String lastName;
     private String password;
     private String email;
-    private String userType;
+    private int roleId;
     private boolean isInactive;
 
     public User(){
     }
 
-    public User(int id, String firstName, String lastName, String password,String email, String userType, boolean isInactive) {
+    public User(int id, String firstName, String lastName, String password, String email, int roleId,
+            boolean isInactive) {
         this.id = id;
         this.firstName = firstName;
         this.lastName = lastName;
         this.password = password;
         this.email = email;
-        this.userType = userType;
+        this.roleId = roleId;
         this.isInactive = isInactive;
     }
 
@@ -64,12 +67,12 @@ public class User {
         this.email = email;
     }
 
-    public String getUserType() {
-        return userType;
+    public int getRoleId() {
+        return roleId;
     }
 
-    public void setUserType(String userType) {
-        this.userType = userType;
+    public void setRoleId(int roleId) {
+        this.roleId = roleId;
     }
 
     public boolean isInactive() {
@@ -95,7 +98,7 @@ public class User {
             && Objects.equals(lastName, other.lastName)
             && Objects.equals(password, other.password)
             && Objects.equals(email, other.email)
-            && Objects.equals(userType, other.userType)
+            && Objects.equals(roleId, other.roleId)
             && Objects.equals(isInactive, other.isInactive);
     }
 }

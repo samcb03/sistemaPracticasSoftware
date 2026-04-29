@@ -27,8 +27,8 @@ import static uv.lis.logic.utils.InputValidator.validateComboBox;
 public class FXMLRegisterProfessorController extends ValidationAbstract {
 
     private static final String COORDINATOR_OPTION = "Si";
-    private static final String COORDINATOR_USER_TYPE = "Coordinador";
-    private static final String PROFESSOR_USER_TYPE = "Profesor";
+    private static final int COORDINATOR_USER_TYPE = 3;
+    private static final int PROFESSOR_USER_TYPE = 2;
 
     @FXML private Button buttonBack;
     @FXML private Label labelMessage;
@@ -99,7 +99,7 @@ public class FXMLRegisterProfessorController extends ValidationAbstract {
         professor.setPassword(textFieldPassword.getText().trim());
         professor.setPersonnelNumber(textFieldPersonnelNumber.getText().trim());
         professor.setIsCoordinator(isCoordinator);
-        professor.setUserType(isCoordinator ? COORDINATOR_USER_TYPE : PROFESSOR_USER_TYPE);
+        professor.setRoleId(isCoordinator ? COORDINATOR_USER_TYPE : PROFESSOR_USER_TYPE);
         professor.setInactive(false);
         return professor;
     }
