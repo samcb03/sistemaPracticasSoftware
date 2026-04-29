@@ -38,8 +38,8 @@ public class ProjectSupervisorDAO implements IProjectSupervisorDAO {
                 supervisor = new ProjectSupervisor();
                 supervisor.setId(resultSet.getInt("idResponsableProyecto"));
                 supervisor.setName(resultSet.getString("nombre"));
-                supervisor.setEmail(resultSet.getString("correo"));
                 supervisor.setPosition(resultSet.getString("cargo"));
+                supervisor.setEmail(resultSet.getString("correo"));
             } else {
                 LOGGER.log(Level.INFO, "No se encontró un supervisor con el id {0}.", id);
                 throw new OperationException("No se encontró un supervisor con el id: " + id, null);
@@ -57,15 +57,15 @@ public class ProjectSupervisorDAO implements IProjectSupervisorDAO {
     public boolean registerProjectSupervisor(ProjectSupervisor projectSupervisor) throws OperationException {
         boolean isRegistered = false;
 
-        String projectSupervisorQuery = "INSERT INTO responsableProyecto(nombre, correo," 
-            + "cargo, estado) VALUES(?,?,?,?);";
+        String projectSupervisorQuery = "INSERT INTO responsableProyecto(nombre, cargo," 
+            + "correo, estado) VALUES(?,?,?,?);";
 
         try (Connection databaseConnection = connectionManager.getConnection();
              PreparedStatement preparedStatement = databaseConnection.prepareStatement(projectSupervisorQuery)) {
 
             preparedStatement.setString(1, projectSupervisor.getName());
-            preparedStatement.setString(2, projectSupervisor.getEmail());
-            preparedStatement.setString(3, projectSupervisor.getPosition());
+            preparedStatement.setString(2, projectSupervisor.getPosition());
+            preparedStatement.setString(3, projectSupervisor.getEmail());
             preparedStatement.setString(4, "0");
 
             if (preparedStatement.executeUpdate() > NO_ROWS_AFFECTED) {
@@ -89,14 +89,14 @@ public class ProjectSupervisorDAO implements IProjectSupervisorDAO {
         boolean isModified = false;
 
         String projectSupervisorQuery = "UPDATE responsableProyecto SET " 
-            + "nombre = ?, correo = ?, cargo = ? WHERE idResponsableProyecto = ?;";
+            + "nombre = ?, cargo = ?, correo = ? WHERE idResponsableProyecto = ?;";
 
         try (Connection databaseConnection = connectionManager.getConnection();
              PreparedStatement preparedStatement = databaseConnection.prepareStatement(projectSupervisorQuery)){
             
             preparedStatement.setString(1, projectSupervisor.getName());
-            preparedStatement.setString(2, projectSupervisor.getEmail());
-            preparedStatement.setString(3, projectSupervisor.getPosition());
+            preparedStatement.setString(2, projectSupervisor.getPosition());
+            preparedStatement.setString(3, projectSupervisor.getEmail());
             preparedStatement.setInt(4, projectSupervisor.getId());
 
             if(preparedStatement.executeUpdate() > NO_ROWS_AFFECTED) {

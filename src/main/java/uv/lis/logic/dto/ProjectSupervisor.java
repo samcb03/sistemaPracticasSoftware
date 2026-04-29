@@ -5,8 +5,9 @@ import java.util.Objects;
 public class ProjectSupervisor {
     private int id;
     private String name;
-    private String email;
     private String position;
+    private String email;
+    private boolean isInactive;
 
     public ProjectSupervisor(){
 
@@ -48,6 +49,14 @@ public class ProjectSupervisor {
 
     public void setEmail(String email) {
         this.email = email;
+    }
+
+    public boolean getIsInactive() {
+        return isInactive;
+    }
+
+    public void setIsInactive(boolean isInactive) {
+        this.isInactive = isInactive;
     }
 
         @Override
