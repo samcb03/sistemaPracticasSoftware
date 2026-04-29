@@ -56,9 +56,4 @@ public class FXMLCoordinatorMenuController extends MenuAbstract  {
         navigateTo("/uv/lis/GUI/view/FXMLConsultSProject.fxml"); 
     }
 
-    @FXML
-    public void logOut(Button buttonLogOut) {
-        navigateToLogOut(buttonLogOut);
-
-    }
 }

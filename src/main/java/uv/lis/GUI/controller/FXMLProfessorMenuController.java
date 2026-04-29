@@ -26,10 +26,4 @@ public class FXMLProfessorMenuController extends MenuAbstract  {
         navigateTo("/uv/lis/GUI/view/FXMLEvaluateReports.fxml");
     }
 
-
-    @FXML
-    public void logOut(Button buttonLogOut) {
-        navigateToLogOut(buttonLogOut);
-    }
-
 }
