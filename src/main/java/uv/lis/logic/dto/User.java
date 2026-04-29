@@ -7,18 +7,19 @@ public class User {
     private String firstName;
     private String lastName;
     private String password;
-    private String identification;
+    private String email;
     private String userType;
     private boolean isInactive;
 
     public User(){
     }
 
-    public User(int id, String firstName, String lastName, String password, String userType, boolean isInactive) {
+    public User(int id, String firstName, String lastName, String password,String email, String userType, boolean isInactive) {
         this.id = id;
         this.firstName = firstName;
         this.lastName = lastName;
         this.password = password;
+        this.email = email;
         this.userType = userType;
         this.isInactive = isInactive;
     }
@@ -55,12 +56,12 @@ public class User {
         this.password = password;
     }
 
-    public String getIdentification() {
-        return identification;
+    public String getEmail() {
+        return email;
     }
 
-    public void setIdentification(String identification) {
-        this.identification = identification;
+    public void setEmail(String email) {
+        this.email = email;
     }
 
     public String getUserType() {
@@ -93,7 +94,7 @@ public class User {
             && Objects.equals(firstName, other.firstName)
             && Objects.equals(lastName, other.lastName)
             && Objects.equals(password, other.password)
-            && Objects.equals(identification, other.identification)
+            && Objects.equals(email, other.email)
             && Objects.equals(userType, other.userType)
             && Objects.equals(isInactive, other.isInactive);
     }
