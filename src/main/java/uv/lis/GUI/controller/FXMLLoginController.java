@@ -1,6 +1,8 @@
 package uv.lis.GUI.controller;
 
 
+import static uv.lis.logic.utils.InputValidator.EMAIL_REGEX;
+
 import java.io.IOException;
 import java.net.URL;
 import java.util.ResourceBundle;
@@ -41,6 +43,8 @@ public class FXMLLoginController implements Initializable {
 
         if (email.isEmpty()) {
             showError("El correo electrónico no puede estar vacío");
+        }else if (!email.matches(EMAIL_REGEX)) {
+            showError("El email debe tener un @ y un . ");
         } else if (password.isEmpty()) {
             showError("La contraseña no puede estar vacía");
         } else {
@@ -87,8 +91,9 @@ public class FXMLLoginController implements Initializable {
                 stage.setScene(new Scene(root));
                 stage.show();
             } catch (IOException e) {
+                e.printStackTrace();
                 showError("Error al cargar la pantalla.");
             }
-        }
+        } 
     }
 }

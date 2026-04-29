@@ -55,7 +55,7 @@
 
             <Button fx:id="buttonLogOut"
                     text="Cerrar Sesion"
-                    onAction="#logOut"
+                    onAction="#navigateToLogOut"
                     maxWidth="Infinity"
                     style="-fx-background-color: #E74C3C;
                            -fx-text-fill: #FFFFFF;

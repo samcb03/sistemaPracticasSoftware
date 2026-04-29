@@ -28,8 +28,4 @@ public class FXMLStudentMenuController extends MenuAbstract {
         navigateTo("/uv/lis/GUI/view/FXMLNotifications.fxml");
     }
 
-    @FXML
-    public void logOut() {
-        navigateToLogOut(buttonLogOut);
-    }
 }

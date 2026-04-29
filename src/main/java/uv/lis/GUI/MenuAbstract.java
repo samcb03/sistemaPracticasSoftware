@@ -1,6 +1,8 @@
 package uv.lis.GUI;
 
 import java.io.IOException;
+
+import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.Parent;
@@ -10,6 +12,8 @@ import javafx.scene.control.Button;
 import javafx.stage.Stage;
 
 public abstract class MenuAbstract implements Initializable {
+
+    @FXML protected Button buttonLogOut;
 
     protected void navigateTo(String fxml) {
         try {
@@ -23,7 +27,8 @@ public abstract class MenuAbstract implements Initializable {
         }
     }
 
-    protected void navigateToLogOut(Button buttonLogOut) {
+    @FXML
+    protected void navigateToLogOut() {
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/uv/lis/GUI/view/FXMLLogin.fxml"));
             Parent root = loader.load();
