@@ -5,6 +5,7 @@
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
+<?import javafx.scene.control.Separator?>
 
 <StackPane xmlns="http://javafx.com/javafx"
            xmlns:fx="http://javafx.com/fxml"
@@ -52,6 +53,10 @@
                            -fx-background-radius: 8;
                            -fx-pref-height: 44;
                            -fx-cursor: hand;"/>
+
+              <Separator>
+                <VBox.margin><Insets top="8" bottom="8"/></VBox.margin>
+            </Separator>
 
             <Button fx:id="buttonLogOut"
                     text="Cerrar Sesion"
