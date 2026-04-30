@@ -25,6 +25,7 @@ import static uv.lis.logic.utils.InputValidator.validateLettersOnly;
 import static uv.lis.logic.utils.InputValidator.validatePassword;
 import static uv.lis.logic.utils.InputValidator.validateExactLength;
 import static uv.lis.logic.utils.InputValidator.validateComboBox;
+import static uv.lis.logic.utils.InputValidator.validateEmail;
 
 
 public class FXMLRegisterStudentController extends ValidationAbstract {
@@ -35,11 +36,12 @@ public class FXMLRegisterStudentController extends ValidationAbstract {
     @FXML private Label labelError;
     @FXML private TextField textFieldFirstName;
     @FXML private TextField textFieldLastName;
-    @FXML private PasswordField textFieldPassword;
+    @FXML private TextField textFieldEmail;
+    @FXML private PasswordField passwordFieldPassword;
     @FXML private TextField textFieldStudentId;
     @FXML private DatePicker datePickerBirthDate;
     @FXML private ComboBox<String> comboBoxGender;
-
+    
     private UserDAO userDAO;
     private StudentDAO studentDAO;
 
@@ -61,7 +63,8 @@ public class FXMLRegisterStudentController extends ValidationAbstract {
         Stream<Optional<String>> validationStream = Stream.of(
             validateLettersOnly(textFieldFirstName.getText().trim(), "El nombre"),
             validateLettersOnly(textFieldLastName.getText().trim(), "Los apellidos"),
-            validatePassword(textFieldPassword.getText().trim()),
+            validateEmail(textFieldEmail.getText().trim()),
+            validatePassword(passwordFieldPassword.getText().trim()),
             validateExactLength(textFieldStudentId.getText().trim(), STUDENT_ID_LENGTH, "La matrícula"),
             validateBirthDate(),
             validateComboBox(comboBoxGender.getValue(), "un género")
@@ -105,12 +108,13 @@ public class FXMLRegisterStudentController extends ValidationAbstract {
         Student student = new Student();
         student.setFirstName(textFieldFirstName.getText().trim());
         student.setLastName(textFieldLastName.getText().trim());
-        student.setPassword(textFieldPassword.getText().trim());
+        student.setEmail(textFieldEmail.getText().trim());
+        student.setPassword(passwordFieldPassword.getText().trim());
         student.setIdStudent(studentId);
         student.setBirthDate(Date.valueOf(datePickerBirthDate.getValue()));
         student.setGender(comboBoxGender.getValue());
         student.setRoleId(USER_TYPE_STUDENT);
-        student.setInactive(false);
+        student.setActive(true);
         return student;
     }
 
@@ -118,7 +122,8 @@ public class FXMLRegisterStudentController extends ValidationAbstract {
     public void clearFields() {
         textFieldFirstName.clear();
         textFieldLastName.clear();
-        textFieldPassword.clear();
+        textFieldEmail.clear();
+        passwordFieldPassword.clear();
         textFieldStudentId.clear();
         datePickerBirthDate.setValue(null);
         comboBoxGender.setValue(null);

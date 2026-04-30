@@ -11,20 +11,20 @@ public class User {
     private String password;
     private String email;
     private int roleId;
-    private boolean isInactive;
+    private boolean isActive;
 
     public User(){
     }
 
     public User(int id, String firstName, String lastName, String password, String email, int roleId,
-            boolean isInactive) {
+            boolean isActive) {
         this.id = id;
         this.firstName = firstName;
         this.lastName = lastName;
         this.password = password;
         this.email = email;
         this.roleId = roleId;
-        this.isInactive = isInactive;
+        this.isActive = isActive;
     }
 
     public int getId() {
@@ -75,12 +75,12 @@ public class User {
         this.roleId = roleId;
     }
 
-    public boolean isInactive() {
-        return isInactive;
+    public boolean isActive() {
+        return isActive;
     }
 
-    public void setInactive(boolean isInactive) {
-        this.isInactive = isInactive;
+    public void setActive(boolean isActive) {
+        this.isActive = isActive;
     }
 
     @Override
@@ -99,6 +99,6 @@ public class User {
             && Objects.equals(password, other.password)
             && Objects.equals(email, other.email)
             && Objects.equals(roleId, other.roleId)
-            && Objects.equals(isInactive, other.isInactive);
+            && Objects.equals(isActive, other.isActive);
     }
 }

@@ -22,6 +22,7 @@ import static uv.lis.logic.utils.InputValidator.validateLettersOnly;
 import static uv.lis.logic.utils.InputValidator.validateText;
 import static uv.lis.logic.utils.InputValidator.validatePassword;
 import static uv.lis.logic.utils.InputValidator.validateComboBox;
+import static uv.lis.logic.utils.InputValidator.validateEmail;
 
 
 public class FXMLRegisterProfessorController extends ValidationAbstract {
@@ -34,7 +35,8 @@ public class FXMLRegisterProfessorController extends ValidationAbstract {
     @FXML private Label labelMessage;
     @FXML private TextField textFieldFirstName;
     @FXML private TextField textFieldLastName;
-    @FXML private PasswordField textFieldPassword;
+    @FXML private TextField textFieldEmail;
+    @FXML private PasswordField passwordFieldPassword;
     @FXML private TextField textFieldPersonnelNumber;
     @FXML private ComboBox<String> comboBoxCoordinator;
 
@@ -59,7 +61,8 @@ public class FXMLRegisterProfessorController extends ValidationAbstract {
         Stream<Optional<String>> validationStream = Stream.of(
             validateLettersOnly(textFieldFirstName.getText().trim(), "El nombre"),
             validateLettersOnly(textFieldLastName.getText().trim(), "El apellido"),
-            validatePassword(textFieldPassword.getText().trim()),
+            validateEmail(textFieldEmail.getText().trim()),
+            validatePassword(passwordFieldPassword.getText().trim()),
             validateText(textFieldPersonnelNumber.getText().trim(), "El número de personal"),
             validateComboBox(comboBoxCoordinator.getValue(), "una opción de coordinador")
         );
@@ -96,11 +99,12 @@ public class FXMLRegisterProfessorController extends ValidationAbstract {
         Professor professor = new Professor();
         professor.setFirstName(textFieldFirstName.getText().trim());
         professor.setLastName(textFieldLastName.getText().trim());
-        professor.setPassword(textFieldPassword.getText().trim());
+        professor.setEmail(textFieldEmail.getText().trim());
+        professor.setPassword(passwordFieldPassword.getText().trim());
         professor.setPersonnelNumber(textFieldPersonnelNumber.getText().trim());
         professor.setIsCoordinator(isCoordinator);
         professor.setRoleId(isCoordinator ? COORDINATOR_USER_TYPE : PROFESSOR_USER_TYPE);
-        professor.setInactive(false);
+        professor.setActive(true);
         return professor;
     }
 
@@ -108,7 +112,8 @@ public class FXMLRegisterProfessorController extends ValidationAbstract {
     public void clearFields() {
         textFieldFirstName.clear();
         textFieldLastName.clear();
-        textFieldPassword.clear();
+        textFieldEmail.clear();
+        passwordFieldPassword.clear();
         textFieldPersonnelNumber.clear();
         comboBoxCoordinator.setValue(null);
     }

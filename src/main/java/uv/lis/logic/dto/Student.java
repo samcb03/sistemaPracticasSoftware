@@ -19,8 +19,8 @@ public class Student extends User {
     }
 
     public Student(int idUser, String firstName, String lastName, String password, String email, int roleId, 
-            boolean isInactive, String idStudent, Date birthDate, int completedHours, String gender) {
-        super(idUser, firstName, lastName, password, email, roleId, isInactive);
+            boolean isActive, String idStudent, Date birthDate, int completedHours, String gender) {
+        super(idUser, firstName, lastName, password, email, roleId, isActive);
         this.idStudent = idStudent;
         this.birthDate = birthDate;
         this.completedHours = completedHours;
