@@ -20,7 +20,6 @@ public class FXMLCoordinatorMenuController extends MenuHandler  {
     @FXML private Button buttonConsultProject;
     @FXML private Button buttonLogOut;
 
-
     @Override
     public void initialize(URL location, ResourceBundle resources) {
     }

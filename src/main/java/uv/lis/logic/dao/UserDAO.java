@@ -11,6 +11,7 @@ import uv.lis.dataaccess.MySQLConnectionManager;
 import uv.lis.logic.contracts.IUserDAO;
 import uv.lis.logic.dto.User;
 import uv.lis.logic.exceptions.OperationException;
+import uv.lis.logic.utils.PasswordHasher;
 import uv.lis.logic.exceptions.AuthenticateException;
 
 
@@ -26,6 +27,10 @@ public class UserDAO implements IUserDAO{
     @Override 
     public int registerUser(User user) throws OperationException {
         int generatedId = -1;
+
+        String hashedPassword = PasswordHasher.hashPassword(user.getPassword());
+        user.setPassword(hashedPassword);
+
         String userQuery = "INSERT INTO Usuario" 
             + "(nombre, apellidos, contraseña, email, idRol) "
             + "VALUES (?, ?, ?, ?, ?);";
@@ -63,22 +68,28 @@ public class UserDAO implements IUserDAO{
     @Override
     public User authenticate(String email, String password) throws AuthenticateException {
         User userAuthenticate = null;
-        String userQuery = "SELECT u.idUsuario, u.email, u.idRol, ru.nombreRol "
+        String userQuery = "SELECT u.idUsuario, u.email, u.idRol, u.contraseña, ru.nombreRol "
             + "FROM Usuario u "
             + "JOIN Rol_Usuario ru ON u.idRol = ru.idRol " 
-            + "WHERE u.email = ? AND u.contraseña = ?";
+            + "WHERE u.email = ?";
 
         try (Connection databaseConnection = connectionManager.getConnection();
             PreparedStatement preparedStatement = databaseConnection.prepareStatement(userQuery)) {
 
             preparedStatement.setString(1, email);
-            preparedStatement.setString(2, password);
 
             try (ResultSet resultSet = preparedStatement.executeQuery()) {
                 if (resultSet.next()) {
-                    userAuthenticate = new User();
-                    userAuthenticate.setEmail(email);
-                    userAuthenticate.setRoleId(resultSet.getInt("idRol"));
+                    String hashedPassword = resultSet.getString("contraseña");
+
+                    if (PasswordHasher.verifyPassword(password, hashedPassword)) {
+                        userAuthenticate = new User();
+                        userAuthenticate.setEmail(email);
+                        userAuthenticate.setRoleId(resultSet.getInt("idRol"));
+                    } else {
+                        throw new AuthenticateException(
+                            "Contraseña incorrecta, verifique sus datos", null);
+                    }
                 } else {
                     throw new AuthenticateException(
                         "Usuario no encontrado, verifique sus datos", null);
