@@ -32,7 +32,7 @@ public class AffiliatedOrganizationDAO implements IAffiliatedOrganizationDAO{
         AffiliatedOrganization affiliatedOrganization = null;
 
         String affiliatedOrganizationQuery = "SELECT * FROM organizacionVinculada " 
-        + "WHERE idOrganizacionVinculada = ?"; 
+            + "WHERE idOrganizacionVinculada = ?"; 
 
         try (Connection databaseConnection = connectionManager.getConnection();
             PreparedStatement preparedStatement = databaseConnection.prepareStatement(affiliatedOrganizationQuery)) {
@@ -123,7 +123,7 @@ public class AffiliatedOrganizationDAO implements IAffiliatedOrganizationDAO{
             + "WHERE idOrganizacionVinculada = ?;";
 
         try (Connection databaseConnection = connectionManager.getConnection();
-             PreparedStatement preparedStatement = databaseConnection.prepareStatement(afilliatedOrganizationQuery)) {
+            PreparedStatement preparedStatement = databaseConnection.prepareStatement(afilliatedOrganizationQuery)) {
 
             preparedStatement.setString(1, affiliatedOrganization.getName());
             preparedStatement.setString(2, affiliatedOrganization.getCity());

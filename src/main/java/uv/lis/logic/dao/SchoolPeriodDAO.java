@@ -16,7 +16,7 @@ import uv.lis.logic.exceptions.OperationException;
 
 public class SchoolPeriodDAO implements ISchoolPeriodDAO{
     private static final int NO_ROWS_AFFECTED = 0; 
-    private static final Logger logger = Logger.getLogger(SchoolPeriodDAO.class.getName());
+    private static final Logger LOGGER = Logger.getLogger(SchoolPeriodDAO.class.getName());
     private MySQLConnectionManager connectionManager;
 
     public SchoolPeriodDAO(MySQLConnectionManager connectionManager) {
@@ -53,7 +53,7 @@ public class SchoolPeriodDAO implements ISchoolPeriodDAO{
             }
             
         } catch (SQLException e) {
-            logger.log(Level.SEVERE, "Error de conexion con la base de datos",e);
+            LOGGER.log(Level.SEVERE, "Error de conexion con la base de datos",e);
             throw new OperationException("Error al obtener el periodo escolar", null);
         }
         return schoolPeriod;
@@ -79,7 +79,7 @@ public class SchoolPeriodDAO implements ISchoolPeriodDAO{
                     null);
             }
         } catch (SQLException e) {
-            logger.log(Level.SEVERE, "Error de conexion con la base de datos",e);
+            LOGGER.log(Level.SEVERE, "Error de conexion con la base de datos",e);
             throw new OperationException("Error al registrar el periodo escolar", e);
         }
         return isRegistered;
@@ -105,7 +105,7 @@ public class SchoolPeriodDAO implements ISchoolPeriodDAO{
                     null);
             }
         } catch (SQLException e) {
-            logger.log(Level.SEVERE, "Error de conexion con la base de datos",e);
+            LOGGER.log(Level.SEVERE, "Error de conexion con la base de datos",e);
             throw new OperationException("Error al modificar el periodo escolar", e);
         }
         return isModified;
@@ -123,7 +123,7 @@ public class SchoolPeriodDAO implements ISchoolPeriodDAO{
                 return resultSet.next();
             }
         } catch (SQLException e) {
-            logger.log(Level.SEVERE, "Error validando periodo escolar", e);
+            LOGGER.log(Level.SEVERE, "Error validando periodo escolar", e);
             throw new OperationException("Error al validar el periodo escolar", e);
         }
     }

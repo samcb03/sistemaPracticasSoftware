@@ -1,6 +1,8 @@
 package uv.lis.logic.dto;
 
+
 import java.util.Objects;
+
 
 public class FinalReport extends Report {
     private int advancePercentage;

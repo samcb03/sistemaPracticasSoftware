@@ -37,7 +37,7 @@ public class AutoevaluationDAO implements IAutoevaluationDAO {
         + "puntuacionFinal) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);";
 
     try (Connection databaseConnection = connectionManager.getConnection();
-         PreparedStatement preparedStatement = databaseConnection.prepareStatement(query)) {
+        PreparedStatement preparedStatement = databaseConnection.prepareStatement(query)) {
         
         preparedStatement.setString(1, autoevaluation.getIdStudent());
         preparedStatement.setInt(2, autoevaluation.getProductiveParticipation());

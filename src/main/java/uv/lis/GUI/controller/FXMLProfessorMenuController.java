@@ -3,9 +3,10 @@ package uv.lis.GUI.controller;
 
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
-import uv.lis.GUI.MenuAbstract;
+import uv.lis.GUI.MenuHandler;
 
-public class FXMLProfessorMenuController extends MenuAbstract  {
+
+public class FXMLProfessorMenuController extends MenuHandler  {
 
     @FXML Button buttonRegisterNotifications;
     @FXML Button buttonEvaluateReports; 

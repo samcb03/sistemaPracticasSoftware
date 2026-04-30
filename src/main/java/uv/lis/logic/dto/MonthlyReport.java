@@ -1,5 +1,6 @@
 package uv.lis.logic.dto;
 
+
 public class MonthlyReport extends Report {
 
     private String month;

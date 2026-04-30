@@ -163,30 +163,31 @@ public class ProjectRequestDAO implements IProjectRequestDAO {
         return hasCapacity;
     }
 
-public boolean requestProject(String idStudent, int idProject) throws OperationException {
-    boolean isRegistered = false;
-    
-    if (validateProjectRequest(idStudent, idProject)) {
-        String query = "INSERT INTO Solicita_Proyecto (idProyecto, matricula, estatus) VALUES (?, ?, FALSE);";
+    @Override
+    public boolean requestProject(String idStudent, int idProject) throws OperationException {
+        boolean isRegistered = false;
+        
+        if (validateProjectRequest(idStudent, idProject)) {
+            String query = "INSERT INTO Solicita_Proyecto (idProyecto, matricula, estatus) VALUES (?, ?, FALSE);";
 
-        try (Connection databaseConnection = connectionManager.getConnection();
-            PreparedStatement preparedStatement = databaseConnection.prepareStatement(query)) {
-            
-            preparedStatement.setInt(1, idProject);
-            preparedStatement.setString(2, idStudent);
+            try (Connection databaseConnection = connectionManager.getConnection();
+                PreparedStatement preparedStatement = databaseConnection.prepareStatement(query)) {
+                
+                preparedStatement.setInt(1, idProject);
+                preparedStatement.setString(2, idStudent);
 
-            if (preparedStatement.executeUpdate() > NO_ROWS_AFFECTED) {
-                isRegistered = true;
-                LOGGER.log(Level.INFO, "Solicitud de proyecto {0} por practicante {1} registrada exitosamente", 
-                    new Object[]{idProject, idStudent});
+                if (preparedStatement.executeUpdate() > NO_ROWS_AFFECTED) {
+                    isRegistered = true;
+                    LOGGER.log(Level.INFO, "Solicitud de proyecto {0} por practicante {1} registrada exitosamente", 
+                        new Object[]{idProject, idStudent});
+                }
+            } catch (SQLException e) {
+                LOGGER.log(Level.SEVERE, "Error al registrar solicitud de proyecto", e);
+                throw new OperationException("Error al registrar solicitud", e);
             }
-        } catch (SQLException e) {
-            LOGGER.log(Level.SEVERE, "Error al registrar solicitud de proyecto", e);
-            throw new OperationException("Error al registrar solicitud", e);
         }
+        return isRegistered;
     }
-    return isRegistered;
-}
 
     @Override
     public boolean validateProjectRequest(String idStudent, int idProject) throws OperationException {

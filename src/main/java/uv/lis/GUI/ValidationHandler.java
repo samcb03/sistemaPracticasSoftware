@@ -10,7 +10,7 @@ import javafx.scene.control.Label;
 import javafx.stage.Stage;
 
 
-public abstract class ValidationAbstract implements Initializable {
+public abstract class ValidationHandler implements Initializable {
 
     protected Label messageLabel;
     protected Button backButton;

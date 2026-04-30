@@ -28,7 +28,8 @@ public class ExpedientDAO implements IExpedientDAO {
         String documentQuery = "INSERT INTO expediente (nombre, tipoDocumento,url, matricula) VALUES (?, ?, ?,?)";
 
         try (Connection databaseConnection = connectionManager.getConnection();
-             PreparedStatement preparedStatement = databaseConnection.prepareStatement(documentQuery, Statement.RETURN_GENERATED_KEYS)) {
+            PreparedStatement preparedStatement = databaseConnection.prepareStatement(documentQuery, 
+                Statement.RETURN_GENERATED_KEYS)) {
 
             preparedStatement.setString(1, expedient.getName());
             preparedStatement.setString(2, expedient.getTypeDocument()); 

@@ -100,12 +100,12 @@ public class ActivityDAO implements IActivityDAO {
                 isRegistered = true;
             } else {
                 LOGGER.log(Level.WARNING, "No se pudo registrar la actividad con ID {0}.", activity.getId());
-                throw new OperationException("No se pudo registrar la actividad con ID: " + activity.getId(), null);     
+                throw new OperationException("No se pudo registrar la actividad con ID: " + activity.getId(),
+                    null);     
             }   
         } catch (SQLException e) {
             LOGGER.log(Level.SEVERE, "Error de conexion con la base de datos",e);
             throw new OperationException("Error al registrar la actividad", e);
-
         }
         return isRegistered;
     }

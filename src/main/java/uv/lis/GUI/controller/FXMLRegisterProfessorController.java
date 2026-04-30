@@ -1,9 +1,15 @@
 package uv.lis.GUI.controller;
 
 
+import static uv.lis.logic.utils.InputValidator.INVALID_ID;
+import static uv.lis.logic.utils.InputValidator.validateLettersOnly;
+import static uv.lis.logic.utils.InputValidator.validateText;
+import static uv.lis.logic.utils.InputValidator.validatePassword;
+import static uv.lis.logic.utils.InputValidator.validateComboBox;
+import static uv.lis.logic.utils.InputValidator.validateEmail;
 import uv.lis.logic.dto.Professor;
 import uv.lis.logic.exceptions.OperationException;
-import uv.lis.GUI.ValidationAbstract;
+import uv.lis.GUI.ValidationHandler;
 import uv.lis.logic.dao.ProfessorDAO;
 import uv.lis.logic.dao.UserDAO;
 import java.net.URL;
@@ -17,15 +23,9 @@ import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
-import static uv.lis.logic.utils.InputValidator.INVALID_ID;
-import static uv.lis.logic.utils.InputValidator.validateLettersOnly;
-import static uv.lis.logic.utils.InputValidator.validateText;
-import static uv.lis.logic.utils.InputValidator.validatePassword;
-import static uv.lis.logic.utils.InputValidator.validateComboBox;
-import static uv.lis.logic.utils.InputValidator.validateEmail;
 
 
-public class FXMLRegisterProfessorController extends ValidationAbstract {
+public class FXMLRegisterProfessorController extends ValidationHandler {
 
     private static final String COORDINATOR_OPTION = "Si";
     private static final int COORDINATOR_USER_TYPE = 3;
