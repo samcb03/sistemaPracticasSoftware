@@ -32,7 +32,7 @@ import javafx.scene.control.TextField;
 public class FXMLRegisterStudentController extends ValidationHandler {
 
     private static final int USER_TYPE_STUDENT = 1;
-
+    
     @FXML private Button buttonBack;
     @FXML private Label labelError;
     @FXML private TextField textFieldFirstName;

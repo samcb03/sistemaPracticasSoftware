@@ -49,4 +49,5 @@ public abstract class MenuHandler implements Initializable {
         alert.setContentText(message);
         alert.showAndWait();
     }
+
 }
