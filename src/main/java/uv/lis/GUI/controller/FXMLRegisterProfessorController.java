@@ -3,10 +3,11 @@ package uv.lis.GUI.controller;
 
 import static uv.lis.logic.utils.InputValidator.INVALID_ID;
 import static uv.lis.logic.utils.InputValidator.validateLettersOnly;
-import static uv.lis.logic.utils.InputValidator.validateText;
 import static uv.lis.logic.utils.InputValidator.validatePassword;
 import static uv.lis.logic.utils.InputValidator.validateComboBox;
 import static uv.lis.logic.utils.InputValidator.validateEmail;
+import static uv.lis.logic.utils.InputValidator.validateExactLength;
+import static uv.lis.logic.utils.InputValidator.PROFESSOR_ID_LENGTH;
 import uv.lis.logic.dto.Professor;
 import uv.lis.logic.exceptions.OperationException;
 import uv.lis.GUI.ValidationHandler;
@@ -63,7 +64,7 @@ public class FXMLRegisterProfessorController extends ValidationHandler {
             validateLettersOnly(textFieldLastName.getText().trim(), "El apellido"),
             validateEmail(textFieldEmail.getText().trim()),
             validatePassword(passwordFieldPassword.getText().trim()),
-            validateText(textFieldPersonnelNumber.getText().trim(), "El número de personal"),
+            validateExactLength(textFieldPersonnelNumber.getText().trim(), PROFESSOR_ID_LENGTH, "El número de personal"),
             validateComboBox(comboBoxCoordinator.getValue(), "una opción de coordinador")
         );
         Optional<String> firstError = validationStream

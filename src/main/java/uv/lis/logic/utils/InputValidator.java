@@ -12,6 +12,7 @@ public final class InputValidator {
 
     public static final int MAX_TEXT_LENGTH = 255;
     public static final int STUDENT_ID_LENGTH = 9;
+    public static final int PROFESSOR_ID_LENGTH = 10;
     public static final int MIN_POSITIVE_INTEGER = 1;
     public static final int INVALID_ID = -1;
 
@@ -20,6 +21,7 @@ public final class InputValidator {
     public static final String EMAIL_REGEX = "^[\\w._%+\\-]+@[\\w.\\-]+\\.[a-zA-Z]{2,}$";
     public static final String PHONE_REGEX = "^[0-9]{7,15}$";
     public static final String PASSWORD_REGEX = "^(?=.*[A-Z])(?=.*[a-z])(?=.*[0-9])(?=.*[!@#$%^&*_]).{12,}$";
+    public static final String REPEAT_LETTERS_REGEX = ".*(.)\\1{2,}.*";
 
     public static Optional<String> validateLettersOnly(String fieldValue, String fieldName) {
         Optional<String> validationResult;
@@ -28,17 +30,8 @@ public final class InputValidator {
                 + MAX_TEXT_LENGTH + " caracteres");
         } else if (!fieldValue.matches(LETTERS_ONLY_REGEX)) {
             validationResult = Optional.of(fieldName + " solo acepta letras");
-        } else {
-            validationResult = Optional.empty();
-        }
-        return validationResult;
-    }
-
-    public static Optional<String> validateText(String fieldValue, String fieldName) {
-        Optional<String> validationResult;
-        if (fieldValue.isEmpty() || fieldValue.length() > MAX_TEXT_LENGTH) {
-            validationResult = Optional.of(fieldName + " no puede estar vacío o tener más de "
-                + MAX_TEXT_LENGTH + " caracteres");
+        } else if (fieldValue.matches(REPEAT_LETTERS_REGEX)) {
+            validationResult = Optional.of(fieldName + " no puede contener caracteres repetidos consecutivamente");
         } else {
             validationResult = Optional.empty();
         }

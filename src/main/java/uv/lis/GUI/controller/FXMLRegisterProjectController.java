@@ -1,7 +1,7 @@
 package uv.lis.GUI.controller;
 
 
-import static uv.lis.logic.utils.InputValidator.validateText;
+import static uv.lis.logic.utils.InputValidator.validateLettersOnly;
 import static uv.lis.logic.utils.InputValidator.validatePositiveInteger;
 import uv.lis.logic.dto.Project;
 import uv.lis.logic.exceptions.OperationException;
@@ -61,11 +61,11 @@ public class FXMLRegisterProjectController extends ValidationHandler {
 
     private Optional<String> getFirstValidationError() {
         Stream<Optional<String>> validationStream = Stream.of(
-            validateText(textFieldName.getText().trim(), "El nombre"),
-            validateText(textFieldMethodology.getText().trim(), "La metodología"),
+            validateLettersOnly(textFieldName.getText().trim(), "El nombre"),
+            validateLettersOnly(textFieldMethodology.getText().trim(), "La metodología"),
             validatePositiveInteger(textFieldCapacity.getText().trim(), "El cupo"),
-            validateText(textFieldObjective.getText().trim(), "El objetivo"),
-            validateText(textAreaDescription.getText().trim(), "La descripción")
+            validateLettersOnly(textFieldObjective.getText().trim(), "El objetivo"),
+            validateLettersOnly(textAreaDescription.getText().trim(), "La descripción")
         );
         Optional<String> firstError = validationStream
             .filter(Optional::isPresent)
