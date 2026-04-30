@@ -6,6 +6,8 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.ArrayList;
 import java.util.List;
 import uv.lis.logic.contracts.IExpedientDAO;
@@ -16,6 +18,7 @@ import uv.lis.dataaccess.MySQLConnectionManager;
 
 public class ExpedientDAO implements IExpedientDAO {
     private static final int NO_ROWS_AFFECTED = 0;
+    private static final Logger LOGGER = Logger.getLogger(ExpedientDAO.class.getName());
     private MySQLConnectionManager connectionManager;
 
     public ExpedientDAO() {
@@ -46,6 +49,7 @@ public class ExpedientDAO implements IExpedientDAO {
                 }
             }
         } catch (SQLException e) {
+            LOGGER.log(Level.SEVERE, "Error al guardar el documento en el expediente", e);
             throw new OperationException("Error de SQL al guardar el documento en el expediente.", e);
         }
         
@@ -71,6 +75,7 @@ public class ExpedientDAO implements IExpedientDAO {
                 documents.add(expedient);
             }
         } catch (SQLException e) {
+            LOGGER.log(Level.SEVERE, "Error al obtener los documentos del expediente", e);
             throw new OperationException("No se pudieron obtener los documentos", e);
         }
         
