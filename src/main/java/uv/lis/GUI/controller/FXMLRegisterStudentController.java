@@ -8,6 +8,7 @@ import static uv.lis.logic.utils.InputValidator.validatePassword;
 import static uv.lis.logic.utils.InputValidator.validateExactLength;
 import static uv.lis.logic.utils.InputValidator.validateComboBox;
 import static uv.lis.logic.utils.InputValidator.validateEmail;
+import static uv.lis.logic.utils.InputValidator.validateBirthDate;
 import uv.lis.logic.dto.Student;
 import uv.lis.logic.exceptions.OperationException;
 import uv.lis.GUI.ValidationHandler;
@@ -15,8 +16,6 @@ import uv.lis.logic.dao.StudentDAO;
 import uv.lis.logic.dao.UserDAO;
 import java.net.URL;
 import java.sql.Date;
-import java.time.LocalDate;
-import java.time.Period;
 import java.util.Optional;
 import java.util.ResourceBundle;
 import java.util.stream.Stream;
@@ -33,7 +32,6 @@ import javafx.scene.control.TextField;
 public class FXMLRegisterStudentController extends ValidationHandler {
 
     private static final int USER_TYPE_STUDENT = 1;
-    private static final int MINIMUM_AGE = 18;
 
     @FXML private Button buttonBack;
     @FXML private Label labelError;
@@ -69,7 +67,7 @@ public class FXMLRegisterStudentController extends ValidationHandler {
             validateEmail(textFieldEmail.getText().trim()),
             validatePassword(passwordFieldPassword.getText().trim()),
             validateExactLength(textFieldStudentId.getText().trim(), STUDENT_ID_LENGTH, "La matrícula"),
-            validateBirthDate(),
+            validateBirthDate(datePickerBirthDate.getValue()),
             validateComboBox(comboBoxGender.getValue(), "un género")
         );
         Optional<String> firstError = validationStream
@@ -77,28 +75,6 @@ public class FXMLRegisterStudentController extends ValidationHandler {
             .map(Optional::get)
             .findFirst();
         return firstError;
-    }
-
-    private Optional<String> validateBirthDate() {
-        Optional<String> validationResult;
-        
-        if (datePickerBirthDate.getValue() == null) {
-            validationResult = Optional.of("Seleccione una fecha de nacimiento");
-        } else {
-            LocalDate birthDate = datePickerBirthDate.getValue();
-            LocalDate today = LocalDate.now();
-            int age = Period.between(birthDate, today).getYears();
-            
-            if (birthDate.isAfter(today)) {
-                validationResult = Optional.of("La fecha de nacimiento no puede ser futura");
-            } else if (age < MINIMUM_AGE) {
-                validationResult = Optional.of("El estudiante debe ser mayor de " + MINIMUM_AGE + " años");
-            } else {
-                validationResult = Optional.empty();
-            }
-        }
-        
-        return validationResult;
     }
 
     private void registerStudent() {

@@ -1,6 +1,8 @@
 package uv.lis.logic.utils;
 
 
+import java.time.LocalDate;
+import java.time.Period;
 import java.util.Optional;
 
 
@@ -15,7 +17,7 @@ public final class InputValidator {
     public static final int PROFESSOR_ID_LENGTH = 10;
     public static final int MIN_POSITIVE_INTEGER = 1;
     public static final int INVALID_ID = -1;
-
+    private static final int MINIMUM_AGE = 18;
     public static final String LETTERS_ONLY_REGEX = "[\\p{L}\\s]+";
     public static final String ONLY_NUMBERS_REGEX = "\\d+";
     public static final String EMAIL_REGEX = "^[\\w._%+\\-]+@[\\w.\\-]+\\.[a-zA-Z]{2,}$";
@@ -118,6 +120,27 @@ public final class InputValidator {
         } else {
             validationResult = Optional.empty();
         }
+        return validationResult;
+    }
+
+    public static Optional<String> validateBirthDate(LocalDate birthDate) {
+        Optional<String> validationResult;
+        
+        if (birthDate == null) {
+            validationResult = Optional.of("Seleccione una fecha de nacimiento");
+        } else {
+            LocalDate today = LocalDate.now();
+            int age = Period.between(birthDate, today).getYears();
+            
+            if (birthDate.isAfter(today)) {
+                validationResult = Optional.of("La fecha de nacimiento no puede ser futura");
+            } else if (age < MINIMUM_AGE) {
+                validationResult = Optional.of("El estudiante debe ser mayor de " + MINIMUM_AGE + " años");
+            } else {
+                validationResult = Optional.empty();
+            }
+        }
+        
         return validationResult;
     }
 }
