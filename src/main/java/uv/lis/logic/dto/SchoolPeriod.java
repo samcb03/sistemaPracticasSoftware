@@ -4,6 +4,7 @@ package uv.lis.logic.dto;
 import java.sql.Date;
 import java.util.Objects;
 
+
 public class SchoolPeriod {
     private int id;
     private Date startDate;

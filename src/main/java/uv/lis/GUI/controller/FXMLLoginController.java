@@ -2,10 +2,11 @@ package uv.lis.GUI.controller;
 
 
 import static uv.lis.logic.utils.InputValidator.EMAIL_REGEX;
-
 import java.io.IOException;
 import java.net.URL;
 import java.util.ResourceBundle;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
@@ -23,8 +24,10 @@ import uv.lis.logic.exceptions.AuthenticateException;
 
 public class FXMLLoginController implements Initializable {
 
+    private static final Logger LOGGER = Logger.getLogger(FXMLLoginController.class.getName());
+    
     @FXML private TextField textFieldEmail;
-    @FXML private PasswordField passwordField;
+    @FXML private PasswordField passwordFieldPassword;
     @FXML private Label labelError;
     @FXML private Button buttonLogin;
 
@@ -39,7 +42,7 @@ public class FXMLLoginController implements Initializable {
     @FXML
     public void handleLogin() {
         String email = textFieldEmail.getText().trim();
-        String password = passwordField.getText();
+        String password = passwordFieldPassword.getText();
 
         if (email.isEmpty()) {
             showError("El correo electrónico no puede estar vacío");
@@ -91,7 +94,7 @@ public class FXMLLoginController implements Initializable {
                 stage.setScene(new Scene(root));
                 stage.show();
             } catch (IOException e) {
-                e.printStackTrace();
+                LOGGER.log(Level.SEVERE, "Error al cargar la pantalla: " + fxml, e);
                 showError("Error al cargar la pantalla.");
             }
         } 

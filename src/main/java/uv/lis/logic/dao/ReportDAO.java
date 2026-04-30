@@ -186,10 +186,10 @@ public class ReportDAO implements IReportDAO {
         boolean isModified = false;
         
         String reportQuery = "UPDATE Reporte SET descripcion = ?, observaciones = ?, actividad = ?, matricula = ? "
-                + "WHERE idReporte = ?";
+            + "WHERE idReporte = ?";
         
         String partialQuery = "UPDATE ReporteParcial SET tiempoPlaneado = ?, tiempoReal = ? "
-                + "WHERE idReporte = ?";
+            + "WHERE idReporte = ?";
 
         try (Connection databaseConnection = connectionManager.getConnection()) {
             databaseConnection.setAutoCommit(false);
@@ -236,10 +236,10 @@ public class ReportDAO implements IReportDAO {
         FinalReport report = null;
 
         String finalReportQuery = "SELECT r.idReporte, r.descripcion, r.observaciones, r.actividad, r.matricula, " 
-                + "rf.porcentajeAvance, rf.ResultadoEntregable " 
-                + "FROM ReporteFinal rf " 
-                + "INNER JOIN Reporte r ON rf.idReporte = r.idReporte " 
-                + "WHERE rf.idReporte = ?";
+            + "rf.porcentajeAvance, rf.ResultadoEntregable " 
+            + "FROM ReporteFinal rf " 
+            + "INNER JOIN Reporte r ON rf.idReporte = r.idReporte " 
+            + "WHERE rf.idReporte = ?";
 
         try (Connection databaseConnection = connectionManager.getConnection();
              PreparedStatement preparedStatement = databaseConnection.prepareStatement(finalReportQuery)) {
@@ -271,10 +271,10 @@ public class ReportDAO implements IReportDAO {
         boolean isRegistered = false;
         
         String reportQuery = "INSERT INTO Reporte (idReporte, descripcion, observaciones, actividad, matricula) " 
-                + "VALUES (?, ?, ?, ?, ?)";
+            + "VALUES (?, ?, ?, ?, ?)";
         
         String finalReportQuery = "INSERT INTO ReporteFinal (idReporte, porcentajeAvance, ResultadoEntregable) " 
-                + "VALUES (?, ?, ?)";
+            + "VALUES (?, ?, ?)";
 
         try (Connection databaseConnection = connectionManager.getConnection()) {
             databaseConnection.setAutoCommit(false);
@@ -317,10 +317,10 @@ public class ReportDAO implements IReportDAO {
         boolean isModified = false;
 
         String reportQuery = "UPDATE Reporte SET descripcion = ?, observaciones = ?, actividad = ?, matricula = ? "
-                + "WHERE idReporte = ?";
+            + "WHERE idReporte = ?";
         
         String finalReportQuery = "UPDATE ReporteFinal SET porcentajeAvance = ?, ResultadoEntregable = ? " 
-                + "WHERE idReporte = ?";
+            + "WHERE idReporte = ?";
 
         try (Connection databaseConnection = connectionManager.getConnection()) {
 

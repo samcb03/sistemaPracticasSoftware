@@ -1,6 +1,8 @@
 package uv.lis.logic.dto;
 
+
 import java.util.Objects;
+
 
 public class AffiliatedOrganization {
     private int id;

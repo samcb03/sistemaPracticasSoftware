@@ -61,7 +61,7 @@ public class ProjectSupervisorDAO implements IProjectSupervisorDAO {
             + "correo, estado) VALUES(?,?,?,?);";
 
         try (Connection databaseConnection = connectionManager.getConnection();
-             PreparedStatement preparedStatement = databaseConnection.prepareStatement(projectSupervisorQuery)) {
+            PreparedStatement preparedStatement = databaseConnection.prepareStatement(projectSupervisorQuery)) {
 
             preparedStatement.setString(1, projectSupervisor.getName());
             preparedStatement.setString(2, projectSupervisor.getPosition());

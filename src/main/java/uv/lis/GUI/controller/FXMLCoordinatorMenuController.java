@@ -5,9 +5,10 @@ import java.net.URL;
 import java.util.ResourceBundle;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
-import uv.lis.GUI.MenuAbstract;
+import uv.lis.GUI.MenuHandler;
 
-public class FXMLCoordinatorMenuController extends MenuAbstract  {
+
+public class FXMLCoordinatorMenuController extends MenuHandler  {
 
     @FXML private Button buttonRegisterStudent;
     @FXML private Button buttonConsultStudent;

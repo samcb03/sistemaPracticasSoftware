@@ -47,7 +47,7 @@ public class ExpedientCommon {
 
         } catch (OperationException e) {
             LOGGER.log(Level.SEVERE, "Error en el proceso de subir y registrar el documento para {0}", idStudent);
-            throw e; 
+            throw new OperationException("Error al subir documento ", e);
         }
     }
 }

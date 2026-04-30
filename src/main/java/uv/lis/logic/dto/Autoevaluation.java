@@ -1,6 +1,8 @@
 package uv.lis.logic.dto;
 
+
 import java.util.Objects;
+
 
 public class Autoevaluation {
     private static final int MAX_POSSIBLE_SCORE = 50;

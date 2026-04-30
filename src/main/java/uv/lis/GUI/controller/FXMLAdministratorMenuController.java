@@ -5,14 +5,14 @@ import java.net.URL;
 import java.util.ResourceBundle;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
-import uv.lis.GUI.MenuAbstract;
+import uv.lis.GUI.MenuHandler;
 
-public class FXMLAdministratorMenuController extends MenuAbstract  {
+
+public class FXMLAdministratorMenuController extends MenuHandler  {
 
     @FXML private Button buttonRegisterProfessor;
     @FXML private Button buttonConsultProfessor;
     @FXML private Button buttonLogOut;
-
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
