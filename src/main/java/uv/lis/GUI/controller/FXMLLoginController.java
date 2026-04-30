@@ -24,6 +24,11 @@ import uv.lis.logic.exceptions.AuthenticateException;
 
 public class FXMLLoginController implements Initializable {
 
+    private static final int USER_TYPE_STUDENT = 1;
+    private static final int USER_TYPE_PROFESSOR = 2;
+    private static final int USER_TYPE_COORDINATOR = 3;
+    private static final int USER_TYPE_ADMINISTRATOR = 4;
+
     private static final Logger LOGGER = Logger.getLogger(FXMLLoginController.class.getName());
     
     @FXML private TextField textFieldEmail;
@@ -69,16 +74,16 @@ public class FXMLLoginController implements Initializable {
         String fxml = null;
 
         switch (userRoleId) {
-            case 1:
+            case USER_TYPE_STUDENT:
                 fxml = "/uv/lis/GUI/view/FXMLStudentMenu.fxml";
                 break;
-            case 2:
+            case USER_TYPE_PROFESSOR:
                 fxml = "/uv/lis/GUI/view/FXMLProfessorMenu.fxml";
                 break;
-            case 3:
+            case USER_TYPE_COORDINATOR:
                 fxml = "/uv/lis/GUI/view/FXMLCoordinatorMenu.fxml";
                 break;
-            case 4:
+            case USER_TYPE_ADMINISTRATOR:
                 fxml = "/uv/lis/GUI/view/FXMLAdministratorMenu.fxml";
                 break;
             default:

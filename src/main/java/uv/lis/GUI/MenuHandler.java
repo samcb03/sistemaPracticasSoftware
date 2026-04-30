@@ -16,15 +16,11 @@ public abstract class MenuHandler implements Initializable {
 
     @FXML protected Button buttonLogOut;
 
-    private static Scene backScene = null;
-
     protected void navigateTo(String fxml) {
         try {
-            Stage stage = (Stage) buttonLogOut.getScene().getWindow();
-            backScene = stage.getScene(); // Guarda la escena actual
-
             FXMLLoader loader = new FXMLLoader(getClass().getResource(fxml));
             Parent root = loader.load();
+            Stage stage = new Stage();
             stage.setScene(new Scene(root));
             stage.show();
         } catch (IOException e) {
@@ -52,15 +48,6 @@ public abstract class MenuHandler implements Initializable {
         alert.setHeaderText(null);
         alert.setContentText(message);
         alert.showAndWait();
-    }
-
-    @FXML
-    protected void goBack() {
-        if (backScene != null) {
-            Stage stage = (Stage) buttonLogOut.getScene().getWindow();
-            stage.setScene(backScene);
-            backScene = null;
-        }
     }
 
 }
