@@ -98,5 +98,7 @@ public class FXMLLoginController implements Initializable {
                 showError("Error al cargar la pantalla.");
             }
         } 
+
+        
     }
 }
