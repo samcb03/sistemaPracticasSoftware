@@ -60,7 +60,7 @@ class UserDAOTest {
         when(resultSet.getInt(1)).thenReturn(42);
 
         assertEquals(42, userDAO.registerUser(builderUser("Juan", "Pérez", 
-            "password12", "Estudiante")));
+            "password12", 1)));
     }
 
     @Test
@@ -70,7 +70,7 @@ class UserDAOTest {
 
         OperationException exception = assertThrows(OperationException.class, () ->
             userDAO.registerUser(builderUser("Juan", "Pérez", "password12",
-                 "Estudiante"))
+                1))
         );
         assertTrue(exception.getMessage().contains("No se pudo registrar al usuario"));
     }
@@ -81,30 +81,29 @@ class UserDAOTest {
 
         OperationException exception = assertThrows(OperationException.class, () ->
             userDAO.registerUser(builderUser("Juan", "Pérez", "password12", 
-                "Estudiante"))
+                1))
         );
         assertTrue(exception.getMessage().contains("No se pudo registrar al usuario"));
     }
 
     @Test
-    void authenticate_student_returnsStudentUser() throws Exception {
-        when(databaseConnection.prepareStatement(anyString())).thenReturn(preparedStatement);
-        when(preparedStatement.executeQuery()).thenReturn(resultSet);
-        when(resultSet.next()).thenReturn(true);
-        when(resultSet.getString("matricula")).thenReturn("S24013322");
+void authenticate_student_returnsStudentUser() throws Exception {
+    when(databaseConnection.prepareStatement(anyString())).thenReturn(preparedStatement);
+    when(preparedStatement.executeQuery()).thenReturn(resultSet);
+    when(resultSet.next()).thenReturn(true);
+    when(resultSet.getInt("idRol")).thenReturn(1);
 
-        assertEquals("Estudiante", userDAO.authenticate("S24013322", "password12").getUserType());
-    }
+    assertEquals(1, userDAO.authenticate("gom03@gmail.com", "Gom_Ram002").getRoleId());
+}
 
     @Test
     void authenticate_administrator_returnsAdministratorUser() throws Exception {
         when(databaseConnection.prepareStatement(anyString())).thenReturn(preparedStatement);
         when(preparedStatement.executeQuery()).thenReturn(resultSet);
         when(resultSet.next()).thenReturn(true);
-        when(resultSet.getString("matricula")).thenReturn(null);
-        when(resultSet.getString("usuario")).thenReturn("admin01");
+        when(resultSet.getInt("idRol")).thenReturn(4);
 
-        assertEquals("Administrador", userDAO.authenticate("admin01", "password12").getUserType());
+        assertEquals(4, userDAO.authenticate("admin01", "password12").getRoleId());
     }
 
     @Test
@@ -112,11 +111,9 @@ class UserDAOTest {
         when(databaseConnection.prepareStatement(anyString())).thenReturn(preparedStatement);
         when(preparedStatement.executeQuery()).thenReturn(resultSet);
         when(resultSet.next()).thenReturn(true);
-        when(resultSet.getString("matricula")).thenReturn(null);
-        when(resultSet.getString("usuario")).thenReturn(null);
-        when(resultSet.getString("rol")).thenReturn("Coordinador");
+        when(resultSet.getInt("idRol")).thenReturn(3);
 
-        assertEquals("Coordinador", userDAO.authenticate("C12345", "password13").getUserType());
+        assertEquals(3, userDAO.authenticate("C12345", "password13").getRoleId());
     }
 
     @Test
@@ -124,11 +121,9 @@ class UserDAOTest {
         when(databaseConnection.prepareStatement(anyString())).thenReturn(preparedStatement);
         when(preparedStatement.executeQuery()).thenReturn(resultSet);
         when(resultSet.next()).thenReturn(true);
-        when(resultSet.getString("matricula")).thenReturn(null);
-        when(resultSet.getString("usuario")).thenReturn(null);
-        when(resultSet.getString("rol")).thenReturn("Maestro");
+        when(resultSet.getInt("idRol")).thenReturn(2);
 
-        assertEquals("Profesor", userDAO.authenticate("UV-001", "password12").getUserType());
+        assertEquals(2, userDAO.authenticate("UV-001", "password12").getRoleId());
     }
 
     @Test
@@ -153,12 +148,12 @@ class UserDAOTest {
         assertEquals("No disponible por el momento. Intentelo mas tarde", exception.getMessage());
     }
 
-    private User builderUser(String firstName, String lastName, String password, String userType) {
+    private User builderUser(String firstName, String lastName, String password, int roleId) {
         User user = new User();
         user.setFirstName(firstName);
         user.setLastName(lastName);
         user.setPassword(password);
-        user.setUserType(userType);
+        user.setRoleId(roleId);
         return user;
     }
 }

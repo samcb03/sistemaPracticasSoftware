@@ -63,38 +63,32 @@ public class UserDAO implements IUserDAO{
     @Override
     public User authenticate(String email, String password) throws AuthenticateException {
         User userAuthenticate = null;
-        String userQuery = "SELECT u.idUsuario, u.contraseña, u.email, u.idRol, ru.nombreRol "
+        String userQuery = "SELECT u.idUsuario, u.email, u.idRol, ru.nombreRol "
             + "FROM Usuario u "
-            + "LEFT JOIN Alumno a ON u.idUsuario = a.idUsuario "
-            + "LEFT JOIN Profesor p ON u.idUsuario = p.idUsuario "
-            + "LEFT JOIN Administrador ad ON u.idUsuario = ad.idUsuario " 
-            + "LEFT JOIN Rol_Usuario ru ON u.idRol = ru.idRol "
-            + "WHERE u.email = ? "
-            + "AND u.contraseña = ?";
+            + "JOIN Rol_Usuario ru ON u.idRol = ru.idRol " 
+            + "WHERE u.email = ? AND u.contraseña = ?";
 
         try (Connection databaseConnection = connectionManager.getConnection();
-             PreparedStatement preparedStatement = databaseConnection.prepareStatement(userQuery)){
-             
-                preparedStatement.setString(1, email);
-                preparedStatement.setString(2, password);
+            PreparedStatement preparedStatement = databaseConnection.prepareStatement(userQuery)) {
 
-                try (ResultSet resultSet = preparedStatement.executeQuery()){
-                    if (resultSet.next()) {
-                        userAuthenticate = new User();
-                        userAuthenticate.setEmail(email);
+            preparedStatement.setString(1, email);
+            preparedStatement.setString(2, password);
 
-                        if(resultSet.getString("nombreRol") != null) {
-                            userAuthenticate.setRoleId(resultSet.getInt("idRol")); 
-                        }
-                    } else {
-                        throw new AuthenticateException("Usuario no encontrado, verifique sus datos", 
-                            null);
-                    }
+            try (ResultSet resultSet = preparedStatement.executeQuery()) {
+                if (resultSet.next()) {
+                    userAuthenticate = new User();
+                    userAuthenticate.setEmail(email);
+                    userAuthenticate.setRoleId(resultSet.getInt("idRol"));
+                } else {
+                    throw new AuthenticateException(
+                        "Usuario no encontrado, verifique sus datos", null);
                 }
-            } catch (SQLException e) {
-                LOGGER.log(Level.SEVERE, "Error de autenticacion SQL", e);
-                throw new AuthenticateException("No disponible por el momento. Intentelo mas tarde", e);
-            }   
-            return userAuthenticate;
+            }
+        } catch (SQLException e) {
+            LOGGER.log(Level.SEVERE, "Error de autenticacion SQL", e);
+            throw new AuthenticateException(
+                "No disponible por el momento. Intentelo mas tarde", e);
         }
+        return userAuthenticate;
+    }
 }

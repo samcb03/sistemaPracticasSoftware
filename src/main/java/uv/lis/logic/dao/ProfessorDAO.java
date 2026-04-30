@@ -67,7 +67,7 @@ public class ProfessorDAO extends UserDAO implements IProfessorDAO {
     public boolean registerProfessor(Professor professor) throws OperationException {
         boolean isRegistered = false;
         
-        String professorQuery = "INSERT INTO Profesor (idUsuario, numeroPersonal, rol, estado) VALUES (?, ?, ?,?);";
+        String professorQuery = "INSERT INTO Profesor (idUsuario, numeroPersonal, idRol, estado) VALUES (?, ?, ?, ?);";
 
         try (Connection databaseConnection = connectionManager.getConnection();
              PreparedStatement preparedStatement = databaseConnection.prepareStatement(professorQuery)) {
@@ -76,9 +76,9 @@ public class ProfessorDAO extends UserDAO implements IProfessorDAO {
             preparedStatement.setString(2, professor.getPersonnelNumber());     
 
             if (professor.getIsCoordinator()) { 
-                preparedStatement.setString(3, "Coordinador");
+                preparedStatement.setInt(3, 3);
             } else {
-                preparedStatement.setString(3, "Maestro");
+                preparedStatement.setInt(3, 2);
             }
 
             preparedStatement.setString(4,"1");

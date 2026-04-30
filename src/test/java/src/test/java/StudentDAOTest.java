@@ -50,8 +50,9 @@ public class StudentDAOTest {
         when(resultSet.getDate("fechaNacimiento")).thenReturn(new Date(System.currentTimeMillis()));
         when(resultSet.getString("genero")).thenReturn("Femenino");
 
-        Student expectedStudent = new Student(1, "Denisse", "Reyes", "123456", 
-            "S123", new Date(System.currentTimeMillis()), 0, "Femenino");
+        Student expectedStudent = new Student(1, "Denisse", "Reyes",
+            "Deni@3234581", "deni@gmail.com", 1, false, "S123", 
+            new Date(System.currentTimeMillis()), 0, "Femenino");
 
         assertEquals(expectedStudent, studentDAO.getStudentById("S123"));
     }
@@ -79,7 +80,7 @@ public class StudentDAOTest {
         student.setIdStudent("S123");
         student.setBirthDate(new java.util.Date());
         student.setGender("Femenino");
-        student.setInactive(false);
+        student.setActive(true);
 
         boolean result = studentDAO.registerStudent(student);
 

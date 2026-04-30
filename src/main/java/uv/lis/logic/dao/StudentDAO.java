@@ -80,7 +80,7 @@ public class StudentDAO extends UserDAO implements IStudentDAO {
 
             preparedStatement.setDate(3, sqlBirthDate);
             preparedStatement.setString(4, student.getGender());
-            preparedStatement.setBoolean(5, student.isInactive());
+            preparedStatement.setBoolean(5, student.isActive());
 
             if (preparedStatement.executeUpdate() > NO_ROWS_AFFECTED) {
                 isRegistered = true;
