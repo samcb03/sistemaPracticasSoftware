@@ -15,6 +15,8 @@ import uv.lis.logic.dao.StudentDAO;
 import uv.lis.logic.dao.UserDAO;
 import java.net.URL;
 import java.sql.Date;
+import java.time.LocalDate;
+import java.time.Period;
 import java.util.Optional;
 import java.util.ResourceBundle;
 import java.util.stream.Stream;
@@ -31,6 +33,7 @@ import javafx.scene.control.TextField;
 public class FXMLRegisterStudentController extends ValidationHandler {
 
     private static final int USER_TYPE_STUDENT = 1;
+    private static final int MINIMUM_AGE = 18;
 
     @FXML private Button buttonBack;
     @FXML private Label labelError;
@@ -78,11 +81,23 @@ public class FXMLRegisterStudentController extends ValidationHandler {
 
     private Optional<String> validateBirthDate() {
         Optional<String> validationResult;
+        
         if (datePickerBirthDate.getValue() == null) {
             validationResult = Optional.of("Seleccione una fecha de nacimiento");
         } else {
-            validationResult = Optional.empty();
+            LocalDate birthDate = datePickerBirthDate.getValue();
+            LocalDate today = LocalDate.now();
+            int age = Period.between(birthDate, today).getYears();
+            
+            if (birthDate.isAfter(today)) {
+                validationResult = Optional.of("La fecha de nacimiento no puede ser futura");
+            } else if (age < MINIMUM_AGE) {
+                validationResult = Optional.of("El estudiante debe ser mayor de " + MINIMUM_AGE + " años");
+            } else {
+                validationResult = Optional.empty();
+            }
         }
+        
         return validationResult;
     }
 
