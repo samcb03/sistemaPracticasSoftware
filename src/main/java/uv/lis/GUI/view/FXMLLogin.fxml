@@ -68,7 +68,7 @@ fx:controller="uv.lis.GUI.controller.FXMLLoginController">
             <VBox.margin><Insets bottom="12" /></VBox.margin>
             </Label>
 
-            <Button fx:id="buttonLogin" maxWidth="Infinity" onAction="#handleLogin" style="-fx-background-color: #87CEEB; -fx-text-fill: #E8C97A; -fx-font-size: 14; -fx-font-weight: bold; -fx-background-radius: 8; -fx-pref-height: 44; -fx-cursor: hand;" text="Iniciar sesion" textFill="WHITE" />
+            <Button fx:id="buttonLogin" maxWidth="Infinity" onAction="#handleLogin" style="-fx-background-color: #87CEEB; -fx-text-fill: #ffffff; -fx-font-size: 14; -fx-font-weight: bold; -fx-background-radius: 8; -fx-pref-height: 44; -fx-cursor: hand;" text="Iniciar sesion" textFill="WHITE" />
         </VBox>
     </VBox>
 </StackPane>

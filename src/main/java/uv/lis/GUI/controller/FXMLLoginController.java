@@ -53,7 +53,7 @@ public class FXMLLoginController implements Initializable {
         } else {
             try {
                 user = userDAO.authenticate(email, password);
-                navigateTO(user.getRoleId());
+                navigateToMenus(user.getRoleId());
             } catch (AuthenticateException e) {
                 showError(e.getMessage());
             }
@@ -65,7 +65,7 @@ public class FXMLLoginController implements Initializable {
         labelError.setStyle("-fx-text-fill: red;");
     }
 
-    private void navigateTO(int userRoleId) {
+    private void navigateToMenus(int userRoleId) {
         String fxml = null;
 
         switch (userRoleId) {
