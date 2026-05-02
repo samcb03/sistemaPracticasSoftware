@@ -21,7 +21,7 @@ public class FXMLStudentMenuController extends MenuHandler {
 
     @FXML
     public void goToSolicityProject() {
-        navigateTo("/uv/lis/GUI/view/FXMLSolicityProject.fxml");
+        navigateTo("/uv/lis/GUI/view/FXMLRequestProject.fxml");
     }
 
     @FXML
