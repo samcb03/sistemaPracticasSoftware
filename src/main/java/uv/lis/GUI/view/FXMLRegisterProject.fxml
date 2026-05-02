@@ -54,14 +54,14 @@
                   <Font size="11.0" />
                </font>
             </Label>
-            <Button fx:id="buttonRegister" layoutX="80.0" layoutY="348.0" mnemonicParsing="false" onAction="#validateFields" prefHeight="28.0" prefWidth="146.0" style="-fx-background-color: white;" text="Registrar Proyecto" />
+            <Button layoutX="80.0" layoutY="348.0" mnemonicParsing="false" onAction="#validateFields" prefHeight="28.0" prefWidth="146.0" style="-fx-background-color: white;" text="Registrar Proyecto" />
             <Button fx:id="buttonBack" layoutX="276.0" layoutY="350.0" mnemonicParsing="false" onAction="#goBack" prefHeight="18.0" prefWidth="62.0" style="-fx-background-color: white;" text="Cancelar" />
             <TextArea fx:id="textAreaDescription" layoutX="160.0" layoutY="230.0" prefHeight="42.0" prefWidth="250.0" />
             <Label layoutX="28.0" layoutY="293.0" text="Organizacion Vinculada" />
             <ComboBox fx:id="comboBoxOrganizationName" layoutX="160.0" layoutY="289.0" prefHeight="25.0" prefWidth="250.0" />
          </children>
       </Pane>
-      <Label fx:id="labelTitle" layoutX="179.0" layoutY="33.0" text="Registrar Nuevo Proyecto">
+      <Label layoutX="179.0" layoutY="33.0" text="Registrar Nuevo Proyecto">
          <font>
             <Font name="System Bold" size="20.0" />
          </font>
