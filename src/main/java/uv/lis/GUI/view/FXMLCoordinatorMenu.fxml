@@ -77,9 +77,9 @@
                            -fx-pref-height: 44;
                            -fx-cursor: hand;"/>
 
-            <Button fx:id="buttonRegisterSupervisor"
+            <Button fx:id="buttonRegisterProjectSupervisor"
                     text="Registrar Responsable Tecnico"
-                    onAction="#goToRegisterSupervisor"
+                    onAction="#goToRegisterProjectSupervisor"
                     maxWidth="Infinity"
                     style="-fx-background-color: #87CEEB;
                            -fx-text-fill: #FFFFFF;

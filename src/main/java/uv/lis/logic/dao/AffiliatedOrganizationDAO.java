@@ -201,4 +201,30 @@ public class AffiliatedOrganizationDAO implements IAffiliatedOrganizationDAO{
 
         return organizationNames;
     }
+
+    @Override
+    public String getAffiliatedOrganizationName(String organizationName) throws OperationException {
+        String afilliatedOrganizationQuery = "SELECT nombreOV FROM OrganizacionVinculada WHERE nombreOV = ?";
+        String foundOrganizationName = null;
+
+        try (Connection databaseConnection = connectionManager.getConnection();
+             PreparedStatement preparedStatement = databaseConnection.prepareStatement(afilliatedOrganizationQuery)) {
+            preparedStatement.setString(1, organizationName);
+            try (ResultSet resultSet = preparedStatement.executeQuery()) {
+                if (resultSet.next()) {
+                    foundOrganizationName = resultSet.getString("nombreOV");
+                } else {
+                    LOGGER.log(Level.INFO, "No se encontró una organización vinculada con el nombre {0}.", 
+                        organizationName);
+                    throw new OperationException("No se encontró una organización vinculada con el nombre: " 
+                        + organizationName, null);
+                }
+            }
+        } catch (SQLException e) {
+               LOGGER.log(Level.SEVERE, "Error de conexion con la base de datos",e);
+                throw new OperationException("Error al conseguir la organización vinculada", e);
+        }
+
+        return foundOrganizationName;
+    }
 }

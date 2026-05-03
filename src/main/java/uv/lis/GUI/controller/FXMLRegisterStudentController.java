@@ -64,10 +64,10 @@ public class FXMLRegisterStudentController extends ValidationHandler {
         Stream<Optional<String>> validationStream = Stream.of(
             validateLettersOnly(textFieldFirstName.getText().trim(), "El nombre"),
             validateLettersOnly(textFieldLastName.getText().trim(), "Los apellidos"),
-            validateEmail(textFieldEmail.getText().trim()),
-            validatePassword(passwordFieldPassword.getText().trim()),
+            validateEmail(textFieldEmail.getText().trim(), "El correo electrónico"),
+            validatePassword(passwordFieldPassword.getText().trim(), "La contraseña"),
             validateExactLength(textFieldStudentId.getText().trim(), STUDENT_ID_LENGTH, "La matrícula"),
-            validateBirthDate(datePickerBirthDate.getValue()),
+            validateBirthDate(datePickerBirthDate.getValue(), "La fecha de nacimiento"),
             validateComboBox(comboBoxGender.getValue(), "un género")
         );
         Optional<String> firstError = validationStream

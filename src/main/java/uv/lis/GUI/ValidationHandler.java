@@ -3,15 +3,13 @@ package uv.lis.GUI;
 
 import java.util.Optional;
 
-import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
-import javafx.stage.Stage;
 
 
-public abstract class ValidationHandler implements Initializable {
+public abstract class ValidationHandler extends WindowHandler   {
 
     protected Label messageLabel;
     protected Button backButton;
@@ -47,9 +45,5 @@ public abstract class ValidationHandler implements Initializable {
         }
     }
 
-    @FXML
-    public void goBack() {
-        Stage currentStage = (Stage) backButton.getScene().getWindow();
-        currentStage.close();
-    }
+    
 }
