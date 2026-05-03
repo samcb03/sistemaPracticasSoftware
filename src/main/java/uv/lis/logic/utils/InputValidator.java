@@ -40,38 +40,38 @@ public final class InputValidator {
         return validationResult;
     }
 
-    public static Optional<String> validateEmail(String emailValue) {
+    public static Optional<String> validateEmail(String emailValue, String fieldName) {
         Optional<String> validationResult;
         if (emailValue.isEmpty()) {
-            validationResult = Optional.of("El correo electrónico no puede estar vacío");
+            validationResult = Optional.of(fieldName + " no puede estar vacío");
         } else if (!emailValue.matches(EMAIL_REGEX)) {
-            validationResult = Optional.of("El correo electrónico no tiene un formato válido");
+            validationResult = Optional.of(fieldName + " no tiene un formato válido");
         } else {
             validationResult = Optional.empty();
         }
         return validationResult;
     }
 
-    public static Optional<String> validatePhoneNumber(String phoneValue) {
+    public static Optional<String> validatePhoneNumber(String phoneValue, String fieldName) {
         Optional<String> validationResult;
         if (phoneValue.isEmpty()) {
-            validationResult = Optional.of("El número de teléfono no puede estar vacío");
+            validationResult = Optional.of(fieldName + " no puede estar vacío");
         } else if (!phoneValue.matches(PHONE_REGEX)) {
-            validationResult = Optional.of("El número de teléfono solo acepta entre 7 y 15 dígitos");
+            validationResult = Optional.of(fieldName + " solo acepta entre 7 y 15 dígitos");
         } else {
             validationResult = Optional.empty();
         }
         return validationResult;
     }
 
-    public static Optional<String> validatePassword(String passwordValue) {
+    public static Optional<String> validatePassword(String passwordValue, String fieldName) {
         passwordValue = passwordValue.trim();
         
         Optional<String> validationResult;
         if (passwordValue.isEmpty()) {
-            validationResult = Optional.of("La contraseña no puede estar vacía");
+            validationResult = Optional.of(fieldName + " no puede estar vacía");
         } else if (!passwordValue.matches(PASSWORD_REGEX)) {
-            validationResult = Optional.of("La contraseña debe tener una mayúscula, un carácter especial y un número");
+            validationResult = Optional.of(fieldName + " debe tener una mayúscula, un carácter especial y un número");
         } else {
             validationResult = Optional.empty();
         }
@@ -123,7 +123,7 @@ public final class InputValidator {
         return validationResult;
     }
 
-    public static Optional<String> validateBirthDate(LocalDate birthDate) {
+    public static Optional<String> validateBirthDate(LocalDate birthDate, String fieldName) {
         Optional<String> validationResult;
         
         if (birthDate == null) {
@@ -133,9 +133,9 @@ public final class InputValidator {
             int age = Period.between(birthDate, today).getYears();
             
             if (birthDate.isAfter(today)) {
-                validationResult = Optional.of("La fecha de nacimiento no puede ser futura");
+                validationResult = Optional.of(fieldName + " no puede ser futura");
             } else if (age < MINIMUM_AGE) {
-                validationResult = Optional.of("El estudiante debe ser mayor de " + MINIMUM_AGE + " años");
+                validationResult = Optional.of(fieldName + "debe ser mayor de " + MINIMUM_AGE + " años");
             } else {
                 validationResult = Optional.empty();
             }

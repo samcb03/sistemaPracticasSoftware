@@ -62,8 +62,8 @@ public class FXMLRegisterProfessorController extends ValidationHandler {
         Stream<Optional<String>> validationStream = Stream.of(
             validateLettersOnly(textFieldFirstName.getText().trim(), "El nombre"),
             validateLettersOnly(textFieldLastName.getText().trim(), "El apellido"),
-            validateEmail(textFieldEmail.getText().trim()),
-            validatePassword(passwordFieldPassword.getText().trim()),
+            validateEmail(textFieldEmail.getText().trim(), "El correo electrónico"),
+            validatePassword(passwordFieldPassword.getText().trim(), "La contraseña"),
             validateExactLength(textFieldPersonnelNumber.getText().trim(), PROFESSOR_ID_LENGTH, "El número de personal"),
             validateComboBox(comboBoxCoordinator.getValue(), "una opción de coordinador")
         );
