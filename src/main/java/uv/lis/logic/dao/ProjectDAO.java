@@ -25,7 +25,7 @@ public class ProjectDAO implements IProjectDAO{
     }
 
     @Override
-    public List<Project> getProjects() throws OperationException {
+    public List<Project> getAllProjects() throws OperationException {
         
         List<Project> projects = new ArrayList<>(); 
         String projectQuery = "SELECT * FROM Proyecto;";
@@ -54,15 +54,15 @@ public class ProjectDAO implements IProjectDAO{
     }
 
     @Override
-    public Project getProjectById(int idProject) throws OperationException {
+    public Project getProjectByName(String projectName) throws OperationException {
         Project project = null; 
-        String projectQuery = "SELECT * FROM Proyecto WHERE idProyecto = ?;";
+        String projectQuery = "SELECT * FROM Proyecto WHERE nombre = ?;";
 
         try (Connection databaseConnection = connectionManager.getConnection();
             PreparedStatement preparedStatement = databaseConnection.prepareStatement(projectQuery, 
                 PreparedStatement.RETURN_GENERATED_KEYS)) {
 
-            preparedStatement.setInt(1, idProject);
+            preparedStatement.setString(1, projectName);
             
             try (ResultSet resultSet = preparedStatement.executeQuery()) {
                 if (resultSet.next()) {
@@ -73,9 +73,10 @@ public class ProjectDAO implements IProjectDAO{
                     project.setCapacity(resultSet.getInt("cupo")); 
                     project.setMethodology(resultSet.getString("metodologiaProyecto"));
                     project.setObjective(resultSet.getString("objetivo"));
+                    project.setIdAffiliatedOrganization(resultSet.getInt("idOrganizacionVinculada"));
                 } else {
-                    LOGGER.log(Level.INFO, "No se encontró el proyecto con ID {0}.", idProject);
-                    throw new OperationException("No se encontró el proyecto con ID: " + idProject, null);
+                    LOGGER.log(Level.INFO, "No se encontró el proyecto con nombre {0}.", projectName);
+                    throw new OperationException("No se encontró el proyecto con nombre: " + projectName, null);
                 }
             }
         } catch (SQLException e) {
@@ -90,8 +91,8 @@ public class ProjectDAO implements IProjectDAO{
         boolean isRegistered = false;
 
         String projectQuery = "INSERT INTO Proyecto(nombre, "  
-        + "descripcion, cupo, metodologiaProyecto, objetivo,estado)" 
-        + " VALUES(?, ?, ?, ?, ?, ?);";
+        + "descripcion, cupo, metodologiaProyecto, objetivo, estado, idOrganizacionVinculada)" 
+        + " VALUES(?, ?, ?, ?, ?, ?, ?);";
 
         try (Connection databaseConnection = connectionManager.getConnection();
             PreparedStatement preparedStatement = databaseConnection.prepareStatement(projectQuery, 
@@ -103,7 +104,8 @@ public class ProjectDAO implements IProjectDAO{
             preparedStatement.setString(4, project.getMethodology());
             preparedStatement.setString(5, project.getObjective());
             preparedStatement.setBoolean(6, true);
-            
+            preparedStatement.setInt(7, project.getIdAffiliatedOrganization());
+
             if (preparedStatement.executeUpdate() > NO_ROWS_AFFECTED){
                 try(ResultSet resultSet = preparedStatement.getGeneratedKeys()) {
                     if (resultSet.next()) {
@@ -188,4 +190,23 @@ public class ProjectDAO implements IProjectDAO{
         return isInactive;
     }
 
+    @Override
+    public ArrayList<String> getAllProjectNames() throws OperationException{
+        String projectQuery = "SELECT nombre FROM Proyecto";
+        ArrayList<String> projectNames = new ArrayList<>();
+
+        try (Connection databaseConnection = connectionManager.getConnection();
+             PreparedStatement preparedStatement = databaseConnection.prepareStatement(projectQuery)) {
+                try (ResultSet resultSet = preparedStatement.executeQuery()) {
+                    while (resultSet.next()) {
+                        projectNames.add(resultSet.getString("nombre"));
+                    } 
+            }
+        } catch (SQLException e) {
+               LOGGER.log(Level.SEVERE, "Error de conexion con la base de datos",e);
+                throw new OperationException("Error al conseguir el nombre del proyecto", e);
+        }
+
+        return projectNames;
+    }
 }

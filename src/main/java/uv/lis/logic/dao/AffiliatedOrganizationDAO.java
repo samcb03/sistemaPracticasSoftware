@@ -201,4 +201,24 @@ public class AffiliatedOrganizationDAO implements IAffiliatedOrganizationDAO{
 
         return organizationNames;
     }
+
+    @Override
+    public int getOrganizationIdByName(String name) throws OperationException {
+        String query = "SELECT idOrganizacionVinculada FROM OrganizacionVinculada WHERE nombreOV = ?";
+        try (Connection databaseConnection = connectionManager.getConnection();
+            PreparedStatement preparedStatement = databaseConnection.prepareStatement(query)) {
+            preparedStatement.setString(1, name);
+            try (ResultSet resultSet = preparedStatement.executeQuery()) {
+                if (resultSet.next()) {
+                    int organizationId = resultSet.getInt("idOrganizacionVinculada");
+                    return organizationId;
+                } else {
+                    throw new OperationException("No se encontró la organización: " + name, null);
+                }
+            }
+        } catch (SQLException e) {
+            LOGGER.log(Level.SEVERE, "Error de conexión", e);
+            throw new OperationException("Error al obtener el ID de la organización", e);
+        }
+    }
 }

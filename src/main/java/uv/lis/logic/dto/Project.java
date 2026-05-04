@@ -15,6 +15,7 @@ public class Project {
     private ArrayList<Activity> activities;
     private AffiliatedOrganization affiliatedOrganization;
     private String idStudent;
+    private int idAffiliatedOrganization;
 
     public Project() {
         
@@ -99,6 +100,13 @@ public class Project {
         this.idStudent = idStudent;
     }
 
+    public int getIdAffiliatedOrganization() {
+        return idAffiliatedOrganization; 
+    }
+    
+    public void setIdAffiliatedOrganization(int id) { 
+        this.idAffiliatedOrganization = id; 
+    }
 
     @Override
     public boolean equals(Object object) {

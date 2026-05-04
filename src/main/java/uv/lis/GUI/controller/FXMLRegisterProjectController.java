@@ -1,6 +1,7 @@
 package uv.lis.GUI.controller;
 
 
+import static uv.lis.logic.utils.InputValidator.validateComboBox;
 import static uv.lis.logic.utils.InputValidator.validateLettersOnly;
 import static uv.lis.logic.utils.InputValidator.validatePositiveInteger;
 import uv.lis.logic.dto.Project;
@@ -65,7 +66,8 @@ public class FXMLRegisterProjectController extends ValidationHandler {
             validateLettersOnly(textFieldMethodology.getText().trim(), "La metodología"),
             validatePositiveInteger(textFieldCapacity.getText().trim(), "El cupo"),
             validateLettersOnly(textFieldObjective.getText().trim(), "El objetivo"),
-            validateLettersOnly(textAreaDescription.getText().trim(), "La descripción")
+            validateLettersOnly(textAreaDescription.getText().trim(), "La descripción"),
+            validateComboBox(comboBoxOrganizationName.getValue(), " organización")
         );
         Optional<String> firstError = validationStream
             .filter(Optional::isPresent)
@@ -96,6 +98,14 @@ public class FXMLRegisterProjectController extends ValidationHandler {
         project.setCapacity(Integer.parseInt(textFieldCapacity.getText().trim()));
         project.setObjective(textFieldObjective.getText().trim());
         project.setDescription(textAreaDescription.getText().trim());
+
+        String selectedOrganization = comboBoxOrganizationName.getValue();
+        try {
+            int organizationId = affiliatedOrganizationDAO.getOrganizationIdByName(selectedOrganization);
+            project.setIdAffiliatedOrganization(organizationId);
+        } catch (OperationException e) {
+            showError(e.getMessage());
+        }
         return project;
     }
 

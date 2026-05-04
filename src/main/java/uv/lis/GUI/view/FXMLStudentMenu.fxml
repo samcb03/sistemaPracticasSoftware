@@ -30,9 +30,9 @@
                 <VBox.margin><Insets bottom="16"/></VBox.margin>
             </Label>
 
-            <Button fx:id="buttonSolicityProject"
+            <Button fx:id="buttonRequestProject"
                     text="Solicitar Proyecto"
-                    onAction="#goToSolicityProject"
+                    onAction="#goToRequestProject"
                     maxWidth="Infinity"
                     style="-fx-background-color: #87CEEB;
                            -fx-text-fill: #ffffff;

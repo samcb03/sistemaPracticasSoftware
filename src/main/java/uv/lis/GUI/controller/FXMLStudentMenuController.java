@@ -10,7 +10,7 @@ import uv.lis.GUI.MenuHandler;
 
 public class FXMLStudentMenuController extends MenuHandler {
 
-    @FXML private Button buttonSolicityProject;
+    @FXML private Button buttonRequestProject;
     @FXML private Button buttonNotifications;
     @FXML private Button buttonLogOut;
 
@@ -20,7 +20,7 @@ public class FXMLStudentMenuController extends MenuHandler {
     }
 
     @FXML
-    public void goToSolicityProject() {
+    public void goToRequestProject() {
         navigateTo("/uv/lis/GUI/view/FXMLRequestProject.fxml");
     }
 

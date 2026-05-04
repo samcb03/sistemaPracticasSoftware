@@ -16,4 +16,6 @@ public interface IAffiliatedOrganizationDAO {
     boolean inactivateOrganization(AffiliatedOrganization affiliatedOrganization) throws OperationException;
 
     ArrayList<String> getAllOrganizationNames() throws OperationException;
+
+    int getOrganizationIdByName(String name) throws OperationException;
 }
