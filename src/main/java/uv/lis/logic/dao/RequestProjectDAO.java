@@ -10,18 +10,18 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import uv.lis.dataaccess.MySQLConnectionManager;
-import uv.lis.logic.contracts.IProjectRequestDAO;
+import uv.lis.logic.contracts.IRequestProjectDAO;
 import uv.lis.logic.dto.Project;
 import uv.lis.logic.exceptions.OperationException;
 
 
-public class ProjectRequestDAO implements IProjectRequestDAO {
+public class RequestProjectDAO implements IRequestProjectDAO {
     private static final int NO_ROWS_AFFECTED = 0;
     private static final int MAX_REQUESTS = 3;
-    private static final Logger LOGGER = Logger.getLogger(ProjectRequestDAO.class.getName());
+    private static final Logger LOGGER = Logger.getLogger(RequestProjectDAO.class.getName());
     private MySQLConnectionManager connectionManager;
 
-    public ProjectRequestDAO() {
+    public RequestProjectDAO() {
         this.connectionManager = new MySQLConnectionManager();
     }
 

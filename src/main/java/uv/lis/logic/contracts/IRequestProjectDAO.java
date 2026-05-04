@@ -6,7 +6,7 @@ import uv.lis.logic.dto.Project;
 import uv.lis.logic.exceptions.OperationException;
 
 
-public interface IProjectRequestDAO {
+public interface IRequestProjectDAO {
     int getActiveRequestCountByStudentId(String id) throws OperationException;
     
     boolean hasAvailableCapacity(int idProject) throws OperationException;

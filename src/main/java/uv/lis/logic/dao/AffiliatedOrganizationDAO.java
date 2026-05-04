@@ -203,28 +203,22 @@ public class AffiliatedOrganizationDAO implements IAffiliatedOrganizationDAO{
     }
 
     @Override
-    public String getAffiliatedOrganizationName(String organizationName) throws OperationException {
-        String afilliatedOrganizationQuery = "SELECT nombreOV FROM OrganizacionVinculada WHERE nombreOV = ?";
-        String foundOrganizationName = null;
-
+    public int getOrganizationIdByName(String name) throws OperationException {
+        String query = "SELECT idOrganizacionVinculada FROM OrganizacionVinculada WHERE nombreOV = ?";
         try (Connection databaseConnection = connectionManager.getConnection();
-             PreparedStatement preparedStatement = databaseConnection.prepareStatement(afilliatedOrganizationQuery)) {
-            preparedStatement.setString(1, organizationName);
+            PreparedStatement preparedStatement = databaseConnection.prepareStatement(query)) {
+            preparedStatement.setString(1, name);
             try (ResultSet resultSet = preparedStatement.executeQuery()) {
                 if (resultSet.next()) {
-                    foundOrganizationName = resultSet.getString("nombreOV");
+                    int organizationId = resultSet.getInt("idOrganizacionVinculada");
+                    return organizationId;
                 } else {
-                    LOGGER.log(Level.INFO, "No se encontró una organización vinculada con el nombre {0}.", 
-                        organizationName);
-                    throw new OperationException("No se encontró una organización vinculada con el nombre: " 
-                        + organizationName, null);
+                    throw new OperationException("No se encontró la organización: " + name, null);
                 }
             }
         } catch (SQLException e) {
-               LOGGER.log(Level.SEVERE, "Error de conexion con la base de datos",e);
-                throw new OperationException("Error al conseguir la organización vinculada", e);
+            LOGGER.log(Level.SEVERE, "Error de conexión", e);
+            throw new OperationException("Error al obtener el ID de la organización", e);
         }
-
-        return foundOrganizationName;
     }
 }

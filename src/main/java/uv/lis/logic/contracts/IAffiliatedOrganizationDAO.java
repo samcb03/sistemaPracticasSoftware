@@ -17,5 +17,5 @@ public interface IAffiliatedOrganizationDAO {
 
     ArrayList<String> getAllOrganizationNames() throws OperationException;
 
-    String getAffiliatedOrganizationName(String organizationName) throws OperationException;
+    int getOrganizationIdByName(String name) throws OperationException;
 }

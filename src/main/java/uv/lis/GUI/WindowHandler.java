@@ -38,8 +38,7 @@ public abstract class WindowHandler implements Initializable {
             stage.setScene(new Scene(root));
             stage.show();
         } catch (IOException e) {
-            showError("Error al cerrar sesión");
-                
+            showError("Error al cerrar sesión");    
         }
     }
 
