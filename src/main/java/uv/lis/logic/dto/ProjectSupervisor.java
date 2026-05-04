@@ -9,7 +9,8 @@ public class ProjectSupervisor {
     private String name;
     private String position;
     private String email;
-    private boolean isInactive;
+    private boolean isActive;
+    private String affiliatedOrganizationName;
 
     public ProjectSupervisor(){
 
@@ -53,12 +54,20 @@ public class ProjectSupervisor {
         this.email = email;
     }
 
-    public boolean getIsInactive() {
-        return isInactive;
+    public boolean getIsActive() {
+        return isActive;
     }
 
-    public void setIsInactive(boolean isInactive) {
-        this.isInactive = isInactive;
+    public void setIsActive(boolean isActive) {
+        this.isActive = isActive;
+    }
+
+    public String getAffiliatedOrganizationName() {
+        return affiliatedOrganizationName;
+    }
+
+    public void setAffiliatedOrganizationName(String affiliatedOrganizationName) {
+        this.affiliatedOrganizationName = affiliatedOrganizationName;
     }
 
         @Override

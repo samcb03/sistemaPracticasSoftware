@@ -12,9 +12,10 @@ import javafx.scene.control.Button;
 import javafx.stage.Stage;
 
 
-public abstract class MenuHandler implements Initializable {
+public abstract class WindowHandler implements Initializable {
 
     @FXML protected Button buttonLogOut;
+    @FXML protected Button buttonBack;
 
     protected void navigateTo(String fxml) {
         try {
@@ -41,12 +42,20 @@ public abstract class MenuHandler implements Initializable {
         }
     }
 
+    @FXML
     protected void showError(String message) {
         Alert alert = new Alert(Alert.AlertType.ERROR);
         alert.setTitle("Error");
         alert.setHeaderText(null);
         alert.setContentText(message);
         alert.showAndWait();
+    }
+
+    
+    @FXML
+    public void goBack() {
+        Stage currentStage = (Stage) buttonBack.getScene().getWindow();
+        currentStage.close();
     }
 
 }

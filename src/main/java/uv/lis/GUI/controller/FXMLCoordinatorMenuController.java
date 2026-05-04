@@ -5,16 +5,16 @@ import java.net.URL;
 import java.util.ResourceBundle;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
-import uv.lis.GUI.MenuHandler;
+import uv.lis.GUI.WindowHandler;
 
 
-public class FXMLCoordinatorMenuController extends MenuHandler  {
+public class FXMLCoordinatorMenuController extends WindowHandler  {
 
     @FXML private Button buttonRegisterStudent;
     @FXML private Button buttonConsultStudent;
     @FXML private Button buttonRegisterOrganization;
     @FXML private Button buttonConsultOrganization;
-    @FXML private Button buttonRegisterSupervisor;
+    @FXML private Button buttonRegisterProjectSupervisor;
     @FXML private Button buttonConsultSupervisor;
     @FXML private Button buttonRegisterProject;
     @FXML private Button buttonConsultProject;
@@ -40,8 +40,8 @@ public class FXMLCoordinatorMenuController extends MenuHandler  {
         navigateTo("/uv/lis/GUI/view/FXMLConsultAffiliatedOrganization.fxml"); 
     }
 
-    @FXML public void goToRegisterSupervisor() { 
-        navigateTo("/uv/lis/GUI/view/FXMLRegisterSupervisor.fxml"); 
+    @FXML public void goToRegisterProjectSupervisor() { 
+        navigateTo("/uv/lis/GUI/view/FXMLRegisterProjectSupervisor.fxml"); 
     }
 
     @FXML public void goToConsultSupervisor() { 
