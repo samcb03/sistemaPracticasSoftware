@@ -30,9 +30,9 @@ public class StudentDAO extends UserDAO implements IStudentDAO {
     public Student getStudentById(int idStudent) throws OperationException { 
         Student student = null;
 
-    String studentQuery = "SELECT e.idUsuario, e.matricula, u.nombre, u.apellidos, e.fechaNacimiento, e.genero "
-        + "FROM Alumno e INNER JOIN Usuario u ON e.idUsuario = u.idUsuario "
-        + "WHERE e.idUsuario = ?"; 
+        String studentQuery = "SELECT e.idUsuario, e.matricula, u.nombre, u.apellidos, e.fechaNacimiento, e.genero "
+            + "FROM Alumno e INNER JOIN Usuario u ON e.idUsuario = u.idUsuario "
+            + "WHERE e.idUsuario = ?"; 
 
         try (Connection databaseConnection = connectionManager.getConnection();
             PreparedStatement preparedStatement = databaseConnection.prepareStatement(studentQuery)) {
@@ -60,7 +60,6 @@ public class StudentDAO extends UserDAO implements IStudentDAO {
             LOGGER.log(Level.SEVERE, "Error de conexion con la base de datos",e);
             throw new OperationException("No se pudo buscar el alumno. Intentelo mas tarde", e);
         }
-        
         return student;
     }
 

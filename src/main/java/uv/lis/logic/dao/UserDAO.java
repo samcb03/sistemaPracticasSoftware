@@ -48,9 +48,10 @@ public class UserDAO implements IUserDAO{
             if (preparedStatement.executeUpdate() > NO_ROWS_AFFECTED) {
             
                try (ResultSet resultSet = preparedStatement.getGeneratedKeys()) {
-                    if (resultSet.next()) { 
-                        generatedId = resultSet.getInt(1);
+                    if (!resultSet.next()) { 
+                        throw new OperationException("No se pudo obtener el ID generado.", null);
                     }
+                    generatedId = resultSet.getInt(1);
                 } 
             } else {
                 throw new OperationException("No se pudo registrar al usuario. Intentelo mas tarde", 

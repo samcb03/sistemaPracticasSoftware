@@ -5,12 +5,15 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
+import org.mockito.MockedStatic;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uv.lis.dataaccess.MySQLConnectionManager;
 import uv.lis.logic.dao.UserDAO;
 import uv.lis.logic.dto.User;
 import uv.lis.logic.exceptions.AuthenticateException;
 import uv.lis.logic.exceptions.OperationException;
+import uv.lis.logic.utils.PasswordHasher;
+
 import java.lang.reflect.Field;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -21,6 +24,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.when;
 
 
@@ -76,6 +80,19 @@ class UserDAOTest {
     }
 
     @Test
+    void registerUser_noGeneratedKeyReturned_throwsOperationException() throws Exception {
+        when(databaseConnection.prepareStatement(anyString(), anyInt())).thenReturn(preparedStatement);
+        when(preparedStatement.executeUpdate()).thenReturn(1);
+        when(preparedStatement.getGeneratedKeys()).thenReturn(resultSet);
+        when(resultSet.next()).thenReturn(false);
+
+        OperationException exception = assertThrows(OperationException.class, () ->
+            userDAO.registerUser(builderUser("Juan", "Pérez", "password12", 1))
+        );
+        assertTrue(exception.getMessage().contains("No se pudo obtener el ID generado"));
+    }
+
+    @Test
     void registerUser_sqlError_throwsOperationException() throws Exception {
         when(connectionManager.getConnection()).thenThrow(new SQLException("Fallo"));
 
@@ -87,14 +104,14 @@ class UserDAOTest {
     }
 
     @Test
-void authenticate_student_returnsStudentUser() throws Exception {
-    when(databaseConnection.prepareStatement(anyString())).thenReturn(preparedStatement);
-    when(preparedStatement.executeQuery()).thenReturn(resultSet);
-    when(resultSet.next()).thenReturn(true);
-    when(resultSet.getInt("idRol")).thenReturn(1);
+    void authenticate_student_returnsStudentUser() throws Exception {
+        when(databaseConnection.prepareStatement(anyString())).thenReturn(preparedStatement);
+        when(preparedStatement.executeQuery()).thenReturn(resultSet);
+        when(resultSet.next()).thenReturn(true);
+        when(resultSet.getInt("idRol")).thenReturn(1);
 
-    assertEquals(1, userDAO.authenticate("gom03@gmail.com", "Gom_Ram002").getRoleId());
-}
+        assertEquals(1, userDAO.authenticate("gom03@gmail.com", "Gom_Ram002").getRoleId());
+    }
 
     @Test
     void authenticate_administrator_returnsAdministratorUser() throws Exception {
@@ -136,6 +153,25 @@ void authenticate_student_returnsStudentUser() throws Exception {
             userDAO.authenticate("S99999", "malpassword")
         );
         assertEquals("Usuario no encontrado, verifique sus datos", exception.getMessage());
+    }
+
+    @Test
+    void authenticate_wrongPassword_throwsAuthenticateException() throws Exception {
+        when(databaseConnection.prepareStatement(anyString())).thenReturn(preparedStatement);
+        when(preparedStatement.executeQuery()).thenReturn(resultSet);
+        when(resultSet.next()).thenReturn(true);
+        when(resultSet.getString("contraseña")).thenReturn("hashedPassword");
+
+        try (MockedStatic<PasswordHasher> mockedHasher = mockStatic(PasswordHasher.class)) {
+            mockedHasher.when(() -> PasswordHasher.verifyPassword("wrongPassword", 
+                "hashedPassword"))
+                .thenReturn(false);
+
+            AuthenticateException exception = assertThrows(AuthenticateException.class, () ->
+                userDAO.authenticate("gom03@gmail.com", "wrongPassword")
+            );
+            assertEquals("Contraseña incorrecta, verifique sus datos", exception.getMessage());
+        }
     }
 
     @Test
