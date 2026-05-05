@@ -27,16 +27,17 @@ public class StudentDAO extends UserDAO implements IStudentDAO {
     }
 
     @Override
-    public Student getStudentById(String idStudent) throws OperationException { 
+    public Student getStudentById(int idStudent) throws OperationException { 
         Student student = null;
 
-    String studentQuery = "SELECT e.idUsuario, e.matricula, u.nombre, u.apellidos, e.fechaNacimiento, e.genero " 
-        + "FROM Alumno e INNER JOIN Usuario u ON e.idUsuario = u.idUsuario WHERE e.matricula = ?;"; 
+    String studentQuery = "SELECT e.idUsuario, e.matricula, u.nombre, u.apellidos, e.fechaNacimiento, e.genero "
+        + "FROM Alumno e INNER JOIN Usuario u ON e.idUsuario = u.idUsuario "
+        + "WHERE e.idUsuario = ?"; 
 
         try (Connection databaseConnection = connectionManager.getConnection();
-             PreparedStatement preparedStatement = databaseConnection.prepareStatement(studentQuery)) {
+            PreparedStatement preparedStatement = databaseConnection.prepareStatement(studentQuery)) {
             
-            preparedStatement.setString(1, idStudent);
+            preparedStatement.setInt(1, idStudent);
             
             try (ResultSet resultSet = preparedStatement.executeQuery()) {
                 if (resultSet.next()) {

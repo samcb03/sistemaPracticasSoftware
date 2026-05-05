@@ -54,7 +54,7 @@ public class StudentDAOTest {
             "Deni@3234581", "deni@gmail.com", 1, false, "S123", 
             new Date(System.currentTimeMillis()), 0, "Femenino");
 
-        assertEquals(expectedStudent, studentDAO.getStudentById("S123"));
+        assertEquals(expectedStudent, studentDAO.getStudentById(1));
     }
 
 
@@ -66,7 +66,7 @@ public class StudentDAOTest {
         when(resultSet.next()).thenReturn(false);
 
         assertThrows(OperationException.class, () -> {
-            studentDAO.getStudentById("S999");
+            studentDAO.getStudentById(1);
         });
     }
 

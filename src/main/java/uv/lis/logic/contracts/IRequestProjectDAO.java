@@ -13,8 +13,6 @@ public interface IRequestProjectDAO {
 
     boolean requestProject(String id, int idProject) throws OperationException;
 
-    List<Project> getRequestedProjectsByStudentId(String id) throws OperationException;
-
     List<Project> getAvailableProjects() throws OperationException;
 
     boolean hasAlreadyRequested(String id, int idProject) throws OperationException;

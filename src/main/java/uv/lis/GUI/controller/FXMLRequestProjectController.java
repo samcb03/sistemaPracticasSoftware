@@ -18,6 +18,7 @@ import uv.lis.logic.dao.AffiliatedOrganizationDAO;
 import uv.lis.logic.dao.ProjectDAO;
 import uv.lis.logic.dto.AffiliatedOrganization;
 import uv.lis.logic.dto.Project;
+import uv.lis.logic.dto.Student;
 import uv.lis.logic.exceptions.OperationException;
 import uv.lis.logic.utils.SessionManager;
 import uv.lis.logic.dao.RequestProjectDAO;
@@ -43,15 +44,27 @@ public class FXMLRequestProjectController extends ValidationHandler {
     private ProjectDAO projectDAO;
     private AffiliatedOrganizationDAO affiliatedOrganizationDAO;
     private RequestProjectDAO requestProjectDAO;
+    private Student student;
 
     private LinkedHashMap<String, Integer> selectedProjects = new LinkedHashMap<>();
-    private String studentId = SessionManager.getCurrentStudent().getIdStudent();
+    private String studentId;
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         projectDAO = new ProjectDAO();
         affiliatedOrganizationDAO = new AffiliatedOrganizationDAO();
         requestProjectDAO = new RequestProjectDAO();
+
+        student = SessionManager.getInstance().getCurrentStudent();
+
+        if (student == null) {
+            showError("No hay una sesión activa. Por favor inicia sesión.");
+            buttonAddProject.setDisable(true);
+            buttonSubmit.setDisable(true);
+            return;
+        }
+        
+        studentId = student.getIdStudent();
         setupControls(labelError, buttonBack);
         loadProjectNames();
         setupComboBoxListener();
@@ -102,24 +115,23 @@ public class FXMLRequestProjectController extends ValidationHandler {
 
         if (selectedProjects.containsKey(selected)) {
             showError("Ya agregaste este proyecto");
-        }
-        if (selectedProjects.size() >= MAX_PROJECTS) {
+        } else if (selectedProjects.size() >= MAX_PROJECTS) {
             showError("Solo puedes solicitar " + MAX_PROJECTS + " proyectos");
-        }
-
-        try {
-            Project project = projectDAO.getProjectByName(selected);
-            boolean isValid = requestProjectDAO.validateProjectRequest(studentId, project.getId());
-            if (isValid) {
-                selectedProjects.put(selected, project.getId());
-                listViewSelectedProjects.getItems().add(selected);
-                updateSelectedCount();
-                labelError.setText("");
-            } else {
-                showError("No es posible agregar este proyecto");
+        } else {
+            try {
+                Project project = projectDAO.getProjectByName(selected);
+                boolean isValid = requestProjectDAO.validateProjectRequest(studentId, project.getId());
+                if (isValid) {
+                    selectedProjects.put(selected, project.getId());
+                    listViewSelectedProjects.getItems().add(selected);
+                    updateSelectedCount();
+                    labelError.setText("");
+                } else {
+                    showError("No es posible agregar este proyecto");
+                }
+            } catch (OperationException e) {
+                showError(e.getMessage());
             }
-        } catch (OperationException e) {
-            showError(e.getMessage());
         }
     }
 
@@ -127,16 +139,16 @@ public class FXMLRequestProjectController extends ValidationHandler {
     public void submitRequests() {
         if (selectedProjects.size() < MAX_PROJECTS) {
             showError("Debes seleccionar exactamente " + MAX_PROJECTS + " proyectos");
-        }
-
-        try {
-            for (Map.Entry<String, Integer> entry : selectedProjects.entrySet()) {
-                requestProjectDAO.requestProject(studentId, entry.getValue());
+        } else {
+            try {
+                for (Map.Entry<String, Integer> entry : selectedProjects.entrySet()) {
+                    requestProjectDAO.requestProject(studentId, entry.getValue());
+                }
+                showSuccess("Solicitudes registradas correctamente");
+                clearFields();
+            } catch (OperationException e) {
+                showError(e.getMessage());
             }
-            showSuccess("Solicitudes registradas correctamente");
-            clearFields();
-        } catch (OperationException e) {
-            showError(e.getMessage());
         }
     }
 

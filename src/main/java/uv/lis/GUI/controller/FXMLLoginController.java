@@ -17,9 +17,13 @@ import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
+import uv.lis.logic.dao.StudentDAO;
 import uv.lis.logic.dao.UserDAO;
+import uv.lis.logic.dto.Student;
 import uv.lis.logic.dto.User;
 import uv.lis.logic.exceptions.AuthenticateException;
+import uv.lis.logic.exceptions.OperationException;
+import uv.lis.logic.utils.SessionManager;
 
 
 public class FXMLLoginController implements Initializable {
@@ -58,8 +62,16 @@ public class FXMLLoginController implements Initializable {
         } else {
             try {
                 user = userDAO.authenticate(email, password);
+
+                if (user.getRoleId() == USER_TYPE_STUDENT) {
+                    StudentDAO studentDAO = new StudentDAO();
+                    Student student = studentDAO.getStudentById(user.getId());
+                    SessionManager.getInstance().setCurrentStudent(student);
+               }
                 navigateToMenus(user.getRoleId());
             } catch (AuthenticateException e) {
+                showError(e.getMessage());
+            }  catch (OperationException e) {
                 showError(e.getMessage());
             }
         }
