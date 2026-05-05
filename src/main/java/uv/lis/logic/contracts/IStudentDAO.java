@@ -6,7 +6,7 @@ import uv.lis.logic.exceptions.OperationException;
 
 
 public interface IStudentDAO {
-    Student getStudentById(String idStudent) throws OperationException;
+    Student getStudentById(int idStudent) throws OperationException;
 
     boolean registerStudent(Student student) throws OperationException;
 

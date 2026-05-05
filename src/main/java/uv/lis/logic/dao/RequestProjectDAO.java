@@ -18,6 +18,8 @@ import uv.lis.logic.exceptions.OperationException;
 public class RequestProjectDAO implements IRequestProjectDAO {
     private static final int NO_ROWS_AFFECTED = 0;
     private static final int MAX_REQUESTS = 3;
+    private static final int STATUS_REQUESTED = 1;
+    private static final int STATUS_ASSIGNED = 2;
     private static final Logger LOGGER = Logger.getLogger(RequestProjectDAO.class.getName());
     private MySQLConnectionManager connectionManager;
 
@@ -50,10 +52,12 @@ public class RequestProjectDAO implements IRequestProjectDAO {
 
     @Override
     public List<Project> getAvailableProjects() throws OperationException{
-         List<Project> projects = new ArrayList<>();
-        String query = "SELECT p.*, " 
-            + "(p.cupo - COALESCE(COUNT(sp.matricula), 0)) as cupoDisponible FROM Proyecto p " 
-            + "LEFT JOIN Solicita_Proyecto sp ON p.idProyecto = sp.idProyecto WHERE p.estado IS NULL OR p.estado = 0 " 
+        List<Project> projects = new ArrayList<>();
+        String query = "SELECT p.*, "
+            + "(p.cupo - COALESCE(COUNT(CASE WHEN sp.estatus = 2 THEN 1 END), 0)) as cupoDisponible "
+            + "FROM Proyecto p "
+            + "LEFT JOIN Solicita_Proyecto sp ON p.idProyecto = sp.idProyecto "
+            + "WHERE p.estado IS NULL OR p.estado = 1 "
             + "GROUP BY p.idProyecto HAVING cupoDisponible > 0;";
 
         try (Connection databaseConnection = connectionManager.getConnection();
@@ -78,39 +82,7 @@ public class RequestProjectDAO implements IRequestProjectDAO {
         }
 
         return projects;
-    }
-
-    @Override
-    public List<Project> getRequestedProjectsByStudentId(String idStudent) throws OperationException {
-        List<Project> projects = new ArrayList<>();
-        String query = "SELECT p.* FROM Proyecto p INNER JOIN Solicita_Proyecto sp ON p.idProyecto = sp.idProyecto " 
-            + "WHERE sp.matricula = ?;";
-
-        try (Connection databaseConnection = connectionManager.getConnection();
-             PreparedStatement preparedStatement = databaseConnection.prepareStatement(query)) {
-            
-            preparedStatement.setString(1, idStudent);
-            
-            try (ResultSet resultSet = preparedStatement.executeQuery()) {
-                while (resultSet.next()) {
-                    Project project = new Project();
-                    project.setId(resultSet.getInt("idProyecto"));
-                    project.setName(resultSet.getString("nombre"));
-                    project.setDescription(resultSet.getString("descripcion"));
-                    project.setCapacity(resultSet.getInt("cupo"));
-                    project.setMethodology(resultSet.getString("metodologiaProyecto"));
-                    project.setObjective(resultSet.getString("objetivoProyecto"));
-                    
-                    projects.add(project);
-                }
-            }
-        } catch (SQLException e) {
-            LOGGER.log(Level.SEVERE, "Error al obtener proyectos solicitados", e);
-            throw new OperationException("Error al verificar solicitud", e);
-        }
-
-        return projects;
-    }
+    }   
 
     @Override
     public boolean hasAlreadyRequested(String idStudent, int idProject) throws OperationException {
@@ -166,25 +138,21 @@ public class RequestProjectDAO implements IRequestProjectDAO {
     @Override
     public boolean requestProject(String idStudent, int idProject) throws OperationException {
         boolean isRegistered = false;
-        
-        if (validateProjectRequest(idStudent, idProject)) {
-            String query = "INSERT INTO Solicita_Proyecto (idProyecto, matricula, estatus) VALUES (?, ?, FALSE);";
+        String query = "INSERT INTO Solicita_Proyecto (idProyecto, matricula, estatus) VALUES (?, ?, ?);";
 
-            try (Connection databaseConnection = connectionManager.getConnection();
-                PreparedStatement preparedStatement = databaseConnection.prepareStatement(query)) {
-                
-                preparedStatement.setInt(1, idProject);
-                preparedStatement.setString(2, idStudent);
+        try (Connection databaseConnection = connectionManager.getConnection();
+            PreparedStatement preparedStatement = databaseConnection.prepareStatement(query)) {
+            
+            preparedStatement.setInt(1, idProject);
+            preparedStatement.setString(2, idStudent);
+            preparedStatement.setInt(3, STATUS_REQUESTED);
 
-                if (preparedStatement.executeUpdate() > NO_ROWS_AFFECTED) {
-                    isRegistered = true;
-                    LOGGER.log(Level.INFO, "Solicitud de proyecto {0} por practicante {1} registrada exitosamente", 
-                        new Object[]{idProject, idStudent});
-                }
-            } catch (SQLException e) {
-                LOGGER.log(Level.SEVERE, "Error al registrar solicitud de proyecto", e);
-                throw new OperationException("Error al registrar solicitud", e);
+            if (preparedStatement.executeUpdate() > NO_ROWS_AFFECTED) {
+                isRegistered = true;
             }
+        } catch (SQLException e) {
+            LOGGER.log(Level.SEVERE, "Error al registrar solicitud de proyecto", e);
+            throw new OperationException("Error al registrar solicitud", e);
         }
         return isRegistered;
     }
@@ -194,14 +162,12 @@ public class RequestProjectDAO implements IRequestProjectDAO {
         boolean isValid = true;
         try {
             if (getActiveRequestCountByStudentId(idStudent) >= MAX_REQUESTS) {
-                LOGGER.log(Level.WARNING, "El practicante {0} ya tiene {1} solicitudes activas", 
-                    new Object[]{idStudent, MAX_REQUESTS});
+                LOGGER.log(Level.WARNING, "El practicante ya tiene {1} solicitudes activas", MAX_REQUESTS);
                 isValid = false;
             }
 
             if (hasAlreadyRequested(idStudent, idProject)) {
-                LOGGER.log(Level.WARNING, "El practicante {0} ya solicitó el proyecto {1}", 
-                    new Object[]{idStudent, idProject});
+                LOGGER.log(Level.WARNING, "El practicante ya solicitó este proyecto");
                 isValid = false;
             }
 
@@ -220,13 +186,14 @@ public class RequestProjectDAO implements IRequestProjectDAO {
     @Override
     public boolean assignStudentToProject(String idStudent, int idProject) throws OperationException {
         boolean isAssigned = false;
-        String query = "UPDATE Solicita_Proyecto SET estatus = TRUE WHERE matricula = ? AND idProyecto = ?;";
+        String query = "UPDATE Solicita_Proyecto SET estatus = ? WHERE matricula = ? AND idProyecto = ?;";
 
         try (Connection databaseConnection = connectionManager.getConnection();
              PreparedStatement preparedStatement = databaseConnection.prepareStatement(query)) {
             
-            preparedStatement.setString(1, idStudent);
-            preparedStatement.setInt(2, idProject);
+            preparedStatement.setInt(1, STATUS_ASSIGNED);
+            preparedStatement.setString(2, idStudent);
+            preparedStatement.setInt(3, idProject);
 
             if (preparedStatement.executeUpdate() > NO_ROWS_AFFECTED) {
                 isAssigned = true;

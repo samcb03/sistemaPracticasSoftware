@@ -84,6 +84,7 @@ public class UserDAO implements IUserDAO{
 
                     if (PasswordHasher.verifyPassword(password, hashedPassword)) {
                         userAuthenticate = new User();
+                        userAuthenticate.setId(resultSet.getInt("idUsuario")); 
                         userAuthenticate.setEmail(email);
                         userAuthenticate.setRoleId(resultSet.getInt("idRol"));
                     } else {
