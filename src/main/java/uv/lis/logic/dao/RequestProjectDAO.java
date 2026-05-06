@@ -17,6 +17,7 @@ import uv.lis.logic.exceptions.OperationException;
 
 public class RequestProjectDAO implements IRequestProjectDAO {
     private static final int NO_ROWS_AFFECTED = 0;
+    private static final int NO_REQUESTS = 0;
     private static final int MAX_REQUESTS = 3;
     private static final int STATUS_REQUESTED = 1;
     private static final int STATUS_ASSIGNED = 2;
@@ -97,7 +98,7 @@ public class RequestProjectDAO implements IRequestProjectDAO {
             
             try (ResultSet resultSet = preparedStatement.executeQuery()) {
                 if (resultSet.next()) {
-                    hasRequested = resultSet.getInt("total") > 0;
+                    hasRequested = resultSet.getInt("total") > NO_REQUESTS;
                 }
             }
         } catch (SQLException e) {

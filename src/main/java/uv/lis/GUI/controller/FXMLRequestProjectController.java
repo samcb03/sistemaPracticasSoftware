@@ -153,7 +153,7 @@ public class FXMLRequestProjectController extends ValidationHandler {
     }
 
     private void updateSelectedCount() {
-        labelSelectedCount.setText("Seleccionados: " + selectedProjects.size() + "/" + MAX_PROJECTS);
+        labelSelectedCount.setText(selectedProjects.size() + "/" + MAX_PROJECTS);
     }
 
     @Override
