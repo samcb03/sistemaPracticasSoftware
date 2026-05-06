@@ -88,7 +88,6 @@ public class FXMLRegisterProjectSupervisorController extends ValidationHandler {
         }
     }
 
-
     private ProjectSupervisor buildProjectSupervisor() {
         ProjectSupervisor projectSupervisor = new ProjectSupervisor();
         projectSupervisor.setName(textFieldName.getText().trim());

@@ -7,6 +7,7 @@ import java.util.Objects;
 
 public class SchoolPeriod {
     private int id;
+    private String name;
     private Date startDate;
     private Date endDate;        
 
@@ -58,4 +59,12 @@ public class SchoolPeriod {
             && Objects.equals(endDate, other.endDate);
     }
 
+    public String getName() {
+        return name;
     }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+}

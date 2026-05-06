@@ -19,6 +19,7 @@ public class FXMLCoordinatorMenuController extends WindowHandler  {
     @FXML private Button buttonRegisterProject;
     @FXML private Button buttonConsultProject;
     @FXML private Button buttonLogOut;
+    @FXML private Button buttonRegisterSubject;
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
@@ -54,6 +55,10 @@ public class FXMLCoordinatorMenuController extends WindowHandler  {
 
     @FXML public void goToConsultProject() { 
         navigateTo("/uv/lis/GUI/view/FXMLConsultSProject.fxml"); 
+    }
+
+    @FXML public void goToRegisterSubject() { 
+        navigateTo("/uv/lis/GUI/view/FXMLRegisterSubject.fxml"); 
     }
 
 }

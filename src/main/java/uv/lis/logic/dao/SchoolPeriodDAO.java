@@ -2,10 +2,10 @@ package uv.lis.logic.dao;
 
 
 import java.sql.Connection;
-import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import uv.lis.dataaccess.MySQLConnectionManager;
@@ -28,41 +28,57 @@ public class SchoolPeriodDAO implements ISchoolPeriodDAO{
     }
 
     @Override
-    public SchoolPeriod getSchoolPeriodbyId(int foundIdSchoolPeriod) throws OperationException {
-        SchoolPeriod schoolPeriod = new SchoolPeriod();
-        String schoolPeriodQuery = "SELECT * FROM PeriodoEscolar WHERE idPeriodoEscolar = ?;";
+    public ArrayList<String> getAllSchoolPeriodsNames() throws OperationException {
+        ArrayList<String> periodsNames = new ArrayList<>();
+        String query = "SELECT nombre FROM PeriodoEscolar";
 
         try (Connection databaseConnection = connectionManager.getConnection();
-            PreparedStatement preparedStatement = databaseConnection.prepareStatement(schoolPeriodQuery)) {
+            PreparedStatement preparedStatement = databaseConnection.prepareStatement(query);
+            ResultSet resultSet = preparedStatement.executeQuery()) {
 
-            preparedStatement.setInt(1, foundIdSchoolPeriod);
-            
+            while (resultSet.next()) {
+                periodsNames.add(resultSet.getString("nombre"));
+            }
+
+        } catch (SQLException e) {
+            LOGGER.log(Level.SEVERE, "Error al obtener los periodos escolares", e);
+            throw new OperationException("No se pudieron obtener los periodos. Intentelo mas tarde", e);
+        }
+        return periodsNames;
+    }
+
+    @Override
+    public String getSchoolPeriodIdByName(String periodName) throws OperationException {
+        String periodId = null;
+        String query = "SELECT idPeriodoEscolar FROM PeriodoEscolar WHERE nombre = ?";
+
+        try (Connection databaseConnection = connectionManager.getConnection();
+            PreparedStatement preparedStatement = databaseConnection.prepareStatement(query)) {
+
+            preparedStatement.setString(1, periodName);
+
             try (ResultSet resultSet = preparedStatement.executeQuery()) {
                 if (resultSet.next()) {
-                    int idSchoolPeriod = resultSet.getInt("idPeriodoEscolar");
-                    Date startDate = resultSet.getDate("FechaInicio");
-                    Date enDate = resultSet.getDate("FechaFin");
-                
-                    schoolPeriod.setId(idSchoolPeriod);
-                    schoolPeriod.setStartDate(startDate);
-                    schoolPeriod.setEndDate(enDate);
+                    periodId = resultSet.getString("idPeriodoEscolar");
+                    LOGGER.log(Level.INFO, "ID de periodo escolar obtenido con exito");
                 } else {
-                    throw new OperationException("No se encontró el periodo escolar con id: " 
-                        + foundIdSchoolPeriod, null);
+                    LOGGER.log(Level.INFO, "No se encontro el periodo escolar");
+                    throw new OperationException("No se encontró el periodo escolar: " + periodName, null);
                 }
             }
-            
+
         } catch (SQLException e) {
-            LOGGER.log(Level.SEVERE, "Error de conexion con la base de datos",e);
-            throw new OperationException("Error al obtener el periodo escolar", null);
+            LOGGER.log(Level.SEVERE, "Error de conexion con la base de datos", e);
+            throw new OperationException("Error al obtener el ID del periodo escolar", e);
         }
-        return schoolPeriod;
+
+        return periodId;
     }
 
     @Override
     public boolean registerSchoolPeriod(SchoolPeriod schoolPeriod) throws OperationException {
         boolean isRegistered = false;
-        String schoolPeriodQuery = "INSERT INTO PeriodoEscolar(idPeriodoEscolar,FechaInicio, FechaFin) " 
+        String schoolPeriodQuery = "INSERT INTO PeriodoEscolar(idPeriodoEscolar, FechaInicio, FechaFin) " 
             + "VALUES(?, ?, ?);";
 
         try (Connection databaseConnection = connectionManager.getConnection();
