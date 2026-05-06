@@ -7,17 +7,34 @@ import java.util.Objects;
 public class Subject {
     private final static String CAREER = "Ingenieria de Software";
     private final static String SUBJECT_NAME = "Practicas Profesionales";
+    private String name;
     private int nrc;
-    private Professor professor;
-    private String schoolPeriod;
+    private String professorPersonnelNumber;
+    private int schoolPeriodId;
 
     public Subject(){
 
     }
 
-    public Subject(int nrc, String schoolPeriod) {
+    public static String getCareer() {
+        return CAREER;
+    }
+
+    public static String getSubjectName() {
+        return SUBJECT_NAME;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public Subject(int nrc, int schoolPeriodId) {
         this.nrc = nrc;
-        this.schoolPeriod = schoolPeriod;
+        this.schoolPeriodId = schoolPeriodId;
     }
 
     public int getNrc() {
@@ -35,21 +52,21 @@ public class Subject {
     public String getCAREER() {
         return CAREER;
     }
-
-    public Professor getProfessor() {
-        return professor;
+    
+    public int getSchoolPeriodId() {
+        return schoolPeriodId;
     }
 
-    public void setProfessor(Professor professor) {
-        this.professor = professor;
+    public void setSchoolPeriodId(int schoolPeriodId) {
+        this.schoolPeriodId = schoolPeriodId;
+    }
+    
+    public String getProfessorPersonnelNumber() {
+        return professorPersonnelNumber;
     }
 
-    public String getSchoolPeriod() {
-        return schoolPeriod;
-    }
-
-    public void setSchoolPeriod(String schoolPeriod) {
-        this.schoolPeriod = schoolPeriod;
+    public void setProfessorPersonnelNumber(String professorPersonnelNumber) {
+        this.professorPersonnelNumber = professorPersonnelNumber;
     }
 
     @Override
@@ -64,8 +81,7 @@ public class Subject {
         Subject other = (Subject) object;
         return nrc == other.nrc
             && Objects.equals(nrc, other.nrc)
-            && Objects.equals(professor, other.professor)
-            && Objects.equals(schoolPeriod, other.schoolPeriod);
+            && Objects.equals(professorPersonnelNumber, other.professorPersonnelNumber)
+            && schoolPeriodId == other.schoolPeriodId;
     }
-
 }

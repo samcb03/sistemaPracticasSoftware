@@ -7,139 +7,38 @@
 <?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
 
-<StackPane prefHeight="583.0" prefWidth="360.0"
-           style="-fx-background-color: #F5F4F0;"
-           xmlns="http://javafx.com/javafx/21"
-           xmlns:fx="http://javafx.com/fxml/1"
-           fx:controller="uv.lis.GUI.controller.FXMLCoordinatorMenuController">
+<StackPane prefHeight="583.0" prefWidth="360.0" style="-fx-background-color: #F5F4F0;" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="uv.lis.GUI.controller.FXMLCoordinatorMenuController">
 
     <VBox alignment="CENTER" prefWidth="360.0" spacing="16">
 
-        <VBox maxWidth="360" minWidth="360.0" spacing="12"
-              style="-fx-background-color: white;
-                     -fx-background-radius: 12;
-                     -fx-border-color: #E0DED8;
-                     -fx-border-width: 0.5;
-                     -fx-border-radius: 12;
-                     -fx-padding: 40 32 40 32;">
+        <VBox maxWidth="360" minWidth="360.0" spacing="12" style="-fx-background-color: white;                      -fx-background-radius: 12;                      -fx-border-color: #E0DED8;                      -fx-border-width: 0.5;                      -fx-border-radius: 12;                      -fx-padding: 40 32 40 32;">
 
-            <Label text="Menu Coordinador"
-                   style="-fx-font-size: 24;
-                          -fx-text-fill: #1A1A1A;">
-                <VBox.margin><Insets bottom="16"/></VBox.margin>
+            <Label style="-fx-font-size: 24;                           -fx-text-fill: #1A1A1A;" text="Menu Coordinador">
+                <VBox.margin><Insets bottom="16" /></VBox.margin>
             </Label>
 
-            <Button fx:id="buttonRegisterStudent"
-                    text="Registrar Alumno"
-                    onAction="#goToRegisterStudent"
-                    maxWidth="Infinity"
-                    style="-fx-background-color: #87CEEB;
-                           -fx-text-fill: #FFFFFF;
-                           -fx-font-size: 14;
-                           -fx-font-weight: bold;
-                           -fx-background-radius: 8;
-                           -fx-pref-height: 44;
-                           -fx-cursor: hand;"/>
+            <Button fx:id="buttonRegisterStudent" maxWidth="Infinity" onAction="#goToRegisterStudent" style="-fx-background-color: #87CEEB;                            -fx-text-fill: #FFFFFF;                            -fx-font-size: 14;                            -fx-font-weight: bold;                            -fx-background-radius: 8;                            -fx-pref-height: 44;                            -fx-cursor: hand;" text="Registrar Alumno" />
 
-            <Button fx:id="buttonConsultStudent"
-                    text="Consultar Alumno"
-                    onAction="#goToConsultStudent"
-                    maxWidth="Infinity"
-                    style="-fx-background-color: #87CEEB;
-                           -fx-text-fill: #FFFFFF;
-                           -fx-font-size: 14;
-                           -fx-font-weight: bold;
-                           -fx-background-radius: 8;
-                           -fx-pref-height: 44;
-                           -fx-cursor: hand;"/>
+            <Button fx:id="buttonConsultStudent" maxWidth="Infinity" onAction="#goToConsultStudent" style="-fx-background-color: #87CEEB;                            -fx-text-fill: #FFFFFF;                            -fx-font-size: 14;                            -fx-font-weight: bold;                            -fx-background-radius: 8;                            -fx-pref-height: 44;                            -fx-cursor: hand;" text="Consultar Alumno" />
 
-            <Button fx:id="buttonRegisterOrganization"
-                    text="Registrar Organizacion Vinculada"
-                    onAction="#goToRegisterOrganization"
-                    maxWidth="Infinity"
-                    style="-fx-background-color: #87CEEB;
-                           -fx-text-fill: #FFFFFF;
-                           -fx-font-size: 14;
-                           -fx-font-weight: bold;
-                           -fx-background-radius: 8;
-                           -fx-pref-height: 44;
-                           -fx-cursor: hand;"/>
+            <Button fx:id="buttonRegisterOrganization" maxWidth="Infinity" onAction="#goToRegisterOrganization" style="-fx-background-color: #87CEEB;                            -fx-text-fill: #FFFFFF;                            -fx-font-size: 14;                            -fx-font-weight: bold;                            -fx-background-radius: 8;                            -fx-pref-height: 44;                            -fx-cursor: hand;" text="Registrar Organizacion Vinculada" />
 
-            <Button fx:id="buttonConsultOrganization"
-                    text="Consultar Organizacion Vinculada"
-                    onAction="#goToConsultOrganization"
-                    maxWidth="Infinity"
-                    style="-fx-background-color: #87CEEB;
-                           -fx-text-fill: #FFFFFF;
-                           -fx-font-size: 14;
-                           -fx-font-weight: bold;
-                           -fx-background-radius: 8;
-                           -fx-pref-height: 44;
-                           -fx-cursor: hand;"/>
+            <Button fx:id="buttonConsultOrganization" maxWidth="Infinity" onAction="#goToConsultOrganization" style="-fx-background-color: #87CEEB;                            -fx-text-fill: #FFFFFF;                            -fx-font-size: 14;                            -fx-font-weight: bold;                            -fx-background-radius: 8;                            -fx-pref-height: 44;                            -fx-cursor: hand;" text="Consultar Organizacion Vinculada" />
 
-            <Button fx:id="buttonRegisterProjectSupervisor"
-                    text="Registrar Responsable Tecnico"
-                    onAction="#goToRegisterProjectSupervisor"
-                    maxWidth="Infinity"
-                    style="-fx-background-color: #87CEEB;
-                           -fx-text-fill: #FFFFFF;
-                           -fx-font-size: 14;
-                           -fx-font-weight: bold;
-                           -fx-background-radius: 8;
-                           -fx-pref-height: 44;
-                           -fx-cursor: hand;"/>
+            <Button fx:id="buttonRegisterProjectSupervisor" maxWidth="Infinity" onAction="#goToRegisterProjectSupervisor" style="-fx-background-color: #87CEEB;                            -fx-text-fill: #FFFFFF;                            -fx-font-size: 14;                            -fx-font-weight: bold;                            -fx-background-radius: 8;                            -fx-pref-height: 44;                            -fx-cursor: hand;" text="Registrar Responsable Tecnico" />
 
-            <Button fx:id="buttonConsultSupervisor"
-                    text="Consultar Responsable Tecnico"
-                    onAction="#goToConsultSupervisor"
-                    maxWidth="Infinity"
-                    style="-fx-background-color: #87CEEB;
-                           -fx-text-fill: #FFFFFF;
-                           -fx-font-size: 14;
-                           -fx-font-weight: bold;
-                           -fx-background-radius: 8;
-                           -fx-pref-height: 44;
-                           -fx-cursor: hand;"/>
+            <Button fx:id="buttonConsultSupervisor" maxWidth="Infinity" onAction="#goToConsultSupervisor" style="-fx-background-color: #87CEEB;                            -fx-text-fill: #FFFFFF;                            -fx-font-size: 14;                            -fx-font-weight: bold;                            -fx-background-radius: 8;                            -fx-pref-height: 44;                            -fx-cursor: hand;" text="Consultar Responsable Tecnico" />
 
-            <Button fx:id="buttonRegisterProject"
-                    text="Registrar Proyecto"
-                    onAction="#goToRegisterProject"
-                    maxWidth="Infinity"
-                    style="-fx-background-color: #87CEEB;
-                           -fx-text-fill: #FFFFFF;
-                           -fx-font-size: 14;
-                           -fx-font-weight: bold;
-                           -fx-background-radius: 8;
-                           -fx-pref-height: 44;
-                           -fx-cursor: hand;"/>
+            <Button fx:id="buttonRegisterProject" maxWidth="Infinity" onAction="#goToRegisterProject" style="-fx-background-color: #87CEEB;                            -fx-text-fill: #FFFFFF;                            -fx-font-size: 14;                            -fx-font-weight: bold;                            -fx-background-radius: 8;                            -fx-pref-height: 44;                            -fx-cursor: hand;" text="Registrar Proyecto" />
 
-            <Button fx:id="buttonConsultProject"
-                    text="Consultar Proyecto"
-                    onAction="#goToConsultProject"
-                    maxWidth="Infinity"
-                    style="-fx-background-color: #87CEEB;
-                           -fx-text-fill: #FFFFFF;
-                           -fx-font-size: 14;
-                           -fx-font-weight: bold;
-                           -fx-background-radius: 8;
-                           -fx-pref-height: 44;
-                           -fx-cursor: hand;"/>
+            <Button fx:id="buttonConsultProject" maxWidth="Infinity" onAction="#goToConsultProject" style="-fx-background-color: #87CEEB;                            -fx-text-fill: #FFFFFF;                            -fx-font-size: 14;                            -fx-font-weight: bold;                            -fx-background-radius: 8;                            -fx-pref-height: 44;                            -fx-cursor: hand;" text="Consultar Proyecto" />
+         <Button fx:id="buttonRegisterSubject" maxWidth="Infinity" onAction="#goToRegisterSubject" style="-fx-background-color: #87CEEB;                            -fx-text-fill: #FFFFFF;                            -fx-font-size: 14;                            -fx-font-weight: bold;                            -fx-background-radius: 8;                            -fx-pref-height: 44;                            -fx-cursor: hand;" text="Registrar Experiencia Educativa" />
 
             <Separator>
-                <VBox.margin><Insets top="8" bottom="8"/></VBox.margin>
+                <VBox.margin><Insets bottom="8" top="8" /></VBox.margin>
             </Separator>
 
-            <Button fx:id="buttonLogOut"
-                    text="Cerrar Sesion"
-                    onAction="#navigateToLogOut"
-                    maxWidth="Infinity"
-                    style="-fx-background-color: #E74C3C;
-                           -fx-text-fill: #FFFFFF;
-                           -fx-font-size: 14;
-                           -fx-font-weight: bold;
-                           -fx-background-radius: 8;
-                           -fx-pref-height: 44;
-                           -fx-cursor: hand;"/>
+            <Button fx:id="buttonLogOut" maxWidth="Infinity" onAction="#navigateToLogOut" style="-fx-background-color: #E74C3C;                            -fx-text-fill: #FFFFFF;                            -fx-font-size: 14;                            -fx-font-weight: bold;                            -fx-background-radius: 8;                            -fx-pref-height: 44;                            -fx-cursor: hand;" text="Cerrar Sesion" />
 
         </VBox>
     </VBox>

@@ -5,6 +5,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import uv.lis.dataaccess.MySQLConnectionManager;
@@ -25,42 +26,58 @@ public class ProfessorDAO extends UserDAO implements IProfessorDAO {
     public ProfessorDAO(MySQLConnectionManager connectionManager) {
         this.connectionManager = connectionManager;
     }
-    
+
     @Override
-    public Professor getProfessorByPersonalNumber(String personnelNumber) throws OperationException {
-        Professor professor = null;
-        String professorQuery = "SELECT p.numeroPersonal, p.rol, u.nombre, u.apellidos "
-            + "FROM Profesor p INNER JOIN Usuario u ON p.idUsuario = u.idUsuario WHERE p.numeroPersonal = ?";
+    public ArrayList<String> getAllActiveProfessorsNames() throws OperationException {
+        ArrayList<String> professorsNames = new ArrayList<>();
+        String query = "SELECT u.nombre, u.apellidos "
+            + "FROM Profesor p INNER JOIN Usuario u ON p.idUsuario = u.idUsuario "
+            + "WHERE p.estado = 1";
 
         try (Connection databaseConnection = connectionManager.getConnection();
-             PreparedStatement preparedStatement = databaseConnection.prepareStatement(professorQuery)) {
+            PreparedStatement preparedStatement = databaseConnection.prepareStatement(query);
+            ResultSet resultSet = preparedStatement.executeQuery()) {
 
-            preparedStatement.setString(1, personnelNumber);
+            while (resultSet.next()) {
+                professorsNames.add(resultSet.getString("nombre") + " " + resultSet.getString("apellidos"));
+            }
+
+        } catch (SQLException e) {
+            LOGGER.log(Level.SEVERE, "Error al obtener los profesores", e);
+            throw new OperationException("No se pudieron obtener los profesores. Intentelo mas tarde", e);
+        }
+        return professorsNames;
+    }
+    
+    @Override
+    public String getProfessorPersonnelNumberByName(String firstName, String lastName) throws OperationException {
+        String personnelNumber = null;
+        String professorQuery = "SELECT p.numeroPersonal "
+            + "FROM Profesor p INNER JOIN Usuario u ON p.idUsuario = u.idUsuario "
+            + "WHERE u.nombre = ? AND u.apellidos = ?";
+
+        try (Connection databaseConnection = connectionManager.getConnection();
+            PreparedStatement preparedStatement = databaseConnection.prepareStatement(professorQuery)) {
+
+            preparedStatement.setString(1, firstName);
+            preparedStatement.setString(2, lastName);
 
             try (ResultSet resultSet = preparedStatement.executeQuery()) {
                 if (resultSet.next()) {
-                    professor = new Professor();
-                    professor.setPersonnelNumber(resultSet.getString("numeroPersonal")); 
-                    professor.setFirstName(resultSet.getString("nombre")); 
-                    professor.setLastName(resultSet.getString("apellidos"));
-                    professor.setIsCoordinator(false); 
-
-                    LOGGER.log(Level.INFO, "Busqueda de Profesor con numero de personal obtenido con exito", 
-                        professor.getPersonnelNumber());
+                    personnelNumber = resultSet.getString("numeroPersonal");
                 } else {
-                    LOGGER.log(Level.INFO, "No se encontro un profesor con el numero de personal {0}.", 
-                        personnelNumber);
-                    throw new OperationException("No se encontró un profesor con el numero de personal: " + 
-                        personnelNumber, null);
+                    LOGGER.log(Level.INFO, "No se encontro profesor");
+                    throw new OperationException("No se encontró un profesor con el nombre: " +
+                        firstName + " " + lastName, null);
                 }
             }
 
         } catch (SQLException e) {
             LOGGER.log(Level.SEVERE, "Error de conexion con la base de datos", e);
-            throw new OperationException("Error al obtener el profesor", e);
+            throw new OperationException("Error al obtener el numero de personal del profesor", e);
         }
 
-        return professor;
+        return personnelNumber;
     }
 
     @Override
