@@ -9,13 +9,15 @@ public class Expedient {
     private String typeDocument;
     private String url;
     private String idStudent;
+    private int idTypeDocument;
 
     public Expedient(String name, String typeDocument, 
-        String url, String idStudent) {
+        String url, String idStudent, int idTypeDocument) {
         this.name = name;
         this.typeDocument = typeDocument;
         this.url = url;
         this.idStudent = idStudent;
+        this.idTypeDocument = idTypeDocument;
     }
 
     public String getName() {
@@ -50,6 +52,15 @@ public class Expedient {
         this.idStudent = idStudent;
     }
 
+    
+    public int getIdTypeDocument() {
+        return idTypeDocument;
+    }
+
+    public void setIdTypeDocument(int idTypeDocument) {
+        this.idTypeDocument = idTypeDocument;
+    }
+
     @Override
     public boolean equals(Object object) {
         if (this == object) {
@@ -65,5 +76,4 @@ public class Expedient {
         && Objects.equals(url, other.url)
         && Objects.equals(idStudent, other.idStudent);
     }
-
 }

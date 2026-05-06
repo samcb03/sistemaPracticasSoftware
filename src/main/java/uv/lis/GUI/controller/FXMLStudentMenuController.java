@@ -6,6 +6,8 @@ import java.util.ResourceBundle;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import uv.lis.GUI.WindowHandler;
+import uv.lis.logic.dto.Student;
+import uv.lis.logic.utils.SessionManager;
 
 
 public class FXMLStudentMenuController extends WindowHandler {
@@ -14,9 +16,12 @@ public class FXMLStudentMenuController extends WindowHandler {
     @FXML private Button buttonNotifications;
     @FXML private Button buttonLogOut;
 
+    private Student student;
+
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
+        this.student = SessionManager.getInstance().getCurrentStudent();
     }
 
     @FXML
@@ -27,6 +32,10 @@ public class FXMLStudentMenuController extends WindowHandler {
     @FXML
     public void goToNotifications() {
         navigateTo("/uv/lis/GUI/view/FXMLNotifications.fxml");
+    }
+
+    @FXML void goToUploadDocuments() {
+        navigateTo("/uv/lis/GUI/view/FXMLUploadDocuments.fxml");
     }
 
 }
