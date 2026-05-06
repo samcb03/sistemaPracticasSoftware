@@ -61,7 +61,6 @@ public class FXMLRequestProjectController extends ValidationHandler {
             showError("No hay una sesión activa. Por favor inicia sesión.");
             buttonAddProject.setDisable(true);
             buttonSubmit.setDisable(true);
-            return;
         }
         
         studentId = student.getIdStudent();
@@ -155,7 +154,7 @@ public class FXMLRequestProjectController extends ValidationHandler {
     private void updateSelectedCount() {
         labelSelectedCount.setText(selectedProjects.size() + "/" + MAX_PROJECTS);
     }
-
+ 
     @Override
     protected void clearFields() {
         comboBoxProjects.getSelectionModel().clearSelection();

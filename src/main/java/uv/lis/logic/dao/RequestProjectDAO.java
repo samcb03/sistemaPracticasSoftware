@@ -50,7 +50,7 @@ public class RequestProjectDAO implements IRequestProjectDAO {
 
         return count;
     }
-
+ 
     @Override
     public List<Project> getAvailableProjects() throws OperationException{
         List<Project> projects = new ArrayList<>();
@@ -158,6 +158,7 @@ public class RequestProjectDAO implements IRequestProjectDAO {
         return isRegistered;
     }
 
+    //FIXME Mostrar estos mensajes en la GUI como informacion para el usuario
     @Override
     public boolean validateProjectRequest(String idStudent, int idProject) throws OperationException {
         boolean isValid = true;

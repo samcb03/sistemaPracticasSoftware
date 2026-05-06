@@ -21,6 +21,8 @@ public class SubjectDAO implements ISubjectDAO {
         this.connectionManager = new MySQLConnectionManager();
     }
 
+    //FIXME refactorizar el metodo para que las excepciones no manejen el flujo de control, verificar si se puede utilizar
+    //otro tipo de variable para el control
     @Override
     public boolean registerSubject(Subject subject) throws OperationException {
         boolean isRegistered = false;
@@ -52,14 +54,14 @@ public class SubjectDAO implements ISubjectDAO {
                 professorSubjectStatement.setString(2, subject.getProfessorPersonnelNumber());
 
                 if (professorSubjectStatement.executeUpdate() == NO_ROWS_AFFECTED) {
-                    throw new OperationException(
-                        "No se pudo asignar el profesor a la Experiencia Educativa.", null);
+                    throw new OperationException("No se pudo asignar el profesor a la Experiencia Educativa", 
+                        null);
                 }
 
                 databaseConnection.commit();
                 isRegistered = true;
                 LOGGER.log(Level.INFO, "Experiencia Educativa registrada con éxito.");
-
+            
             } catch (OperationException | SQLException e) {
                 databaseConnection.rollback();
                 LOGGER.log(Level.SEVERE, "Error al registrar la Experiencia Educativa", e);
@@ -73,7 +75,7 @@ public class SubjectDAO implements ISubjectDAO {
         }
         return isRegistered;
     }
-
+ 
     @Override
     public ArrayList<Subject> getAllSubjects() throws OperationException {
         ArrayList<Subject> subjects = new ArrayList<>();
