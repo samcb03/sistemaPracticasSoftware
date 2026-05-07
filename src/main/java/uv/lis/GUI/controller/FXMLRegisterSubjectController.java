@@ -62,7 +62,7 @@ public class FXMLRegisterSubjectController extends ValidationHandler {
 
     private void loadProfessorsNames() {
         try {
-            professorsMap = professorDAO.getAllActiveProfessorsMap(); // devuelve Map<nombre, numeroPersonal>
+            professorsMap = professorDAO.getAllActiveProfessorsMap();
             comboBoxProfessorName.setItems(FXCollections.observableArrayList(professorsMap.keySet()));
         } catch (OperationException e) {
             showError(e.getMessage());

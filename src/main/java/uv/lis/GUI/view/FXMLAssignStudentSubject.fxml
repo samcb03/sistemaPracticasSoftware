@@ -32,7 +32,7 @@
                     </font>
                 </Label>
 
-                <Button fx:id="buttonAssign" layoutX="52.0" layoutY="337.0" mnemonicParsing="false" onAction="#assignStudent" prefHeight="28.0" prefWidth="146.0" style="-fx-background-color: white;" text="Asignar Alumno" />
+                <Button fx:id="buttonAssign" layoutX="52.0" layoutY="337.0" mnemonicParsing="false" onAction="#validateFields" prefHeight="28.0" prefWidth="146.0" style="-fx-background-color: white;" text="Asignar Alumno" />
 
                 <Button fx:id="buttonBack" layoutX="266.0" layoutY="337.0" mnemonicParsing="false" onAction="#goBack" prefHeight="28.0" prefWidth="146.0" style="-fx-background-color: white;" text="Cancelar" />
             <TableView fx:id="tableViewStudents" layoutX="57.0" layoutY="66.0" prefHeight="229.0" prefWidth="339.0">
