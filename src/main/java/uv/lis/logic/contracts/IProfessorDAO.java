@@ -1,8 +1,7 @@
 package uv.lis.logic.contracts;
 
 
-import java.util.ArrayList;
-
+import java.util.LinkedHashMap;
 import uv.lis.logic.dto.Professor;
 import uv.lis.logic.exceptions.OperationException;
 
@@ -16,5 +15,5 @@ public interface IProfessorDAO {
 
     boolean inactivateProfessor(Professor professor) throws OperationException;
 
-    ArrayList<String> getAllActiveProfessorsNames() throws OperationException;
+    LinkedHashMap<String, String> getAllActiveProfessorsMap() throws OperationException;
 }
