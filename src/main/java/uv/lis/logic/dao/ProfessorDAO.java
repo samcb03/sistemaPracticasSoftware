@@ -5,7 +5,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import uv.lis.dataaccess.MySQLConnectionManager;
@@ -28,25 +28,25 @@ public class ProfessorDAO extends UserDAO implements IProfessorDAO {
     }
 
     @Override
-    public ArrayList<String> getAllActiveProfessorsNames() throws OperationException {
-        ArrayList<String> professorsNames = new ArrayList<>();
-        String query = "SELECT u.nombre, u.apellidos "
-            + "FROM Profesor p INNER JOIN Usuario u ON p.idUsuario = u.idUsuario "
-            + "WHERE p.estado = 1";
+    public LinkedHashMap<String, String> getAllActiveProfessorsMap() throws OperationException {
+        LinkedHashMap<String, String> map = new LinkedHashMap<>();
+        String query = "SELECT numeroPersonal, nombre, apellidos FROM Profesor WHERE activo = 1;";
 
-        try (Connection databaseConnection = connectionManager.getConnection();
-            PreparedStatement preparedStatement = databaseConnection.prepareStatement(query);
-            ResultSet resultSet = preparedStatement.executeQuery()) {
+        try (Connection connection = connectionManager.getConnection();
+            PreparedStatement statement = connection.prepareStatement(query);
+            ResultSet resultSet = statement.executeQuery()) {
 
             while (resultSet.next()) {
-                professorsNames.add(resultSet.getString("nombre") + " " + resultSet.getString("apellidos"));
+                String fullName = resultSet.getString("nombre") + " " + resultSet.getString("apellidos");
+                String personnelNumber = resultSet.getString("numeroPersonal");
+                map.put(fullName, personnelNumber);
             }
-
         } catch (SQLException e) {
-            LOGGER.log(Level.SEVERE, "Error al obtener los profesores", e);
-            throw new OperationException("No se pudieron obtener los profesores. Intentelo mas tarde", e);
+            LOGGER.log(Level.SEVERE, "Error al obtener profesores", e);
+            throw new OperationException("Error al obtener profesores", e);
         }
-        return professorsNames;
+
+        return map;
     }
     
     @Override
