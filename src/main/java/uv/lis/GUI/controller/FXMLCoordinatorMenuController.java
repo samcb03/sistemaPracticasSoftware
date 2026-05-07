@@ -20,7 +20,7 @@ public class FXMLCoordinatorMenuController extends WindowHandler  {
     @FXML private Button buttonConsultProject;
     @FXML private Button buttonLogOut;
     @FXML private Button buttonRegisterSubject;
-    @FXML private Button buttonAssignStudentSubject;
+    @FXML private Button buttonAssignationProject;
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
@@ -62,7 +62,8 @@ public class FXMLCoordinatorMenuController extends WindowHandler  {
         navigateTo("/uv/lis/GUI/view/FXMLRegisterSubject.fxml"); 
     }
 
-    @FXML public void goToAssignStudentSubject() { 
-        navigateTo("/uv/lis/GUI/view/FXMLAssignStudentSubject.fxml"); 
+    @FXML public void goToAssignationProject() {
+        navigateTo("/uv/lis/GUI/view/FXMLAssignationProject.fxml");
     }
+
 }

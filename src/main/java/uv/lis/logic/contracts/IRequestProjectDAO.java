@@ -21,5 +21,7 @@ public interface IRequestProjectDAO {
     Optional<String> validateProjectRequest(String idStudent, int idProject) throws OperationException;
 
     boolean assignStudentToProject(String idStudent, int idProject) throws OperationException;
+
+    List<String> getApplicantsByProjectId(int idProject) throws OperationException;
 }
 

@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ListView?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.text.Font?>
+
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="540.0" prefWidth="680.0" xmlns="http://javafx.com/javafx/21" 
+xmlns:fx="http://javafx.com/fxml/1" 
+fx:controller="uv.lis.GUI.controller.FXMLAssignationProjectController">
+   <children>
+
+      <Label layoutX="0.0" layoutY="0.0" prefHeight="20.0" prefWidth="680.0" style="-fx-background-color: #a8c8e8; -fx-border-color: BLACK;" text=" Sistema de Expedientes - Panel de Profesor">
+      </Label>
+
+      <Label layoutX="195.0" layoutY="32.0" text="Asignar Estudiante a Proyecto">
+         <font>
+            <Font name="System Bold" size="20.0" />
+         </font>
+      </Label>
+
+      <AnchorPane layoutX="40.0" layoutY="70.0" prefHeight="440.0" prefWidth="600.0" style="-fx-background-color: #cce4f7; -fx-background-radius: 20; -fx-border-radius: 20;">
+         <children>
+            <ComboBox fx:id="comboBoxProjects" layoutX="158.0" layoutY="34.0" prefHeight="30.0" prefWidth="282.0" promptText="Seleccione un proyecto..." />
+            
+            <Label layoutX="37.0" layoutY="92.0" text="Organización:" />
+            <Label layoutX="37.0" layoutY="137.0" text="Metodología:" />
+            <Label layoutX="37.0" layoutY="182.0" text="Cupo:" />
+            <Label layoutX="37.0" layoutY="230.0" text="Objetivo:" />
+            <Label layoutX="36.0" layoutY="279.0" text="Descripción:" />
+
+            <Label fx:id="labelOrganizationName" layoutX="119.0" layoutY="92.0" prefHeight="18.0" prefWidth="229.0" />
+            <Label fx:id="labelMethodology" layoutX="119.0" layoutY="136.0" prefHeight="18.0" prefWidth="229.0" />
+            <Label fx:id="labelCapacity" layoutX="80.0" layoutY="181.0" prefHeight="18.0" prefWidth="229.0" />
+            <Label fx:id="labelObjective" layoutX="95.0" layoutY="229.0" prefHeight="18.0" prefWidth="229.0" />
+            <Label fx:id="labelDescription" alignment="TOP_LEFT" layoutX="109.0" layoutY="279.0" prefHeight="90.0" prefWidth="230.0" wrapText="true" />
+            
+            <Label layoutX="368.0" layoutY="60.0" text="Alumnos solicitantes:">
+               <font>
+                  <Font name="System Bold" size="12.0" />
+               </font>
+            </Label>
+            <ListView fx:id="listViewApplicants" layoutX="368.0" layoutY="81.0" prefHeight="258.0" prefWidth="200.0" />
+            
+            <Label fx:id="labelError" layoutX="110.0" layoutY="379.0" prefHeight="18.0" prefWidth="380.0" style="-fx-text-fill: red; -fx-alignment: center;" />
+            
+            <Button fx:id="buttonAssignProject" layoutX="230.0" layoutY="405.0" mnemonicParsing="false" onAction="#assignStudent" text="Asignar" />
+            <Button fx:id="buttonBack" layoutX="310.0" layoutY="405.0" mnemonicParsing="false" onAction="#goBack" text="Cancelar" />
+         </children>
+      </AnchorPane>
+
+   </children>
+</AnchorPane>
