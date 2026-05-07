@@ -22,7 +22,7 @@ public class SubjectDAO implements ISubjectDAO {
     }
 
     //FIXME refactorizar el metodo para que las excepciones no manejen el flujo de control, verificar si se puede utilizar
-    //otro tipo de variable para el control
+    //otro tipo de variable para el control y verificar si hay algun caso en el que suceda el NO_ROWS_AFFECTED sin que haya una excepcion antes
     @Override
     public boolean registerSubject(Subject subject) throws OperationException {
         boolean isRegistered = false;
@@ -77,26 +77,43 @@ public class SubjectDAO implements ISubjectDAO {
     }
  
     @Override
-    public ArrayList<Subject> getAllSubjects() throws OperationException {
-        ArrayList<Subject> subjects = new ArrayList<>();
-        String subjectQuery = "SELECT NRC, idPeriodoEscolar FROM ExperienciaEducativa";
+    public ArrayList<String> getAllSubjectsNRCName() throws OperationException {
+        ArrayList<String> subjects = new ArrayList<>();
+        String subjectQuery = "SELECT NRC, nombreExperiencia FROM ExperienciaEducativa";
 
         try (Connection databaseConnection = connectionManager.getConnection();
                 PreparedStatement preparedStatement = databaseConnection.prepareStatement(subjectQuery);
                 ResultSet resultSet = preparedStatement.executeQuery()) {
 
             while (resultSet.next()) {
-                Subject subject = new Subject();
-                subject.setNrc(resultSet.getInt("NRC"));
-                subject.setSchoolPeriodId(resultSet.getInt("idPeriodoEscolar"));
-                subjects.add(subject);
+                String formatted = resultSet.getInt("NRC") + " - " + resultSet.getString("nombreExperiencia");
+                subjects.add(formatted);
             }
 
         } catch (SQLException e) {
             LOGGER.log(Level.SEVERE, "Error de conexion con la base de datos", e);
-            throw new OperationException("No se pudo obtener las Experiencias Educativas. Intentelo mas tarde",
-                e);
+            throw new OperationException("No se pudo obtener las Experiencias Educativas", e);
         }
         return subjects;
+    }
+
+    public boolean assignStudentToSubject(String studentId, int subjectNrc) throws OperationException {
+        boolean isAssigned = false;
+        String query = "INSERT INTO alumno_esta_ee (matricula, NRC) VALUES (?, ?);";
+
+        try (Connection databaseConnection = connectionManager.getConnection();
+            PreparedStatement preparedStatement = databaseConnection.prepareStatement(query)) {
+            
+            preparedStatement.setString(1, studentId);
+            preparedStatement.setInt(2, subjectNrc);
+
+            if (preparedStatement.executeUpdate() > NO_ROWS_AFFECTED) {
+                isAssigned = true;
+            }
+        } catch (SQLException e) {
+            LOGGER.log(Level.SEVERE, "Error al asignar alumno a la experiencia educativa", e);
+            throw new OperationException("No se pudo asignar el alumno a la experiencia educativa", e);
+        }
+        return isAssigned;
     }
 }

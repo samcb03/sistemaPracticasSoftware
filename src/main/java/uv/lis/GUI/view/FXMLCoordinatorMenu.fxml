@@ -33,6 +33,7 @@
 
             <Button fx:id="buttonConsultProject" maxWidth="Infinity" onAction="#goToConsultProject" style="-fx-background-color: #87CEEB;                            -fx-text-fill: #FFFFFF;                            -fx-font-size: 14;                            -fx-font-weight: bold;                            -fx-background-radius: 8;                            -fx-pref-height: 44;                            -fx-cursor: hand;" text="Consultar Proyecto" />
          <Button fx:id="buttonRegisterSubject" maxWidth="Infinity" onAction="#goToRegisterSubject" style="-fx-background-color: #87CEEB;                            -fx-text-fill: #FFFFFF;                            -fx-font-size: 14;                            -fx-font-weight: bold;                            -fx-background-radius: 8;                            -fx-pref-height: 44;                            -fx-cursor: hand;" text="Registrar Experiencia Educativa" />
+         <Button fx:id="buttonAssignStudent" maxWidth="Infinity" onAction="#goToAssignStudentSubject" style="-fx-background-color: #87CEEB;                            -fx-text-fill: #FFFFFF;                            -fx-font-size: 14;                            -fx-font-weight: bold;                            -fx-background-radius: 8;                            -fx-pref-height: 44;                            -fx-cursor: hand;" text="Asignar Alumnos a EE" />
 
             <Separator>
                 <VBox.margin><Insets bottom="8" top="8" /></VBox.margin>
