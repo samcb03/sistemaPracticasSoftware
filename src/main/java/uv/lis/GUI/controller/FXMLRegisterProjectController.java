@@ -54,11 +54,9 @@ public class FXMLRegisterProjectController extends ValidationHandler {
         }
     }
 
-    //TODO Añadir validacion de combobox
     @FXML
     public void validateFields() {
         Optional<String> firstValidationError = getFirstValidationError();
-
         handleValidation(firstValidationError, this::registerProject);
     }
 

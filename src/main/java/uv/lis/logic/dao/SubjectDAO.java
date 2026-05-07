@@ -21,8 +21,6 @@ public class SubjectDAO implements ISubjectDAO {
         this.connectionManager = new MySQLConnectionManager();
     }
 
-    //FIXME refactorizar el metodo para que las excepciones no manejen el flujo de control, verificar si se puede utilizar
-    //otro tipo de variable para el control y verificar si hay algun caso en el que suceda el NO_ROWS_AFFECTED sin que haya una excepcion antes
     @Override
     public boolean registerSubject(Subject subject) throws OperationException {
         boolean isRegistered = false;
@@ -38,44 +36,45 @@ public class SubjectDAO implements ISubjectDAO {
             databaseConnection.setAutoCommit(false);
 
             try (PreparedStatement subjectStatement = databaseConnection.prepareStatement(subjectQuery);
-                    PreparedStatement professorSubjectStatement 
-                    = databaseConnection.prepareStatement(professorSubjectQuery)) {
+                    PreparedStatement professorSubjectStatement = 
+                    databaseConnection.prepareStatement(professorSubjectQuery)) {
 
                 subjectStatement.setInt(1, subject.getNrc());
                 subjectStatement.setString(2, subject.getSUBJECT_NAME());
                 subjectStatement.setString(3, subject.getCAREER());
                 subjectStatement.setInt(4, subject.getSchoolPeriodId());
-
-                if (subjectStatement.executeUpdate() == NO_ROWS_AFFECTED) {
-                    throw new OperationException("No se pudo registrar la Experiencia Educativa.", null);
-                }
+                int subjectRows = subjectStatement.executeUpdate();
 
                 professorSubjectStatement.setInt(1, subject.getNrc());
                 professorSubjectStatement.setString(2, subject.getProfessorPersonnelNumber());
+                int professorRows = professorSubjectStatement.executeUpdate();
 
-                if (professorSubjectStatement.executeUpdate() == NO_ROWS_AFFECTED) {
-                    throw new OperationException("No se pudo asignar el profesor a la Experiencia Educativa", 
-                        null);
+                boolean bothInserted = subjectRows != NO_ROWS_AFFECTED && professorRows != NO_ROWS_AFFECTED;
+
+                if (bothInserted) {
+                    databaseConnection.commit();
+                    isRegistered = true;
+                    LOGGER.log(Level.INFO, "Experiencia Educativa registrada con éxito.");
+                } else {
+                    databaseConnection.rollback();
+                    LOGGER.log(Level.WARNING, "No se afectaron filas al registrar la Experiencia Educativa.");
                 }
 
-                databaseConnection.commit();
-                isRegistered = true;
-                LOGGER.log(Level.INFO, "Experiencia Educativa registrada con éxito.");
-            
-            } catch (OperationException | SQLException e) {
+            } catch (SQLException e) {
                 databaseConnection.rollback();
                 LOGGER.log(Level.SEVERE, "Error al registrar la Experiencia Educativa", e);
-                throw new OperationException("No se pudo registrar la Experiencia Educativa",
-                    e);
+                throw new OperationException("No se pudo registrar la Experiencia Educativa", e);
             }
+
         } catch (SQLException e) {
             LOGGER.log(Level.SEVERE, "Error de conexión al registrar la Experiencia Educativa", e);
             throw new OperationException("No se pudo registrar la Experiencia Educativa. Intentelo mas tarde", 
                 e);
         }
+
         return isRegistered;
     }
- 
+    
     @Override
     public ArrayList<String> getAllSubjectsNRCName() throws OperationException {
         ArrayList<String> subjects = new ArrayList<>();

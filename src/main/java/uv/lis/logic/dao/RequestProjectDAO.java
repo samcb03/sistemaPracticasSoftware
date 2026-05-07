@@ -7,6 +7,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import uv.lis.dataaccess.MySQLConnectionManager;
@@ -158,31 +159,28 @@ public class RequestProjectDAO implements IRequestProjectDAO {
         return isRegistered;
     }
 
-    //FIXME Mostrar estos mensajes en la GUI como informacion para el usuario
     @Override
-    public boolean validateProjectRequest(String idStudent, int idProject) throws OperationException {
-        boolean isValid = true;
+    public Optional<String> validateProjectRequest(String idStudent, int idProject) throws OperationException {
+        Optional<String> validationError = Optional.empty();
         try {
             if (getActiveRequestCountByStudentId(idStudent) >= MAX_REQUESTS) {
-                LOGGER.log(Level.WARNING, "El practicante ya tiene {1} solicitudes activas", MAX_REQUESTS);
-                isValid = false;
+                validationError = Optional.of("Ya tienes " + MAX_REQUESTS + " solicitudes activas");
             }
 
             if (hasAlreadyRequested(idStudent, idProject)) {
-                LOGGER.log(Level.WARNING, "El practicante ya solicitó este proyecto");
-                isValid = false;
+                validationError = Optional.of("Ya solicitaste este proyecto anteriormente");
             }
 
             if (!hasAvailableCapacity(idProject)) {
-                LOGGER.log(Level.WARNING, "El proyecto {0} no tiene cupo disponible", idProject);
-                isValid = false;
+                validationError = Optional.of("Este proyecto ya no tiene cupo disponible");
             }
-  
+
         } catch (OperationException e) {
             LOGGER.log(Level.SEVERE, "Error en validación de solicitud", e);
             throw new OperationException("Error al validar solicitud", e);
-        } 
-        return isValid;
+        }
+
+        return validationError;
     }
 
     @Override
