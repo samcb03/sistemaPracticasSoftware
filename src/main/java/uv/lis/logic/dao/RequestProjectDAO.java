@@ -183,29 +183,116 @@ public class RequestProjectDAO implements IRequestProjectDAO {
         return isValid;
     }
 
-    @Override
-    public boolean assignStudentToProject(String idStudent, int idProject) throws OperationException {
-        boolean isAssigned = false;
-        String query = "UPDATE Solicita_Proyecto SET estatus = ? WHERE matricula = ? AND idProyecto = ?;";
+@Override
+public boolean assignStudentToProject(String idStudent, int idProject) throws OperationException {
+    boolean isAssigned = false;
+    
+    // Consulta para contar cuántos ya están asignados (estatus = 1)
+    String queryCount = "SELECT (p.cupo - COUNT(sp.idSolicitud)) as disponibles " +
+                        "FROM Proyecto p LEFT JOIN Solicita_Proyecto sp " +
+                        "ON p.idProyecto = sp.idProyecto AND sp.estatus = 1 " +
+                        "WHERE p.idProyecto = ? GROUP BY p.cupo;";
 
-        try (Connection databaseConnection = connectionManager.getConnection();
-             PreparedStatement preparedStatement = databaseConnection.prepareStatement(query)) {
-            
-            preparedStatement.setInt(1, STATUS_ASSIGNED);
-            preparedStatement.setString(2, idStudent);
-            preparedStatement.setInt(3, idProject);
+    String queryAssign = "UPDATE Solicita_Proyecto SET estatus = 1 WHERE matricula = ? AND idProyecto = ?;";
+    String queryClean = "DELETE FROM Solicita_Proyecto WHERE matricula = ? AND estatus = 0;";
 
-            if (preparedStatement.executeUpdate() > NO_ROWS_AFFECTED) {
-                isAssigned = true;
-                LOGGER.log(Level.INFO, "Practicante {0} asignado al proyecto {1} exitosamente", 
-                    new Object[]{idStudent, idProject});
+    try (Connection connection = connectionManager.getConnection()) {
+        connection.setAutoCommit(false);
+
+        try {
+            // PASO 0: ¡VALIDACIÓN DE ÚLTIMO MOMENTO!
+            try (PreparedStatement psCount = connection.prepareStatement(queryCount)) {
+                psCount.setInt(1, idProject);
+                try (ResultSet rs = psCount.executeQuery()) {
+                    if (rs.next() && rs.getInt("disponibles") <= 0) {
+                        throw new SQLException("CUPO_LLENO"); // Forzamos el error
+                    }
+                }
             }
+
+            // PASO A: Asignar (estatus = 1)
+            try (PreparedStatement psAssign = connection.prepareStatement(queryAssign)) {
+                psAssign.setString(1, idStudent);
+                psAssign.setInt(2, idProject);
+                psAssign.executeUpdate();
+            }
+
+            // PASO B: Limpiar otras solicitudes del alumno
+            try (PreparedStatement psClean = connection.prepareStatement(queryClean)) {
+                psClean.setString(1, idStudent);
+                psClean.executeUpdate();
+            }
+
+            connection.commit();
+            isAssigned = true;
+
         } catch (SQLException e) {
-            LOGGER.log(Level.SEVERE, "Error al asignar practicante al proyecto", e);
-            throw new OperationException("Error al asignar practicante al proyecto", e);
+            connection.rollback();
+            if ("CUPO_LLENO".equals(e.getMessage())) {
+                throw new OperationException("Lo sentimos, otro coordinador acaba de llenar el cupo de este proyecto.", e);
+            }
+            throw e;
+        }
+    } catch (SQLException e) {
+        throw new OperationException("Error de base de datos", e);
+    }
+    return isAssigned;
+}
+    
+    public int getAssignedCount(int projectId) throws OperationException {
+    int count = 0;
+
+    String query = "SELECT COUNT(*) AS Total " +
+                   "FROM Solicita_Proyecto " +
+                   "WHERE idProyecto = ? AND estatus = ?;";
+
+    try (Connection databaseConnection = connectionManager.getConnection();
+         PreparedStatement preparedStatement = databaseConnection.prepareStatement(query)) {
+
+        preparedStatement.setInt(1, projectId);
+        preparedStatement.setInt(2, STATUS_ASSIGNED);
+
+        try(ResultSet resultSet = preparedStatement.executeQuery()) {
+            if(resultSet.next()) {
+                count = resultSet.getInt("Total");
+            }
         }
 
-        return isAssigned;
-    } 
+    } catch (SQLException e) {
+        LOGGER.log(Level.SEVERE, "Error al obtener el recuento de asignaciones", e);
+        throw new OperationException("Error al obtener el recuento de asignaciones", e);
+    }
+
+    return count;
+    }
+
+    @Override
+    public List<String> getApplicantsByProjectId(int idProject) throws OperationException {
+    List<String> applicants = new ArrayList<>();
+    String query = "SELECT u.nombre, u.apellidos, a.matricula " +
+                   "FROM Usuario u " +
+                   "INNER JOIN Alumno a ON u.idUsuario = a.idUsuario " +
+                   "INNER JOIN Solicita_Proyecto sp ON a.matricula = sp.matricula " +
+                   "WHERE sp.idProyecto = ?";
+
+    try (Connection databaseConnection = connectionManager.getConnection();
+         PreparedStatement statement = databaseConnection.prepareStatement(query)) {
+         
+        statement.setInt(1, idProject);
+        
+        try (ResultSet resultSet = statement.executeQuery()) {
+            while (resultSet.next()) {
+                String fullName = resultSet.getString("nombre") + " " + 
+                                  resultSet.getString("apellidos") + 
+                                  " (" + resultSet.getString("matricula") + ")";
+                applicants.add(fullName);
+            }
+        }
+    } catch (SQLException e) {
+        throw new OperationException("Error al obtener los solicitantes del proyecto", e);
+    }
+
+    return applicants;
+}
     
 }

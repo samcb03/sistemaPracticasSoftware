@@ -1,5 +1,7 @@
 package uv.lis.logic.utils;
 
+import java.util.Optional;
+
 import uv.lis.logic.dto.Professor;
 import uv.lis.logic.dto.Student;
 
@@ -8,6 +10,7 @@ public class SessionManager {
     private static SessionManager instance;
     private Student currentStudent;
     private Professor currentProfessor;
+
 
     private SessionManager() {}
 
@@ -32,6 +35,20 @@ public class SessionManager {
 
     public void setCurrentProfessor(Professor professor) {
         this.currentProfessor = professor;
+    }
+
+    public Optional<Professor> getCurrentCoordinator() {
+        if (currentProfessor != null && currentProfessor.getIsCoordinator()) {
+            return Optional.of(currentProfessor);
+        }
+            return Optional.empty();
+    }
+
+    public void setCurrentCoordinator(Professor coordinator) {
+        if (coordinator != null) {
+            coordinator.setIsCoordinator(true);
+        }
+        this.currentProfessor = coordinator;
     }
 
 

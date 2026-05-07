@@ -17,4 +17,6 @@ public interface IProfessorDAO {
     boolean inactivateProfessor(Professor professor) throws OperationException;
 
     ArrayList<String> getAllActiveProfessorsNames() throws OperationException;
+
+    Professor getProfessorById(int id) throws OperationException;
 }
