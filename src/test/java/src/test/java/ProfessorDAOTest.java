@@ -1,5 +1,6 @@
 package src.test.java;
 
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -11,18 +12,17 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-
 import java.lang.reflect.Field;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.LinkedHashMap;
-
 import uv.lis.dataaccess.MySQLConnectionManager;
 import uv.lis.logic.dao.ProfessorDAO;
 import uv.lis.logic.dto.Professor;
 import uv.lis.logic.exceptions.OperationException;
+
 
 @ExtendWith(MockitoExtension.class)
 class ProfessorDAOTest {
