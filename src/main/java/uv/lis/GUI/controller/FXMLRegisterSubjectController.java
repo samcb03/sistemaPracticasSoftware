@@ -95,42 +95,42 @@ public class FXMLRegisterSubjectController extends ValidationHandler {
     }
 
     private void registerSubject() {
-        Subject subject = buildSubject();
-        try {
-            boolean isRegistered = subjectDAO.registerSubject(subject);
-            if (isRegistered) {
-                showSuccess("Experiencia Educativa registrada con éxito.");
-                clearFields();
+        Optional<Subject> subject = buildSubject();
+
+        subject.ifPresent(s -> {
+            try {
+                boolean isRegistered = subjectDAO.registerSubject(s);
+                if (isRegistered) {
+                    showSuccess("Experiencia Educativa registrada con éxito.");
+                    clearFields();
+                }
+            } catch (OperationException e) {
+                LOGGER.log(Level.SEVERE, "Error al registrar la Experiencia Educativa", e);
+                showError(e.getMessage());
             }
-        } catch (OperationException e) {
-            LOGGER.log(Level.SEVERE, "Error al registrar la Experiencia Educativa", e);
-            showError(e.getMessage());
-        }
+        });
     }
 
-    private Subject buildSubject() {
+    private Optional<Subject> buildSubject() {
         Subject subject = new Subject();
         subject.setNrc(Integer.parseInt(textFieldNRC.getText().trim()));
+
         String selectedProfessor = comboBoxProfessorName.getValue();
+        String[] nameParts = selectedProfessor.split(" ", 2);        
+        String firstName = nameParts[0];
+        String lastName = nameParts.length > 1 ? nameParts[1] : "";
+
         try {
-            String[] nameParts = selectedProfessor.split(" ", 2);
-            String firstName = nameParts[0];
-            String lastName = nameParts.length > 1 ? nameParts[1] : "";
-            
             String professorPersonnelNumber = professorDAO.getProfessorPersonnelNumberByName(firstName, lastName);
-            subject.setProfessorPersonnelNumber(String.valueOf(professorPersonnelNumber));
-        } catch (OperationException e) {
-            showError(e.getMessage()); 
-        }
-        
-        String selectedPeriod = comboBoxPeriodName.getValue();
-        try {
+            subject.setProfessorPersonnelNumber(professorPersonnelNumber);
+
+            String selectedPeriod = comboBoxPeriodName.getValue();
             String schoolPeriodId = schoolPeriodDAO.getSchoolPeriodIdByName(selectedPeriod);
             subject.setSchoolPeriodId(Integer.parseInt(schoolPeriodId));
         } catch (OperationException e) {
             showError(e.getMessage());
-        }
-        return subject;
+        } 
+        return Optional.of(subject);
     }
 
     @Override
