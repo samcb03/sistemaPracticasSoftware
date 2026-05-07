@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.Pane?>
+<?import javafx.scene.text.Font?>
+
+<AnchorPane prefHeight="480.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="uv.lis.GUI.controller.FXMLAssignStudentSubjectController">
+
+    <children>
+
+        <Label layoutY="-1.0" prefHeight="20.0" prefWidth="600.0" style="-fx-background-color: orange; -fx-border-color: BLACK;" text="Asignar Alumno" />
+
+        <Label layoutX="248.0" layoutY="29.0" text="Asignacion">
+            <font>
+                <Font name="System Bold" size="20.0" />
+            </font>
+        </Label>
+
+        <Pane layoutX="75.0" layoutY="60.0" prefHeight="390.0" prefWidth="450.0" style="-fx-background-color: #ffaf9c; -fx-background-radius: 20;">
+
+            <children>
+                <ComboBox fx:id="comboBoxSubjects" layoutX="102.0" layoutY="30.0" prefHeight="25.0" prefWidth="250.0" />
+
+                <Label fx:id="labelMessage" layoutX="30.0" layoutY="305.0" prefWidth="390.0" style="-fx-text-fill: red;">
+                    <font>
+                        <Font size="11.0" />
+                    </font>
+                </Label>
+
+                <Button fx:id="buttonAssign" layoutX="52.0" layoutY="337.0" mnemonicParsing="false" onAction="#validateFields" prefHeight="28.0" prefWidth="146.0" style="-fx-background-color: white;" text="Asignar Alumno" />
+
+                <Button fx:id="buttonBack" layoutX="266.0" layoutY="337.0" mnemonicParsing="false" onAction="#goBack" prefHeight="28.0" prefWidth="146.0" style="-fx-background-color: white;" text="Cancelar" />
+            <TableView fx:id="tableViewStudents" layoutX="57.0" layoutY="66.0" prefHeight="229.0" prefWidth="339.0">
+              <columns>
+                <TableColumn fx:id="columnIdStudent" prefWidth="169.60003662109375" text="Matricula" />
+                <TableColumn fx:id="columnName" prefWidth="168.79998779296875" text="Nombre" />
+              </columns>
+            </TableView>
+
+            </children>
+        </Pane>
+
+    </children>
+</AnchorPane>

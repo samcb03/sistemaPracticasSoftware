@@ -5,6 +5,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import uv.lis.dataaccess.MySQLConnectionManager;
@@ -49,7 +50,7 @@ public class StudentDAO extends UserDAO implements IStudentDAO {
                     student.setBirthDate(resultSet.getDate("fechaNacimiento"));
                     student.setGender(resultSet.getString("genero"));
 
-                    LOGGER.log(Level.INFO, "Busqueda de responsable de proyecto con matricula {0} exitosa.", 
+                    LOGGER.log(Level.INFO, "Busqueda de alumno con matricula {0} exitosa.", 
                         idStudent);
                 } else {
                     LOGGER.log(Level.INFO, "No se encontro un alumno con la matricula {0}.", idStudent);
@@ -61,6 +62,36 @@ public class StudentDAO extends UserDAO implements IStudentDAO {
             throw new OperationException("No se pudo buscar el alumno. Intentelo mas tarde", e);
         }
         return student;
+    }
+
+    @Override
+    public ArrayList<Student> getActiveStudentsNotInSubject() throws OperationException {
+        ArrayList<Student> students = new ArrayList<>();
+        String query = "SELECT a.matricula, u.nombre, u.apellidos "
+            + "FROM Alumno a "
+            + "JOIN Usuario u ON a.idUsuario = u.idUsuario "
+            + "WHERE a.estado = 1 "
+            + "AND a.matricula NOT IN ("
+            + "SELECT matricula FROM Alumno_Esta_EE)";
+
+        try (Connection databaseConnection = connectionManager.getConnection();
+                PreparedStatement preparedStatement = databaseConnection.prepareStatement(query)) {
+
+            try (ResultSet resultSet = preparedStatement.executeQuery()) {
+                while (resultSet.next()) {
+                    Student student = new Student();
+                    student.setIdStudent(resultSet.getString("matricula"));
+                    student.setFirstName(resultSet.getString("nombre"));
+                    student.setLastName(resultSet.getString("apellidos"));
+                    students.add(student);
+                }
+            }
+
+        } catch (SQLException e) {
+            LOGGER.log(Level.SEVERE, "Error al obtener alumnos sin EE asignada", e);
+            throw new OperationException("No se pudo obtener los alumnos disponibles. Intente más tarde", e);
+        }
+        return students;
     }
 
     @Override

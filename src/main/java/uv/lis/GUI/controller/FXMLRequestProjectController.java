@@ -5,6 +5,7 @@ import java.net.URL;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.ResourceBundle;
 import java.util.stream.Collectors;
 import javafx.collections.FXCollections;
@@ -61,7 +62,6 @@ public class FXMLRequestProjectController extends ValidationHandler {
             showError("No hay una sesión activa. Por favor inicia sesión.");
             buttonAddProject.setDisable(true);
             buttonSubmit.setDisable(true);
-            return;
         }
         
         studentId = student.getIdStudent();
@@ -111,27 +111,30 @@ public class FXMLRequestProjectController extends ValidationHandler {
 
     @FXML
     public void addProject() {
-        String selected = comboBoxProjects.getValue();
+        String projectSelected = comboBoxProjects.getValue();
 
-        if (selectedProjects.containsKey(selected)) {
+        if (selectedProjects.containsKey(projectSelected)) {
             showError("Ya agregaste este proyecto");
-        } else if (selectedProjects.size() >= MAX_PROJECTS) {
+            return;
+        }
+
+        if (selectedProjects.size() >= MAX_PROJECTS) {
             showError("Solo puedes solicitar " + MAX_PROJECTS + " proyectos");
-        } else {
-            try {
-                Project project = projectDAO.getProjectByName(selected);
-                boolean isValid = requestProjectDAO.validateProjectRequest(studentId, project.getId());
-                if (isValid) {
-                    selectedProjects.put(selected, project.getId());
-                    listViewSelectedProjects.getItems().add(selected);
-                    updateSelectedCount();
-                    labelError.setText("");
-                } else {
-                    showError("No es posible agregar este proyecto");
-                }
-            } catch (OperationException e) {
-                showError(e.getMessage());
-            }
+            return;
+        }
+
+        try {
+            Project project = projectDAO.getProjectByName(projectSelected);
+            Optional<String> validationError = requestProjectDAO.validateProjectRequest(studentId, project.getId());
+
+            handleValidation(validationError, () -> {
+                selectedProjects.put(projectSelected, project.getId());
+                listViewSelectedProjects.getItems().add(projectSelected);
+                updateSelectedCount();
+                labelError.setText(""); 
+            });
+        } catch (OperationException e) {
+            showError(e.getMessage());
         }
     }
 
@@ -153,9 +156,9 @@ public class FXMLRequestProjectController extends ValidationHandler {
     }
 
     private void updateSelectedCount() {
-        labelSelectedCount.setText("Seleccionados: " + selectedProjects.size() + "/" + MAX_PROJECTS);
+        labelSelectedCount.setText(selectedProjects.size() + "/" + MAX_PROJECTS);
     }
-
+ 
     @Override
     protected void clearFields() {
         comboBoxProjects.getSelectionModel().clearSelection();

@@ -154,7 +154,7 @@ public class ProjectDAO implements IProjectDAO{
                 LOGGER.log(Level.INFO, "Proyecto con ID {0} modificado con éxito.", project.getId());
             } else {
                 LOGGER.log(Level.WARNING, "No se pudo modificar el proyecto con ID {0}.", project.getId());
-                throw new OperationException("No se pudo modificar el proyecto con ID: " + project.getId(), null);
+                throw new OperationException("No se pudo modificar el proyecto", null);
             }
         } catch (SQLException e) {
             LOGGER.log(Level.SEVERE, "Error de conexion con la base de datos", e);
@@ -179,7 +179,7 @@ public class ProjectDAO implements IProjectDAO{
                 isInactive = true;
             } else {
                 LOGGER.log(Level.WARNING, "No se pudo inactivar el proyecto con ID {0}.", project.getId());
-                throw new OperationException("No se pudo inactivar el proyecto con ID: " + project.getId(), null);
+                throw new OperationException("No se pudo inactivar el proyecto", null);
             }
 
         } catch (SQLException e) {

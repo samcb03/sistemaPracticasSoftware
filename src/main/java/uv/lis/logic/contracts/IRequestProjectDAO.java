@@ -2,6 +2,7 @@ package uv.lis.logic.contracts;
 
 
 import java.util.List;
+import java.util.Optional;
 import uv.lis.logic.dto.Project;
 import uv.lis.logic.exceptions.OperationException;
 
@@ -17,7 +18,7 @@ public interface IRequestProjectDAO {
 
     boolean hasAlreadyRequested(String id, int idProject) throws OperationException;
 
-    boolean validateProjectRequest(String idStudent, int idProject) throws OperationException;
+    Optional<String> validateProjectRequest(String idStudent, int idProject) throws OperationException;
 
     boolean assignStudentToProject(String idStudent, int idProject) throws OperationException;
 

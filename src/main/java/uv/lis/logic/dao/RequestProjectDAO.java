@@ -7,6 +7,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import uv.lis.dataaccess.MySQLConnectionManager;
@@ -17,6 +18,7 @@ import uv.lis.logic.exceptions.OperationException;
 
 public class RequestProjectDAO implements IRequestProjectDAO {
     private static final int NO_ROWS_AFFECTED = 0;
+    private static final int NO_REQUESTS = 0;
     private static final int MAX_REQUESTS = 3;
     private static final int STATUS_REQUESTED = 1;
     private static final int STATUS_ASSIGNED = 2;
@@ -49,7 +51,7 @@ public class RequestProjectDAO implements IRequestProjectDAO {
 
         return count;
     }
-
+ 
     @Override
     public List<Project> getAvailableProjects() throws OperationException{
         List<Project> projects = new ArrayList<>();
@@ -97,7 +99,7 @@ public class RequestProjectDAO implements IRequestProjectDAO {
             
             try (ResultSet resultSet = preparedStatement.executeQuery()) {
                 if (resultSet.next()) {
-                    hasRequested = resultSet.getInt("total") > 0;
+                    hasRequested = resultSet.getInt("total") > NO_REQUESTS;
                 }
             }
         } catch (SQLException e) {
@@ -158,29 +160,27 @@ public class RequestProjectDAO implements IRequestProjectDAO {
     }
 
     @Override
-    public boolean validateProjectRequest(String idStudent, int idProject) throws OperationException {
-        boolean isValid = true;
+    public Optional<String> validateProjectRequest(String idStudent, int idProject) throws OperationException {
+        Optional<String> validationError = Optional.empty();
         try {
             if (getActiveRequestCountByStudentId(idStudent) >= MAX_REQUESTS) {
-                LOGGER.log(Level.WARNING, "El practicante ya tiene {1} solicitudes activas", MAX_REQUESTS);
-                isValid = false;
+                validationError = Optional.of("Ya tienes " + MAX_REQUESTS + " solicitudes activas");
             }
 
             if (hasAlreadyRequested(idStudent, idProject)) {
-                LOGGER.log(Level.WARNING, "El practicante ya solicitó este proyecto");
-                isValid = false;
+                validationError = Optional.of("Ya solicitaste este proyecto anteriormente");
             }
 
             if (!hasAvailableCapacity(idProject)) {
-                LOGGER.log(Level.WARNING, "El proyecto {0} no tiene cupo disponible", idProject);
-                isValid = false;
+                validationError = Optional.of("Este proyecto ya no tiene cupo disponible");
             }
-  
+
         } catch (OperationException e) {
             LOGGER.log(Level.SEVERE, "Error en validación de solicitud", e);
             throw new OperationException("Error al validar solicitud", e);
-        } 
-        return isValid;
+        }
+
+        return validationError;
     }
 
 @Override
