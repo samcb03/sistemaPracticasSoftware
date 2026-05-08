@@ -31,7 +31,7 @@ public class StudentDAO extends UserDAO implements IStudentDAO {
     public Student getStudentById(int idStudent) throws OperationException { 
         Student student = null;
 
-        String studentQuery = "SELECT e.idUsuario, e.matricula, u.nombre, u.apellidos, e.fechaNacimiento, e.genero "
+        String studentQuery = "SELECT e.matricula, u.nombre, u.apellidos, e.fechaNacimiento, e.genero "
             + "FROM Alumno e INNER JOIN Usuario u ON e.idUsuario = u.idUsuario "
             + "WHERE e.idUsuario = ?"; 
 
@@ -43,7 +43,6 @@ public class StudentDAO extends UserDAO implements IStudentDAO {
             try (ResultSet resultSet = preparedStatement.executeQuery()) {
                 if (resultSet.next()) {
                     student = new Student();
-                    student.setId(resultSet.getInt("idUsuario"));
                     student.setIdStudent(resultSet.getString("matricula"));
                     student.setFirstName(resultSet.getString("nombre"));
                     student.setLastName(resultSet.getString("apellidos"));
@@ -62,6 +61,31 @@ public class StudentDAO extends UserDAO implements IStudentDAO {
             throw new OperationException("No se pudo buscar el alumno. Intentelo mas tarde", e);
         }
         return student;
+    }
+
+    @Override
+    public int getIdUserByStudentId(String studentId) throws OperationException {
+        int idUser = -1;
+        String query = "SELECT idUsuario FROM Alumno WHERE matricula = ?";
+
+        try (Connection databaseConnection = connectionManager.getConnection();
+             PreparedStatement preparedStatement = databaseConnection.prepareStatement(query)) {
+            
+            preparedStatement.setString(1, studentId);
+            
+            try (ResultSet resultSet = preparedStatement.executeQuery()) {
+                if (resultSet.next()) {
+                    idUser = resultSet.getInt("idUsuario");
+                } else {
+                    LOGGER.log(Level.INFO, "No se encontro un alumno con la matricula {0}.", studentId);
+                    throw new OperationException("No se encontró un alumno con la matricula: " + studentId, null);
+                }
+            }
+        } catch (SQLException e) {
+            LOGGER.log(Level.SEVERE, "Error de conexion con la base de datos",e);
+            throw new OperationException("No se pudo buscar el alumno. Intentelo mas tarde", e);
+        }
+        return idUser;
     }
 
     @Override
@@ -183,5 +207,27 @@ public class StudentDAO extends UserDAO implements IStudentDAO {
         }
 
         return isInactive;
+    }
+
+    @Override
+    public ArrayList<String> searchStudentIds(String prefix) throws OperationException {
+        ArrayList<String> studentIds = new ArrayList<>();
+        String query = "SELECT matricula FROM Alumno WHERE matricula LIKE ? LIMIT 10";
+
+        try (Connection databaseConnection = connectionManager.getConnection();
+            PreparedStatement preparedStatement = databaseConnection.prepareStatement(query)) {
+
+            preparedStatement.setString(1, prefix + "%");
+
+            try (ResultSet resultSet = preparedStatement.executeQuery()) {
+                while (resultSet.next()) {
+                    studentIds.add(resultSet.getString("matricula"));
+                }
+            }
+        } catch (SQLException e) {
+            LOGGER.log(Level.SEVERE, "Error al buscar matriculas", e);
+            throw new OperationException("No se pudieron obtener las matriculas", e);
+        }
+        return studentIds;
     }
 }
