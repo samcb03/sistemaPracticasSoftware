@@ -30,10 +30,10 @@ public class ProfessorDAO extends UserDAO implements IProfessorDAO {
     @Override
     public LinkedHashMap<String, String> getAllActiveProfessorsMap() throws OperationException {
         LinkedHashMap<String, String> map = new LinkedHashMap<>();
-        String query = "SELECT p.numeroPersonal, u.nombre, u.apellidos "  
-            + "FROM Profesor p " 
-            + "INNER JOIN Usuario u ON p.idUsuario = u.idUsuario " 
-            + "WHERE p.estado = 1";
+        String query = "SELECT p.numeroPersonal, u.nombre, u.apellidos"
+            + " FROM Profesor p"
+            + " INNER JOIN Usuario u ON p.idUsuario = u.idUsuario"
+            + " WHERE p.estado = 1";
 
         try (Connection connection = connectionManager.getConnection();
             PreparedStatement statement = connection.prepareStatement(query);

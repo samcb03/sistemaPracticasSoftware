@@ -115,27 +115,23 @@ public class FXMLRequestProjectController extends ValidationHandler {
 
         if (selectedProjects.containsKey(projectSelected)) {
             showError("Ya agregaste este proyecto");
-            return;
-        }
-
-        if (selectedProjects.size() >= MAX_PROJECTS) {
+        } else if (selectedProjects.size() >= MAX_PROJECTS) {
             showError("Solo puedes solicitar " + MAX_PROJECTS + " proyectos");
-            return;
-        }
+        } else {
+            try {
+                Project project = projectDAO.getProjectByName(projectSelected);
+                Optional<String> validationError = requestProjectDAO.validateProjectRequest(studentId, project.getId());
 
-        try {
-            Project project = projectDAO.getProjectByName(projectSelected);
-            Optional<String> validationError = requestProjectDAO.validateProjectRequest(studentId, project.getId());
-
-            handleValidation(validationError, () -> {
-                selectedProjects.put(projectSelected, project.getId());
-                listViewSelectedProjects.getItems().add(projectSelected);
-                updateSelectedCount();
-                labelError.setText(""); 
-            });
-        } catch (OperationException e) {
-            showError(e.getMessage());
-        }
+                handleValidation(validationError, () -> {
+                    selectedProjects.put(projectSelected, project.getId());
+                    listViewSelectedProjects.getItems().add(projectSelected);
+                    updateSelectedCount();
+                    labelError.setText(""); 
+                });
+            } catch (OperationException e) {
+                showError(e.getMessage());
+            }
+        }   
     }
 
     @FXML

@@ -73,10 +73,9 @@ public class FXMLAssignStudentSubjectController extends ValidationHandler {
     private void loadStudents() {
         try {
             ArrayList<Student> students = studentDAO.getActiveStudentsNotInSubject();
+            tableViewStudents.setItems(FXCollections.observableArrayList(students));
             if (students.isEmpty()) {
                 showError("No hay alumnos disponibles");
-            } else {
-                tableViewStudents.setItems(FXCollections.observableArrayList(students));
             }
         } catch (OperationException e) {
             showError(e.getMessage());

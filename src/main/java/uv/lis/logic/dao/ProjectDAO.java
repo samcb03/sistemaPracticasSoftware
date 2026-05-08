@@ -76,7 +76,7 @@ public class ProjectDAO implements IProjectDAO{
                     project.setIdAffiliatedOrganization(resultSet.getInt("idOrganizacionVinculada"));
                 } else {
                     LOGGER.log(Level.INFO, "No se encontró el proyecto con nombre {0}.", projectName);
-                    throw new OperationException("No se encontró el proyecto con nombre: " + projectName, null);
+                    throw new OperationException("No se encontró el proyecto", null);
                 }
             }
         } catch (SQLException e) {

@@ -116,17 +116,17 @@ public class RequestProjectDAO implements IRequestProjectDAO {
     @Override
     public boolean hasAvailableCapacity(int idProject) throws OperationException {
         boolean hasCapacity = false;
-        String query = "SELECT p.cupo, COUNT(sp.matricula) AS solicitudes " +
-                        "FROM Proyecto p " +
-                        "LEFT JOIN Solicita_Proyecto sp ON p.idProyecto = sp.idProyecto " +
-                        "AND sp.estatus = " + STATUS_ASSIGNED + " " +
-                        "WHERE p.idProyecto = ? " +
-                        "GROUP BY p.idProyecto, p.cupo";
+        String query = "SELECT p.cupo, COUNT(sp.matricula) as solicitudes FROM Proyecto p "
+            + "LEFT JOIN Solicita_Proyecto sp ON p.idProyecto = sp.idProyecto "
+            + "AND sp.estatus = ? "
+            + "WHERE p.idProyecto = ? "
+            + "GROUP BY p.idProyecto, p.cupo;";
 
         try (Connection databaseConnection = connectionManager.getConnection();
              PreparedStatement preparedStatement = databaseConnection.prepareStatement(query)) {
             
-            preparedStatement.setInt(1, idProject);
+            preparedStatement.setInt(1, STATUS_ASSIGNED); 
+            preparedStatement.setInt(2, idProject);
             
             try (ResultSet resultSet = preparedStatement.executeQuery()) {
                 if (resultSet.next()) {
@@ -171,13 +171,9 @@ public class RequestProjectDAO implements IRequestProjectDAO {
         try {
             if (getActiveRequestCountByStudentId(idStudent) >= MAX_REQUESTS) {
                 validationError = Optional.of("Ya tienes " + MAX_REQUESTS + " solicitudes activas");
-            }
-
-            if (hasAlreadyRequested(idStudent, idProject)) {
+            } else if (hasAlreadyRequested(idStudent, idProject)) {
                 validationError = Optional.of("Ya solicitaste este proyecto anteriormente");
-            }
-
-            if (!hasAvailableCapacity(idProject)) {
+            } else if (!hasAvailableCapacity(idProject)) {
                 validationError = Optional.of("Este proyecto ya no tiene cupo disponible");
             }
 
@@ -236,6 +232,7 @@ public class RequestProjectDAO implements IRequestProjectDAO {
                     psClean.executeUpdate();
                 }
 
+            if (preparedStatement.executeUpdate() > NO_RESULTS) {
                 connection.commit();
                 isAssigned = true;
 
