@@ -1,6 +1,5 @@
 package uv.lis.logic.utils;
 
-import static uv.lis.logic.utils.FileValidator.EXTENSION_PDF;
 
 import java.io.File;
 import java.io.IOException;
@@ -8,7 +7,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
-import java.util.UUID;
 import uv.lis.logic.exceptions.OperationException;
 
 public class FileManager {
@@ -21,12 +19,10 @@ public class FileManager {
         if(!directory.exists()) {
             directory.mkdirs(); 
         }
-
-        String fileName = idStudent + "_" + UUID.randomUUID() + EXTENSION_PDF;
         
         Path baseAbsoluta = Paths.get(BASE_PATH).toAbsolutePath().normalize();
         
-        Path targetAbsoluta = baseAbsoluta.resolve(fileName).normalize();
+        Path targetAbsoluta = baseAbsoluta.resolve(idStudent + "_" + file.getName()).normalize();
         
         if (!targetAbsoluta.startsWith(baseAbsoluta)) {
             throw new OperationException("Ruta de archivo no permitida", null);

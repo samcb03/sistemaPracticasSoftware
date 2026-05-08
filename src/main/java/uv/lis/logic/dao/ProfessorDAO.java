@@ -83,6 +83,41 @@ public class ProfessorDAO extends UserDAO implements IProfessorDAO {
         return personnelNumber;
     }
 
+
+    @Override
+    public Professor getProfessorById(int id) throws OperationException {
+        Professor professor = null;
+        String query = "SELECT p.numeroPersonal, u.nombre, u.apellidos, p.idRol "
+            + "FROM Profesor p INNER JOIN Usuario u ON p.idUsuario = u.idUsuario "
+            + "WHERE p.idUsuario = ? AND p.estado = 1";
+
+        try (Connection databaseConnection = connectionManager.getConnection();
+            PreparedStatement preparedStatement = databaseConnection.prepareStatement(query)) {
+
+            preparedStatement.setInt(1, id);
+
+            try (ResultSet resultSet = preparedStatement.executeQuery()) {
+                if (resultSet.next()) {
+                    professor = new Professor();
+                    professor.setId(id);
+                    professor.setPersonnelNumber(resultSet.getString("numeroPersonal"));
+                    professor.setFirstName(resultSet.getString("nombre"));
+                    professor.setLastName(resultSet.getString("apellidos"));
+                    professor.setIsCoordinator(resultSet.getInt("idRol") == 3);
+                } else {
+                    LOGGER.log(Level.INFO, "No se encontro profesor con id {0}", id);
+                    throw new OperationException("No se encontró un profesor con el id: " + id, null);
+                }
+            }
+
+        } catch (SQLException e) {
+            LOGGER.log(Level.SEVERE, "Error de conexion con la base de datos", e);
+            throw new OperationException("Error al obtener el profesor", e);
+        }
+
+        return professor;
+    }
+
     @Override
     public boolean registerProfessor(Professor professor) throws OperationException {
         boolean isRegistered = false;
@@ -126,7 +161,7 @@ public class ProfessorDAO extends UserDAO implements IProfessorDAO {
         boolean isModified = false;
 
         String professorQuery = "UPDATE Profesor p INNER JOIN Usuario u ON p.idUsuario = u.idUsuario" 
-            + "SET p.rol = ?, u.nombre = ?, u.apellidos = ? WHERE p.numeroPersonal = ?;";
+            + "SET p.idRol = ?, u.nombre = ?, u.apellidos = ? WHERE p.numeroPersonal = ?;";
 
         try (Connection databaseConnection = connectionManager.getConnection();
              PreparedStatement preparedStament = databaseConnection.prepareStatement(professorQuery)) {
