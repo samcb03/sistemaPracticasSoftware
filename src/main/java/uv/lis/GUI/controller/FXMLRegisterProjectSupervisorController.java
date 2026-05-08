@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.Optional;
 import java.util.ResourceBundle;
 import java.util.stream.Stream;
+
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
@@ -45,10 +46,9 @@ public class FXMLRegisterProjectSupervisorController extends ValidationHandler {
         try {
             ArrayList<String> organizationNames = affiliatedOrganizationDAO.getAllOrganizationNames();
             comboBoxOrganizationName.setItems(FXCollections.observableArrayList(organizationNames));
-        } catch (Exception e) {
-            showError("Error al cargar los nombres de las organizaciones");    
+        } catch (OperationException operationException) {
+            showError(operationException.getMessage());
         }
-
     }
 
     @FXML
@@ -61,10 +61,7 @@ public class FXMLRegisterProjectSupervisorController extends ValidationHandler {
         Stream<Optional<String>> validationStream = Stream.of(
             validateLettersOnly(textFieldName.getText().trim(), "El nombre"),
             validateLettersOnly(textFieldPosition.getText().trim(), "El cargo"),
-            validateEmail(textFieldEmail.getText().trim(), "El correo electrónico"),
-            comboBoxOrganizationName.getValue() == null || comboBoxOrganizationName.getValue().isEmpty()
-                ? Optional.of("Debe seleccionar una organización afiliada") 
-                : Optional.empty()
+            validateEmail(textFieldEmail.getText().trim(), "El correo electrónico")
         );
         Optional<String> firstError = validationStream
             .filter(Optional::isPresent)
@@ -93,7 +90,6 @@ public class FXMLRegisterProjectSupervisorController extends ValidationHandler {
         projectSupervisor.setName(textFieldName.getText().trim());
         projectSupervisor.setPosition(textFieldPosition.getText().trim());
         projectSupervisor.setEmail(textFieldEmail.getText().trim());
-        projectSupervisor.setAffiliatedOrganizationName(comboBoxOrganizationName.getValue());
         projectSupervisor.setIsActive(true);
         return projectSupervisor;
         
@@ -104,6 +100,5 @@ public class FXMLRegisterProjectSupervisorController extends ValidationHandler {
         textFieldName.clear();
         textFieldPosition.clear();
         textFieldEmail.clear();
-        comboBoxOrganizationName.setValue(null);
     }
 }

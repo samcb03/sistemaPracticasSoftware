@@ -7,6 +7,7 @@ import static uv.lis.logic.utils.InputValidator.validatePositiveInteger;
 import uv.lis.logic.dto.Project;
 import uv.lis.logic.exceptions.OperationException;
 import uv.lis.logic.dao.ProjectDAO;
+import uv.lis.logic.dao.ProjectSupervisorDAO;
 import uv.lis.GUI.ValidationHandler;
 import uv.lis.logic.dao.AffiliatedOrganizationDAO;
 import java.net.URL;
@@ -33,22 +34,35 @@ public class FXMLRegisterProjectController extends ValidationHandler {
     @FXML private TextField textFieldObjective;
     @FXML private TextArea textAreaDescription;
     @FXML private ComboBox<String> comboBoxOrganizationName;
+    @FXML private ComboBox<String> comboBoxProjectSupervisor;
 
     private ProjectDAO projectDAO;
     private AffiliatedOrganizationDAO affiliatedOrganizationDAO;
+    private ProjectSupervisorDAO projectSupervisorDAO;
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
         projectDAO = new ProjectDAO();
         affiliatedOrganizationDAO = new AffiliatedOrganizationDAO();
+        projectSupervisorDAO = new ProjectSupervisorDAO();
         setupControls(labelError, buttonBack);
         loadOrganizationNames();
+        loadProjectSupervisorNames();
     }
 
     private void loadOrganizationNames() {
         try {
             ArrayList<String> organizationNames = affiliatedOrganizationDAO.getAllOrganizationNames();
             comboBoxOrganizationName.setItems(FXCollections.observableArrayList(organizationNames));
+        } catch (OperationException operationException) {
+            showError(operationException.getMessage());
+        }
+    }
+
+    private void loadProjectSupervisorNames() {
+        try {
+            ArrayList<String> supervisorNames = projectSupervisorDAO.getAllSupervisorNames();
+            comboBoxProjectSupervisor.setItems(FXCollections.observableArrayList(supervisorNames));
         } catch (OperationException operationException) {
             showError(operationException.getMessage());
         }
