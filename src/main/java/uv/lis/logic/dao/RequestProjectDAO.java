@@ -17,8 +17,7 @@ import uv.lis.logic.exceptions.OperationException;
 
 
 public class RequestProjectDAO implements IRequestProjectDAO {
-    private static final int NO_ROWS_AFFECTED = 0;
-    private static final int NO_REQUESTS = 0;
+    private static final int NO_RESULTS = 0;
     private static final int MAX_REQUESTS = 3;
     private static final int STATUS_REQUESTED = 1;
     private static final int STATUS_ASSIGNED = 2;
@@ -99,7 +98,7 @@ public class RequestProjectDAO implements IRequestProjectDAO {
             
             try (ResultSet resultSet = preparedStatement.executeQuery()) {
                 if (resultSet.next()) {
-                    hasRequested = resultSet.getInt("total") > NO_REQUESTS;
+                    hasRequested = resultSet.getInt("total") > NO_RESULTS;
                 }
             }
         } catch (SQLException e) {
@@ -114,13 +113,16 @@ public class RequestProjectDAO implements IRequestProjectDAO {
     public boolean hasAvailableCapacity(int idProject) throws OperationException {
         boolean hasCapacity = false;
         String query = "SELECT p.cupo, COUNT(sp.matricula) as solicitudes FROM Proyecto p "
-            + "LEFT JOIN Solicita_Proyecto sp ON p.idProyecto = sp.idProyecto WHERE p.idProyecto = ? "
+            + "LEFT JOIN Solicita_Proyecto sp ON p.idProyecto = sp.idProyecto "
+            + "AND sp.estatus = ? "
+            + "WHERE p.idProyecto = ? "
             + "GROUP BY p.idProyecto, p.cupo;";
 
         try (Connection databaseConnection = connectionManager.getConnection();
              PreparedStatement preparedStatement = databaseConnection.prepareStatement(query)) {
             
-            preparedStatement.setInt(1, idProject);
+            preparedStatement.setInt(1, STATUS_ASSIGNED); 
+            preparedStatement.setInt(2, idProject);
             
             try (ResultSet resultSet = preparedStatement.executeQuery()) {
                 if (resultSet.next()) {
@@ -149,7 +151,7 @@ public class RequestProjectDAO implements IRequestProjectDAO {
             preparedStatement.setString(2, idStudent);
             preparedStatement.setInt(3, STATUS_REQUESTED);
 
-            if (preparedStatement.executeUpdate() > NO_ROWS_AFFECTED) {
+            if (preparedStatement.executeUpdate() > NO_RESULTS) {
                 isRegistered = true;
             }
         } catch (SQLException e) {
@@ -165,13 +167,9 @@ public class RequestProjectDAO implements IRequestProjectDAO {
         try {
             if (getActiveRequestCountByStudentId(idStudent) >= MAX_REQUESTS) {
                 validationError = Optional.of("Ya tienes " + MAX_REQUESTS + " solicitudes activas");
-            }
-
-            if (hasAlreadyRequested(idStudent, idProject)) {
+            } else if (hasAlreadyRequested(idStudent, idProject)) {
                 validationError = Optional.of("Ya solicitaste este proyecto anteriormente");
-            }
-
-            if (!hasAvailableCapacity(idProject)) {
+            } else if (!hasAvailableCapacity(idProject)) {
                 validationError = Optional.of("Este proyecto ya no tiene cupo disponible");
             }
 
@@ -195,7 +193,7 @@ public class RequestProjectDAO implements IRequestProjectDAO {
             preparedStatement.setString(2, idStudent);
             preparedStatement.setInt(3, idProject);
 
-            if (preparedStatement.executeUpdate() > NO_ROWS_AFFECTED) {
+            if (preparedStatement.executeUpdate() > NO_RESULTS) {
                 isAssigned = true;
                 LOGGER.log(Level.INFO, "Practicante {0} asignado al proyecto {1} exitosamente", 
                     new Object[]{idStudent, idProject});

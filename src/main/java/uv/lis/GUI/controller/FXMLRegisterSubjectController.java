@@ -62,7 +62,7 @@ public class FXMLRegisterSubjectController extends ValidationHandler {
 
     private void loadProfessorsNames() {
         try {
-            professorsMap = professorDAO.getAllActiveProfessorsMap(); // devuelve Map<nombre, numeroPersonal>
+            professorsMap = professorDAO.getAllActiveProfessorsMap();
             comboBoxProfessorName.setItems(FXCollections.observableArrayList(professorsMap.keySet()));
         } catch (OperationException e) {
             showError(e.getMessage());
@@ -99,9 +99,9 @@ public class FXMLRegisterSubjectController extends ValidationHandler {
     private void registerSubject() {
         Optional<Subject> subject = buildSubject();
 
-        subject.ifPresent(s -> {
+        subject.ifPresent(newSubject -> {
             try {
-                boolean isRegistered = subjectDAO.registerSubject(s);
+                boolean isRegistered = subjectDAO.registerSubject(newSubject);
                 if (isRegistered) {
                     showSuccess("Experiencia Educativa registrada con éxito.");
                     clearFields();
@@ -126,7 +126,6 @@ public class FXMLRegisterSubjectController extends ValidationHandler {
             subject.setSchoolPeriodId(Integer.parseInt(schoolPeriodId));
         } catch (OperationException e) {
             showError(e.getMessage());
-            return Optional.empty();
         }
 
         return Optional.of(subject);
