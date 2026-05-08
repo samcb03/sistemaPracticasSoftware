@@ -191,13 +191,15 @@ public class RequestProjectDAO implements IRequestProjectDAO {
         
         String queryCheckRequestStudent = "SELECT COUNT(*) FROM Solicita_Proyecto WHERE matricula = ? AND estatus = " + STATUS_ASSIGNED + ";";
         
-        String queryCount = "SELECT (p.cupo - COUNT(sp.idSolicitud)) as " + COLUMN_AVAILABLE + " " +
-                            "FROM Proyecto p LEFT JOIN Solicita_Proyecto sp " +
-                            "ON p.idProyecto = sp.idProyecto AND sp.estatus = " + STATUS_ASSIGNED + " " +
-                            "WHERE p.idProyecto = ? GROUP BY p.cupo;";
+        String queryCount = "SELECT (p.cupo - COUNT(sp.idSolicitud)) as " + COLUMN_AVAILABLE
+            + " FROM Proyecto p LEFT JOIN Solicita_Proyecto sp "
+            + "ON p.idProyecto = sp.idProyecto AND sp.estatus = " + STATUS_ASSIGNED
+            + " WHERE p.idProyecto = ? GROUP BY p.cupo;";
 
-        String queryAssign = "UPDATE Solicita_Proyecto SET estatus = " + STATUS_ASSIGNED + " WHERE matricula = ? AND idProyecto = ?;";
-        String queryClean = "DELETE FROM Solicita_Proyecto WHERE matricula = ? AND estatus = " + STATUS_REQUESTED + ";";
+        String queryAssign = "UPDATE Solicita_Proyecto SET estatus = " + STATUS_ASSIGNED + " WHERE matricula = ?" 
+            + "AND idProyecto = ?;";
+        String queryClean = "DELETE FROM Solicita_Proyecto WHERE matricula = ? AND estatus = " 
+            + STATUS_REQUESTED + ";";
 
         try (Connection connection = connectionManager.getConnection()) {
             connection.setAutoCommit(false);
@@ -231,8 +233,6 @@ public class RequestProjectDAO implements IRequestProjectDAO {
                     psClean.setString(1, idStudent);
                     psClean.executeUpdate();
                 }
-
-            if (preparedStatement.executeUpdate() > NO_RESULTS) {
                 connection.commit();
                 isAssigned = true;
 
@@ -256,11 +256,11 @@ public class RequestProjectDAO implements IRequestProjectDAO {
     @Override
     public List<String> getApplicantsByProjectId(int idProject) throws OperationException {
     List<String> applicants = new ArrayList<>();
-    String query = "SELECT u.nombre, u.apellidos, a.matricula " +
-                   "FROM Usuario u " +
-                   "INNER JOIN Alumno a ON u.idUsuario = a.idUsuario " +
-                   "INNER JOIN Solicita_Proyecto sp ON a.matricula = sp.matricula " +
-                   "WHERE sp.idProyecto = ?";
+    String query = "SELECT u.nombre, u.apellidos, a.matricula "
+        + "FROM Usuario u " 
+        + "INNER JOIN Alumno a ON u.idUsuario = a.idUsuario " 
+        + "INNER JOIN Solicita_Proyecto sp ON a.matricula = sp.matricula "
+        + "WHERE sp.idProyecto = ?";
 
     try (Connection databaseConnection = connectionManager.getConnection();
          PreparedStatement statement = databaseConnection.prepareStatement(query)) {
