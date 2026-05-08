@@ -17,11 +17,14 @@ import uv.lis.logic.exceptions.OperationException;
 
 
 public class RequestProjectDAO implements IRequestProjectDAO {
-    private static final int NO_ROWS_AFFECTED = 0;
-    private static final int NO_REQUESTS = 0;
+    private static final int NO_RESULTS = 0;
     private static final int MAX_REQUESTS = 3;
     private static final int STATUS_REQUESTED = 1;
     private static final int STATUS_ASSIGNED = 2;
+
+    private static final String COLUMN_AVAILABLE = "disponibles";
+    private static final String ERROR_ALREADY_ASSIGNED = "ALUMNO_YA_ASIGNADO";
+    private static final String ERROR_FULL_CAPACITY = "CUPO_LLENO";
     private static final Logger LOGGER = Logger.getLogger(RequestProjectDAO.class.getName());
     private MySQLConnectionManager connectionManager;
 
@@ -99,7 +102,7 @@ public class RequestProjectDAO implements IRequestProjectDAO {
             
             try (ResultSet resultSet = preparedStatement.executeQuery()) {
                 if (resultSet.next()) {
-                    hasRequested = resultSet.getInt("total") > NO_REQUESTS;
+                    hasRequested = resultSet.getInt("total") > NO_RESULTS;
                 }
             }
         } catch (SQLException e) {
@@ -113,9 +116,12 @@ public class RequestProjectDAO implements IRequestProjectDAO {
     @Override
     public boolean hasAvailableCapacity(int idProject) throws OperationException {
         boolean hasCapacity = false;
-        String query = "SELECT p.cupo, COUNT(sp.matricula) as solicitudes FROM Proyecto p "
-            + "LEFT JOIN Solicita_Proyecto sp ON p.idProyecto = sp.idProyecto WHERE p.idProyecto = ? "
-            + "GROUP BY p.idProyecto, p.cupo;";
+        String query = "SELECT p.cupo, COUNT(sp.matricula) AS solicitudes " +
+                        "FROM Proyecto p " +
+                        "LEFT JOIN Solicita_Proyecto sp ON p.idProyecto = sp.idProyecto " +
+                        "AND sp.estatus = " + STATUS_ASSIGNED + " " +
+                        "WHERE p.idProyecto = ? " +
+                        "GROUP BY p.idProyecto, p.cupo";
 
         try (Connection databaseConnection = connectionManager.getConnection();
              PreparedStatement preparedStatement = databaseConnection.prepareStatement(query)) {
@@ -131,7 +137,7 @@ public class RequestProjectDAO implements IRequestProjectDAO {
             }
         } catch (SQLException e) {
             LOGGER.log(Level.SEVERE, "Error al verificar cupo del proyecto", e);
-            throw new OperationException("No hay capacidad", e);
+            throw new OperationException("Error al verificar el cupo del proyecto", e);
         }
         
         return hasCapacity;
@@ -149,7 +155,7 @@ public class RequestProjectDAO implements IRequestProjectDAO {
             preparedStatement.setString(2, idStudent);
             preparedStatement.setInt(3, STATUS_REQUESTED);
 
-            if (preparedStatement.executeUpdate() > NO_ROWS_AFFECTED) {
+            if (preparedStatement.executeUpdate() > NO_RESULTS) {
                 isRegistered = true;
             }
         } catch (SQLException e) {
@@ -187,37 +193,44 @@ public class RequestProjectDAO implements IRequestProjectDAO {
 public boolean assignStudentToProject(String idStudent, int idProject) throws OperationException {
     boolean isAssigned = false;
     
-    // Consulta para contar cuántos ya están asignados (estatus = 1)
-    String queryCount = "SELECT (p.cupo - COUNT(sp.idSolicitud)) as disponibles " +
+    String queryCheckStudent = "SELECT COUNT(*) FROM Solicita_Proyecto WHERE matricula = ? AND estatus = " + STATUS_ASSIGNED + ";";
+    
+    String queryCount = "SELECT (p.cupo - COUNT(sp.idSolicitud)) as " + COLUMN_AVAILABLE + " " +
                         "FROM Proyecto p LEFT JOIN Solicita_Proyecto sp " +
-                        "ON p.idProyecto = sp.idProyecto AND sp.estatus = 1 " +
+                        "ON p.idProyecto = sp.idProyecto AND sp.estatus = " + STATUS_ASSIGNED + " " +
                         "WHERE p.idProyecto = ? GROUP BY p.cupo;";
 
-    String queryAssign = "UPDATE Solicita_Proyecto SET estatus = 1 WHERE matricula = ? AND idProyecto = ?;";
-    String queryClean = "DELETE FROM Solicita_Proyecto WHERE matricula = ? AND estatus = 0;";
+    String queryAssign = "UPDATE Solicita_Proyecto SET estatus = " + STATUS_ASSIGNED + " WHERE matricula = ? AND idProyecto = ?;";
+    String queryClean = "DELETE FROM Solicita_Proyecto WHERE matricula = ? AND estatus = " + STATUS_REQUESTED + ";";
 
     try (Connection connection = connectionManager.getConnection()) {
         connection.setAutoCommit(false);
 
         try {
-            // PASO 0: ¡VALIDACIÓN DE ÚLTIMO MOMENTO!
-            try (PreparedStatement psCount = connection.prepareStatement(queryCount)) {
-                psCount.setInt(1, idProject);
-                try (ResultSet rs = psCount.executeQuery()) {
-                    if (rs.next() && rs.getInt("disponibles") <= 0) {
-                        throw new SQLException("CUPO_LLENO"); // Forzamos el error
+            try (PreparedStatement psCheck = connection.prepareStatement(queryCheckStudent)) {
+                psCheck.setString(1, idStudent);
+                try (ResultSet rs = psCheck.executeQuery()) {
+                    if (rs.next() && rs.getInt(1) > NO_RESULTS) {
+                        throw new SQLException(ERROR_ALREADY_ASSIGNED);
                     }
                 }
             }
 
-            // PASO A: Asignar (estatus = 1)
+            try (PreparedStatement psCount = connection.prepareStatement(queryCount)) {
+                psCount.setInt(1, idProject);
+                try (ResultSet rs = psCount.executeQuery()) {
+                    if (rs.next() && rs.getInt(COLUMN_AVAILABLE) <= NO_RESULTS) {
+                        throw new SQLException(ERROR_FULL_CAPACITY);
+                    }
+                }
+            }
+
             try (PreparedStatement psAssign = connection.prepareStatement(queryAssign)) {
                 psAssign.setString(1, idStudent);
                 psAssign.setInt(2, idProject);
                 psAssign.executeUpdate();
             }
 
-            // PASO B: Limpiar otras solicitudes del alumno
             try (PreparedStatement psClean = connection.prepareStatement(queryClean)) {
                 psClean.setString(1, idStudent);
                 psClean.executeUpdate();
@@ -228,16 +241,20 @@ public boolean assignStudentToProject(String idStudent, int idProject) throws Op
 
         } catch (SQLException e) {
             connection.rollback();
-            if ("CUPO_LLENO".equals(e.getMessage())) {
-                throw new OperationException("Lo sentimos, otro coordinador acaba de llenar el cupo de este proyecto.", e);
+
+            if (ERROR_ALREADY_ASSIGNED.equals(e.getMessage())) {
+                throw new OperationException("El estudiante ya cuenta con un proyecto asignado.", e);
             }
-            throw e;
+            if (ERROR_FULL_CAPACITY.equals(e.getMessage())) {
+                throw new OperationException("El cupo del proyecto se ha agotado.", e);
+            }
+            throw new OperationException("Error al ejecutar la transacción de asignación", e);
         }
     } catch (SQLException e) {
-        throw new OperationException("Error de base de datos", e);
+        throw new OperationException("Error de conexión a la base de datos", e);
     }
-    return isAssigned;
-}
+        return isAssigned;
+    }
     
     public int getAssignedCount(int projectId) throws OperationException {
     int count = 0;

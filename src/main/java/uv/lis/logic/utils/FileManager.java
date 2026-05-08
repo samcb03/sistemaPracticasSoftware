@@ -1,8 +1,6 @@
 package uv.lis.logic.utils;
 
 
-import static uv.lis.logic.utils.FileValidator.EXTENSION_PDF;
-
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;

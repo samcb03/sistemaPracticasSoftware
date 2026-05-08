@@ -62,6 +62,10 @@ public class FXMLCoordinatorMenuController extends WindowHandler  {
         navigateTo("/uv/lis/GUI/view/FXMLRegisterSubject.fxml"); 
     }
 
+    @FXML public void goToAssignationStudentSubject() {
+        navigateTo("/uv/lis/GUI/view/FXMLAssignStudentSubject.fxml");
+    }
+
     @FXML public void goToAssignationProject() {
         navigateTo("/uv/lis/GUI/view/FXMLAssignationProject.fxml");
     }
