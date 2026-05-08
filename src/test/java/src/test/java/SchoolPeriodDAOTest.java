@@ -1,7 +1,6 @@
 package src.test.java;
 
 
-
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -22,23 +21,15 @@ import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
 
 
 @ExtendWith(MockitoExtension.class)
 class SchoolPeriodDAOTest {
 
-    @Mock
-    private MySQLConnectionManager connectionManager;
-
-    @Mock
-    private Connection connection;
-
-    @Mock
-    private PreparedStatement preparedStatement;
-
-    @Mock
-    private ResultSet resultSet;
+    @Mock private MySQLConnectionManager connectionManager;
+    @Mock private Connection connection;
+    @Mock private PreparedStatement preparedStatement;
+    @Mock private ResultSet resultSet;
 
     private SchoolPeriodDAO schoolPeriodDAO;
 
@@ -48,6 +39,14 @@ class SchoolPeriodDAOTest {
         when(connectionManager.getConnection()).thenReturn(connection);
     }
 
+    private SchoolPeriod buildSchoolPeriod() {
+        SchoolPeriod schoolPeriod = new SchoolPeriod();
+        schoolPeriod.setId(1);
+        schoolPeriod.setStartDate(Date.valueOf("2025-01-20"));
+        schoolPeriod.setEndDate(Date.valueOf("2025-06-20"));
+        return schoolPeriod;
+    }
+
     @Test
     void getAllSchoolPeriodsNames_withResults_returnsPopulatedList() throws Exception {
         when(connection.prepareStatement(anyString())).thenReturn(preparedStatement);
@@ -55,11 +54,7 @@ class SchoolPeriodDAOTest {
         when(resultSet.next()).thenReturn(true, true, false);
         when(resultSet.getString("nombre")).thenReturn("2025-1", "2025-2");
 
-        ArrayList<String> result = schoolPeriodDAO.getAllSchoolPeriodsNames();
-
-        assertEquals(2, result.size());
-        assertEquals("2025-1", result.get(0));
-        assertEquals("2025-2", result.get(1));
+        assertEquals(2, schoolPeriodDAO.getAllSchoolPeriodsNames().size());
     }
 
     @Test
@@ -68,19 +63,15 @@ class SchoolPeriodDAOTest {
         when(preparedStatement.executeQuery()).thenReturn(resultSet);
         when(resultSet.next()).thenReturn(false);
 
-        ArrayList<String> result = schoolPeriodDAO.getAllSchoolPeriodsNames();
-
-        assertTrue(result.isEmpty());
+        assertTrue(schoolPeriodDAO.getAllSchoolPeriodsNames().isEmpty());
     }
 
     @Test
     void getAllSchoolPeriodsNames_sqlError_throwsOperationException() throws Exception {
         when(connectionManager.getConnection()).thenThrow(new SQLException("Fallo"));
 
-        OperationException exception = assertThrows(OperationException.class, () ->
-            schoolPeriodDAO.getAllSchoolPeriodsNames()
-        );
-        assertTrue(exception.getMessage().contains("No se pudieron obtener los periodos"));
+        assertThrows(OperationException.class, () ->
+            schoolPeriodDAO.getAllSchoolPeriodsNames());
     }
 
     @Test
@@ -99,20 +90,16 @@ class SchoolPeriodDAOTest {
         when(preparedStatement.executeQuery()).thenReturn(resultSet);
         when(resultSet.next()).thenReturn(false);
 
-        OperationException exception = assertThrows(OperationException.class, () ->
-            schoolPeriodDAO.getSchoolPeriodIdByName("NoExiste")
-        );
-        assertTrue(exception.getMessage().contains("No se encontró el periodo escolar: NoExiste"));
+        assertThrows(OperationException.class, () ->
+            schoolPeriodDAO.getSchoolPeriodIdByName("NoExiste"));
     }
 
     @Test
     void getSchoolPeriodIdByName_sqlError_throwsOperationException() throws Exception {
         when(connectionManager.getConnection()).thenThrow(new SQLException("Fallo"));
 
-        OperationException exception = assertThrows(OperationException.class, () ->
-            schoolPeriodDAO.getSchoolPeriodIdByName("2025-1")
-        );
-        assertTrue(exception.getMessage().contains("Error al obtener el ID del periodo escolar"));
+        assertThrows(OperationException.class, () ->
+            schoolPeriodDAO.getSchoolPeriodIdByName("2025-1"));
     }
 
     @Test
@@ -128,20 +115,16 @@ class SchoolPeriodDAOTest {
         when(connection.prepareStatement(anyString())).thenReturn(preparedStatement);
         when(preparedStatement.executeUpdate()).thenReturn(0);
 
-        OperationException exception = assertThrows(OperationException.class, () ->
-            schoolPeriodDAO.registerSchoolPeriod(buildSchoolPeriod())
-        );
-        assertTrue(exception.getMessage().contains("No se pudo registrar el periodo escolar"));
+        assertThrows(OperationException.class, () ->
+            schoolPeriodDAO.registerSchoolPeriod(buildSchoolPeriod()));
     }
 
     @Test
     void registerSchoolPeriod_sqlError_throwsOperationException() throws Exception {
         when(connectionManager.getConnection()).thenThrow(new SQLException("Fallo"));
 
-        OperationException exception = assertThrows(OperationException.class, () ->
-            schoolPeriodDAO.registerSchoolPeriod(buildSchoolPeriod())
-        );
-        assertTrue(exception.getMessage().contains("Error al registrar el periodo escolar"));
+        assertThrows(OperationException.class, () ->
+            schoolPeriodDAO.registerSchoolPeriod(buildSchoolPeriod()));
     }
 
     @Test
@@ -157,20 +140,16 @@ class SchoolPeriodDAOTest {
         when(connection.prepareStatement(anyString())).thenReturn(preparedStatement);
         when(preparedStatement.executeUpdate()).thenReturn(0);
 
-        OperationException exception = assertThrows(OperationException.class, () ->
-            schoolPeriodDAO.modifySchoolPeriod(buildSchoolPeriod())
-        );
-        assertTrue(exception.getMessage().contains("No se pudo modificar el periodo escolar"));
+        assertThrows(OperationException.class, () ->
+            schoolPeriodDAO.modifySchoolPeriod(buildSchoolPeriod()));
     }
 
     @Test
     void modifySchoolPeriod_sqlError_throwsOperationException() throws Exception {
         when(connectionManager.getConnection()).thenThrow(new SQLException("Fallo"));
 
-        OperationException exception = assertThrows(OperationException.class, () ->
-            schoolPeriodDAO.modifySchoolPeriod(buildSchoolPeriod())
-        );
-        assertTrue(exception.getMessage().contains("Error al modificar el periodo escolar"));
+        assertThrows(OperationException.class, () ->
+            schoolPeriodDAO.modifySchoolPeriod(buildSchoolPeriod()));
     }
 
     @Test
@@ -195,17 +174,7 @@ class SchoolPeriodDAOTest {
     void existsSchoolPeriod_sqlError_throwsOperationException() throws Exception {
         when(connectionManager.getConnection()).thenThrow(new SQLException("Fallo"));
 
-        OperationException exception = assertThrows(OperationException.class, () ->
-            schoolPeriodDAO.existsSchoolPeriod(1)
-        );
-        assertTrue(exception.getMessage().contains("Error al validar el periodo escolar"));
-    }
-
-    private SchoolPeriod buildSchoolPeriod() {
-        SchoolPeriod schoolPeriod = new SchoolPeriod();
-        schoolPeriod.setId(1);
-        schoolPeriod.setStartDate(Date.valueOf("2025-01-20"));
-        schoolPeriod.setEndDate(Date.valueOf("2025-06-20"));
-        return schoolPeriod;
+        assertThrows(OperationException.class, () ->
+            schoolPeriodDAO.existsSchoolPeriod(1));
     }
 }

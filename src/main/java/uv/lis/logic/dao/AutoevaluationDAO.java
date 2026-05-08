@@ -73,22 +73,21 @@ public class AutoevaluationDAO implements IAutoevaluationDAO {
     @Override
     public boolean existsByStudent(String idStudent) throws OperationException {
         boolean exists = false;
-
         String query = "SELECT 1 FROM Autoevaluacion WHERE matricula = ? LIMIT 1";
 
         try (Connection databaseConnection = connectionManager.getConnection();
-            PreparedStatement preparedStatement = databaseConnection.prepareStatement(query);
-            ResultSet resultSet = preparedStatement.executeQuery();) {
+            PreparedStatement preparedStatement = databaseConnection.prepareStatement(query)) {
 
             preparedStatement.setString(1, idStudent);
-
-            exists = resultSet.next();
+            
+            try (ResultSet resultSet = preparedStatement.executeQuery()) {
+                exists = resultSet.next();
+            }
 
         } catch (SQLException e) {
             LOGGER.log(Level.SEVERE, "Error verificando la existencia de la autoevaluación", e);
             throw new OperationException("Error al verificar la existencia de la autoevaluación", e);
         }
-
         return exists;
     }
 

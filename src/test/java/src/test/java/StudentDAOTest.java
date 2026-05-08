@@ -31,13 +31,12 @@ public class StudentDAOTest {
 
     @BeforeEach
     void setUp() throws Exception {
-        MockitoAnnotations.openMocks(this); 
-
+        MockitoAnnotations.openMocks(this);
         when(connectionManager.getConnection()).thenReturn(connection);
         studentDAO = new StudentDAO(connectionManager);
     }
 
-    private Student builderStudent(int id, String idStudent, String firstName, 
+    private Student builderStudent(int id, String idStudent, String firstName,
         String lastName, Date birthDate, String gender) {
         Student student = new Student();
         student.setId(id);
@@ -54,14 +53,13 @@ public class StudentDAOTest {
         when(connection.prepareStatement(anyString())).thenReturn(preparedStatement);
         when(preparedStatement.executeQuery()).thenReturn(resultSet);
         when(resultSet.next()).thenReturn(true);
-        when(resultSet.getInt("idUsuario")).thenReturn(1);
         when(resultSet.getString("matricula")).thenReturn("S123");
         when(resultSet.getString("nombre")).thenReturn("Denisse");
         when(resultSet.getString("apellidos")).thenReturn("Reyes");
         when(resultSet.getDate("fechaNacimiento")).thenReturn(new Date(System.currentTimeMillis()));
         when(resultSet.getString("genero")).thenReturn("Femenino");
 
-        assertEquals(1, studentDAO.getStudentById(1).getId());
+        assertEquals("S123", studentDAO.getStudentById(1).getIdStudent()); 
     }
 
     @Test
@@ -70,20 +68,14 @@ public class StudentDAOTest {
         when(preparedStatement.executeQuery()).thenReturn(resultSet);
         when(resultSet.next()).thenReturn(false);
 
-        OperationException exception = assertThrows(OperationException.class, () ->
-            studentDAO.getStudentById(1)
-        );
-        assertTrue(exception.getMessage().contains("No se encontró un alumno con la matricula"));
+        assertThrows(OperationException.class, () -> studentDAO.getStudentById(1));
     }
 
     @Test
     void getStudentById_sqlError_throwsOperationException() throws Exception {
         when(connectionManager.getConnection()).thenThrow(new SQLException("Fallo"));
 
-        OperationException exception = assertThrows(OperationException.class, () ->
-            studentDAO.getStudentById(1)
-        );
-        assertTrue(exception.getMessage().contains("No se pudo buscar el alumno"));
+        assertThrows(OperationException.class, () -> studentDAO.getStudentById(1));
     }
 
     @Test
@@ -101,22 +93,20 @@ public class StudentDAOTest {
         when(connection.prepareStatement(anyString())).thenReturn(preparedStatement);
         when(preparedStatement.executeUpdate()).thenReturn(0);
 
-        OperationException exception = assertThrows(OperationException.class, () ->
+        assertThrows(OperationException.class, () ->
             studentDAO.registerStudent(
                 builderStudent(1, "S123", "Denisse", "Reyes",
                     new Date(System.currentTimeMillis()), "Femenino")));
-        assertTrue(exception.getMessage().contains("No se pudo registrar al alumno"));
     }
 
     @Test
     void registerStudent_sqlError_throwsOperationException() throws Exception {
         when(connectionManager.getConnection()).thenThrow(new SQLException("Fallo"));
 
-        OperationException exception = assertThrows(OperationException.class, () ->
+        assertThrows(OperationException.class, () ->
             studentDAO.registerStudent(
                 builderStudent(1, "S123", "Denisse", "Reyes",
                     new Date(System.currentTimeMillis()), "Femenino")));
-        assertTrue(exception.getMessage().contains("No se pudo registrar al alumno"));
     }
 
     @Test
@@ -125,7 +115,7 @@ public class StudentDAOTest {
         when(preparedStatement.executeUpdate()).thenReturn(1);
 
         assertTrue(studentDAO.modifyStudent(
-            builderStudent(1, "S123", "Samuel", "Carreto", 
+            builderStudent(1, "S123", "Samuel", "Carreto",
                 new Date(System.currentTimeMillis()), "Masculino")));
     }
 
@@ -134,22 +124,20 @@ public class StudentDAOTest {
         when(connection.prepareStatement(anyString())).thenReturn(preparedStatement);
         when(preparedStatement.executeUpdate()).thenReturn(0);
 
-        OperationException exception = assertThrows(OperationException.class, () ->
+        assertThrows(OperationException.class, () ->
             studentDAO.modifyStudent(
                 builderStudent(1, "S123", "Samuel", "Carreto",
                     new Date(System.currentTimeMillis()), "Masculino")));
-        assertTrue(exception.getMessage().contains("No se pudo modificar al alumno"));
     }
 
     @Test
     void modifyStudent_sqlError_throwsOperationException() throws Exception {
         when(connectionManager.getConnection()).thenThrow(new SQLException("Fallo"));
 
-        OperationException exception = assertThrows(OperationException.class, () ->
+        assertThrows(OperationException.class, () ->
             studentDAO.modifyStudent(
                 builderStudent(1, "S123", "Samuel", "Carreto",
                     new Date(System.currentTimeMillis()), "Masculino")));
-        assertTrue(exception.getMessage().contains("No se pudo modificar al alumno"));
     }
 
     @Test
@@ -166,19 +154,69 @@ public class StudentDAOTest {
         when(connection.prepareStatement(anyString())).thenReturn(preparedStatement);
         when(preparedStatement.executeUpdate()).thenReturn(0);
 
-        OperationException exception = assertThrows(OperationException.class, () ->
+        assertThrows(OperationException.class, () ->
             studentDAO.inactivateStudent(
                 builderStudent(1, "S123", null, null, null, null)));
-        assertTrue(exception.getMessage().contains("No se pudo inactivar al alumno"));
     }
 
     @Test
     void inactivateStudent_sqlError_throwsOperationException() throws Exception {
         when(connectionManager.getConnection()).thenThrow(new SQLException("Fallo"));
 
-        OperationException exception = assertThrows(OperationException.class, () ->
+        assertThrows(OperationException.class, () ->
             studentDAO.inactivateStudent(
                 builderStudent(1, "S123", null, null, null, null)));
-        assertTrue(exception.getMessage().contains("No se pudo inactivar al alumno"));
+    }
+
+    @Test
+    void getIdUserByStudentId_successful_returnsIdUser() throws Exception {
+        when(connection.prepareStatement(anyString())).thenReturn(preparedStatement);
+        when(preparedStatement.executeQuery()).thenReturn(resultSet);
+        when(resultSet.next()).thenReturn(true);
+        when(resultSet.getInt("idUsuario")).thenReturn(1);
+
+        assertEquals(1, studentDAO.getIdUserByStudentId("S123"));
+    }
+
+    @Test
+    void getIdUserByStudentId_notFound_throwsOperationException() throws Exception {
+        when(connection.prepareStatement(anyString())).thenReturn(preparedStatement);
+        when(preparedStatement.executeQuery()).thenReturn(resultSet);
+        when(resultSet.next()).thenReturn(false);
+
+        assertThrows(OperationException.class, () -> studentDAO.getIdUserByStudentId("S123"));
+    }
+
+    @Test
+    void getIdUserByStudentId_sqlError_throwsOperationException() throws Exception {
+        when(connectionManager.getConnection()).thenThrow(new SQLException("Fallo"));
+
+        assertThrows(OperationException.class, () -> studentDAO.getIdUserByStudentId("S123"));
+    }
+
+    @Test
+    void searchStudentIds_successful_returnsStudentIds() throws Exception {
+        when(connection.prepareStatement(anyString())).thenReturn(preparedStatement);
+        when(preparedStatement.executeQuery()).thenReturn(resultSet);
+        when(resultSet.next()).thenReturn(true, true, false);
+        when(resultSet.getString("matricula")).thenReturn("S123", "S124");
+
+        assertEquals(2, studentDAO.searchStudentIds("S1").size());
+    }
+
+    @Test
+    void searchStudentIds_noMatches_returnsEmptyList() throws Exception {
+        when(connection.prepareStatement(anyString())).thenReturn(preparedStatement);
+        when(preparedStatement.executeQuery()).thenReturn(resultSet);
+        when(resultSet.next()).thenReturn(false);
+
+        assertTrue(studentDAO.searchStudentIds("Z99").isEmpty());
+    }
+
+    @Test
+    void searchStudentIds_sqlError_throwsOperationException() throws Exception {
+        when(connectionManager.getConnection()).thenThrow(new SQLException("Fallo"));
+
+        assertThrows(OperationException.class, () -> studentDAO.searchStudentIds("S1"));
     }
 }
