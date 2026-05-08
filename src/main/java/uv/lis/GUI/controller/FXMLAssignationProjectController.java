@@ -22,6 +22,7 @@ import uv.lis.logic.utils.SessionManager;
 
 public class FXMLAssignationProjectController extends ValidationHandler {
 
+
     @FXML private ComboBox<String> comboBoxProjects;
     @FXML private Button buttonAssignProject;
     @FXML private Button buttonBack;
@@ -37,6 +38,7 @@ public class FXMLAssignationProjectController extends ValidationHandler {
     private ProjectDAO projectDAO;
     private AffiliatedOrganizationDAO affiliatedOrganizationDAO;
     private Professor coordinator;
+    private final static int INDEX_ADJUSTMENT = 1;
 
 @Override
     public void initialize(URL location, ResourceBundle resources) {
@@ -114,43 +116,35 @@ public class FXMLAssignationProjectController extends ValidationHandler {
         }
     }
 
-@FXML
-public void assignStudent() {
-    String selectedProject = comboBoxProjects.getValue();
-    String selectedRow = listViewApplicants.getSelectionModel().getSelectedItem(); 
+    @FXML
+    public void assignStudent() {
+        String selectedProject = comboBoxProjects.getValue();
+        String selectedRow = listViewApplicants.getSelectionModel().getSelectedItem();
 
-    if(selectedProject == null || selectedRow == null) {
-        showError("Seleccione un proyecto y un alumno de la lista.");
-        return;
-    }
+        if (selectedProject == null || selectedRow == null) {
+            showError("Seleccione un proyecto y un alumno de la lista.");
+        } else {
+            try {
+            String matricula = selectedRow.substring(selectedRow.lastIndexOf("(") + INDEX_ADJUSTMENT, 
+            selectedRow.lastIndexOf(")"));
+    
 
-    try {
-        // 1. Extraer matrícula de "Nombre Apellido (S23013127)"
-        String matricula = selectedRow.substring(selectedRow.lastIndexOf("(") + 1, selectedRow.lastIndexOf(")"));
-        
-        Project project = projectDAO.getProjectByName(selectedProject);
+                Project project = projectDAO.getProjectByName(selectedProject);
 
-        // 2. Ejecutar asignación
-        if(requestProjectDAO.assignStudentToProject(matricula, project.getId())) {
-            
-            // 3. Mostrar éxito (Feedback visual)
-            labelError.setStyle("-fx-text-fill: #27ae60; -fx-font-weight: bold;");
-            labelError.setText("¡Asignación exitosa para " + matricula + "!");
-            
-            // 4. Actualizar interfaz
-            listViewApplicants.getItems().remove(selectedRow);
-            
-            // Si el proyecto se llenó, refrescar el ComboBox para que ya no aparezca
-            if (requestProjectDAO.getAssignedCount(project.getId()) >= project.getCapacity()) {
-                loadProjectNames(); 
-                clearFields();
-                labelError.setText("Proyecto completado.");
+                if (requestProjectDAO.assignStudentToProject(matricula, project.getId())) {
+                    showSuccess("Asignación exitosa para " + matricula);
+                    listViewApplicants.getItems().remove(selectedRow);
+
+                    if (listViewApplicants.getItems().isEmpty()) {
+                        loadProjectNames();
+                        clearFields();
+                    }
+                }
+            } catch (OperationException e) {
+                showError("No se pudo asignar: " + e.getMessage());
             }
         }
-    } catch(OperationException e) {
-        showError("No se pudo asignar: " + e.getMessage());
     }
-}
 
     @Override
     protected void clearFields() {
