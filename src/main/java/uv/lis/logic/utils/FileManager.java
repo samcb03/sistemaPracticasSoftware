@@ -13,15 +13,16 @@ public class FileManager {
     private static final String BASE_PATH = "Expediente";
     
     public static String saveFile(File file, String idStudent) throws OperationException {
-        String savedFilePath = null;
         
-        File directory = new File(BASE_PATH);
-        if(!directory.exists()) {
-            directory.mkdirs(); 
+        File studentDirectory = new File(BASE_PATH, idStudent);
+        if(!studentDirectory.exists()) {
+           boolean created =  studentDirectory.mkdirs(); 
+           if(!created) {
+            throw new OperationException("No se pudo crear el directorio",null);
+           }
         }
         
-        Path baseAbsoluta = Paths.get(BASE_PATH).toAbsolutePath().normalize();
-        
+        Path baseAbsoluta = Paths.get(BASE_PATH,idStudent).toAbsolutePath().normalize();
         Path targetAbsoluta = baseAbsoluta.resolve(idStudent + "_" + file.getName()).normalize();
         
         if (!targetAbsoluta.startsWith(baseAbsoluta)) {
@@ -29,15 +30,13 @@ public class FileManager {
         } else {
             try {
                 Files.copy(file.toPath(), targetAbsoluta, StandardCopyOption.REPLACE_EXISTING);
-                savedFilePath = targetAbsoluta.toString();
+                return targetAbsoluta.toString();
             } catch (IOException e) {
                 throw new OperationException("Error al guardar el archivo en el servidor", e);
             }
         }
-        
-        return savedFilePath;
     }
-
+    
     public static void deleteFile(String url) {
         File file = new File(url);
         if (file.exists()) {

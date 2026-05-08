@@ -74,6 +74,7 @@ public class ProjectDAO implements IProjectDAO{
                     project.setMethodology(resultSet.getString("metodologiaProyecto"));
                     project.setObjective(resultSet.getString("objetivo"));
                     project.setIdAffiliatedOrganization(resultSet.getInt("idOrganizacionVinculada"));
+                    project.setIdProjectSupervisor(resultSet.getInt("idResponsableProyecto"));
                 } else {
                     LOGGER.log(Level.INFO, "No se encontró el proyecto con nombre {0}.", projectName);
                     throw new OperationException("No se encontró el proyecto", null);
@@ -91,8 +92,8 @@ public class ProjectDAO implements IProjectDAO{
         boolean isRegistered = false;
 
         String projectQuery = "INSERT INTO Proyecto(nombre, "  
-        + "descripcion, cupo, metodologiaProyecto, objetivo, estado, idOrganizacionVinculada)" 
-        + " VALUES(?, ?, ?, ?, ?, ?, ?);";
+        + "descripcion, cupo, metodologiaProyecto, objetivo, estado, idOrganizacionVinculada,idResponsableProyecto)" 
+        + " VALUES(?, ?, ?, ?, ?, ?, ?,?);";
 
         try (Connection databaseConnection = connectionManager.getConnection();
             PreparedStatement preparedStatement = databaseConnection.prepareStatement(projectQuery, 
@@ -105,6 +106,7 @@ public class ProjectDAO implements IProjectDAO{
             preparedStatement.setString(5, project.getObjective());
             preparedStatement.setBoolean(6, true);
             preparedStatement.setInt(7, project.getIdAffiliatedOrganization());
+            preparedStatement.setInt(8,project.getIdProjectSupervisor());
 
             if (preparedStatement.executeUpdate() > NO_ROWS_AFFECTED){
                 try(ResultSet resultSet = preparedStatement.getGeneratedKeys()) {

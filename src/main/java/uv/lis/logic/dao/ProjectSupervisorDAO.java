@@ -5,6 +5,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import uv.lis.dataaccess.MySQLConnectionManager;
@@ -20,6 +21,26 @@ public class ProjectSupervisorDAO implements IProjectSupervisorDAO {
 
     public ProjectSupervisorDAO() {
         this.connectionManager = new MySQLConnectionManager();
+    }
+
+    @Override
+    public ArrayList<String> getAllSupervisorNames() throws OperationException{
+        String supervisorQuery = "SELECT nombre FROM ResponsableProyecto";
+        ArrayList<String> supervisorNames = new ArrayList<>();
+
+        try (Connection databaseConnection = connectionManager.getConnection();
+             PreparedStatement preparedStatement = databaseConnection.prepareStatement(supervisorQuery)) {
+                try (ResultSet resultSet = preparedStatement.executeQuery()) {
+                    while (resultSet.next()) {
+                        supervisorNames.add(resultSet.getString("nombre"));
+                    } 
+            }
+        } catch (SQLException e) {
+               LOGGER.log(Level.SEVERE, "Error de conexion con la base de datos",e);
+                throw new OperationException("Error al conseguir los responsables", e);
+        }
+
+        return supervisorNames;
     }
 
     @Override
