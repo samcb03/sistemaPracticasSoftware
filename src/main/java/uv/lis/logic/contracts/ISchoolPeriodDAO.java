@@ -2,7 +2,6 @@ package uv.lis.logic.contracts;
 
 
 import java.util.ArrayList;
-
 import uv.lis.logic.dto.SchoolPeriod;
 import uv.lis.logic.exceptions.OperationException;
 

@@ -6,6 +6,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
+import static uv.lis.logic.utils.InputValidator.STUDENT_ID_LENGTH;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -19,20 +20,29 @@ import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.GridPane;
 import uv.lis.GUI.controller.FXMLConsultStudentController;
+import uv.lis.logic.dao.RequestProjectDAO;
 import uv.lis.logic.dao.StudentDAO;
+import uv.lis.logic.dao.SubjectDAO;
 import uv.lis.logic.dto.Student;
+import uv.lis.logic.dto.Subject;
 import uv.lis.logic.exceptions.OperationException;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.sql.Date;
 import java.util.ArrayList;
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.atomic.AtomicReference;
 
 
 @ExtendWith(MockitoExtension.class)
 class FXMLConsultStudentControllerTest {
 
     @Mock private StudentDAO studentDAO;
+    @Mock private RequestProjectDAO requestProjectDAO;
+    @Mock private SubjectDAO subjectDAO;
+    @Mock private Subject subject;
+
+    private static final String VALID_STUDENT_ID = "S" + "0".repeat(STUDENT_ID_LENGTH - 1);
 
     private FXMLConsultStudentController controller;
 
@@ -61,14 +71,21 @@ class FXMLConsultStudentControllerTest {
                 injectField("labelLastName", new Label());
                 injectField("labelDateBirth", new Label());
                 injectField("labelGender", new Label());
+                injectField("labelSubject", new Label());
+                injectField("labelProject", new Label());
                 injectField("buttonUpdate", new Button());
                 injectField("buttonInactivate", new Button());
                 injectField("buttonBack", new Button());
                 injectField("labelMessage", new Label());
                 injectField("contextMenuSuggestions", new ContextMenu());
                 injectField("studentDAO", studentDAO);
+                injectField("requestProjectDAO", requestProjectDAO);
+                injectField("subjectDAO", subjectDAO);
+                injectField("subject", subject);
+                invokeSetupControls();
+                invokeSetupAutocomplete();
             } catch (Exception e) {
-                e.printStackTrace();
+                e.getMessage();
             } finally {
                 latch.countDown();
             }
@@ -87,8 +104,34 @@ class FXMLConsultStudentControllerTest {
         field.set(controller, value);
     }
 
+    private void invokeSetupControls() throws Exception {
+        Label labelMessage = (Label) getFieldValue(FXMLConsultStudentController.class, "labelMessage");
+        Button buttonBack  = (Button) getFieldValue(FXMLConsultStudentController.class, "buttonBack");
+        Method method = controller.getClass().getSuperclass()
+            .getDeclaredMethod("setupControls", Label.class, Button.class);
+        method.setAccessible(true);
+        method.invoke(controller, labelMessage, buttonBack);
+    }
+
+    private Object getFieldValue(Class<?> clazz, String name) throws Exception {
+        Field field;
+        try {
+            field = clazz.getDeclaredField(name);
+        } catch (NoSuchFieldException e) {
+            field = clazz.getSuperclass().getDeclaredField(name);
+        }
+        field.setAccessible(true);
+        return field.get(controller);
+    }
+
     private void invokeSearchStudent() throws Exception {
         Method method = FXMLConsultStudentController.class.getDeclaredMethod("searchStudent");
+        method.setAccessible(true);
+        method.invoke(controller);
+    }
+
+    private void invokeSetupAutocomplete() throws Exception {
+        Method method = FXMLConsultStudentController.class.getDeclaredMethod("setupAutocomplete");
         method.setAccessible(true);
         method.invoke(controller);
     }
@@ -107,7 +150,7 @@ class FXMLConsultStudentControllerTest {
 
     private Student buildStudent() {
         Student student = new Student();
-        student.setIdStudent("S200123");
+        student.setIdStudent(VALID_STUDENT_ID);
         student.setFirstName("Denisse");
         student.setLastName("Reyes");
         student.setBirthDate(new Date(System.currentTimeMillis()));
@@ -117,16 +160,20 @@ class FXMLConsultStudentControllerTest {
 
     private void runOnFxThread(ThrowingRunnable action) throws Exception {
         CountDownLatch latch = new CountDownLatch(1);
+        AtomicReference<Throwable> thrown = new AtomicReference<>();
         Platform.runLater(() -> {
             try {
                 action.run();
-            } catch (Exception e) {
-                e.printStackTrace();
+            } catch (Throwable e) {
+                thrown.set(e);
             } finally {
                 latch.countDown();
             }
         });
         latch.await();
+        if (thrown.get() != null) {
+            throw new Exception("Exception on FX thread", thrown.get());
+        }
     }
 
     @FunctionalInterface
@@ -134,7 +181,6 @@ class FXMLConsultStudentControllerTest {
         void run() throws Exception;
     }
 
-    // searchStudent - camino 1: validación falla
     @Test
     void searchStudent_invalidLength_showsError() throws Exception {
         runOnFxThread(() -> {
@@ -147,15 +193,17 @@ class FXMLConsultStudentControllerTest {
 
     @Test
     void searchStudent_validId_displaysStudent() throws Exception {
-        when(studentDAO.getIdUserByStudentId("S200123")).thenReturn(1);
+        when(studentDAO.getIdUserByStudentId(VALID_STUDENT_ID)).thenReturn(1);
         when(studentDAO.getStudentById(1)).thenReturn(buildStudent());
+        when(subjectDAO.getSubjectNRCByStudentID(VALID_STUDENT_ID)).thenReturn("NRC001");
+        when(requestProjectDAO.getProjectAssignedToStudent(VALID_STUDENT_ID)).thenReturn("Proyecto A");
 
         runOnFxThread(() -> {
-            getTextField().setText("S200123");
+            getTextField().setText(VALID_STUDENT_ID);
             invokeSearchStudent();
         });
 
-        assertEquals("S200123", getLabel("labelStudentId").getText());
+        assertEquals(VALID_STUDENT_ID, getLabel("labelStudentId").getText());
     }
 
     @Test
@@ -164,7 +212,7 @@ class FXMLConsultStudentControllerTest {
             .thenThrow(new OperationException("No se encontró un alumno con la matricula", null));
 
         runOnFxThread(() -> {
-            getTextField().setText("S200123");
+            getTextField().setText(VALID_STUDENT_ID);
             invokeSearchStudent();
         });
 

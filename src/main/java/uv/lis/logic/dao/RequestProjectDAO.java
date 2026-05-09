@@ -281,5 +281,30 @@ public class RequestProjectDAO implements IRequestProjectDAO {
 
     return applicants;
 }
+
+    @Override
+    public String getProjectAssignedToStudent(String idStudent) throws OperationException {
+        String projectName = "Sin proyecto asignado";
+
+        String query = "SELECT p.nombre FROM Proyecto p" 
+            + " INNER JOIN Solicita_Proyecto sp ON p.idProyecto = sp.idProyecto "
+            + "WHERE sp.matricula = ? AND sp.estatus = " + STATUS_ASSIGNED + ";";
+
+        try (Connection databaseConnectio = connectionManager.getConnection();
+             PreparedStatement preparedStatement = databaseConnectio.prepareStatement(query)) {
+            
+            preparedStatement.setString(1, idStudent);
+            
+            try (ResultSet resultSet = preparedStatement.executeQuery()) {
+                if (resultSet.next()) {
+                    projectName = resultSet.getString("nombre");
+                }
+            }
+        } catch (SQLException e) {
+            LOGGER.log(Level.SEVERE, "Error al obtener el proyecto asignado al estudiante", e);
+            throw new OperationException("Error al obtener el proyecto asignado al estudiante", e);
+        }
+        return projectName;
+    }
     
 }

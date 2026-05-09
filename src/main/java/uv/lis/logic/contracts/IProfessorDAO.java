@@ -16,7 +16,7 @@ public interface IProfessorDAO {
 
     boolean inactivateProfessor(Professor professor) throws OperationException;
 
-    public LinkedHashMap<String, String> getAllActiveProfessorsMap() throws OperationException;
+    LinkedHashMap<String, String> getAllActiveProfessorsMap() throws OperationException;
 
     Professor getProfessorById(int id) throws OperationException;
 
