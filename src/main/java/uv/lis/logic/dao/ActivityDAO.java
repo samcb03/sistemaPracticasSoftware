@@ -133,7 +133,8 @@ public class ActivityDAO implements IActivityDAO {
                 isModified = true;
             } else {
                 LOGGER.log(Level.WARNING, "No se pudo modificar la actividad con ID {0}.", activity.getId());
-                throw new OperationException("No se pudo modificar la actividad con ID: " + activity.getId(), null);     
+                throw new OperationException("No se pudo modificar la actividad con ID: " + activity.getId(), 
+                    null);     
             }
         } catch (SQLException e) {
             LOGGER.log(Level.SEVERE, "Error de conexion con la base de datos",e);

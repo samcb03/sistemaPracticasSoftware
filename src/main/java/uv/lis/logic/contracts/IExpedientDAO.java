@@ -9,13 +9,13 @@ import uv.lis.logic.exceptions.OperationException;
 
 
 public interface IExpedientDAO {
-    
     int saveDocument(Expedient expedient) throws OperationException;
 
     List<Expedient> getAllDocuments() throws OperationException;
+
     int getIdDocumentTypeByName(String name) throws OperationException;
+
     void uploadDocument(String idStudent, String typeDocument, File file) throws OperationException;
+
     ArrayList<String> getAllDocumentsTypes() throws OperationException;
-
-
 }

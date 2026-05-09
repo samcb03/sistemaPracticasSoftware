@@ -2,7 +2,6 @@ package uv.lis.logic.contracts;
 
 
 import java.util.ArrayList;
-
 import uv.lis.logic.dto.Student;
 import uv.lis.logic.exceptions.OperationException;
 
@@ -20,5 +19,5 @@ public interface IStudentDAO {
 
     int getIdUserByStudentId(String studentId) throws OperationException;
 
-ArrayList<String> searchStudentIds(String prefix) throws OperationException;
+    ArrayList<String> searchStudentIds(String prefix) throws OperationException;
 }

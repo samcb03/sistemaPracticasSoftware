@@ -115,4 +115,27 @@ public class SubjectDAO implements ISubjectDAO {
         }
         return isAssigned;
     }
+
+    @Override
+    public String getSubjectNRCByStudentID(String studentID) throws OperationException {
+        String subjectNRC = "No tiene asignada una experiencia";
+        String query = "SELECT ee.NRC FROM ExperienciaEducativa ee "
+            + "JOIN alumno_esta_ee aee ON ee.NRC = aee.NRC "
+            + "WHERE aee.matricula = ?;";
+
+        try (Connection databaseConnection = connectionManager.getConnection();
+            PreparedStatement preparedStatement = databaseConnection.prepareStatement(query)) {
+                
+            preparedStatement.setString(1, studentID);
+            try (ResultSet resultSet = preparedStatement.executeQuery()) {
+                if (resultSet.next()) {
+                    subjectNRC = resultSet.getString("NRC");
+                }
+            }
+        } catch (SQLException e) {
+            LOGGER.log(Level.SEVERE, "Error al asignar alumno a la experiencia educativa", e);
+            throw new OperationException("No se pudo asignar el alumno a la experiencia educativa", e);
+        }
+        return subjectNRC;
+    }
 }

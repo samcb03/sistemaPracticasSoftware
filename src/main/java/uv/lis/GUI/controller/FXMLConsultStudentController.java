@@ -16,8 +16,11 @@ import javafx.scene.control.MenuItem;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.GridPane;
 import uv.lis.GUI.ValidationHandler;
+import uv.lis.logic.dao.RequestProjectDAO;
 import uv.lis.logic.dao.StudentDAO;
+import uv.lis.logic.dao.SubjectDAO;
 import uv.lis.logic.dto.Student;
+import uv.lis.logic.dto.Subject;
 import uv.lis.logic.exceptions.OperationException;
 
 
@@ -35,12 +38,20 @@ public class FXMLConsultStudentController extends ValidationHandler{
     @FXML Button buttonBack;
     @FXML Label labelMessage;
     @FXML ContextMenu contextMenuSuggestions;
+    @FXML Label labelSubject;
+    @FXML Label labelProject;
 
     private StudentDAO studentDAO;
+    private RequestProjectDAO requestProjectDAO;
+    private SubjectDAO subjectDAO;
+    private Subject subject;
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         studentDAO = new StudentDAO();
+        requestProjectDAO = new RequestProjectDAO();
+        subjectDAO = new SubjectDAO();
+        subject = new Subject();
         setupControls(labelMessage, buttonBack);
         gridPaneStudentInfo.setVisible(true);
         setupAutocomplete();
@@ -65,7 +76,9 @@ public class FXMLConsultStudentController extends ValidationHandler{
                 labelLastName.setText(student.getLastName());
                 labelDateBirth.setText(student.getBirthDate().toString());
                 labelGender.setText(student.getGender());
-
+                labelSubject.setText(subjectDAO.getSubjectNRCByStudentID(studentId) + " - " 
+                    + subject.getSUBJECT_NAME());
+                labelProject.setText(requestProjectDAO.getProjectAssignedToStudent(studentId));
             } catch (OperationException e) {
                 showError(e.getMessage());
             }
