@@ -5,6 +5,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -224,5 +225,52 @@ public class ProfessorDAO extends UserDAO implements IProfessorDAO {
         }
 
         return isInactived;
+    }
+    
+    @Override
+    public int getIdUserByProfessorPersonnelNumber(String personnelNumber) throws OperationException {
+        int idUser = -1;
+        String professorQuery = "SELECT idUsuario FROM Profesor WHERE numeroPersonal = ?";
+
+        try (Connection databaseConnection = connectionManager.getConnection();
+             PreparedStatement preparedStatement = databaseConnection.prepareStatement(professorQuery)) {
+            
+            preparedStatement.setString(1, personnelNumber);
+            
+            try (ResultSet resultSet = preparedStatement.executeQuery()) {
+                if (resultSet.next()) {
+                    idUser = resultSet.getInt("idUsuario");
+                } else {
+                    LOGGER.log(Level.INFO, "No se encontro un Profesor con el número de personal {0}.", personnelNumber);
+                    throw new OperationException("No se encontró un Profesor con el número de personal: " + personnelNumber, null);
+                }
+            }
+        } catch (SQLException e) {
+            LOGGER.log(Level.SEVERE, "Error de conexion con la base de datos",e);
+            throw new OperationException("No se pudo buscar el Professor. Intentelo mas tarde", e);
+        }
+        return idUser;
+    }
+
+    @Override
+    public ArrayList<String> searchProfessorPersonalNumbers(String prefix) throws OperationException {
+        ArrayList<String> professorPersonnelNumbers = new ArrayList<>();
+        String professorQuery = "SELECT numeroPersonal FROM Profesor WHERE numeroPersonal LIKE ? LIMIT 10";
+
+        try (Connection databaseConnection = connectionManager.getConnection();
+            PreparedStatement preparedStatement = databaseConnection.prepareStatement(professorQuery)) {
+
+            preparedStatement.setString(1, prefix + "%");
+
+            try (ResultSet resultSet = preparedStatement.executeQuery()) {
+                while (resultSet.next()) {
+                    professorPersonnelNumbers.add(resultSet.getString("numeroPersonal"));
+                }
+            }
+        } catch (SQLException e) {
+            LOGGER.log(Level.SEVERE, "Error al buscar numeros de personal", e);
+            throw new OperationException("No se pudieron obtener los numeros de personal", e);
+        }
+        return professorPersonnelNumbers;
     }
 }
