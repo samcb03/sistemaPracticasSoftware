@@ -8,6 +8,10 @@
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.control.ToggleButton?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
 
 <StackPane style="-fx-background-color: #F5F4F0;" 
 xmlns="http://javafx.com/javafx/26" xmlns:fx="http://javafx.com/fxml/1" 
@@ -53,15 +57,41 @@ fx:controller="uv.lis.GUI.controller.FXMLLoginController">
             <VBox.margin><Insets bottom="6" /></VBox.margin>
             </Label>
 
-            <PasswordField fx:id="passwordFieldPassword" promptText="********" style="-fx-background-color: #F5F4F0;                                   
-            -fx-border-color: #C8C6C0;                                   
-            -fx-border-width: 0.5;                                   
-            -fx-border-radius: 8;                                   
-            -fx-background-radius: 8;                                   
-            -fx-font-size: 14;                                   
-            -fx-pref-height: 42;">
-            <VBox.margin><Insets bottom="24" /></VBox.margin>
-            </PasswordField>
+            <HBox alignment="CENTER_LEFT" spacing="10">
+                <VBox.margin><Insets bottom="24" /></VBox.margin>
+
+                <StackPane HBox.hgrow="ALWAYS">
+
+                <PasswordField fx:id="passwordFieldPassword" promptText="********" style="-fx-background-color: #F5F4F0;                                   
+                -fx-border-color: #C8C6C0;                                   
+                -fx-border-width: 0.5;                                   
+                -fx-border-radius: 8;                                   
+                -fx-background-radius: 8;                                   
+                -fx-font-size: 14;                                   
+                -fx-pref-height: 42;">
+                <VBox.margin><Insets bottom="24" /></VBox.margin>
+                </PasswordField>
+
+                <TextField fx:id="textFieldPasswordVisible" visible="false" style="-fx-background-color: #F5F4F0;
+                    -fx-border-color: #C8C6C0;                                   
+                        -fx-border-width: 0.5;                                   
+                        -fx-border-radius: 8;                                   
+                        -fx-background-radius: 8;                                   
+                        -fx-font-size: 14;                                   
+                        -fx-pref-height: 42;" />
+                </StackPane>
+
+                <ToggleButton fx:id="toggleButtonShowPassword" mnemonicParsing="false" 
+                onAction="#togglePasswordVisibility" style="-fx-background-color: transparent; -fx-cursor: hand;">
+                <graphic>
+                        <ImageView fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
+                            <image>
+                                <Image url="@../imagens/show-password-icon-eye-symbol-vision-hide-from-watch-icon-secret-view-web-design-element-vector1.png" />
+                            </image>
+                        </ImageView>
+                    </graphic>
+                </ToggleButton>
+            </HBox>
 
             <Label fx:id="labelError" style="-fx-font-size: 12;                           
             -fx-text-fill: red;" text="">

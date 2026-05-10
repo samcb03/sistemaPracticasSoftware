@@ -22,7 +22,7 @@ public final class InputValidator {
     public static final String ONLY_NUMBERS_REGEX = "\\d+";
     public static final String EMAIL_REGEX = "^[\\w._%+\\-]+@[\\w.\\-]+\\.[a-zA-Z]{2,}$";
     public static final String PHONE_REGEX = "^[0-9]{7,15}$";
-    public static final String PASSWORD_REGEX = "^(?=.*[A-Z])(?=.*[a-z])(?=.*[0-9])(?=.*[!@#$%^&*_]).{12,}$";
+    public static final String PASSWORD_REGEX = "^[a-zA-Z0-9_+&*-]+(?:\\.[a-zA-Z0-9_+&*-]+)*@(?:[a-zA-Z0-9-]+\\.)+[a-zA-Z]{2,7}$";
     public static final String REPEAT_LETTERS_REGEX = ".*(.)\\1{2,}.*";
 
     public static Optional<String> validateLettersOnly(String fieldValue, String fieldName) {

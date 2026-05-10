@@ -68,7 +68,6 @@ public class UserDAO implements IUserDAO{
 
     @Override
     public User authenticate(String email, String password) throws AuthenticateException {
-        User userAuthenticate = null;
         String userQuery = "SELECT u.idUsuario, u.email, u.idRol, u.contraseña, ru.nombreRol "
             + "FROM Usuario u "
             + "JOIN Rol_Usuario ru ON u.idRol = ru.idRol " 
@@ -80,28 +79,28 @@ public class UserDAO implements IUserDAO{
             preparedStatement.setString(1, email);
 
             try (ResultSet resultSet = preparedStatement.executeQuery()) {
-                if (resultSet.next()) {
-                    String hashedPassword = resultSet.getString("contraseña");
-
-                    if (PasswordHasher.verifyPassword(password, hashedPassword)) {
-                        userAuthenticate = new User();
-                        userAuthenticate.setId(resultSet.getInt("idUsuario")); 
-                        userAuthenticate.setEmail(email);
-                        userAuthenticate.setRoleId(resultSet.getInt("idRol"));
-                    } else {
-                        throw new AuthenticateException(
-                            "Contraseña incorrecta, verifique sus datos", null);
-                    }
-                } else {
-                    throw new AuthenticateException(
-                        "Usuario no encontrado, verifique sus datos", null);
+                if (!resultSet.next()) {
+                    throw new AuthenticateException("Credenciales incorrectas, "
+                    + "verifique sus datos.", null);
                 }
+
+                String hashedPassword = resultSet.getString("contraseña");
+
+                    if (!PasswordHasher.verifyPassword(password, hashedPassword)) {
+                        throw new AuthenticateException("Contraseña incorrecta",null);
+                    } 
+
+                    User userAuthenticate = new User();
+                    userAuthenticate.setId(resultSet.getInt("idUsuario"));
+                    userAuthenticate.setEmail(email);
+                    userAuthenticate.setRoleId(resultSet.getInt("idRol"));
+                    return userAuthenticate;
             }
-        } catch (SQLException e) {
-            LOGGER.log(Level.SEVERE, "Error de autenticacion SQL", e);
-            throw new AuthenticateException(
-                "No disponible por el momento. Intentelo mas tarde", e);
+        } catch (AuthenticateException e) {
+            throw e;
+        } catch(SQLException e) {
+            LOGGER.log(Level.SEVERE, "Error de conexión", e);
+            throw new AuthenticateException("No se pudo loggear, intente más tarde", e);
         }
-        return userAuthenticate;
     }
 }
