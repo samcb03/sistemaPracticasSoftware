@@ -16,6 +16,9 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
+import javafx.scene.control.ToggleButton;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.stage.Stage;
 import uv.lis.logic.dao.ProfessorDAO;
 import uv.lis.logic.dao.StudentDAO;
@@ -39,15 +42,47 @@ public class FXMLLoginController implements Initializable {
     
     @FXML private TextField textFieldEmail;
     @FXML private PasswordField passwordFieldPassword;
+    @FXML private TextField textFieldPasswordVisible;
+    @FXML private ToggleButton toggleButtonShowPassword;
     @FXML private Label labelError;
     @FXML private Button buttonLogin;
 
     private UserDAO userDAO;
     private User user;
 
+    private Image eyeOpen;
+    private Image eyeClosed;
+
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         this.userDAO = new UserDAO();
+        textFieldPasswordVisible.textProperty().bindBidirectional(passwordFieldPassword.textProperty());
+        eyeOpen = new Image(getClass().getResourceAsStream("/uv/lis/GUI/view/imagens/show-password-icon-eye-symbol-vision-hide-from-watch-icon-secret-view-web-design-element-vector.png"));
+        eyeClosed = new Image(getClass().getResourceAsStream("/uv/lis/GUI/view/imagens/show-password-icon-eye-symbol-vision-hide-from-watch-icon-secret-view-web-design-element-vector1.png"));
+
+        toggleButtonShowPassword.setGraphic(createIcon(eyeClosed));
+    }
+
+    @FXML
+    private void togglePasswordVisibility() {
+        if (toggleButtonShowPassword.isSelected()) {
+            passwordFieldPassword.setVisible(false);
+            textFieldPasswordVisible.setVisible(true);
+            toggleButtonShowPassword.setGraphic(createIcon(eyeOpen));
+        } else {
+            textFieldPasswordVisible.setVisible(false);
+            passwordFieldPassword.setVisible(true);
+            toggleButtonShowPassword.setGraphic(createIcon(eyeClosed));
+        }
+    }
+
+    private ImageView createIcon(Image image) {
+        ImageView imageView = new ImageView(image);
+        imageView.setFitHeight(20.0);
+        imageView.setFitWidth(20.0);
+        imageView.setPickOnBounds(true);
+        imageView.setPreserveRatio(true);
+        return imageView;
     }
 
     @FXML

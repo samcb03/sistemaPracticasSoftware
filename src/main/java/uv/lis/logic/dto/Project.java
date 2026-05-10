@@ -64,6 +64,9 @@ public class Project {
     }
 
     public void setCapacity(int capacity) {
+        if (capacity > 0) {
+            
+        }
         this.capacity = capacity;
     }
 
