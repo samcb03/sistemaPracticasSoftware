@@ -33,7 +33,7 @@
             <Label fx:id="labelOrganizationName" layoutX="119.0" layoutY="92.0" prefHeight="18.0" prefWidth="229.0" />
             <Label fx:id="labelMethodology" layoutX="119.0" layoutY="136.0" prefHeight="18.0" prefWidth="229.0" />
             <Label fx:id="labelCapacity" layoutX="80.0" layoutY="181.0" prefHeight="18.0" prefWidth="229.0" />
-            <Label fx:id="labelObjective" layoutX="95.0" layoutY="229.0" prefHeight="18.0" prefWidth="229.0" />
+            <Label fx:id="labelObjective" layoutX="95.0" layoutY="229.0" prefHeight="18.0" prefWidth="229.0" wrapText="true" />
             <Label fx:id="labelDescription" alignment="TOP_LEFT" layoutX="109.0" layoutY="279.0" prefHeight="90.0" prefWidth="230.0" wrapText="true" />
             <Button fx:id="buttonAddProject" layoutX="468.0" layoutY="37.0" mnemonicParsing="false" onAction="#addProject" text="Agregar" />
             <Label fx:id="labelSelectedCount" layoutX="536.0" layoutY="40.0" prefHeight="18.0" prefWidth="31.0" />
