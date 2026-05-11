@@ -21,6 +21,7 @@ public class FXMLCoordinatorMenuController extends WindowHandler  {
     @FXML private Button buttonLogOut;
     @FXML private Button buttonRegisterSubject;
     @FXML private Button buttonAssignationProject;
+    @FXML private Button buttonAssignStudentSubject;
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
