@@ -57,7 +57,7 @@ public class FXMLLoginController implements Initializable {
     public void initialize(URL location, ResourceBundle resources) {
         this.userDAO = new UserDAO();
         textFieldPasswordVisible.textProperty().bindBidirectional(passwordFieldPassword.textProperty());
-        eyeOpen = new Image(getClass().getResourceAsStream("/uv/lis/GUI/view/imagens/show-password-icon-eye-symbol-vision-hide-from-watch-icon-secret-view-web-design-element-vector.png"));
+        eyeOpen = new Image(getClass().getResourceAsStream("/uv/lis/GUI/view/imagens/show-password-icon-eye-symbol-vision-hide-from-watch-icon-secret-view-web-design-element-vector2.png"));
         eyeClosed = new Image(getClass().getResourceAsStream("/uv/lis/GUI/view/imagens/show-password-icon-eye-symbol-vision-hide-from-watch-icon-secret-view-web-design-element-vector1.png"));
 
         toggleButtonShowPassword.setGraphic(createIcon(eyeClosed));

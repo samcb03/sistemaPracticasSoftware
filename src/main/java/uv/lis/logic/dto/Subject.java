@@ -52,6 +52,8 @@ public class Subject {
     public String getCAREER() {
         return CAREER;
     }
+
+    
     
     public int getSchoolPeriodId() {
         return schoolPeriodId;
