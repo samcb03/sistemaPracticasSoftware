@@ -6,6 +6,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.logging.Logger;
+import java.util.Optional;
 import java.util.logging.Level;
 import uv.lis.dataaccess.MySQLConnectionManager;
 import uv.lis.logic.contracts.IUserDAO;
@@ -13,6 +14,7 @@ import uv.lis.logic.dto.User;
 import uv.lis.logic.exceptions.OperationException;
 import uv.lis.logic.utils.PasswordHasher;
 import uv.lis.logic.exceptions.AuthenticateException;
+import uv.lis.logic.utils.InputValidator;
 
 
 public class UserDAO implements IUserDAO{
@@ -67,10 +69,12 @@ public class UserDAO implements IUserDAO{
     }
 
     @Override
-    public User authenticate(String email, String password) throws AuthenticateException {
+    public Optional<User> authenticate(String email, String password) throws AuthenticateException {
+        Optional<User> validateUser = Optional.empty();
+
         String userQuery = "SELECT u.idUsuario, u.email, u.idRol, u.contraseña, ru.nombreRol "
             + "FROM Usuario u "
-            + "JOIN Rol_Usuario ru ON u.idRol = ru.idRol " 
+            + "JOIN Rol_Usuario ru ON u.idRol = ru.idRol "
             + "WHERE u.email = ?";
 
         try (Connection databaseConnection = connectionManager.getConnection();
@@ -79,28 +83,27 @@ public class UserDAO implements IUserDAO{
             preparedStatement.setString(1, email);
 
             try (ResultSet resultSet = preparedStatement.executeQuery()) {
-                if (!resultSet.next()) {
-                    throw new AuthenticateException("Credenciales incorrectas, "
-                    + "verifique sus datos.", null);
+                if (resultSet.next()) {
+                    String hashedPassword = resultSet.getString("contraseña");
+
+                    if (PasswordHasher.verifyPassword(password, hashedPassword)) {
+                        User user = new User();
+                        user.setId(resultSet.getInt("idUsuario"));
+                        user.setEmail(resultSet.getString("email"));
+                        user.setRoleId(resultSet.getInt("idRol"));
+                        validateUser = Optional.of(user);
+                    } else {
+                        throw new AuthenticateException("Credenciales incorrectas", null);
+                    }
+
+                } else {
+                    throw new AuthenticateException("Credenciales incorrectas", null);
                 }
-
-                String hashedPassword = resultSet.getString("contraseña");
-
-                    if (!PasswordHasher.verifyPassword(password, hashedPassword)) {
-                        throw new AuthenticateException("Contraseña incorrecta",null);
-                    } 
-
-                    User userAuthenticate = new User();
-                    userAuthenticate.setId(resultSet.getInt("idUsuario"));
-                    userAuthenticate.setEmail(email);
-                    userAuthenticate.setRoleId(resultSet.getInt("idRol"));
-                    return userAuthenticate;
             }
-        } catch (AuthenticateException e) {
-            throw e;
-        } catch(SQLException e) {
-            LOGGER.log(Level.SEVERE, "Error de conexión", e);
-            throw new AuthenticateException("No se pudo loggear, intente más tarde", e);
+
+        } catch (SQLException e) {
+            throw new AuthenticateException("Error al autenticar: " + e.getMessage());
         }
+        return validateUser;
     }
 }
