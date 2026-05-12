@@ -4,6 +4,7 @@ package uv.lis.GUI.controller;
 import static uv.lis.logic.utils.InputValidator.EMAIL_REGEX;
 import java.io.IOException;
 import java.net.URL;
+import java.util.Optional;
 import java.util.ResourceBundle;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -98,7 +99,8 @@ public class FXMLLoginController implements Initializable {
             showError("La contraseña no puede estar vacía");
         } else {
             try {
-                user = userDAO.authenticate(email, password);
+                Optional<User> optionalUser = userDAO.authenticate(email, password);
+                user = optionalUser.get();
 
                 if (user.getRoleId() == USER_TYPE_STUDENT) {
                     StudentDAO studentDAO = new StudentDAO();

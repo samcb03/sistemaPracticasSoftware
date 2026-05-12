@@ -12,6 +12,8 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.Optional;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -108,7 +110,10 @@ class UserDAOTest {
                 "hashedPassword"))
                 .thenReturn(true);
 
-            assertEquals(1, userDAO.authenticate("gom03@gmail.com", "Gom_Ram002").getRoleId());
+
+
+            Optional<User> result = userDAO.authenticate("gom03@gmail.com","Gom_Ram002");   
+            assertEquals(1,result.get().getRoleId());
         }
     }
 
@@ -122,11 +127,12 @@ class UserDAOTest {
         when(resultSet.getInt("idRol")).thenReturn(4);
 
         try (MockedStatic<PasswordHasher> mockedHasher = mockStatic(PasswordHasher.class)) {
-            mockedHasher.when(() -> PasswordHasher.verifyPassword("password12", 
+            mockedHasher.when(() -> PasswordHasher.verifyPassword("Demos25_rask", 
                 "hashedPassword"))
                 .thenReturn(true);
 
-            assertEquals(4, userDAO.authenticate("admin01", "password12").getRoleId());
+                Optional<User> result = userDAO.authenticate("GutJac_03@gmail.com", "Demos25_rask");
+                assertEquals(4,result.get().getRoleId());
         }
     }
 
@@ -140,11 +146,12 @@ class UserDAOTest {
         when(resultSet.getInt("idRol")).thenReturn(3);
 
         try (MockedStatic<PasswordHasher> mockedHasher = mockStatic(PasswordHasher.class)) {
-            mockedHasher.when(() -> PasswordHasher.verifyPassword("password13", 
+            mockedHasher.when(() -> PasswordHasher.verifyPassword("Demos25_rask", 
                 "hashedPassword"))
                 .thenReturn(true);
 
-            assertEquals(3, userDAO.authenticate("C12345", "password13").getRoleId());
+                Optional<User> result = userDAO.authenticate("carRG@gmail.com", "Demos25_rask");
+                assertEquals(3,result.get().getRoleId());
         }
     }
 
@@ -158,11 +165,12 @@ class UserDAOTest {
         when(resultSet.getInt("idRol")).thenReturn(2);
 
         try (MockedStatic<PasswordHasher> mockedHasher = mockStatic(PasswordHasher.class)) {
-            mockedHasher.when(() -> PasswordHasher.verifyPassword("password12", 
+            mockedHasher.when(() -> PasswordHasher.verifyPassword("Bet@04ga", 
                 "hashedPassword"))
                 .thenReturn(true);
 
-            assertEquals(2, userDAO.authenticate("UV-001", "password12").getRoleId());
+            Optional<User> result = userDAO.authenticate("LopHern@hotmail.com", "Bet@04ga");
+            assertEquals(2, result.get().getRoleId());
         }
     }
 
@@ -188,7 +196,8 @@ class UserDAOTest {
                 "hashedPassword"))
                 .thenReturn(false);
 
-            assertThrows(AuthenticateException.class, () ->
+            
+                assertThrows(AuthenticateException.class, () ->
                 userDAO.authenticate("gom03@gmail.com", "wrongPassword"));
         }
     }
