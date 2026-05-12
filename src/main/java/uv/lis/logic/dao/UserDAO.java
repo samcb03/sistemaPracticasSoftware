@@ -14,7 +14,6 @@ import uv.lis.logic.dto.User;
 import uv.lis.logic.exceptions.OperationException;
 import uv.lis.logic.utils.PasswordHasher;
 import uv.lis.logic.exceptions.AuthenticateException;
-import uv.lis.logic.utils.InputValidator;
 
 
 public class UserDAO implements IUserDAO{

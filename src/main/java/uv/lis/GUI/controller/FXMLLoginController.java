@@ -1,7 +1,6 @@
 package uv.lis.GUI.controller;
 
 
-import static uv.lis.logic.utils.InputValidator.EMAIL_REGEX;
 import java.io.IOException;
 import java.net.URL;
 import java.util.Optional;
@@ -29,6 +28,7 @@ import uv.lis.logic.dto.Student;
 import uv.lis.logic.dto.User;
 import uv.lis.logic.exceptions.AuthenticateException;
 import uv.lis.logic.exceptions.OperationException;
+import uv.lis.logic.utils.InputValidator;
 import uv.lis.logic.utils.SessionManager;
 
 
@@ -91,36 +91,59 @@ public class FXMLLoginController implements Initializable {
         String email = textFieldEmail.getText().trim();
         String password = passwordFieldPassword.getText();
 
-        if (email.isEmpty()) {
-            showError("El correo electrónico no puede estar vacío");
-        }else if (!email.matches(EMAIL_REGEX)) {
-            showError("El email debe tener un @ y un . ");
-        } else if (password.isEmpty()) {
-            showError("La contraseña no puede estar vacía");
-        } else {
+        if (validateInputs(email, password)) {
             try {
                 Optional<User> optionalUser = userDAO.authenticate(email, password);
-                user = optionalUser.get();
 
-                if (user.getRoleId() == USER_TYPE_STUDENT) {
-                    StudentDAO studentDAO = new StudentDAO();
-                    Student student = studentDAO.getStudentById(user.getId());
-                    SessionManager.getInstance().setCurrentStudent(student);
-               } else if(user.getRoleId() == USER_TYPE_PROFESSOR) {
-                    ProfessorDAO professorDAO = new ProfessorDAO();
-                    Professor professor = professorDAO.getProfessorById(user.getId());
-                    SessionManager.getInstance().setCurrentProfessor(professor);
-               } else if(user.getRoleId() == USER_TYPE_COORDINATOR) {
-                    ProfessorDAO professorDAO = new ProfessorDAO();
-                    Professor coordinator = professorDAO.getProfessorById(user.getId());
-                    SessionManager.getInstance().setCurrentCoordinator(coordinator);
-               }
-                navigateToMenus(user.getRoleId());
+                if (optionalUser.isPresent()) {
+                    user = optionalUser.get();
+                    loadSessionByRole(user);
+                    navigateToMenus(user.getRoleId());
+                } else {
+                    showError("Credenciales inválidas. Intente de nuevo.");
+                }
+
             } catch (AuthenticateException e) {
-                showError(e.getMessage());
-            }  catch (OperationException e) {
+                LOGGER.log(Level.WARNING, "Error al autenticar al usuario: {0}", e.getMessage());
                 showError(e.getMessage());
             }
+        }
+    }
+
+    private boolean validateInputs(String email, String password) {
+        Optional<String> emailError = InputValidator.validateEmail(email, "El correo electrónico");
+        Optional<String> passwordError = InputValidator.validatePassword(password, "La contraseña");
+
+        Optional<String> validationError = emailError.or(() -> passwordError);
+
+        validationError.ifPresent(this::showError);
+
+        return validationError.isEmpty();
+    }
+
+    private void loadSessionByRole(User user) {
+        int roleId = user.getRoleId();
+        int userId = user.getId();
+
+        try {
+            switch (roleId) {
+            case USER_TYPE_STUDENT -> {
+                Student student = new StudentDAO().getStudentById(userId);
+                SessionManager.getInstance().setCurrentStudent(student);
+            }
+            case USER_TYPE_PROFESSOR -> {
+                Professor professor = new ProfessorDAO().getProfessorById(userId);
+                SessionManager.getInstance().setCurrentProfessor(professor);
+            }
+            case USER_TYPE_COORDINATOR -> {
+                Professor coordinator = new ProfessorDAO().getProfessorById(userId);
+                SessionManager.getInstance().setCurrentCoordinator(coordinator);
+            }
+            default -> LOGGER.log(Level.WARNING, "Rol desconocido: {0}", roleId);
+        }
+        } catch (OperationException e) {
+            LOGGER.log(Level.SEVERE, "Error al cargar los datos del usuario para la sesión", e);
+            showError("Error al cargar los datos del usuario. Intente de nuevo.");
         }
     }
 
