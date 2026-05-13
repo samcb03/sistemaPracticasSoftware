@@ -1,5 +1,6 @@
 package uv.lis.GUI.controller;
 
+
 import java.net.URL;
 import java.util.List;
 import java.util.ResourceBundle;
@@ -19,6 +20,7 @@ import uv.lis.logic.dto.Project;
 import uv.lis.logic.dto.Professor;
 import uv.lis.logic.exceptions.OperationException;
 import uv.lis.logic.utils.SessionManager;
+
 
 public class FXMLAssignationProjectController extends ValidationHandler {
 
