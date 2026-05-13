@@ -1,6 +1,5 @@
 package uv.lis.logic.dao;
 
-
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -14,16 +13,17 @@ import uv.lis.logic.contracts.IProfessorDAO;
 import uv.lis.logic.dto.Professor;
 import uv.lis.logic.exceptions.OperationException;
 
-
 public class ProfessorDAO extends UserDAO implements IProfessorDAO {
+
     private static final int NO_ROWS_AFFECTED = 0;
-    private static final Logger LOGGER = Logger.getLogger(UserDAO.class.getName());
+    private static final int ID_ERROR         = -1;
+    private static final Logger LOGGER = Logger.getLogger(ProfessorDAO.class.getName());
     private MySQLConnectionManager connectionManager;
 
     public ProfessorDAO() {
         this.connectionManager = new MySQLConnectionManager();
     }
-    
+
     public ProfessorDAO(MySQLConnectionManager connectionManager) {
         this.connectionManager = connectionManager;
     }
@@ -37,14 +37,15 @@ public class ProfessorDAO extends UserDAO implements IProfessorDAO {
             + " WHERE p.estado = 1";
 
         try (Connection connection = connectionManager.getConnection();
-            PreparedStatement statement = connection.prepareStatement(query);
-            ResultSet resultSet = statement.executeQuery()) {
+             PreparedStatement statement = connection.prepareStatement(query);
+             ResultSet resultSet = statement.executeQuery()) {
 
             while (resultSet.next()) {
-                String fullName = resultSet.getString("nombre") + " " + resultSet.getString("apellidos");
-                String personnelNumber = resultSet.getString("numeroPersonal");
-                map.put(fullName, personnelNumber);
+                String fullName = resultSet.getString("nombre") + " "
+                    + resultSet.getString("apellidos");
+                map.put(fullName, resultSet.getString("numeroPersonal"));
             }
+
         } catch (SQLException e) {
             LOGGER.log(Level.SEVERE, "Error al obtener profesores", e);
             throw new OperationException("Error al obtener profesores", e);
@@ -52,16 +53,18 @@ public class ProfessorDAO extends UserDAO implements IProfessorDAO {
 
         return map;
     }
-    
+
     @Override
-    public String getProfessorPersonnelNumberByName(String firstName, String lastName) throws OperationException {
+    public String getProfessorPersonnelNumberByName(String firstName, String lastName)
+            throws OperationException {
+
         String personnelNumber = null;
         String professorQuery = "SELECT p.numeroPersonal "
             + "FROM Profesor p INNER JOIN Usuario u ON p.idUsuario = u.idUsuario "
             + "WHERE u.nombre = ? AND u.apellidos = ?";
 
         try (Connection databaseConnection = connectionManager.getConnection();
-            PreparedStatement preparedStatement = databaseConnection.prepareStatement(professorQuery)) {
+             PreparedStatement preparedStatement = databaseConnection.prepareStatement(professorQuery)) {
 
             preparedStatement.setString(1, firstName);
             preparedStatement.setString(2, lastName);
@@ -70,30 +73,28 @@ public class ProfessorDAO extends UserDAO implements IProfessorDAO {
                 if (resultSet.next()) {
                     personnelNumber = resultSet.getString("numeroPersonal");
                 } else {
-                    LOGGER.log(Level.INFO, "No se encontro profesor");
-                    throw new OperationException("No se encontró un profesor con el nombre: " +
-                        firstName + " " + lastName, null);
+                    throw new OperationException("No se encontró un profesor con el nombre: "
+                        + firstName + " " + lastName, null);
                 }
             }
 
         } catch (SQLException e) {
-            LOGGER.log(Level.SEVERE, "Error de conexion con la base de datos", e);
-            throw new OperationException("Error al obtener el numero de personal del profesor", e);
+            LOGGER.log(Level.SEVERE, "Error de conexión con la base de datos", e);
+            throw new OperationException("Error al obtener el número de personal del profesor", e);
         }
 
         return personnelNumber;
     }
-
 
     @Override
     public Professor getProfessorById(int id) throws OperationException {
         Professor professor = null;
         String query = "SELECT p.numeroPersonal, u.nombre, u.apellidos, p.idRol "
             + "FROM Profesor p INNER JOIN Usuario u ON p.idUsuario = u.idUsuario "
-            + "WHERE p.idUsuario = ? AND p.estado = 1";
+            + "WHERE p.idUsuario = ? ";
 
         try (Connection databaseConnection = connectionManager.getConnection();
-            PreparedStatement preparedStatement = databaseConnection.prepareStatement(query)) {
+             PreparedStatement preparedStatement = databaseConnection.prepareStatement(query)) {
 
             preparedStatement.setInt(1, id);
 
@@ -106,13 +107,12 @@ public class ProfessorDAO extends UserDAO implements IProfessorDAO {
                     professor.setLastName(resultSet.getString("apellidos"));
                     professor.setIsCoordinator(resultSet.getInt("idRol") == 3);
                 } else {
-                    LOGGER.log(Level.INFO, "No se encontro profesor con id {0}", id);
                     throw new OperationException("No se encontró un profesor con el id: " + id, null);
                 }
             }
 
         } catch (SQLException e) {
-            LOGGER.log(Level.SEVERE, "Error de conexion con la base de datos", e);
+            LOGGER.log(Level.SEVERE, "Error de conexión con la base de datos", e);
             throw new OperationException("Error al obtener el profesor", e);
         }
 
@@ -122,38 +122,31 @@ public class ProfessorDAO extends UserDAO implements IProfessorDAO {
     @Override
     public boolean registerProfessor(Professor professor) throws OperationException {
         boolean isRegistered = false;
-        
-        String professorQuery = "INSERT INTO Profesor (idUsuario, numeroPersonal, idRol, estado) VALUES (?, ?, ?, ?);";
+        String professorQuery = "INSERT INTO Profesor (idUsuario, numeroPersonal, idRol, estado)"
+            + " VALUES (?, ?, ?, ?)";
 
         try (Connection databaseConnection = connectionManager.getConnection();
              PreparedStatement preparedStatement = databaseConnection.prepareStatement(professorQuery)) {
-            
-            preparedStatement.setInt(1, professor.getId());      
-            preparedStatement.setString(2, professor.getPersonnelNumber());     
 
-            if (professor.getIsCoordinator()) { 
-                preparedStatement.setInt(3, 3);
-            } else {
-                preparedStatement.setInt(3, 2);
-            }
-
-            preparedStatement.setString(4,"1");
+            preparedStatement.setInt(1, professor.getId());
+            preparedStatement.setString(2, professor.getPersonnelNumber());
+            preparedStatement.setInt(3, professor.getIsCoordinator() ? 3 : 2);
+            preparedStatement.setInt(4, 1);
 
             if (preparedStatement.executeUpdate() > NO_ROWS_AFFECTED) {
                 isRegistered = true;
-                LOGGER.log(Level.INFO, "Registro de profesor con ID {0} exitosa.", professor.getPersonnelNumber());
-            } else {
-                LOGGER.log(Level.WARNING, "No se pudo registrar al profesor con numero de personal {0}.", 
+                LOGGER.log(Level.INFO, "Profesor {0} registrado exitosamente.",
                     professor.getPersonnelNumber());
-                throw new OperationException("No se pudo registrar al profesor con numero de personal: " 
+            } else {
+                throw new OperationException("No se pudo registrar al profesor con número: "
                     + professor.getPersonnelNumber(), null);
             }
 
         } catch (SQLException e) {
-            LOGGER.log(Level.SEVERE, "Error de conexion con la base de datos",e);
+            LOGGER.log(Level.SEVERE, "Error de conexión con la base de datos", e);
             throw new OperationException("Error al registrar el profesor", e);
         }
-        
+
         return isRegistered;
     }
 
@@ -161,36 +154,29 @@ public class ProfessorDAO extends UserDAO implements IProfessorDAO {
     public boolean modifyProfessor(Professor professor) throws OperationException {
         boolean isModified = false;
 
-        String professorQuery = "UPDATE Profesor p INNER JOIN Usuario u ON p.idUsuario = u.idUsuario" 
-            + "SET p.idRol = ?, u.nombre = ?, u.apellidos = ? WHERE p.numeroPersonal = ?;";
+        String professorQuery = "UPDATE Profesor p INNER JOIN Usuario u ON p.idUsuario = u.idUsuario "
+            + "SET p.idRol = ?, u.nombre = ?, u.apellidos = ? "
+            + "WHERE p.numeroPersonal = ?";
 
         try (Connection databaseConnection = connectionManager.getConnection();
-             PreparedStatement preparedStament = databaseConnection.prepareStatement(professorQuery)) {
+             PreparedStatement preparedStatement = databaseConnection.prepareStatement(professorQuery)) {
 
-            if (professor.getIsCoordinator()) { 
-                preparedStament.setString(1, "Coordinador");
-            } else {
-                preparedStament.setString(1, "Maestro");
-            }
+            preparedStatement.setInt(1, professor.getIsCoordinator() ? 3 : 2);
+            preparedStatement.setString(2, professor.getFirstName());
+            preparedStatement.setString(3, professor.getLastName());
+            preparedStatement.setString(4, professor.getPersonnelNumber());
 
-            preparedStament.setString(2, professor.getFirstName());
-            preparedStament.setString(3, professor.getLastName());
-            
-            preparedStament.setString(4, professor.getPersonnelNumber()); 
-
-            if (preparedStament.executeUpdate() > NO_ROWS_AFFECTED) {
+            if (preparedStatement.executeUpdate() > NO_ROWS_AFFECTED) {
                 isModified = true;
-                LOGGER.log(Level.INFO, "Modificacion de profesor con numero de personal {0} exitosa.", 
+                LOGGER.log(Level.INFO, "Profesor {0} modificado exitosamente.",
                     professor.getPersonnelNumber());
             } else {
-                LOGGER.log(Level.WARNING, "No se pudo modificar al profesor con numero de personal {0}.", 
-                    professor.getPersonnelNumber());
-                throw new OperationException("No se pudo modificar al profesor con numero de personal: " 
+                throw new OperationException("No se pudo modificar al profesor con número: "
                     + professor.getPersonnelNumber(), null);
             }
 
         } catch (SQLException e) {
-            LOGGER.log(Level.SEVERE, "Error de conexion con la base de datos",e);
+            LOGGER.log(Level.SEVERE, "Error de conexión con la base de datos", e);
             throw new OperationException("Error al modificar el profesor", e);
         }
 
@@ -198,67 +184,93 @@ public class ProfessorDAO extends UserDAO implements IProfessorDAO {
     }
 
     @Override
-    public boolean inactivateProfessor(Professor professor) throws OperationException {
+    public boolean inactivateProfessor(String personalNumber) throws OperationException {
         boolean isInactived = false;
-
-        String professorQuery = "UPDATE Profesor SET estado = 0 WHERE numeroPersonal = ?;";
+        String professorQuery = "UPDATE Profesor SET estado = 0 WHERE numeroPersonal = ?";
 
         try (Connection databaseConnection = connectionManager.getConnection();
              PreparedStatement preparedStatement = databaseConnection.prepareStatement(professorQuery)) {
-            
-            preparedStatement.setString(1, professor.getPersonnelNumber());
+
+            preparedStatement.setString(1, personalNumber);
 
             if (preparedStatement.executeUpdate() > NO_ROWS_AFFECTED) {
                 isInactived = true;
-                LOGGER.log(Level.INFO, "Inactivacion de profesor con numero de personal exitosa.", 
-                    professor.getPersonnelNumber());
+                LOGGER.log(Level.INFO, "Profesor {0} inactivado exitosamente.", personalNumber);
             } else {
-                LOGGER.log(Level.WARNING, "No se pudo inactivar al profesor con numero de personal {0}.", 
-                    professor.getPersonnelNumber());
-                throw new OperationException("No se pudo inactivar al profesor con numero de personal: " 
-                    + professor.getPersonnelNumber(), null);
+                throw new OperationException("No se pudo inactivar al profesor con número: "
+                    + personalNumber, null);
             }
 
         } catch (SQLException e) {
-            LOGGER.log(Level.SEVERE, "Error de conexion con la base de datos",e);
+            LOGGER.log(Level.SEVERE, "Error de conexión con la base de datos", e);
             throw new OperationException("Error al inactivar el profesor", e);
         }
 
         return isInactived;
     }
-    
+
+    @Override
+    public boolean isProfessorInactive(String personnelNumber) throws OperationException {
+        boolean isInactive = false;
+        String professorQuery = "SELECT estado FROM Profesor WHERE numeroPersonal = ?";
+
+        try (Connection databaseConnection = connectionManager.getConnection();
+             PreparedStatement preparedStatement = databaseConnection.prepareStatement(professorQuery)) {
+
+            preparedStatement.setString(1, personnelNumber);
+
+            try (ResultSet resultSet = preparedStatement.executeQuery()) {
+                if (resultSet.next()) {
+                    isInactive = resultSet.getInt("estado") == 0;
+                } else {
+                    throw new OperationException("No se encontró al profesor con número: "
+                        + personnelNumber, null);
+                }
+            }
+
+        } catch (SQLException e) {
+            LOGGER.log(Level.SEVERE, "Error al verificar el estado del profesor", e);
+            throw new OperationException("No se pudo verificar al profesor. Intente más tarde", e);
+        }
+
+        return isInactive;
+    }
+
     @Override
     public int getIdUserByProfessorPersonnelNumber(String personnelNumber) throws OperationException {
-        int idUser = -1;
+        int idUser = ID_ERROR;
         String professorQuery = "SELECT idUsuario FROM Profesor WHERE numeroPersonal = ?";
 
         try (Connection databaseConnection = connectionManager.getConnection();
              PreparedStatement preparedStatement = databaseConnection.prepareStatement(professorQuery)) {
-            
+
             preparedStatement.setString(1, personnelNumber);
-            
+
             try (ResultSet resultSet = preparedStatement.executeQuery()) {
                 if (resultSet.next()) {
                     idUser = resultSet.getInt("idUsuario");
                 } else {
-                    LOGGER.log(Level.INFO, "No se encontro un Profesor con el número de personal {0}.", personnelNumber);
-                    throw new OperationException("No se encontró un Profesor con el número de personal: " + personnelNumber, null);
+                    throw new OperationException("No se encontró un profesor con el número: "
+                        + personnelNumber, null);
                 }
             }
+
         } catch (SQLException e) {
-            LOGGER.log(Level.SEVERE, "Error de conexion con la base de datos",e);
-            throw new OperationException("No se pudo buscar el Professor. Intentelo mas tarde", e);
+            LOGGER.log(Level.SEVERE, "Error de conexión con la base de datos", e);
+            throw new OperationException("No se pudo buscar al profesor. Inténtelo más tarde", e);
         }
+
         return idUser;
     }
 
     @Override
     public ArrayList<String> searchProfessorPersonalNumbers(String prefix) throws OperationException {
         ArrayList<String> professorPersonnelNumbers = new ArrayList<>();
-        String professorQuery = "SELECT numeroPersonal FROM Profesor WHERE numeroPersonal LIKE ? LIMIT 10";
+        String professorQuery = "SELECT numeroPersonal FROM Profesor"
+            + " WHERE numeroPersonal LIKE ? LIMIT 10";
 
         try (Connection databaseConnection = connectionManager.getConnection();
-            PreparedStatement preparedStatement = databaseConnection.prepareStatement(professorQuery)) {
+             PreparedStatement preparedStatement = databaseConnection.prepareStatement(professorQuery)) {
 
             preparedStatement.setString(1, prefix + "%");
 
@@ -267,10 +279,67 @@ public class ProfessorDAO extends UserDAO implements IProfessorDAO {
                     professorPersonnelNumbers.add(resultSet.getString("numeroPersonal"));
                 }
             }
+
         } catch (SQLException e) {
-            LOGGER.log(Level.SEVERE, "Error al buscar numeros de personal", e);
-            throw new OperationException("No se pudieron obtener los numeros de personal", e);
+            LOGGER.log(Level.SEVERE, "Error al buscar números de personal", e);
+            throw new OperationException("No se pudieron obtener los números de personal", e);
         }
+
         return professorPersonnelNumbers;
+    }
+
+    @Override
+    public boolean hasSubjectAssigned(String personnelNumber) throws OperationException {
+        boolean hasSubject = false;
+        String professorQuery = "SELECT 1 FROM Profesor_Imparte_Experiencia"
+            + " WHERE numeroPersonal = ?";
+
+        try (Connection databaseConnection = connectionManager.getConnection();
+             PreparedStatement preparedStatement = databaseConnection.prepareStatement(professorQuery)) {
+
+            preparedStatement.setString(1, personnelNumber);
+
+            try (ResultSet resultSet = preparedStatement.executeQuery()) {
+                hasSubject = resultSet.next();
+            }
+
+        } catch (SQLException e) {
+            LOGGER.log(Level.SEVERE, "Error al verificar asignación de experiencia", e);
+            throw new OperationException("No se pudo verificar la asignación. Intente más tarde", e);
+        }
+
+        return hasSubject;
+    }
+
+    public ArrayList<String> getSubjectHistoryByProfessor(String personnelNumber) throws OperationException {
+
+        ArrayList<String> history = new ArrayList<>();
+        String query = "SELECT ee.nombreExperiencia, ee.carrera, pe.nombre AS periodo "
+            + "FROM Profesor_Imparte_Experiencia pie "
+            + "JOIN ExperienciaEducativa ee ON pie.NRC = ee.NRC "
+            + "JOIN PeriodoEscolar pe ON ee.idPeriodoEscolar = pe.idPeriodoEscolar "
+            + "WHERE pie.numeroPersonal = ? "
+            + "ORDER BY pe.FechaInicio DESC";
+
+        try (Connection databaseConnection = connectionManager.getConnection();
+             PreparedStatement preparedStatement = databaseConnection.prepareStatement(query)) {
+
+            preparedStatement.setString(1, personnelNumber);
+
+            try (ResultSet resultSet = preparedStatement.executeQuery()) {
+                while (resultSet.next()) {
+                    String entry = resultSet.getString("nombreExperiencia")
+                        + " — " + resultSet.getString("carrera")
+                        + " (" + resultSet.getString("periodo") + ")";
+                    history.add(entry);
+                }
+            }
+
+        } catch (SQLException e) {
+            LOGGER.log(Level.SEVERE, "Error al obtener historial de experiencias", e);
+            throw new OperationException("No se pudo obtener el historial del profesor.", e);
+        }
+
+        return history;
     }
 }

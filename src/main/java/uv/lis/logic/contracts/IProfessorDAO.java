@@ -14,8 +14,6 @@ public interface IProfessorDAO {
 
     boolean modifyProfessor(Professor professor) throws OperationException;
 
-    boolean inactivateProfessor(Professor professor) throws OperationException;
-
     LinkedHashMap<String, String> getAllActiveProfessorsMap() throws OperationException;
 
     Professor getProfessorById(int id) throws OperationException;
@@ -23,4 +21,10 @@ public interface IProfessorDAO {
     int getIdUserByProfessorPersonnelNumber(String personnelNumber) throws OperationException;
 
     ArrayList<String> searchProfessorPersonalNumbers(String prefix) throws OperationException;
+
+    boolean isProfessorInactive(String personnelNumber) throws OperationException;
+
+    boolean inactivateProfessor(String personalNumber) throws OperationException;
+
+    boolean hasSubjectAssigned(String personnelNumber) throws OperationException;
 }
