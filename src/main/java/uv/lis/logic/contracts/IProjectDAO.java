@@ -3,6 +3,8 @@ package uv.lis.logic.contracts;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
+
 import uv.lis.logic.dto.Project;
 import uv.lis.logic.exceptions.OperationException;
 
@@ -19,4 +21,6 @@ public interface IProjectDAO {
     boolean inactivateProject(Project project) throws OperationException;
 
     ArrayList<String> getAllProjectNames() throws OperationException;
+
+    Optional<String> getProjectBySupervisorName(String supervisorName) throws OperationException;
 }

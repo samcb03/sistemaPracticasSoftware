@@ -6,6 +6,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Optional;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import uv.lis.dataaccess.MySQLConnectionManager;
@@ -221,4 +222,32 @@ public class AffiliatedOrganizationDAO implements IAffiliatedOrganizationDAO{
             throw new OperationException("Error al obtener el ID de la organización", e);
         }
     }
+
+    @Override
+    public Optional<String> getOrganizationBySupervisorName(String nombreSupervisor) throws OperationException {
+        Optional<String> organization = Optional.empty();
+        
+        String supervisorQuery = "SELECT nombreOV FROM OrganizacionVinculada ov" 
+            + " JOIN Organizacion_Tiene_Responsable ot ON ov.idOrganizacionVinculada = ot.idOrganizacionVinculada" 
+            + " JOIN ResponsableProyecto rp ON ot.idResponsableProyecto = rp.idResponsableProyecto"
+            + " WHERE rp.nombre = ?";
+
+            try(Connection databaseConnection = connectionManager.getConnection();
+                    PreparedStatement preparedStatement = databaseConnection.prepareStatement(supervisorQuery)) {
+
+                        preparedStatement.setString(1,nombreSupervisor);
+
+                        try(ResultSet resultSet = preparedStatement.executeQuery()) {
+                            if(resultSet.next()) {
+                               String organizationName = resultSet.getString("nombreOV");
+                               organization = Optional.of(organizationName);
+                            }
+                        }
+                    } catch(SQLException e) {
+                        LOGGER.log(Level.SEVERE,"Error de conexión a la base de datos", e);
+                        throw new OperationException("Error al cargar el nombre de la organización", e);
+                    }
+            return organization;
+        }
+
 }

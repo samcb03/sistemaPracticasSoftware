@@ -7,6 +7,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import uv.lis.dataaccess.MySQLConnectionManager;
@@ -211,4 +212,31 @@ public class ProjectDAO implements IProjectDAO{
 
         return projectNames;
     }
+
+   @Override
+    public Optional<String> getProjectBySupervisorName(String supervisorName) throws OperationException {
+        Optional<String> project = Optional.empty();
+        
+        String supervisorQuery = "SELECT p.nombre FROM Proyecto p"  
+            + " JOIN ResponsableProyecto rp ON p.idResponsableProyecto = rp.idResponsableProyecto"
+            + " WHERE rp.nombre = ?";
+
+            try(Connection databaseConnection = connectionManager.getConnection();
+                    PreparedStatement preparedStatement = databaseConnection.prepareStatement(supervisorQuery)) {
+
+                        preparedStatement.setString(1,supervisorName);
+
+                        try(ResultSet resultSet = preparedStatement.executeQuery()) {
+                            if(resultSet.next()) {
+                               String projectName = resultSet.getString("nombre");
+                               project = Optional.of(projectName);
+                            }
+                        }
+                    } catch(SQLException e) {
+                        LOGGER.log(Level.SEVERE,"Error de conexión a la base de datos", e);
+                        throw new OperationException("Error al cargar el nombre de la organización", e);
+                    }
+            return project;
+        }
+
 }

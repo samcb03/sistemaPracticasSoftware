@@ -6,6 +6,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Optional;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import uv.lis.dataaccess.MySQLConnectionManager;
@@ -72,6 +73,39 @@ public class ProjectSupervisorDAO implements IProjectSupervisorDAO {
         }
 
         return supervisor;
+    }
+ @Override
+    public Optional<ProjectSupervisor> getProjectSupervisorByName(String supervisorName) throws OperationException {
+
+        Optional<ProjectSupervisor> supervisorOpt = Optional.empty();
+
+        String query = "SELECT * FROM ResponsableProyecto WHERE nombre = ?";
+
+        try (Connection databaseConnection = connectionManager.getConnection();
+             PreparedStatement preparedStatement = databaseConnection.prepareStatement(query)) {
+
+            preparedStatement.setString(1, supervisorName);
+            
+            try (ResultSet resultSet = preparedStatement.executeQuery()) {
+                if (resultSet.next()) {
+                    ProjectSupervisor supervisor = new ProjectSupervisor();
+                    supervisor.setId(resultSet.getInt("idResponsableProyecto"));
+                    supervisor.setName(resultSet.getString("nombre"));
+                    supervisor.setPosition(resultSet.getString("cargo"));
+                    supervisor.setEmail(resultSet.getString("correo"));
+                    
+                    supervisorOpt = Optional.of(supervisor);
+                } else {
+                    LOGGER.log(Level.INFO, "No se encontró un supervisor con el nombre: {0}", supervisorName);
+                }
+            }
+
+        } catch (SQLException e) {
+            LOGGER.log(Level.SEVERE, "Error buscando al supervisor", e);
+            throw new OperationException("Error al buscar al supervisor en la base de datos", e);
+        }
+
+        return supervisorOpt;
     }
 
     @Override
@@ -165,5 +199,27 @@ public class ProjectSupervisorDAO implements IProjectSupervisorDAO {
         }
 
         return isInactive;
+    }
+
+    @Override
+    public ArrayList<String> searchProjectSupervisorName(String prefix) throws OperationException {
+        ArrayList<String> projectSupervisorNames = new ArrayList<>();
+        String projectSupervisorQuery = "SELECT nombre FROM ResponsableProyecto WHERE nombre LIKE ? ";
+
+        try (Connection databaseConnection = connectionManager.getConnection();
+            PreparedStatement preparedStatement = databaseConnection.prepareStatement(projectSupervisorQuery)) {
+
+            preparedStatement.setString(1, prefix + "%");
+
+            try (ResultSet resultSet = preparedStatement.executeQuery()) {
+                while (resultSet.next()) {
+                    projectSupervisorNames.add(resultSet.getString("nombre"));
+                }
+            }
+        } catch (SQLException e) {
+            LOGGER.log(Level.SEVERE, "Error al buscar a los encargados", e);
+            throw new OperationException("No se pudieron obtener los nombres de los encargados", e);
+        }
+        return projectSupervisorNames;
     }
 }
