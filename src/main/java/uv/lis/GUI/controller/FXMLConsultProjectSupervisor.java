@@ -22,7 +22,7 @@ import uv.lis.logic.dao.ProjectSupervisorDAO;
 import uv.lis.logic.dto.ProjectSupervisor;
 import uv.lis.logic.exceptions.OperationException;
 
-public class FXMLConsultarProjectSupervisor extends ValidationHandler{
+public class FXMLConsultProjectSupervisor extends ValidationHandler{
     @FXML private Button buttonBack;
     @FXML private Button buttonModify;
     @FXML private Button buttonSearch;

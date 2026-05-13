@@ -13,9 +13,11 @@ import uv.lis.logic.dto.Subject;
 import uv.lis.logic.exceptions.OperationException;
 
 public class SubjectDAO implements ISubjectDAO {
+    private static final int STATUS_ASSIGNED = 2;
     private static final int NO_ROWS_AFFECTED = 0;
     private static final Logger LOGGER = Logger.getLogger(SubjectDAO.class.getName());
     private MySQLConnectionManager connectionManager;
+
 
     public SubjectDAO() {
         this.connectionManager = new MySQLConnectionManager();
@@ -138,4 +140,22 @@ public class SubjectDAO implements ISubjectDAO {
         }
         return subjectNRC;
     }
+
+    @Override
+    public void unassignProfessorFromSubject(String personnelNumber) throws OperationException {
+        String subjectQuery = "DELETE FROM Profesor_Imparte_Experiencia"
+        + " WHERE numeroPersonal = ?";
+
+
+        try (Connection databaseConnection = connectionManager.getConnection();
+            PreparedStatement preparedStatement = databaseConnection.prepareStatement(subjectQuery)) {
+            
+            preparedStatement.setString(1, personnelNumber);
+            preparedStatement.executeUpdate();
+        } catch (SQLException e) {
+            LOGGER.log(Level.SEVERE, "Error al desasignar profesor a experiencia educativa", e);
+            throw new OperationException("Error al desasignar profesor a experiencia educativa", e);
+         }
+    }
 }
+

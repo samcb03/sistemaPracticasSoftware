@@ -15,36 +15,36 @@
       <Pane layoutX="200.0" layoutY="140.0" prefHeight="200.0" prefWidth="200.0" />
       <Pane layoutX="75.0" layoutY="64.0" prefHeight="390.0" prefWidth="450.0" style="-fx-background-color: #cce4f7; -fx-background-radius: 20;">
          <children>
-            <Label layoutX="136.0" layoutY="14.0" text="Información del proyecto">
+            <Label layoutX="136.0" layoutY="4.0" text="Información del proyecto">
                <font>
                   <Font name="System Bold" size="15.0" />
                </font>
             </Label>
-            <Label layoutX="30.0" layoutY="51.0" text="Nombre:">
+            <Label layoutX="29.0" layoutY="39.0" text="Nombre:">
                <font>
                   <Font size="13.0" />
                </font>
             </Label>
-            <TextField fx:id="textFieldName" layoutX="160.0" layoutY="48.0" prefHeight="25.0" prefWidth="250.0" />
-            <Label layoutX="25.0" layoutY="88.0" text="Metodologia:">
+            <TextField fx:id="textFieldName" layoutX="160.0" layoutY="36.0" prefHeight="25.0" prefWidth="250.0" />
+            <Label layoutX="25.0" layoutY="79.0" text="Metodologia:">
                <font>
                   <Font size="13.0" />
                </font>
             </Label>
-            <TextField fx:id="textFieldMethodology" layoutX="160.0" layoutY="85.0" prefHeight="25.0" prefWidth="250.0" />
-            <Label layoutX="38.0" layoutY="131.0" text="Cupo:">
+            <TextField fx:id="textFieldMethodology" layoutX="160.0" layoutY="76.0" prefHeight="25.0" prefWidth="250.0" />
+            <Label layoutX="38.0" layoutY="122.0" text="Cupo:">
                <font>
                   <Font size="13.0" />
                </font>
             </Label>
-            <TextField fx:id="textFieldCapacity" layoutX="160.0" layoutY="128.0" prefHeight="25.0" prefWidth="250.0" />
-            <Label layoutX="29.0" layoutY="171.0" text="Objetivo:">
+            <TextField fx:id="textFieldCapacity" layoutX="160.0" layoutY="119.0" prefHeight="25.0" prefWidth="250.0" />
+            <Label layoutX="29.0" layoutY="162.0" text="Objetivo:">
                <font>
                   <Font size="13.0" />
                </font>
             </Label>
-            <TextField fx:id="textFieldObjective" layoutX="160.0" layoutY="168.0" prefHeight="25.0" prefWidth="250.0" />
-            <Label layoutX="28.0" layoutY="221.0" text="Descripcion:">
+            <TextField fx:id="textFieldObjective" layoutX="160.0" layoutY="159.0" prefHeight="25.0" prefWidth="250.0" />
+            <Label layoutX="28.0" layoutY="207.0" text="Descripcion:">
                <font>
                   <Font size="13.0" />
                </font>
@@ -56,14 +56,14 @@
             </Label>
             <Button layoutX="80.0" layoutY="348.0" mnemonicParsing="false" onAction="#validateFields" prefHeight="28.0" prefWidth="146.0" style="-fx-background-color: white;" text="Registrar Proyecto" />
             <Button fx:id="buttonBack" layoutX="276.0" layoutY="350.0" mnemonicParsing="false" onAction="#goBack" prefHeight="18.0" prefWidth="62.0" style="-fx-background-color: white;" text="Cancelar" />
-            <TextArea fx:id="textAreaDescription" layoutX="160.0" layoutY="209.0" prefHeight="42.0" prefWidth="250.0" />
-            <Label layoutX="18.0" layoutY="272.0" text="Organizacion Vinculada" />
-            <ComboBox fx:id="comboBoxOrganizationName" layoutX="160.0" layoutY="268.0" prefHeight="25.0" prefWidth="250.0" />
-            <ComboBox fx:id="comboBoxProjectSupervisor" layoutX="160.0" layoutY="309.0" prefHeight="16.0" prefWidth="250.0" />
-            <Label layoutX="30.0" layoutY="313.0" text="Responsable" />
+            <TextArea fx:id="textAreaDescription" layoutX="160.0" layoutY="195.0" prefHeight="42.0" prefWidth="250.0" />
+            <Label layoutX="18.0" layoutY="251.0" text="Organizacion Vinculada" />
+            <ComboBox fx:id="comboBoxOrganizationName" layoutX="160.0" layoutY="247.0" prefHeight="25.0" prefWidth="250.0" />
+            <ComboBox fx:id="comboBoxProjectSupervisor" layoutX="160.0" layoutY="288.0" prefHeight="16.0" prefWidth="250.0" />
+            <Label layoutX="30.0" layoutY="292.0" text="Responsable" />
          </children>
       </Pane>
-      <Label layoutX="179.0" layoutY="33.0" text="Registrar Nuevo Proyecto">
+      <Label layoutX="179.0" layoutY="18.0" text="Registrar Nuevo Proyecto">
          <font>
             <Font name="System Bold" size="20.0" />
          </font>

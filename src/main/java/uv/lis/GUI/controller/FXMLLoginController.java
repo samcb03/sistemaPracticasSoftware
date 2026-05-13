@@ -139,6 +139,9 @@ public class FXMLLoginController implements Initializable {
                 Professor coordinator = new ProfessorDAO().getProfessorById(userId);
                 SessionManager.getInstance().setCurrentCoordinator(coordinator);
             }
+            case USER_TYPE_ADMINISTRATOR -> {
+                LOGGER.log(Level.INFO, "Inició sesión el administrador");
+            }
             default -> LOGGER.log(Level.WARNING, "Rol desconocido: {0}", roleId);
         }
         } catch (OperationException e) {
