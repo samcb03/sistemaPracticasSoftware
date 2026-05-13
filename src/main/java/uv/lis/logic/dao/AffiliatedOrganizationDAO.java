@@ -74,7 +74,7 @@ public class AffiliatedOrganizationDAO implements IAffiliatedOrganizationDAO{
     public boolean registerOrganization(AffiliatedOrganization affiliatedOrganization) throws OperationException {
         boolean isRegistered = false;
         String affiliatedOrganizationQuery = "INSERT INTO organizacionVinculada(nombreOV," 
-            + "ciudad, estado, sector, correo, telefono, numUsuariosIndirectos,numUsuariosDirectos)" 
+            + "ciudad, estado, calle, numeroDomicilio, codigoPostal, sector, correo, telefono, numUsuariosIndirectos,numUsuariosDirectos)" 
             + "VALUES (?, ?, ?, ?, ?, ?, ?, ?);";
 
         try (Connection databaseConnection = connectionManager.getConnection();
@@ -84,11 +84,14 @@ public class AffiliatedOrganizationDAO implements IAffiliatedOrganizationDAO{
             preparedStatement.setString(1, affiliatedOrganization.getName());
             preparedStatement.setString(2, affiliatedOrganization.getCity());
             preparedStatement.setString(3, affiliatedOrganization.getState());
-            preparedStatement.setString(4, affiliatedOrganization.getSector());
-            preparedStatement.setString(5, affiliatedOrganization.getEmail());
-            preparedStatement.setString(6, affiliatedOrganization.getPhoneNumber());
-            preparedStatement.setInt(7, affiliatedOrganization.getNumberOfIndirectUsers());
-            preparedStatement.setInt(8, affiliatedOrganization.getNumberOfDirectUsers());
+            preparedStatement.setString(4, affiliatedOrganization.getStreet());
+            preparedStatement.setString(5, affiliatedOrganization.getStreetNumber());
+            preparedStatement.setInt(6, affiliatedOrganization.getPostalCode());
+            preparedStatement.setString(7, affiliatedOrganization.getSector());
+            preparedStatement.setString(8, affiliatedOrganization.getEmail());
+            preparedStatement.setString(9, affiliatedOrganization.getPhoneNumber());
+            preparedStatement.setInt(10, affiliatedOrganization.getNumberOfIndirectUsers());
+            preparedStatement.setInt(11, affiliatedOrganization.getNumberOfDirectUsers());
 
             if (preparedStatement.executeUpdate() > NO_ROWS_AFFECTED) {
                 try (ResultSet generatedKeys = preparedStatement.getGeneratedKeys()) {
@@ -119,8 +122,8 @@ public class AffiliatedOrganizationDAO implements IAffiliatedOrganizationDAO{
         boolean isModified = false;
 
         String afilliatedOrganizationQuery = "UPDATE organizacionVinculada" 
-            + "SET nombreOv = ?, ciudad = ?, estado = ?, correo = ?, " 
-            + "telefono = ?, numUsuariosIndirectos = ?, numUsuariosDirectos = ? " 
+            + "SET nombreOv = ?, ciudad = ?, estado = ?, calle = ?, numeroDomicilio = ?, codigoPostal = ?, sector = ?," 
+            + "correo = ?, telefono = ?, numUsuariosIndirectos = ?, numUsuariosDirectos = ? " 
             + "WHERE idOrganizacionVinculada = ?;";
 
         try (Connection databaseConnection = connectionManager.getConnection();
@@ -129,11 +132,15 @@ public class AffiliatedOrganizationDAO implements IAffiliatedOrganizationDAO{
             preparedStatement.setString(1, affiliatedOrganization.getName());
             preparedStatement.setString(2, affiliatedOrganization.getCity());
             preparedStatement.setString(3, affiliatedOrganization.getState());
-            preparedStatement.setString(4, affiliatedOrganization.getEmail());
-            preparedStatement.setString(5, affiliatedOrganization.getPhoneNumber());
-            preparedStatement.setInt(6, affiliatedOrganization.getNumberOfIndirectUsers());
-            preparedStatement.setInt(7, affiliatedOrganization.getNumberOfDirectUsers());
-            preparedStatement.setInt(8, affiliatedOrganization.getId());
+            preparedStatement.setString(4, affiliatedOrganization.getStreet());
+            preparedStatement.setString(5, affiliatedOrganization.getStreetNumber());
+            preparedStatement.setInt(6, affiliatedOrganization.getPostalCode());
+            preparedStatement.setString(7, affiliatedOrganization.getSector());
+            preparedStatement.setString(8, affiliatedOrganization.getEmail());
+            preparedStatement.setString(9, affiliatedOrganization.getPhoneNumber());
+            preparedStatement.setInt(10, affiliatedOrganization.getNumberOfIndirectUsers());
+            preparedStatement.setInt(11, affiliatedOrganization.getNumberOfDirectUsers());
+            preparedStatement.setInt(12, affiliatedOrganization.getId());
 
             if (preparedStatement.executeUpdate() > NO_ROWS_AFFECTED) {
                 isModified = true;

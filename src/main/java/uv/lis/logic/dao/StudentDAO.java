@@ -95,7 +95,7 @@ public class StudentDAO extends UserDAO implements IStudentDAO {
         String query = "SELECT a.matricula, u.nombre, u.apellidos "
             + "FROM Alumno a "
             + "JOIN Usuario u ON a.idUsuario = u.idUsuario "
-            + "WHERE a.estado = 1 "
+            + "WHERE u.estado = 1 "
             + "AND a.matricula NOT IN ("
             + "SELECT matricula FROM Alumno_Esta_EE)";
 
@@ -124,7 +124,7 @@ public class StudentDAO extends UserDAO implements IStudentDAO {
         boolean isRegistered = false;
 
         String studentQuery = "INSERT INTO Alumno (idUsuario, matricula, fechaNacimiento, genero," 
-            + "estado) VALUES (?, ?, ?, ?, ?);";
+            + " VALUES (?, ?, ?, ?);";
 
         try (Connection databaseConnection = connectionManager.getConnection();
              PreparedStatement preparedStatement = databaseConnection.prepareStatement(studentQuery)) {
@@ -136,7 +136,6 @@ public class StudentDAO extends UserDAO implements IStudentDAO {
 
             preparedStatement.setDate(3, sqlBirthDate);
             preparedStatement.setString(4, student.getGender());
-            preparedStatement.setBoolean(5, student.isActive());
 
             if (preparedStatement.executeUpdate() > NO_ROWS_AFFECTED) {
                 isRegistered = true;
@@ -188,7 +187,8 @@ public class StudentDAO extends UserDAO implements IStudentDAO {
     public boolean inactivateStudent(String studentId) throws OperationException {
         boolean isInactive = false;
         
-        String studentQuery = "UPDATE Alumno SET estado = 0 WHERE matricula = ?;";
+        String studentQuery = "UPDATE Alumno a INNER JOIN Usuario u ON a.idUsuario = u.idUsuario SET u.estado = 0" 
+            + "WHERE a.matricula = ?;";
 
         try (Connection databaseConnection = connectionManager.getConnection();
             PreparedStatement preparedStatement = databaseConnection.prepareStatement(studentQuery)) {
@@ -213,7 +213,8 @@ public class StudentDAO extends UserDAO implements IStudentDAO {
     @Override
     public boolean isStudentInactive(String studentId) throws OperationException {
         boolean isActive = false;
-        String query = "SELECT estado FROM Alumno WHERE matricula = ?";
+        String query = "SELECT u.estado FROM Alumno a INNER JOIN Usuario u ON a.idUsuario = u.idUsuario"  
+            + "WHERE a.matricula = ?";
 
         try (Connection databaseConnection = connectionManager.getConnection();
             PreparedStatement preparedStatement = databaseConnection.prepareStatement(query)) {
