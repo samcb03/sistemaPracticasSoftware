@@ -1,12 +1,11 @@
 package uv.lis.GUI.controller;
 
-import static uv.lis.logic.utils.InputValidator.validateLettersOnly;
 
+import static uv.lis.logic.utils.InputValidator.validateLettersOnly;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Optional;
 import java.util.ResourceBundle;
-
 import javafx.fxml.FXML;
 import javafx.geometry.Side;
 import javafx.scene.control.Button;
@@ -21,6 +20,7 @@ import uv.lis.logic.dao.ProjectDAO;
 import uv.lis.logic.dao.ProjectSupervisorDAO;
 import uv.lis.logic.dto.ProjectSupervisor;
 import uv.lis.logic.exceptions.OperationException;
+
 
 public class FXMLConsultProjectSupervisor extends ValidationHandler{
     @FXML private Button buttonBack;

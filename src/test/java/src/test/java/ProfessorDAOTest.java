@@ -188,22 +188,19 @@ class ProfessorDAOTest {
 
     @Test
     void inactivateProfessor_successful_returnsTrue() throws Exception {
-        Professor professor = buildProfessor("UV-001", "Ana", "García", 
-        false);
         when(databaseConnection.prepareStatement(anyString())).thenReturn(preparedStatement);
         when(preparedStatement.executeUpdate()).thenReturn(1);
 
-        assertTrue(professorDAO.inactivateProfessor(professor));
+        assertTrue(professorDAO.inactivateProfessor("12345"));
     }
 
     @Test
     void inactivateProfessor_noRowsAffected_throwsOperationException() throws Exception {
-        Professor professor = buildProfessor("UV-999", "No", "Existe", false);
         when(databaseConnection.prepareStatement(anyString())).thenReturn(preparedStatement);
         when(preparedStatement.executeUpdate()).thenReturn(0);
 
         assertThrows(OperationException.class, () ->
-            professorDAO.inactivateProfessor(professor));
+            professorDAO.inactivateProfessor("12345"));
     }
 
     @Test
@@ -211,7 +208,6 @@ class ProfessorDAOTest {
         when(connectionManager.getConnection()).thenThrow(new SQLException("Fallo"));
 
         assertThrows(OperationException.class, () ->
-            professorDAO.inactivateProfessor(buildProfessor("UV-001", "Ana", "García", 
-                false)));
+            professorDAO.inactivateProfessor("12345"));
     }
 }
