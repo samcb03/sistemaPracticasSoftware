@@ -71,4 +71,5 @@ public class FXMLCoordinatorMenuController extends WindowHandler  {
         navigateTo("/uv/lis/GUI/view/FXMLAssignationProject.fxml");
     }
 
+
 }
