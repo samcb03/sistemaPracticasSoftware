@@ -17,6 +17,7 @@ import uv.lis.logic.exceptions.OperationException;
 public class StudentDAO extends UserDAO implements IStudentDAO {
     private static final int NO_ROWS_AFFECTED = 0;
     private static final Logger LOGGER = Logger.getLogger(UserDAO.class.getName());
+    private static final int PROJECT_ASSIGNED = 2;
     private MySQLConnectionManager connectionManager;
 
     public StudentDAO(){
@@ -184,19 +185,19 @@ public class StudentDAO extends UserDAO implements IStudentDAO {
     }
 
     @Override
-    public boolean inactivateStudent(Student student) throws OperationException {
+    public boolean inactivateStudent(String studentId) throws OperationException {
         boolean isInactive = false;
         
-        String studentQuery = "UPDATE Alumno SET estado = 0 WHERE idUsuario = ?;";
+        String studentQuery = "UPDATE Alumno SET estado = 0 WHERE matricula = ?;";
 
         try (Connection databaseConnection = connectionManager.getConnection();
-             PreparedStatement preparedStatement = databaseConnection.prepareStatement(studentQuery)) {
+            PreparedStatement preparedStatement = databaseConnection.prepareStatement(studentQuery)) {
             
-            preparedStatement.setInt(1, student.getId());
+            preparedStatement.setString(1, studentId);
 
             if (preparedStatement.executeUpdate() > NO_ROWS_AFFECTED) {
                 isInactive = true;
-                LOGGER.log(Level.INFO, "Inactivacion de alumno con matricula exitosa.", student.getIdStudent());
+                LOGGER.log(Level.INFO, "Inactivacion de alumno con matricula exitosa.", studentId);
             } else {
                 throw new OperationException("No se pudo inactivar al alumno. Intentelo mas tarde", null);
             }
@@ -207,6 +208,30 @@ public class StudentDAO extends UserDAO implements IStudentDAO {
         }
 
         return isInactive;
+    }
+
+    @Override
+    public boolean isStudentInactive(String studentId) throws OperationException {
+        boolean isActive = false;
+        String query = "SELECT estado FROM Alumno WHERE matricula = ?";
+
+        try (Connection databaseConnection = connectionManager.getConnection();
+            PreparedStatement preparedStatement = databaseConnection.prepareStatement(query)) {
+
+            preparedStatement.setString(1, studentId);
+
+            try (ResultSet resultSet = preparedStatement.executeQuery()) {
+                if (resultSet.next()) {
+                    isActive = resultSet.getInt("estado") == 0;
+                } else {
+                    throw new OperationException("No se encontró un alumno con la matrícula: " + studentId, null);
+                }
+            }
+        } catch (SQLException e) {
+            LOGGER.log(Level.SEVERE, "Error al verificar estado del alumno", e);
+            throw new OperationException("No se pudo verificar el estado del alumno. Intente más tarde", e);
+        }
+        return isActive;
     }
 
     @Override
@@ -229,5 +254,27 @@ public class StudentDAO extends UserDAO implements IStudentDAO {
             throw new OperationException("No se pudieron obtener las matriculas", e);
         }
         return studentIds;
+    }
+
+    public boolean hasProjectAssigned(String studentId) throws OperationException {
+        boolean hasProject = false;
+        String query = "SELECT COUNT(*) FROM Solicita_Proyecto WHERE matricula = ? AND estatus = " 
+            + PROJECT_ASSIGNED + ";";
+
+        try (Connection databaseConnection = connectionManager.getConnection();
+            PreparedStatement preparedStatement = databaseConnection.prepareStatement(query)) {
+            
+            preparedStatement.setString(1, studentId);
+
+            try (ResultSet resultSet = preparedStatement.executeQuery()) {
+                if (resultSet.next()) {
+                    hasProject = resultSet.getInt(1) > 0;
+                }
+            }
+        } catch (SQLException e) {
+            LOGGER.log(Level.SEVERE, "Error al verificar asignacion de proyecto", e);
+            throw new OperationException("No se pudo verificar la asignación de proyecto. Intente más tarde", e);
+        }
+        return hasProject;
     }
 }

@@ -15,9 +15,11 @@ public interface IStudentDAO {
 
     boolean modifyStudent(Student student) throws OperationException;
 
-    boolean inactivateStudent(Student student) throws OperationException;
+    boolean inactivateStudent(String studentId) throws OperationException;
 
     int getIdUserByStudentId(String studentId) throws OperationException;
 
     ArrayList<String> searchStudentIds(String prefix) throws OperationException;
+
+    boolean isStudentInactive(String studentId) throws OperationException;
 }

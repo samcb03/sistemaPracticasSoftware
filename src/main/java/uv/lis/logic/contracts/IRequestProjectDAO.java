@@ -25,5 +25,7 @@ public interface IRequestProjectDAO {
     List<String> getApplicantsByProjectId(int idProject) throws OperationException;
 
     String getProjectAssignedToStudent(String idStudent) throws OperationException;
+
+    void unassignStudentFromProject(String idStudent) throws OperationException;
 }
 
