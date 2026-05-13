@@ -9,6 +9,9 @@ public class AffiliatedOrganization {
     private String name;
     private String city;
     private String state;
+    private String street;
+    private String streetNumber;
+    private int postalCode;
     private String sector;
     private String email;
     private String phoneNumber;
@@ -116,6 +119,30 @@ public class AffiliatedOrganization {
 
     public void setProjectSupervisor(ProjectSupervisor projectSupervisor) {
         this.projectSupervisor = projectSupervisor;
+    }
+
+    public String getStreet() {
+        return street;
+    }
+
+    public void setStreet(String street) {
+        this.street = street;
+    }
+
+    public String getStreetNumber() {
+        return streetNumber;
+    }
+
+    public void setStreetNumber(String streetNumber) {
+        this.streetNumber = streetNumber;
+    }
+
+    public int getPostalCode() {
+        return postalCode;
+    }
+
+    public void setPostalCode(int postalCode) {
+        this.postalCode = postalCode;
     }
 
     @Override

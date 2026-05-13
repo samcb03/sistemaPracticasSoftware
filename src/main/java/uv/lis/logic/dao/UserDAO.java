@@ -33,8 +33,8 @@ public class UserDAO implements IUserDAO{
         user.setPassword(hashedPassword);
 
         String userQuery = "INSERT INTO Usuario" 
-            + "(nombre, apellidos, contraseña, email, idRol) "
-            + "VALUES (?, ?, ?, ?, ?);";
+            + "(nombre, apellidos, contraseña, email, idRol, estado) "
+            + "VALUES (?, ?, ?, ?, ?, ?);";
 
         try (Connection databaseConnection = connectionManager.getConnection();
             PreparedStatement preparedStatement = databaseConnection.prepareStatement(userQuery,
@@ -45,6 +45,7 @@ public class UserDAO implements IUserDAO{
             preparedStatement.setString(3, user.getPassword());
             preparedStatement.setString(4, user.getEmail());
             preparedStatement.setInt(5, user.getRoleId());
+            preparedStatement.setBoolean(6, user.isActive());
 
             if (preparedStatement.executeUpdate() > NO_ROWS_AFFECTED) {
             
@@ -74,7 +75,7 @@ public class UserDAO implements IUserDAO{
         String userQuery = "SELECT u.idUsuario, u.email, u.idRol, u.contraseña, ru.nombreRol "
             + "FROM Usuario u "
             + "JOIN Rol_Usuario ru ON u.idRol = ru.idRol "
-            + "WHERE u.email = ?";
+            + "WHERE u.email = ? AND u.estado = 1;";
 
         try (Connection databaseConnection = connectionManager.getConnection();
             PreparedStatement preparedStatement = databaseConnection.prepareStatement(userQuery)) {

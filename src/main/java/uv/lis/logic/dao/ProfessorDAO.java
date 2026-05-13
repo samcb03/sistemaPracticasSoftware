@@ -34,7 +34,7 @@ public class ProfessorDAO extends UserDAO implements IProfessorDAO {
         String query = "SELECT p.numeroPersonal, u.nombre, u.apellidos"
             + " FROM Profesor p"
             + " INNER JOIN Usuario u ON p.idUsuario = u.idUsuario"
-            + " WHERE p.estado = 1";
+            + " WHERE u.estado = 1";
 
         try (Connection connection = connectionManager.getConnection();
             PreparedStatement statement = connection.prepareStatement(query);
@@ -88,9 +88,9 @@ public class ProfessorDAO extends UserDAO implements IProfessorDAO {
     @Override
     public Professor getProfessorById(int id) throws OperationException {
         Professor professor = null;
-        String query = "SELECT p.numeroPersonal, u.nombre, u.apellidos, p.idRol "
+        String query = "SELECT p.numeroPersonal, u.nombre, u.apellidos, u.idRol "
             + "FROM Profesor p INNER JOIN Usuario u ON p.idUsuario = u.idUsuario "
-            + "WHERE p.idUsuario = ? AND p.estado = 1";
+            + "WHERE p.idUsuario = ? AND u.estado = 1";
 
         try (Connection databaseConnection = connectionManager.getConnection();
             PreparedStatement preparedStatement = databaseConnection.prepareStatement(query)) {
@@ -123,7 +123,7 @@ public class ProfessorDAO extends UserDAO implements IProfessorDAO {
     public boolean registerProfessor(Professor professor) throws OperationException {
         boolean isRegistered = false;
         
-        String professorQuery = "INSERT INTO Profesor (idUsuario, numeroPersonal, idRol, estado) VALUES (?, ?, ?, ?);";
+        String professorQuery = "INSERT INTO Profesor (idUsuario, numeroPersonal) VALUES (?, ?);";
 
         try (Connection databaseConnection = connectionManager.getConnection();
              PreparedStatement preparedStatement = databaseConnection.prepareStatement(professorQuery)) {
@@ -136,8 +136,6 @@ public class ProfessorDAO extends UserDAO implements IProfessorDAO {
             } else {
                 preparedStatement.setInt(3, 2);
             }
-
-            preparedStatement.setString(4,"1");
 
             if (preparedStatement.executeUpdate() > NO_ROWS_AFFECTED) {
                 isRegistered = true;
@@ -201,7 +199,8 @@ public class ProfessorDAO extends UserDAO implements IProfessorDAO {
     public boolean inactivateProfessor(Professor professor) throws OperationException {
         boolean isInactived = false;
 
-        String professorQuery = "UPDATE Profesor SET estado = 0 WHERE numeroPersonal = ?;";
+        String professorQuery = "UPDATE Profesor p INNER JOIN Usuario u ON p.idUsuario = u.idUsuario SET u.estado = 0" 
+            + "WHERE p.numeroPersonal = ?;";
 
         try (Connection databaseConnection = connectionManager.getConnection();
              PreparedStatement preparedStatement = databaseConnection.prepareStatement(professorQuery)) {
@@ -241,8 +240,10 @@ public class ProfessorDAO extends UserDAO implements IProfessorDAO {
                 if (resultSet.next()) {
                     idUser = resultSet.getInt("idUsuario");
                 } else {
-                    LOGGER.log(Level.INFO, "No se encontro un Profesor con el número de personal {0}.", personnelNumber);
-                    throw new OperationException("No se encontró un Profesor con el número de personal: " + personnelNumber, null);
+                    LOGGER.log(Level.INFO, "No se encontro un Profesor con el número de personal {0}.", 
+                        personnelNumber);
+                    throw new OperationException("No se encontró un Profesor con el número de personal: " 
+                        + personnelNumber, null);
                 }
             }
         } catch (SQLException e) {

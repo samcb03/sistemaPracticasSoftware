@@ -44,6 +44,7 @@ public class FXMLConsultStudentController extends ValidationHandler{
     @FXML ContextMenu contextMenuSuggestions;
     @FXML Label labelSubject;
     @FXML Label labelProject;
+    @FXML Label labelIsInactive;
 
     private StudentDAO studentDAO;
     private RequestProjectDAO requestProjectDAO;
@@ -84,6 +85,7 @@ public class FXMLConsultStudentController extends ValidationHandler{
                 labelSubject.setText(subjectDAO.getSubjectNRCByStudentID(studentId) + " - " 
                     + subject.getSUBJECT_NAME());
                 labelProject.setText(requestProjectDAO.getProjectAssignedToStudent(studentId));
+                labelIsInactive.setText(studentDAO.isStudentInactive(studentId) ? "Inactivo" : "Activo");
             } catch (OperationException e) {
                 showError(e.getMessage());
             }

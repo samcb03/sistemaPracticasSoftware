@@ -62,7 +62,7 @@ public class RequestProjectDAO implements IRequestProjectDAO {
             + "(p.cupo - COALESCE(COUNT(CASE WHEN sp.estatus = 2 THEN 1 END), 0)) as cupoDisponible "
             + "FROM Proyecto p "
             + "LEFT JOIN Solicita_Proyecto sp ON p.idProyecto = sp.idProyecto "
-            + "WHERE p.estado IS NULL OR p.estado = 1 "
+            + "WHERE p.estado IS NULL OR p.estado = " + STATUS_REQUESTED + " "
             + "GROUP BY p.idProyecto HAVING cupoDisponible > 0;";
 
         try (Connection databaseConnection = connectionManager.getConnection();
@@ -255,10 +255,11 @@ public class RequestProjectDAO implements IRequestProjectDAO {
         return isAssigned;
     }
 
+    //TODO verificar si ese 1 es un numero magico
     @Override
     public void unassignStudentFromProject(String idStudent) throws OperationException {
-        String query = "DELETE FROM Solicita_Proyecto WHERE matricula = ? " 
-            + "AND estatus = " + STATUS_ASSIGNED + ";";
+        String query = "UPDATE Proyecto p INNER JOIN Solicita_Proyecto sp ON p.idProyecto = sp.idProyecto "
+            + "SET p.cupo = p.cupo + 1 WHERE sp.matricula = ? AND sp.estatus = " + STATUS_ASSIGNED + ";";
 
         try (Connection databaseConnection = connectionManager.getConnection();
             PreparedStatement preparedStatement = databaseConnection.prepareStatement(query)) {
