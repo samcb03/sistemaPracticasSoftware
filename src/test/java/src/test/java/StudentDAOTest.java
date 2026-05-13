@@ -146,7 +146,7 @@ public class StudentDAOTest {
         when(preparedStatement.executeUpdate()).thenReturn(1);
 
         assertTrue(studentDAO.inactivateStudent(
-            builderStudent(1, "S123", null, null, null, null)));
+            "S123"));
     }
 
     @Test
@@ -156,16 +156,16 @@ public class StudentDAOTest {
 
         assertThrows(OperationException.class, () ->
             studentDAO.inactivateStudent(
-                builderStudent(1, "S123", null, null, null, null)));
+                "S123"));
     }
-
+    
     @Test
     void inactivateStudent_sqlError_throwsOperationException() throws Exception {
         when(connectionManager.getConnection()).thenThrow(new SQLException("Fallo"));
 
         assertThrows(OperationException.class, () ->
             studentDAO.inactivateStudent(
-                builderStudent(1, "S123", null, null, null, null)));
+                "S123"));
     }
 
     @Test

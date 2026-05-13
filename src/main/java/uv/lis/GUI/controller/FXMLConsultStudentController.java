@@ -9,12 +9,16 @@ import java.util.Optional;
 import java.util.ResourceBundle;
 import javafx.fxml.FXML;
 import javafx.geometry.Side;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
+import javafx.scene.control.ButtonBar;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Label;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.GridPane;
+import javafx.stage.Stage;
 import uv.lis.GUI.ValidationHandler;
 import uv.lis.logic.dao.RequestProjectDAO;
 import uv.lis.logic.dao.StudentDAO;
@@ -45,6 +49,7 @@ public class FXMLConsultStudentController extends ValidationHandler{
     private RequestProjectDAO requestProjectDAO;
     private SubjectDAO subjectDAO;
     private Subject subject;
+    private boolean studentLoaded = false;
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
@@ -116,6 +121,72 @@ public class FXMLConsultStudentController extends ValidationHandler{
                 }
             }
         });
+    }
+    @FXML
+    private void inactivateStudent() {
+        String studentId = labelStudentId.getText().trim();
+        Optional<String> validationError = validateExactLength(studentId, STUDENT_ID_LENGTH, "La matricula ");
+
+        if (validationError.isPresent()) {
+            showError(validationError.get());
+        } else {
+            try {
+                if (studentDAO.isStudentInactive(studentId)) {
+                    showError("El estudiante ya se encuentra inactivado.");
+                } else {
+                    confirmAndInactivate(studentId);
+                }
+            } catch (OperationException e) {
+                showError(e.getMessage());
+            }
+        }
+    }
+
+    private void confirmAndInactivate(String studentId) throws OperationException {
+        boolean confirmed = showConfirmation(
+            "Confirmar inactivación",
+            "¿Está seguro que desea inactivar al estudiante?"
+        );
+
+        if (confirmed) {
+            if (studentDAO.hasProjectAssigned(studentId)) {
+                boolean confirmedAnyway = showConfirmation(
+                    "Proyecto asignado",
+                    "El estudiante tiene un proyecto asignado. ¿Desea inactivarlo de todas formas?"
+                );
+                if (confirmedAnyway) {
+                    studentDAO.inactivateStudent(studentId);
+                    requestProjectDAO.unassignStudentFromProject(studentId);
+                    showSuccess("El estudiante ha sido inactivado correctamente");
+                } else {
+                    showError("Inactivación cancelada");
+                }
+            } else {
+                studentDAO.inactivateStudent(studentId);
+                showSuccess("El estudiante ha sido inactivado correctamente");
+            }
+        } else {
+            showError("Inactivación cancelada.");
+        }
+    }
+
+    private boolean showConfirmation(String title, String message) {
+        boolean confirmed = false;
+        ButtonType yesButton = new ButtonType("Sí", ButtonBar.ButtonData.YES);
+        ButtonType noButton = new ButtonType("No", ButtonBar.ButtonData.NO);
+
+        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+        alert.setTitle(title);
+        alert.setHeaderText(null);
+        alert.setContentText(message);
+        alert.getButtonTypes().setAll(yesButton, noButton);
+
+        Stage owner = (Stage) buttonInactivate.getScene().getWindow();
+        alert.initOwner(owner);
+
+        Optional<ButtonType> result = alert.showAndWait();
+        confirmed = result.isPresent() && result.get() == yesButton;
+        return confirmed;
     }
 
     @Override

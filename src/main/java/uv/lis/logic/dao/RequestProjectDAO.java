@@ -185,11 +185,13 @@ public class RequestProjectDAO implements IRequestProjectDAO {
         return validationError;
     }
 
+    //FIXME Se puede mejorar este metodo para disminuir su complejidad, ademas de que no mande un mensaje diciendo que hubo un error de conexion a la base de datos
     @Override
     public boolean assignStudentToProject(String idStudent, int idProject) throws OperationException {
         boolean isAssigned = false;
         
-        String queryCheckRequestStudent = "SELECT COUNT(*) FROM Solicita_Proyecto WHERE matricula = ? AND estatus = " + STATUS_ASSIGNED + ";";
+        String queryCheckRequestStudent = "SELECT COUNT(*) FROM Solicita_Proyecto WHERE matricula = ? AND estatus = " 
+            + STATUS_ASSIGNED + ";";
         
         String queryCount = "SELECT (p.cupo - COUNT(sp.idSolicitud)) as " + COLUMN_AVAILABLE
             + " FROM Proyecto p LEFT JOIN Solicita_Proyecto sp "
@@ -197,7 +199,7 @@ public class RequestProjectDAO implements IRequestProjectDAO {
             + " WHERE p.idProyecto = ? GROUP BY p.cupo;";
 
         String queryAssign = "UPDATE Solicita_Proyecto SET estatus = " + STATUS_ASSIGNED + " WHERE matricula = ?" 
-            + "AND idProyecto = ?;";
+            + " AND idProyecto = ?;";
         String queryClean = "DELETE FROM Solicita_Proyecto WHERE matricula = ? AND estatus = " 
             + STATUS_REQUESTED + ";";
 
@@ -251,6 +253,22 @@ public class RequestProjectDAO implements IRequestProjectDAO {
             throw new OperationException("Error de conexión a la base de datos", e);
         }
         return isAssigned;
+    }
+
+    @Override
+    public void unassignStudentFromProject(String idStudent) throws OperationException {
+        String query = "DELETE FROM Solicita_Proyecto WHERE matricula = ? " 
+            + "AND estatus = " + STATUS_ASSIGNED + ";";
+
+        try (Connection databaseConnection = connectionManager.getConnection();
+            PreparedStatement preparedStatement = databaseConnection.prepareStatement(query)) {
+            
+            preparedStatement.setString(1, idStudent);
+            preparedStatement.executeUpdate();
+        } catch (SQLException e) {
+            LOGGER.log(Level.SEVERE, "Error al desasignar estudiante del proyecto", e);
+            throw new OperationException("Error al desasignar estudiante del proyecto", e);
+         }
     }
 
     @Override
