@@ -48,7 +48,7 @@ public class FXMLCoordinatorMenuController extends WindowHandler  {
     }
 
     @FXML public void goToConsultSupervisor() { 
-        navigateTo("/uv/lis/GUI/view/FXMLConsultSupervisor.fxml"); 
+        navigateTo("/uv/lis/GUI/view/FXMLConsultProjectSupervisor.fxml"); 
     }
 
     @FXML public void goToRegisterProject() { 
