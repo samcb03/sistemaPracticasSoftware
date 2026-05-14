@@ -22,4 +22,6 @@ public interface IProjectSupervisorDAO {
     ArrayList<String> searchProjectSupervisorName(String prefix) throws OperationException;
 
     Optional<ProjectSupervisor> getProjectSupervisorByName(String supervisorName) throws OperationException;
+
+    int getSupervisorIdByName(String supervisorName) throws OperationException;
 }

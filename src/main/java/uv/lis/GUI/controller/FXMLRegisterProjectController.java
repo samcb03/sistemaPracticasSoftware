@@ -81,7 +81,8 @@ public class FXMLRegisterProjectController extends ValidationHandler {
             validatePositiveInteger(textFieldCapacity.getText().trim(), "El cupo"),
             validateLettersOnly(textFieldObjective.getText().trim(), "El objetivo"),
             validateLettersOnly(textAreaDescription.getText().trim(), "La descripción"),
-            validateComboBox(comboBoxOrganizationName.getValue(), " organización")
+            validateComboBox(comboBoxOrganizationName.getValue(), " organización"),
+            validateComboBox(comboBoxProjectSupervisor.getValue(), " responsable de proyecto")
         );
         Optional<String> firstError = validationStream
             .filter(Optional::isPresent)
@@ -117,6 +118,8 @@ public class FXMLRegisterProjectController extends ValidationHandler {
         try {
             int organizationId = affiliatedOrganizationDAO.getOrganizationIdByName(selectedOrganization);
             project.setIdAffiliatedOrganization(organizationId);
+            int supervisorId = projectSupervisorDAO.getSupervisorIdByName(comboBoxProjectSupervisor.getValue()); 
+            project.setIdProjectSupervisor(supervisorId);
         } catch (OperationException e) {
             showError(e.getMessage());
         }
