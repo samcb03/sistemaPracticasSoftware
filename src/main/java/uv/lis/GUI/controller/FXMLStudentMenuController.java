@@ -13,7 +13,8 @@ import uv.lis.logic.utils.SessionManager;
 public class FXMLStudentMenuController extends WindowHandler {
 
     @FXML private Button buttonRequestProject;
-    @FXML private Button buttonNotifications;
+    @FXML private Button buttonReports;
+    @FXML private Button buttonUploadDocuments;
     @FXML private Button buttonLogOut;
 
     private Student student;
@@ -30,8 +31,8 @@ public class FXMLStudentMenuController extends WindowHandler {
     }
 
     @FXML
-    public void goToNotifications() {
-        navigateTo("/uv/lis/GUI/view/FXMLNotifications.fxml");
+    public void goToReports() {
+        navigateTo("/uv/lis/GUI/view/FXMLReports.fxml");
     }
 
     @FXML void goToUploadDocuments() {

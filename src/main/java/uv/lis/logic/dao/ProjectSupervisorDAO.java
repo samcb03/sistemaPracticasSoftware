@@ -222,4 +222,26 @@ public class ProjectSupervisorDAO implements IProjectSupervisorDAO {
         }
         return projectSupervisorNames;
     }
+
+    @Override
+    public int getSupervisorIdByName(String supervisorName) throws OperationException {
+        int supervisorId = -1;
+        String query = "SELECT idResponsableProyecto FROM ResponsableProyecto WHERE nombre = ?";
+
+        try (Connection databaseConnection = connectionManager.getConnection();
+            PreparedStatement preparedStatement = databaseConnection.prepareStatement(query)) {
+
+            preparedStatement.setString(1, supervisorName);
+
+            try (ResultSet resultSet = preparedStatement.executeQuery()) {
+                if (resultSet.next()) {
+                    supervisorId = resultSet.getInt("idResponsableProyecto");
+                }
+            }
+        } catch (SQLException e) {
+            throw new OperationException("Error al obtener el ID del responsable de proyecto", e);
+        }
+
+        return supervisorId;
+    }
 }

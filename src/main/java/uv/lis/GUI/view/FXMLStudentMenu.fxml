@@ -7,80 +7,27 @@
 <?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
 
-<StackPane xmlns="http://javafx.com/javafx"
-           xmlns:fx="http://javafx.com/fxml"
-           fx:controller="uv.lis.GUI.controller.FXMLStudentMenuController"
-           style="-fx-background-color: #F5F4F0;">
+<StackPane style="-fx-background-color: #F5F4F0;" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="uv.lis.GUI.controller.FXMLStudentMenuController">
 
     <VBox alignment="CENTER" spacing="16">
 
-        <VBox spacing="12"
-              style="-fx-background-color: white;
-                     -fx-background-radius: 12;
-                     -fx-border-color: #E0DED8;
-                     -fx-border-width: 0.5;
-                     -fx-border-radius: 12;
-                     -fx-padding: 40 32 40 32;"
-              maxWidth="360"
-              minWidth="360">
+        <VBox maxWidth="360" minWidth="360" spacing="12" style="-fx-background-color: white;                      -fx-background-radius: 12;                      -fx-border-color: #E0DED8;                      -fx-border-width: 0.5;                      -fx-border-radius: 12;                      -fx-padding: 40 32 40 32;">
 
-            <Label text="Menu Estudiante"
-                   style="-fx-font-size: 24;
-                          -fx-text-fill: #000000;">
-                <VBox.margin><Insets bottom="16"/></VBox.margin>
+            <Label style="-fx-font-size: 24;                           -fx-text-fill: #000000;" text="Menu Estudiante">
+                <VBox.margin><Insets bottom="16" /></VBox.margin>
             </Label>
 
-            <Button fx:id="buttonRequestProject"
-                    text="Solicitar Proyecto"
-                    onAction="#goToRequestProject"
-                    maxWidth="Infinity"
-                    style="-fx-background-color: #87CEEB;
-                           -fx-text-fill: #ffffff;
-                           -fx-font-size: 14;
-                           -fx-font-weight: bold;
-                           -fx-background-radius: 8;
-                           -fx-pref-height: 44;
-                           -fx-cursor: hand;"/>
+            <Button fx:id="buttonRequestProject" maxWidth="Infinity" onAction="#goToRequestProject" style="-fx-background-color: #87CEEB;                            -fx-text-fill: #ffffff;                            -fx-font-size: 14;                            -fx-font-weight: bold;                            -fx-background-radius: 8;                            -fx-pref-height: 44;                            -fx-cursor: hand;" text="Solicitar Proyecto" />
 
-            <Button fx:id="buttonNotifications"
-                    text="Notificaciones"
-                    onAction="#goToNotifications"
-                    maxWidth="Infinity"
-                    style="-fx-background-color: #87CEEB;
-                           -fx-text-fill: #ffffff;
-                           -fx-font-size: 14;
-                           -fx-font-weight: bold;
-                           -fx-background-radius: 8;
-                           -fx-pref-height: 44;
-                           -fx-cursor: hand;"/>
+            <Button fx:id="buttonReports" maxWidth="Infinity" onAction="#goToReports" style="-fx-background-color: #87CEEB;                            -fx-text-fill: #ffffff;                            -fx-font-size: 14;                            -fx-font-weight: bold;                            -fx-background-radius: 8;                            -fx-pref-height: 44;                            -fx-cursor: hand;" text="Generar Reporte" />
 
-              <Button fx:id = "buttonUploadDocuments"
-                     text="Subir documentos"
-                     onAction="#goToUploadDocuments"
-                     maxWidth="Infinity"
-                     style="-fx-background-color: #87CEEB;
-                            -fx-text-fill: #ffffff;
-                            -fx-font-size: 14;
-                            -fx-font-weight: bold;
-                            -fx-background-radius: 8;
-                            -fx-pref-height: 44;
-                            -fx-cursor: hand;"/>
+              <Button fx:id="buttonUploadDocuments" maxWidth="Infinity" onAction="#goToUploadDocuments" style="-fx-background-color: #87CEEB;                             -fx-text-fill: #ffffff;                             -fx-font-size: 14;                             -fx-font-weight: bold;                             -fx-background-radius: 8;                             -fx-pref-height: 44;                             -fx-cursor: hand;" text="Subir documentos" />
 
             <Separator>
-                <VBox.margin><Insets top="8" bottom="8"/></VBox.margin>
+                <VBox.margin><Insets bottom="8" top="8" /></VBox.margin>
             </Separator>
 
-            <Button fx:id="buttonLogOut"
-                    text="Cerrar Sesion"
-                    onAction="#navigateToLogOut"
-                    maxWidth="Infinity"
-                    style="-fx-background-color: #E74C3C;
-                           -fx-text-fill: #ffffff;
-                           -fx-font-size: 14;
-                           -fx-font-weight: bold;
-                           -fx-background-radius: 8;
-                           -fx-pref-height: 44;
-                           -fx-cursor: hand;"/>
+            <Button fx:id="buttonLogOut" maxWidth="Infinity" onAction="#navigateToLogOut" style="-fx-background-color: #E74C3C;                            -fx-text-fill: #ffffff;                            -fx-font-size: 14;                            -fx-font-weight: bold;                            -fx-background-radius: 8;                            -fx-pref-height: 44;                            -fx-cursor: hand;" text="Cerrar Sesion" />
 
         </VBox>
     </VBox>
