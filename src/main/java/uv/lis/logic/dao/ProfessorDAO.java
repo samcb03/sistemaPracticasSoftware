@@ -128,12 +128,9 @@ public class ProfessorDAO extends UserDAO implements IProfessorDAO {
         try (Connection databaseConnection = connectionManager.getConnection();
              PreparedStatement preparedStatement = databaseConnection.prepareStatement(professorQuery)) {
 
-            if (professor.getIsCoordinator()) { 
-                preparedStatement.setInt(3, 3);
-            } else {
-                preparedStatement.setInt(3, 2);
-            }
-
+            preparedStatement.setInt(1, professor.getId());
+            preparedStatement.setString(2, professor.getPersonnelNumber());
+            
             if (preparedStatement.executeUpdate() > NO_ROWS_AFFECTED) {
                 isRegistered = true;
                 LOGGER.log(Level.INFO, "Profesor {0} registrado exitosamente.",

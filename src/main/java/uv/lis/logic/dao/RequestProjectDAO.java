@@ -257,8 +257,7 @@ public class RequestProjectDAO implements IRequestProjectDAO {
             preparedStatement.executeUpdate();
         }
     }
-
-    //TODO ese 1 es un numero magico :c
+    
     @Override
     public void unassignStudentFromProject(String idStudent) throws OperationException {
         String query = "UPDATE Proyecto p INNER JOIN Solicita_Proyecto sp ON p.idProyecto = sp.idProyecto "

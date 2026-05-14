@@ -123,7 +123,7 @@ public class StudentDAO extends UserDAO implements IStudentDAO {
     public boolean registerStudent(Student student) throws OperationException {
         boolean isRegistered = false;
 
-        String studentQuery = "INSERT INTO Alumno (idUsuario, matricula, fechaNacimiento, genero," 
+        String studentQuery = "INSERT INTO Alumno (idUsuario, matricula, fechaNacimiento, genero)" 
             + " VALUES (?, ?, ?, ?);";
 
         try (Connection databaseConnection = connectionManager.getConnection();
