@@ -75,7 +75,7 @@ public class AffiliatedOrganizationDAO implements IAffiliatedOrganizationDAO{
         boolean isRegistered = false;
         String affiliatedOrganizationQuery = "INSERT INTO organizacionVinculada(nombreOV," 
             + "ciudad, estado, calle, numeroDomicilio, codigoPostal, sector, correo, telefono, numUsuariosIndirectos,numUsuariosDirectos)" 
-            + "VALUES (?, ?, ?, ?, ?, ?, ?, ?);";
+            + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);";
 
         try (Connection databaseConnection = connectionManager.getConnection();
             PreparedStatement preparedStatement = databaseConnection.prepareStatement(affiliatedOrganizationQuery, 
@@ -121,7 +121,7 @@ public class AffiliatedOrganizationDAO implements IAffiliatedOrganizationDAO{
     public boolean modifyOrganization(AffiliatedOrganization affiliatedOrganization) throws OperationException {
         boolean isModified = false;
 
-        String afilliatedOrganizationQuery = "UPDATE organizacionVinculada" 
+        String afilliatedOrganizationQuery = "UPDATE organizacionVinculada " 
             + "SET nombreOv = ?, ciudad = ?, estado = ?, calle = ?, numeroDomicilio = ?, codigoPostal = ?, sector = ?," 
             + "correo = ?, telefono = ?, numUsuariosIndirectos = ?, numUsuariosDirectos = ? " 
             + "WHERE idOrganizacionVinculada = ?;";
@@ -163,7 +163,7 @@ public class AffiliatedOrganizationDAO implements IAffiliatedOrganizationDAO{
     public boolean inactivateOrganization(AffiliatedOrganization affiliatedOrganization) throws OperationException {
         boolean isInactive = false;
 
-        String afilliatedOrganizationQuery = "UPDATE organizacionVinculada" 
+        String afilliatedOrganizationQuery = "UPDATE organizacionVinculada " 
             + "SET estadoEnBD = '0'" 
             + "WHERE idOrganizacionVinculada = ?;";
 

@@ -70,39 +70,80 @@ public class FXMLGenerateReportController extends ValidationHandler {
         Optional<String> reportTypeValidation = InputValidator.validateComboBox(
             reportType, "un tipo de reporte"
         );
+
         Optional<String> activity1Validation = InputValidator.validateLettersOnly(
             textFieldActivity1.getText(), "Actividad 1"
         );
         Optional<String> advance1Validation = InputValidator.validatePositiveInteger(
             textFieldAdvance1.getText(), "Porcentaje de Avance de Actividad 1"
         );
+        Optional<String> observation1Validation = InputValidator.validateLettersOnly(
+            textAreaObservation1.getText(), "Observación de Actividad 1"
+        );
+
+        Optional<String> activity2Validation = InputValidator.validateLettersOnly(
+            textFieldActivity2.getText(), "Actividad 2"
+        );
+        Optional<String> advance2Validation = InputValidator.validatePositiveInteger(
+            textFieldAdvance2.getText(), "Porcentaje de Avance de Actividad 2"
+        );
+        Optional<String> observation2Validation = InputValidator.validateLettersOnly(
+            textAreaObservation2.getText(), "Observación de Actividad 2"
+        );
+
         Optional<String> result1Validation = InputValidator.validateLettersOnly(
             textFieldResult1.getText(), "Entregable 1"
         );
         Optional<String> resultAdvance1Validation = InputValidator.validatePositiveInteger(
             textFieldResultAdvance1.getText(), "Porcentaje de Avance de Entregable 1"
         );
+        Optional<String> resultObservation1Validation = InputValidator.validateLettersOnly(
+            textAreaObservationResult1.getText(), "Observación de Entregable 1"
+        );
+
+        Optional<String> result2Validation = InputValidator.validateLettersOnly(
+            textFieldResult2.getText(), "Entregable 2"
+        );
+        Optional<String> resultAdvance2Validation = InputValidator.validatePositiveInteger(
+            textFieldAdvanceResult2.getText(), "Porcentaje de Avance de Entregable 2"
+        );
+        Optional<String> resultObservation2Validation = InputValidator.validateLettersOnly(
+            textAreaObservationResult2.getText(), "Observación de Entregable 2"
+        );
+
+        Optional<String> generalObservationsValidation = InputValidator.validateLettersOnly(
+            textAreaGeneralObservations.getText(), "Observaciones Generales"
+        );
 
         Optional<String> validationError = reportTypeValidation
             .or(() -> activity1Validation)
             .or(() -> advance1Validation)
+            .or(() -> observation1Validation)
+            .or(() -> activity2Validation)
+            .or(() -> advance2Validation)
+            .or(() -> observation2Validation)
             .or(() -> result1Validation)
-            .or(() -> resultAdvance1Validation);
+            .or(() -> resultAdvance1Validation)
+            .or(() -> resultObservation1Validation)
+            .or(() -> result2Validation)
+            .or(() -> resultAdvance2Validation)
+            .or(() -> resultObservation2Validation)
+            .or(() -> generalObservationsValidation);
 
-        handleValidation(validationError, this::buildAndGenerateReport);
+        handleValidation(validationError, this::GenerateReport);
     }
 
-    private void buildAndGenerateReport() {
+    private void GenerateReport() {
         try {
             Report report = buildReport();
             JasperPrint jasperPrint = finalReportCommon.generateFinalReport(report);
-            displayReport(jasperPrint);
             showSuccess("Reporte generado correctamente.");
+            displayReport(jasperPrint);
+            clearFields();
         } catch (OperationException e) {
             showError(e.getMessage());
         } catch (JRException e) {
-            e.printStackTrace();
-            showError("Error al generar el reporte: ");
+            showError("Error al generar el reporte");
         }
     }
 

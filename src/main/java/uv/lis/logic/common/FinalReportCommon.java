@@ -12,7 +12,6 @@ import net.sf.jasperreports.engine.JasperCompileManager;
 import net.sf.jasperreports.engine.JasperFillManager;
 import net.sf.jasperreports.engine.JasperPrint;
 import net.sf.jasperreports.engine.JasperReport;
-import uv.lis.logic.contracts.IReportContextDAO;
 import uv.lis.logic.dao.ReportContextDAO;
 import uv.lis.logic.dto.Report;
 import uv.lis.logic.dto.Student;
@@ -25,14 +24,10 @@ public class FinalReportCommon {
     private static final String REPORT_TEMPLATE_PATH = "/uv/lis/GUI/view/templates/finalReport.jrxml";
     private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 
-    private final IReportContextDAO reportContextDAO;
+    private final ReportContextDAO reportContextDAO;
 
     public FinalReportCommon() {
         this.reportContextDAO = new ReportContextDAO();
-    }
-
-    public FinalReportCommon(IReportContextDAO reportContextDAO) {
-        this.reportContextDAO = reportContextDAO;
     }
 
     public JasperPrint generateFinalReport(Report finalReport) throws JRException, OperationException {

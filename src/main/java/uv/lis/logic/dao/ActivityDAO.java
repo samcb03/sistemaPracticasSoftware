@@ -113,8 +113,8 @@ public class ActivityDAO implements IActivityDAO {
     @Override
     public boolean modifyActivity(Activity activity) throws OperationException {
         boolean isModified = false;
-        String activityQuery = "UPDATE Actividad SET descripcionActividad = ?, FechaInicio = ?, FechaFin = ?" 
-            + " WHERE idActividad = ?;";
+        String activityQuery = "UPDATE Actividad SET nombreActividad = ?, descripcionActividad = ?, FechaInicio = ?, " 
+        + "FechaFin = ? WHERE idActividad = ?;";
 
         if (activity == null) {
             isModified = false;

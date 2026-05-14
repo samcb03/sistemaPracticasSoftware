@@ -15,6 +15,7 @@ import uv.lis.logic.exceptions.OperationException;
 
 public class ReportContextDAO implements IReportContextDAO {
 
+    private static final int REPORT_STATUS_ASSIGNED = 2;
     private static final Logger LOGGER = Logger.getLogger(ReportContextDAO.class.getName());
     private MySQLConnectionManager connectionManager;
 
@@ -48,7 +49,7 @@ public class ReportContextDAO implements IReportContextDAO {
             + "INNER JOIN Solicita_Proyecto sp ON a.matricula = sp.matricula "
             + "INNER JOIN Proyecto p ON sp.idProyecto = p.idProyecto "
             + "INNER JOIN OrganizacionVinculada ov ON p.idOrganizacionVinculada = ov.idOrganizacionVinculada "
-            + "WHERE a.matricula = ? AND sp.estatus = 2";
+            + "WHERE a.matricula = ? AND sp.estatus = " + REPORT_STATUS_ASSIGNED + ";";
 
         try (Connection databaseConnection = connectionManager.getConnection();
             PreparedStatement preparedStatement = databaseConnection.prepareStatement(contextQuery)) {
@@ -71,10 +72,9 @@ public class ReportContextDAO implements IReportContextDAO {
                     report.setProjectMethodology(resultSet.getString("metodologiaProyecto"));
                     report.setAffiliatedOrganization(resultSet.getString("organizacion"));
                 } else {
-                    LOGGER.log(Level.INFO, "No se encontró contexto de reporte para la matrícula {0}.",
+                    LOGGER.log(Level.INFO, "No se encontró contexto de reporte.",
                         studentId);
-                    throw new OperationException("No se encontraron datos asociados al alumno: "
-                        + studentId, null);
+                    throw new OperationException("No se encontraron datos asociados al alumno", null);
                 }
             }
 

@@ -14,7 +14,7 @@ public final class InputValidator {
 
     public static final int MAX_TEXT_LENGTH = 255;
     public static final int STUDENT_ID_LENGTH = 9;
-    public static final int PROFESSOR_ID_LENGTH = 10;
+    public static final int PROFESSOR_ID_LENGTH = 5;
     public static final int MIN_POSITIVE_INTEGER = 1;
     public static final int INVALID_ID = -1;
     private static final int MINIMUM_AGE = 18;
