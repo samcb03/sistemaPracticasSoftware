@@ -62,8 +62,8 @@ public class FXMLRegisterStudentController extends ValidationHandler {
 
     private Optional<String> getFirstValidationError() {
         Stream<Optional<String>> validationStream = Stream.of(
-            validateLettersOnly(textFieldFirstName.getText().trim(), "El nombre"),
-            validateLettersOnly(textFieldLastName.getText().trim(), "Los apellidos"),
+            validateLettersOnly(textFieldFirstName.getText(), "El nombre"),
+            validateLettersOnly(textFieldLastName.getText(), "Los apellidos"),
             validateEmail(textFieldEmail.getText().trim(), "El correo electrónico"),
             validatePassword(passwordFieldPassword.getText().trim(), "La contraseña"),
             validateExactLength(textFieldStudentId.getText().trim(), STUDENT_ID_LENGTH, "La matrícula"),

@@ -16,7 +16,6 @@ public class Project {
     private AffiliatedOrganization affiliatedOrganization;
     private String idStudent;
     private int idAffiliatedOrganization;
-    private int idProjectSupervisor;
 
     public Project() {
         
@@ -110,14 +109,6 @@ public class Project {
     
     public void setIdAffiliatedOrganization(int id) { 
         this.idAffiliatedOrganization = id; 
-    }
-
-    public int getIdProjectSupervisor() {
-        return idProjectSupervisor;
-    }
-
-    public void setIdProjectSupervisor(int idProjectSupervisor) {
-        this.idProjectSupervisor = idProjectSupervisor;
     }
 
     @Override

@@ -18,12 +18,14 @@ public final class InputValidator {
     public static final int MIN_POSITIVE_INTEGER = 1;
     public static final int INVALID_ID = -1;
     private static final int MINIMUM_AGE = 18;
-    public static final String LETTERS_ONLY_REGEX = "[\\p{L}\\s]+";
+    public static final String LETTERS_ONLY_REGEX = "^(?!\\s)(?!.*\\s{2,})(?!.*\\s$)[\\p{L}\\s]+$";
     public static final String ONLY_NUMBERS_REGEX = "\\d+";
-    public static final String EMAIL_REGEX = "^[a-zA-Z0-9_+&*-]+(?:\\.[a-zA-Z0-9_+&*-]+)*@(?:[a-zA-Z0-9-]+\\.)+[a-zA-Z]{2,7}$";
+    public static final String EMAIL_REGEX 
+        = "^[a-zA-Z0-9_+&*-]+(?:\\.[a-zA-Z0-9_+&*-]+)*@(?:[a-zA-Z0-9-]+\\.)+[a-zA-Z]{2,7}$";
     public static final String PHONE_REGEX = "^[0-9]{7,15}$";
-    public static final String PASSWORD_REGEX =  "^(?=.*[A-Z])(?=.*\\d)(?=.*[!@#$%^&*()_+=\\[\\]{};':\"|,.<>/?-]).{8,}$";
-    public static final String REPEAT_LETTERS_REGEX = ".*(.)\\1{2,}.*";
+    public static final String PASSWORD_REGEX 
+        =  "^(?=.*[A-Z])(?=.*\\d)(?=.*[!@#$%^&*()_+=\\[\\]{};':\"|,.<>/?-]).{8,}$";
+    public static final String REPEAT_LETTERS_REGEX = "^.*([\\p{L}])\\1{2,}.*$";
 
     public static Optional<String> validateLettersOnly(String fieldValue, String fieldName) {
         Optional<String> validationResult;
@@ -34,7 +36,7 @@ public final class InputValidator {
             validationResult = Optional.of(fieldName + " solo acepta letras");
         } else if (fieldValue.matches(REPEAT_LETTERS_REGEX)) {
             validationResult = Optional.of(fieldName + " no puede contener caracteres repetidos consecutivamente");
-        } else {
+        }  else {
             validationResult = Optional.empty();
         }
         return validationResult;

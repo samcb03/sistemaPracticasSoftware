@@ -59,8 +59,8 @@ public class FXMLRegisterProjectSupervisorController extends ValidationHandler {
 
     private Optional<String> getFirstValidationError() {
         Stream<Optional<String>> validationStream = Stream.of(
-            validateLettersOnly(textFieldName.getText().trim(), "El nombre"),
-            validateLettersOnly(textFieldPosition.getText().trim(), "El cargo"),
+            validateLettersOnly(textFieldName.getText(), "El nombre"),
+            validateLettersOnly(textFieldPosition.getText(), "El cargo"),
             validateEmail(textFieldEmail.getText().trim(), "El correo electrónico")
         );
         Optional<String> firstError = validationStream

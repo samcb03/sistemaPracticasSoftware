@@ -60,11 +60,12 @@ public class FXMLRegisterProfessorController extends ValidationHandler {
 
     private Optional<String> getFirstValidationError() {
         Stream<Optional<String>> validationStream = Stream.of(
-            validateLettersOnly(textFieldFirstName.getText().trim(), "El nombre"),
-            validateLettersOnly(textFieldLastName.getText().trim(), "El apellido"),
+            validateLettersOnly(textFieldFirstName.getText(), "El nombre"),
+            validateLettersOnly(textFieldLastName.getText(), "El apellido"),
             validateEmail(textFieldEmail.getText().trim(), "El correo electrónico"),
             validatePassword(passwordFieldPassword.getText().trim(), "La contraseña"),
-            validateExactLength(textFieldPersonnelNumber.getText().trim(), PROFESSOR_ID_LENGTH, "El número de personal"),
+            validateExactLength(textFieldPersonnelNumber.getText().trim(), PROFESSOR_ID_LENGTH, 
+                "El número de personal"),
             validateComboBox(comboBoxCoordinator.getValue(), "una opción de coordinador")
         );
         Optional<String> firstError = validationStream

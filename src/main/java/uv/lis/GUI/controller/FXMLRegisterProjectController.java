@@ -34,7 +34,6 @@ public class FXMLRegisterProjectController extends ValidationHandler {
     @FXML private TextField textFieldObjective;
     @FXML private TextArea textAreaDescription;
     @FXML private ComboBox<String> comboBoxOrganizationName;
-    @FXML private ComboBox<String> comboBoxProjectSupervisor;
 
     private ProjectDAO projectDAO;
     private AffiliatedOrganizationDAO affiliatedOrganizationDAO;
@@ -47,22 +46,12 @@ public class FXMLRegisterProjectController extends ValidationHandler {
         projectSupervisorDAO = new ProjectSupervisorDAO();
         setupControls(labelError, buttonBack);
         loadOrganizationNames();
-        loadProjectSupervisorNames();
     }
 
     private void loadOrganizationNames() {
         try {
             ArrayList<String> organizationNames = affiliatedOrganizationDAO.getAllOrganizationNames();
             comboBoxOrganizationName.setItems(FXCollections.observableArrayList(organizationNames));
-        } catch (OperationException operationException) {
-            showError(operationException.getMessage());
-        }
-    }
-
-    private void loadProjectSupervisorNames() {
-        try {
-            ArrayList<String> supervisorNames = projectSupervisorDAO.getAllSupervisorNames();
-            comboBoxProjectSupervisor.setItems(FXCollections.observableArrayList(supervisorNames));
         } catch (OperationException operationException) {
             showError(operationException.getMessage());
         }
@@ -76,13 +65,12 @@ public class FXMLRegisterProjectController extends ValidationHandler {
 
     private Optional<String> getFirstValidationError() {
         Stream<Optional<String>> validationStream = Stream.of(
-            validateLettersOnly(textFieldName.getText().trim(), "El nombre"),
-            validateLettersOnly(textFieldMethodology.getText().trim(), "La metodología"),
+            validateLettersOnly(textFieldName.getText(), "El nombre"),
+            validateLettersOnly(textFieldMethodology.getText(), "La metodología"),
             validatePositiveInteger(textFieldCapacity.getText().trim(), "El cupo"),
-            validateLettersOnly(textFieldObjective.getText().trim(), "El objetivo"),
-            validateLettersOnly(textAreaDescription.getText().trim(), "La descripción"),
-            validateComboBox(comboBoxOrganizationName.getValue(), " organización"),
-            validateComboBox(comboBoxProjectSupervisor.getValue(), " responsable de proyecto")
+            validateLettersOnly(textFieldObjective.getText(), "El objetivo"),
+            validateLettersOnly(textAreaDescription.getText(), "La descripción"),
+            validateComboBox(comboBoxOrganizationName.getValue(), " organización")
         );
         Optional<String> firstError = validationStream
             .filter(Optional::isPresent)
@@ -118,8 +106,6 @@ public class FXMLRegisterProjectController extends ValidationHandler {
         try {
             int organizationId = affiliatedOrganizationDAO.getOrganizationIdByName(selectedOrganization);
             project.setIdAffiliatedOrganization(organizationId);
-            int supervisorId = projectSupervisorDAO.getSupervisorIdByName(comboBoxProjectSupervisor.getValue()); 
-            project.setIdProjectSupervisor(supervisorId);
         } catch (OperationException e) {
             showError(e.getMessage());
         }
