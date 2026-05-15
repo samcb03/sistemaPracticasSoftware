@@ -5,8 +5,6 @@ import java.util.Objects;
 
 
 public class Autoevaluation {
-    private static final int MAX_POSSIBLE_SCORE = 50;
-    private static final double PERCENTAGE_MULTIPLIER = 100.0;
     private String idStudent;
     private int productiveParticipation;
     private int appliedKnowledge;
@@ -20,6 +18,11 @@ public class Autoevaluation {
     private int internshipImportance;
     private double finalScore;
     private String evaluationDate;
+    private String studentName;
+    private String organizationName;
+    private String projectName;
+    private String projectSupervisorName;
+    private String positionSupervisor;
 
     public Autoevaluation() {
 
@@ -43,6 +46,21 @@ public class Autoevaluation {
 
             calculateFinalScore();
         }
+
+    public int[] toArray() {
+        return new int[] {
+        this.productiveParticipation, 
+        this.appliedKnowledge, 
+        this.confidenceInActivities,
+        this.activitiesInterest, 
+        this.organizationSupport, 
+        this.rulesAwareness,
+        this.supervisorGuidance, 
+        this.effectiveMonitoring, 
+        this.careerAlignment, 
+        this.internshipImportance
+        };
+    }
     
     public String getIdStudent() {
         return idStudent;
@@ -148,12 +166,52 @@ public class Autoevaluation {
         this.evaluationDate = evaluationDate;
     }
 
+    public String getStudentName() {
+        return studentName;
+    }
+
+    public void setStudentName(String studentName) {
+        this.studentName = studentName;
+    }
+
+    public String getProjectName() {
+        return projectName;
+    }
+
+    public void setProjectName(String projectName) {
+        this.projectName = projectName;
+    }
+
+    public String getProjectSupervisorName() {
+        return projectSupervisorName;
+    }
+
+    public void setProjectSupervisorName(String projectSupervisorName) {
+        this.projectSupervisorName = projectSupervisorName;
+    }
+
+    public String getPositionSupervisor() {
+        return positionSupervisor;
+    }
+
+    public String getOrganizationName() {
+        return organizationName;
+    }
+
+    public void setOrganizationName(String organizationName) {
+        this.organizationName = organizationName;
+    }
+
+    public void setPositionSupervisor(String positionSupervisor) {
+        this.positionSupervisor = positionSupervisor;
+    }
+
     public void calculateFinalScore() {
         double totalScore = productiveParticipation + appliedKnowledge + confidenceInActivities; 
         totalScore += activitiesInterest + organizationSupport + rulesAwareness; 
         totalScore += supervisorGuidance + effectiveMonitoring + careerAlignment;
         totalScore += internshipImportance;
-        this.finalScore = (totalScore / MAX_POSSIBLE_SCORE) * PERCENTAGE_MULTIPLIER;
+        this.finalScore = totalScore;
     }
 
     @Override

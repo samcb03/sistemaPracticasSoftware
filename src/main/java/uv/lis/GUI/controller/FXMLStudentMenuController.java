@@ -14,6 +14,7 @@ public class FXMLStudentMenuController extends WindowHandler {
 
     @FXML private Button buttonRequestProject;
     @FXML private Button buttonReports;
+    @FXML private Button buttonAutoevaluation;
     @FXML private Button buttonUploadDocuments;
     @FXML private Button buttonLogOut;
 
@@ -35,6 +36,11 @@ public class FXMLStudentMenuController extends WindowHandler {
         navigateTo("/uv/lis/GUI/view/FXMLReports.fxml");
     }
 
+    @FXML   
+    public void goToAutoevaluation() {
+        navigateTo("/uv/lis/GUI/view/FXMLGenerateAutoevaluation.fxml");
+    }
+ 
     @FXML void goToUploadDocuments() {
         navigateTo("/uv/lis/GUI/view/FXMLUploadDocuments.fxml");
     }
