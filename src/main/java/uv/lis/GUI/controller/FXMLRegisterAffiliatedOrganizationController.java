@@ -48,10 +48,10 @@ public class FXMLRegisterAffiliatedOrganizationController extends ValidationHand
 
     private Optional<String> getFirstValidationError() {
         Stream<Optional<String>> validationStream = Stream.of(
-            validateLettersOnly(textFieldName.getText().trim(), "El nombre"),
-            validateLettersOnly(textFieldCity.getText().trim(), "La ciudad"),
-            validateLettersOnly(textFieldState.getText().trim(), "El estado"),
-            validateLettersOnly(textFieldSector.getText().trim(), "El sector"),
+            validateLettersOnly(textFieldName.getText(), "El nombre"),
+            validateLettersOnly(textFieldCity.getText(), "La ciudad"),
+            validateLettersOnly(textFieldState.getText(), "El estado"),
+            validateLettersOnly(textFieldSector.getText(), "El sector"),
             validateEmail(textFieldEmail.getText().trim(), "El correo electrónico"),
             validatePhoneNumber(textFieldPhoneNumber.getText().trim(), "El número de teléfono"),
             validatePositiveInteger(textFieldNumberOfDirectUsers.getText().trim(), 

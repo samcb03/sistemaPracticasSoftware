@@ -14,16 +14,14 @@
 <AnchorPane prefHeight="480.0" prefWidth="600.0"
     xmlns="http://javafx.com/javafx/25"
     xmlns:fx="http://javafx.com/fxml/1"
-    fx:controller="uv.lis.GUI.controller.FXMLConsultarProjectSupervisor">
+    fx:controller="uv.lis.GUI.controller.FXMLConsultProjectSupervisorController">
 
     <children>
 
-        <!-- Barra naranja superior -->
         <Label layoutY="-1.0" prefHeight="20.0" prefWidth="600.0"
                style="-fx-background-color: orange; -fx-border-color: BLACK;"
                text="Consultar Responsable de Proyecto" />
 
-        <!-- Título -->
         <Label layoutX="155.0" layoutY="29.0"
                text="Consultar Responsable de Proyecto">
             <font>
@@ -31,14 +29,12 @@
             </font>
         </Label>
 
-        <!-- Panel rosa -->
         <Pane layoutX="75.0" layoutY="60.0"
               prefHeight="390.0" prefWidth="450.0"
               style="-fx-background-color: #ffaf9c; -fx-background-radius: 20;">
 
             <children>
 
-                <!-- Búsqueda -->
                 <TextField fx:id="textFieldNameProjectSupervisor"
                            layoutX="57.0" layoutY="24.0"
                            prefHeight="25.0" prefWidth="279.0"
@@ -50,7 +46,6 @@
                         onAction="#searchProjectSupervisor"
                         text="Buscar" />
 
-                <!-- Datos del responsable -->
                 <GridPane fx:id="gridPaneProjectSupervisorInfo"
                           layoutX="57.0" layoutY="62.0"
                           prefHeight="250.0" prefWidth="334.0"
@@ -69,14 +64,12 @@
                         <RowConstraints minHeight="10.0" prefHeight="40.0" vgrow="SOMETIMES" />
                     </rowConstraints>
                     <children>
-                        <!-- Etiquetas fijas -->
                         <Label text="Nombre:" />
                         <Label text="Cargo:"          GridPane.rowIndex="1" />
                         <Label text="Correo:"         GridPane.rowIndex="2" />
                         <Label text="Organización:"   GridPane.rowIndex="3" />
                         <Label text="Proyecto:"       GridPane.rowIndex="4" />
 
-                        <!-- Valores dinámicos -->
                         <Label fx:id="labelName"
                                prefHeight="18.0" prefWidth="204.0"
                                GridPane.columnIndex="1" />
@@ -97,13 +90,11 @@
                     </children>
                 </GridPane>
 
-                <!-- Mensaje -->
                 <Label fx:id="labelMessage"
                        layoutX="53.0" layoutY="330.0"
                        prefHeight="17.0" prefWidth="343.0"
                        textAlignment="CENTER" />
 
-                <!-- Botones -->
                 <HBox alignment="CENTER"
                       layoutX="53.0" layoutY="347.0"
                       prefHeight="38.0" prefWidth="343.0"

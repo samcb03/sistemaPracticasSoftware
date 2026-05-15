@@ -5,24 +5,34 @@ import java.net.URL;
 import java.util.ResourceBundle;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
-import uv.lis.GUI.WindowHandler;
+import javafx.scene.control.Label;
+import uv.lis.GUI.ValidationHandler;
+import uv.lis.logic.dao.StudentDAO;
+import uv.lis.logic.dao.SubjectDAO;
 import uv.lis.logic.dto.Student;
+import uv.lis.logic.exceptions.OperationException;
 import uv.lis.logic.utils.SessionManager;
 
 
-public class FXMLStudentMenuController extends WindowHandler {
+public class FXMLStudentMenuController extends ValidationHandler {
+
+    private static final String NO_SUBJECT_MESSAGE = "No tiene asignada una experiencia";
 
     @FXML private Button buttonRequestProject;
     @FXML private Button buttonReports;
     @FXML private Button buttonUploadDocuments;
     @FXML private Button buttonLogOut;
+    @FXML private Label labelMessage;
 
     private Student student;
+    private final StudentDAO studentDAO = new StudentDAO();
+    private final SubjectDAO subjectDAO = new SubjectDAO();
 
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         this.student = SessionManager.getInstance().getCurrentStudent();
+        setupControls(labelMessage, buttonLogOut);
     }
 
     @FXML
@@ -32,11 +42,42 @@ public class FXMLStudentMenuController extends WindowHandler {
 
     @FXML
     public void goToReports() {
-        navigateTo("/uv/lis/GUI/view/FXMLReports.fxml");
+        try {
+            if (canGenerateReport()) {
+                navigateTo("/uv/lis/GUI/view/FXMLReports.fxml");
+            }
+        } catch (OperationException e) {
+            showError(e.getMessage());
+        }
+    }
+
+    private boolean canGenerateReport() throws OperationException {
+        Student currentStudent = student != null
+            ? student
+            : SessionManager.getInstance().getCurrentStudent();
+        String studentId = currentStudent.getIdStudent();
+        boolean canGenerate = true;
+
+        String subjectNRC = subjectDAO.getSubjectNRCByStudentID(studentId);
+        if (NO_SUBJECT_MESSAGE.equals(subjectNRC)) {
+            showError("No puede generar un reporte porque no tiene una experiencia educativa asignada.");
+            canGenerate = false;
+        }
+
+        if (!studentDAO.hasProjectAssigned(studentId)) {
+            showError("No puede generar un reporte porque no tiene un proyecto asignado.");
+            canGenerate = false;
+        }
+
+        return canGenerate;
     }
 
     @FXML void goToUploadDocuments() {
         navigateTo("/uv/lis/GUI/view/FXMLUploadDocuments.fxml");
+    }
+
+    @Override
+    protected void clearFields() {
     }
 
 }

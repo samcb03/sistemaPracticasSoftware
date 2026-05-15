@@ -274,7 +274,8 @@ public class StudentDAO extends UserDAO implements IStudentDAO {
             }
         } catch (SQLException e) {
             LOGGER.log(Level.SEVERE, "Error al verificar asignacion de proyecto", e);
-            throw new OperationException("No se pudo verificar la asignación de proyecto. Intente más tarde", e);
+            throw new OperationException("No se pudo verificar la asignación de proyecto. Intente más tarde", 
+                e);
         }
         return hasProject;
     }

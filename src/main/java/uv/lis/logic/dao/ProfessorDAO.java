@@ -185,7 +185,7 @@ public class ProfessorDAO extends UserDAO implements IProfessorDAO {
     public boolean inactivateProfessor(String personalNumber) throws OperationException {
         boolean isInactived = false;
 
-        String professorQuery = "UPDATE Profesor p INNER JOIN Usuario u ON p.idUsuario = u.idUsuario SET u.estado = 0" 
+        String professorQuery = "UPDATE Profesor p INNER JOIN Usuario u ON p.idUsuario = u.idUsuario SET u.estado = 0 " 
             + "WHERE p.numeroPersonal = ?;";
 
         try (Connection databaseConnection = connectionManager.getConnection();
@@ -212,7 +212,8 @@ public class ProfessorDAO extends UserDAO implements IProfessorDAO {
     @Override
     public boolean isProfessorInactive(String personnelNumber) throws OperationException {
         boolean isInactive = false;
-        String professorQuery = "SELECT estado FROM Profesor WHERE numeroPersonal = ?";
+        String professorQuery = "SELECT u.estado FROM Profesor p INNER JOIN Usuario u " 
+            + "ON p.idUsuario = u.idUsuario WHERE p.numeroPersonal = ?";
 
         try (Connection databaseConnection = connectionManager.getConnection();
              PreparedStatement preparedStatement = databaseConnection.prepareStatement(professorQuery)) {

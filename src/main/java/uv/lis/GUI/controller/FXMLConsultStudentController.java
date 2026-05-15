@@ -124,6 +124,7 @@ public class FXMLConsultStudentController extends ValidationHandler{
             }
         });
     }
+    
     @FXML
     private void inactivateStudent() {
         String studentId = labelStudentId.getText().trim();

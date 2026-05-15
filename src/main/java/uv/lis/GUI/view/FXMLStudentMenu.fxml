@@ -11,7 +11,7 @@
 
     <VBox alignment="CENTER" spacing="16">
 
-        <VBox maxWidth="360" minWidth="360" spacing="12" style="-fx-background-color: white;                      -fx-background-radius: 12;                      -fx-border-color: #E0DED8;                      -fx-border-width: 0.5;                      -fx-border-radius: 12;                      -fx-padding: 40 32 40 32;">
+        <VBox alignment="CENTER" maxWidth="360" minWidth="360" spacing="12" style="-fx-background-color: white;                      -fx-background-radius: 12;                      -fx-border-color: #E0DED8;                      -fx-border-width: 0.5;                      -fx-border-radius: 12;                      -fx-padding: 40 32 40 32;">
 
             <Label style="-fx-font-size: 24;                           -fx-text-fill: #000000;" text="Menu Estudiante">
                 <VBox.margin><Insets bottom="16" /></VBox.margin>
@@ -28,6 +28,7 @@
             </Separator>
 
             <Button fx:id="buttonLogOut" maxWidth="Infinity" onAction="#navigateToLogOut" style="-fx-background-color: #E74C3C;                            -fx-text-fill: #ffffff;                            -fx-font-size: 14;                            -fx-font-weight: bold;                            -fx-background-radius: 8;                            -fx-pref-height: 44;                            -fx-cursor: hand;" text="Cerrar Sesion" />
+         <Label fx:id="labelMessage" prefHeight="18.0" prefWidth="184.0" wrapText="true" />
 
         </VBox>
     </VBox>
