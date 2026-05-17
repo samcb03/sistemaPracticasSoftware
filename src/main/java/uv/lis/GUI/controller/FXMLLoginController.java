@@ -1,12 +1,12 @@
 package uv.lis.GUI.controller;
 
-
 import java.io.IOException;
 import java.net.URL;
 import java.util.Optional;
 import java.util.ResourceBundle;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
@@ -20,6 +20,7 @@ import javafx.scene.control.ToggleButton;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.stage.Stage;
+
 import uv.lis.logic.dao.ProfessorDAO;
 import uv.lis.logic.dao.StudentDAO;
 import uv.lis.logic.dao.UserDAO;
@@ -30,7 +31,6 @@ import uv.lis.logic.exceptions.AuthenticateException;
 import uv.lis.logic.exceptions.OperationException;
 import uv.lis.logic.utils.InputValidator;
 import uv.lis.logic.utils.SessionManager;
-
 
 public class FXMLLoginController implements Initializable {
 

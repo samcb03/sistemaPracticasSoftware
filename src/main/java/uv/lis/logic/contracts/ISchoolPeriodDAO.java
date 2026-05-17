@@ -1,10 +1,9 @@
 package uv.lis.logic.contracts;
 
-
 import java.util.ArrayList;
+
 import uv.lis.logic.dto.SchoolPeriod;
 import uv.lis.logic.exceptions.OperationException;
-
 
 public interface ISchoolPeriodDAO {
     ArrayList<String> getAllSchoolPeriodsNames() throws OperationException;

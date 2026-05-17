@@ -1,6 +1,5 @@
 package uv.lis.logic.dao;
 
-
 import java.sql.Connection;
 import java.sql.Date;
 import java.sql.PreparedStatement;
@@ -10,11 +9,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
 import uv.lis.dataaccess.MySQLConnectionManager;
 import uv.lis.logic.contracts.IActivityDAO;
 import uv.lis.logic.dto.Activity;
 import uv.lis.logic.exceptions.OperationException;
-
 
 public class ActivityDAO implements IActivityDAO {
         private static final int NO_ROWS_AFFECTED = 0;
@@ -114,7 +113,7 @@ public class ActivityDAO implements IActivityDAO {
     public boolean modifyActivity(Activity activity) throws OperationException {
         boolean isModified = false;
         String activityQuery = "UPDATE Actividad SET nombreActividad = ?, descripcionActividad = ?, FechaInicio = ?, " 
-        + "FechaFin = ? WHERE idActividad = ?;";
+            + "FechaFin = ? WHERE idActividad = ?;";
 
         if (activity == null) {
             isModified = false;

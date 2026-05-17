@@ -1,13 +1,11 @@
 package uv.lis.logic.contracts;
 
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
 import uv.lis.logic.dto.Project;
 import uv.lis.logic.exceptions.OperationException;
-
 
 public interface IProjectDAO {
     List<Project> getAllProjects() throws OperationException;

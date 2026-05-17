@@ -1,23 +1,22 @@
 package uv.lis.logic.dao;
 
-
 import java.io.File;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+import uv.lis.dataaccess.MySQLConnectionManager;
 import uv.lis.logic.contracts.IExpedientDAO;
 import uv.lis.logic.dto.Expedient;
 import uv.lis.logic.exceptions.OperationException;
 import uv.lis.logic.utils.FileManager;
 import uv.lis.logic.utils.FileValidator;
-import uv.lis.dataaccess.MySQLConnectionManager;
-
 
 public class ExpedientDAO implements IExpedientDAO {
     private static final int NO_ROWS_AFFECTED = 0;
@@ -36,7 +35,8 @@ public class ExpedientDAO implements IExpedientDAO {
     @Override
     public int saveDocument(Expedient expedient) throws OperationException {
         int generatedId = -1;
-        String expedientQuery = "INSERT INTO expediente (nombre, tipoDocumento,url, matricula,idTipoDocumento) VALUES (?, ?, ?,?,?)";
+        String expedientQuery = "INSERT INTO expediente (nombre, tipoDocumento,url, matricula,idTipoDocumento)" 
+            + " VALUES (?, ?, ?,?,?)";
 
         try (Connection databaseConnection = connectionManager.getConnection();
             PreparedStatement preparedStatement = databaseConnection.prepareStatement(expedientQuery, 
@@ -91,13 +91,13 @@ public class ExpedientDAO implements IExpedientDAO {
         
         return documents;
     }
-
+    //FIXME -1 es numero magico
     public int getIdDocumentTypeByName(String typeName) throws OperationException {
         int id = -1;
-        String query = "SELECT idTipoDocumento FROM Tipo_Documento WHERE nombreTipoDocumento = ?";
+        String expedientQuery = "SELECT idTipoDocumento FROM Tipo_Documento WHERE nombreTipoDocumento = ?";
         
         try (Connection databaseConnection = connectionManager.getConnection();
-             PreparedStatement preparedStatement = databaseConnection.prepareStatement(query)) {
+             PreparedStatement preparedStatement = databaseConnection.prepareStatement(expedientQuery)) {
             
             preparedStatement.setString(1, typeName);
             

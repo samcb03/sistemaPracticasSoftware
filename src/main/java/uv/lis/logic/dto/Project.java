@@ -1,9 +1,7 @@
 package uv.lis.logic.dto;
 
-
 import java.util.ArrayList;
 import java.util.Objects;
-
 
 public class Project {
     private int id;

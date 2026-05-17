@@ -1,8 +1,6 @@
 package uv.lis.logic.dto;
 
-
 import java.util.Objects;
-
 
 public class Subject {
     private final static String CAREER = "Ingenieria de Software";
@@ -52,8 +50,6 @@ public class Subject {
     public String getCAREER() {
         return CAREER;
     }
-
-    
     
     public int getSchoolPeriodId() {
         return schoolPeriodId;

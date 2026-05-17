@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
 import uv.lis.dataaccess.MySQLConnectionManager;
 import uv.lis.logic.contracts.IProfessorDAO;
 import uv.lis.logic.dto.Professor;
@@ -16,7 +17,7 @@ import uv.lis.logic.exceptions.OperationException;
 public class ProfessorDAO extends UserDAO implements IProfessorDAO {
 
     private static final int NO_ROWS_AFFECTED = 0;
-    private static final int ID_ERROR         = -1;
+    private static final int ID_ERROR = -1;
     private static final Logger LOGGER = Logger.getLogger(ProfessorDAO.class.getName());
     private MySQLConnectionManager connectionManager;
 
@@ -31,13 +32,13 @@ public class ProfessorDAO extends UserDAO implements IProfessorDAO {
     @Override
     public LinkedHashMap<String, String> getAllActiveProfessorsMap() throws OperationException {
         LinkedHashMap<String, String> map = new LinkedHashMap<>();
-        String query = "SELECT p.numeroPersonal, u.nombre, u.apellidos"
+        String professorQuery = "SELECT p.numeroPersonal, u.nombre, u.apellidos"
             + " FROM Profesor p"
             + " INNER JOIN Usuario u ON p.idUsuario = u.idUsuario"
             + " WHERE u.estado = 1";
 
         try (Connection connection = connectionManager.getConnection();
-             PreparedStatement statement = connection.prepareStatement(query);
+             PreparedStatement statement = connection.prepareStatement(professorQuery);
              ResultSet resultSet = statement.executeQuery()) {
 
             while (resultSet.next()) {
@@ -89,12 +90,12 @@ public class ProfessorDAO extends UserDAO implements IProfessorDAO {
     @Override
     public Professor getProfessorById(int id) throws OperationException {
         Professor professor = null;
-        String query = "SELECT p.numeroPersonal, u.nombre, u.apellidos, u.idRol "
+        String professorQuery = "SELECT p.numeroPersonal, u.nombre, u.apellidos, u.idRol "
             + "FROM Profesor p INNER JOIN Usuario u ON p.idUsuario = u.idUsuario "
             + "WHERE p.idUsuario = ? AND u.estado = 1";
 
         try (Connection databaseConnection = connectionManager.getConnection();
-             PreparedStatement preparedStatement = databaseConnection.prepareStatement(query)) {
+             PreparedStatement preparedStatement = databaseConnection.prepareStatement(professorQuery)) {
 
             preparedStatement.setInt(1, id);
 
@@ -317,7 +318,7 @@ public class ProfessorDAO extends UserDAO implements IProfessorDAO {
     public ArrayList<String> getSubjectHistoryByProfessor(String personnelNumber) throws OperationException {
 
         ArrayList<String> history = new ArrayList<>();
-        String query = "SELECT ee.nombreExperiencia, ee.carrera, pe.nombre AS periodo "
+        String professorQuery = "SELECT ee.nombreExperiencia, ee.carrera, pe.nombre AS periodo "
             + "FROM Profesor_Imparte_Experiencia pie "
             + "JOIN ExperienciaEducativa ee ON pie.NRC = ee.NRC "
             + "JOIN PeriodoEscolar pe ON ee.idPeriodoEscolar = pe.idPeriodoEscolar "
@@ -325,7 +326,7 @@ public class ProfessorDAO extends UserDAO implements IProfessorDAO {
             + "ORDER BY pe.FechaInicio DESC";
 
         try (Connection databaseConnection = connectionManager.getConnection();
-             PreparedStatement preparedStatement = databaseConnection.prepareStatement(query)) {
+             PreparedStatement preparedStatement = databaseConnection.prepareStatement(professorQuery)) {
 
             preparedStatement.setString(1, personnelNumber);
 

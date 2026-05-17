@@ -4,6 +4,7 @@ package uv.lis.GUI.controller;
 import java.net.URL;
 import java.util.Optional;
 import java.util.ResourceBundle;
+
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
@@ -11,15 +12,16 @@ import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
+
 import net.sf.jasperreports.engine.JRException;
 import net.sf.jasperreports.engine.JasperPrint;
 import net.sf.jasperreports.view.JasperViewer;
+
 import uv.lis.GUI.ValidationHandler;
 import uv.lis.logic.common.FinalReportCommon;
 import uv.lis.logic.dto.Report;
 import uv.lis.logic.exceptions.OperationException;
 import uv.lis.logic.utils.InputValidator;
-
 
 public class FXMLGenerateReportController extends ValidationHandler {
 

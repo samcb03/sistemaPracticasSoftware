@@ -1,6 +1,5 @@
 package uv.lis.logic.dao;
 
-
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -10,11 +9,11 @@ import java.util.List;
 import java.util.Optional;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
 import uv.lis.dataaccess.MySQLConnectionManager;
 import uv.lis.logic.contracts.IProjectDAO;
 import uv.lis.logic.dto.Project;
 import uv.lis.logic.exceptions.OperationException;
-
 
 public class ProjectDAO implements IProjectDAO{
     private static final int NO_ROWS_AFFECTED = 0;
@@ -92,8 +91,8 @@ public class ProjectDAO implements IProjectDAO{
         boolean isRegistered = false;
 
         String projectQuery = "INSERT INTO Proyecto(nombre, "  
-        + "descripcion, cupo, metodologiaProyecto, objetivo, estado, idOrganizacionVinculada,idResponsableProyecto)" 
-        + " VALUES(?, ?, ?, ?, ?, ?, ?,?);";
+            + "descripcion, cupo, metodologiaProyecto, objetivo, estado, idOrganizacionVinculada)" 
+            + " VALUES(?, ?, ?, ?, ?, ?, ?);";
 
         try (Connection databaseConnection = connectionManager.getConnection();
             PreparedStatement preparedStatement = databaseConnection.prepareStatement(projectQuery, 
@@ -106,7 +105,6 @@ public class ProjectDAO implements IProjectDAO{
             preparedStatement.setString(5, project.getObjective());
             preparedStatement.setBoolean(6, true);
             preparedStatement.setInt(7, project.getIdAffiliatedOrganization());
-
             if (preparedStatement.executeUpdate() > NO_ROWS_AFFECTED){
                 try(ResultSet resultSet = preparedStatement.getGeneratedKeys()) {
                     if (resultSet.next()) {
@@ -169,10 +167,10 @@ public class ProjectDAO implements IProjectDAO{
     public boolean inactivateProject(Project project) throws OperationException {
         boolean isInactive = false;
 
-        String query = "UPDATE Proyecto SET estado = 0 WHERE idProyecto = ?;";
+        String projectQuery = "UPDATE Proyecto SET estado = 0 WHERE idProyecto = ?;";
 
         try (Connection databaseConnection = connectionManager.getConnection();
-             PreparedStatement preparedStatement = databaseConnection.prepareStatement(query)) {
+             PreparedStatement preparedStatement = databaseConnection.prepareStatement(projectQuery)) {
 
             preparedStatement.setInt(1, project.getId());
 
@@ -204,8 +202,8 @@ public class ProjectDAO implements IProjectDAO{
                     } 
             }
         } catch (SQLException e) {
-               LOGGER.log(Level.SEVERE, "Error de conexion con la base de datos",e);
-                throw new OperationException("Error al conseguir el nombre del proyecto", e);
+            LOGGER.log(Level.SEVERE, "Error de conexion con la base de datos",e);
+            throw new OperationException("Error al conseguir el nombre del proyecto", e);
         }
 
         return projectNames;

@@ -1,6 +1,5 @@
 package uv.lis.logic.dao;
 
-
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -10,11 +9,11 @@ import java.util.List;
 import java.util.Optional;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
 import uv.lis.dataaccess.MySQLConnectionManager;
 import uv.lis.logic.contracts.IRequestProjectDAO;
 import uv.lis.logic.dto.Project;
 import uv.lis.logic.exceptions.OperationException;
-
 
 public class RequestProjectDAO implements IRequestProjectDAO {
     private static final int NO_RESULTS = 0;
@@ -35,10 +34,10 @@ public class RequestProjectDAO implements IRequestProjectDAO {
     @Override
     public int getActiveRequestCountByStudentId(String idStudent) throws OperationException {
         int count = 0;
-        String query = "SELECT COUNT(*) as total FROM Solicita_Proyecto WHERE matricula = ?;";
+        String requestProjectQuery = "SELECT COUNT(*) as total FROM Solicita_Proyecto WHERE matricula = ?;";
 
         try (Connection databaseConnection = connectionManager.getConnection();
-            PreparedStatement preparedStatement = databaseConnection.prepareStatement(query)) {
+            PreparedStatement preparedStatement = databaseConnection.prepareStatement(requestProjectQuery)) {
             
             preparedStatement.setString(1, idStudent);
             
@@ -58,7 +57,7 @@ public class RequestProjectDAO implements IRequestProjectDAO {
     @Override
     public List<Project> getAvailableProjects() throws OperationException{
         List<Project> projects = new ArrayList<>();
-        String query = "SELECT p.*, "
+        String requestProjectQuery = "SELECT p.*, "
             + "(p.cupo - COALESCE(COUNT(CASE WHEN sp.estatus = 2 THEN 1 END), 0)) as cupoDisponible "
             + "FROM Proyecto p "
             + "LEFT JOIN Solicita_Proyecto sp ON p.idProyecto = sp.idProyecto "
@@ -66,7 +65,7 @@ public class RequestProjectDAO implements IRequestProjectDAO {
             + "GROUP BY p.idProyecto HAVING cupoDisponible > 0;";
 
         try (Connection databaseConnection = connectionManager.getConnection();
-             PreparedStatement preparedStatement = databaseConnection.prepareStatement(query)) {
+             PreparedStatement preparedStatement = databaseConnection.prepareStatement(requestProjectQuery)) {
             
             try (ResultSet resultSet = preparedStatement.executeQuery()) {
                 while (resultSet.next()) {
@@ -92,10 +91,10 @@ public class RequestProjectDAO implements IRequestProjectDAO {
     @Override
     public boolean hasAlreadyRequested(String idStudent, int idProject) throws OperationException {
         boolean hasRequested = false;
-        String query = "SELECT COUNT(*) as total FROM Solicita_Proyecto WHERE matricula = ? AND idProyecto = ?;";
+        String requestProjectQuery = "SELECT COUNT(*) as total FROM Solicita_Proyecto WHERE matricula = ? AND idProyecto = ?;";
 
         try (Connection databaseConnection = connectionManager.getConnection();
-             PreparedStatement preparedStatement = databaseConnection.prepareStatement(query)) {
+             PreparedStatement preparedStatement = databaseConnection.prepareStatement(requestProjectQuery)) {
             
             preparedStatement.setString(1, idStudent);
             preparedStatement.setInt(2, idProject);
@@ -116,14 +115,14 @@ public class RequestProjectDAO implements IRequestProjectDAO {
     @Override
     public boolean hasAvailableCapacity(int idProject) throws OperationException {
         boolean hasCapacity = false;
-        String query = "SELECT p.cupo, COUNT(sp.matricula) as solicitudes FROM Proyecto p "
+        String requestProjectQuery = "SELECT p.cupo, COUNT(sp.matricula) as solicitudes FROM Proyecto p "
             + "LEFT JOIN Solicita_Proyecto sp ON p.idProyecto = sp.idProyecto "
             + "AND sp.estatus = ? "
             + "WHERE p.idProyecto = ? "
             + "GROUP BY p.idProyecto, p.cupo;";
 
         try (Connection databaseConnection = connectionManager.getConnection();
-             PreparedStatement preparedStatement = databaseConnection.prepareStatement(query)) {
+             PreparedStatement preparedStatement = databaseConnection.prepareStatement(requestProjectQuery)) {
             
             preparedStatement.setInt(1, STATUS_ASSIGNED); 
             preparedStatement.setInt(2, idProject);
@@ -146,10 +145,10 @@ public class RequestProjectDAO implements IRequestProjectDAO {
     @Override
     public boolean requestProject(String idStudent, int idProject) throws OperationException {
         boolean isRegistered = false;
-        String query = "INSERT INTO Solicita_Proyecto (idProyecto, matricula, estatus) VALUES (?, ?, ?);";
+        String requestProjectQuery = "INSERT INTO Solicita_Proyecto (idProyecto, matricula, estatus) VALUES (?, ?, ?);";
 
         try (Connection databaseConnection = connectionManager.getConnection();
-            PreparedStatement preparedStatement = databaseConnection.prepareStatement(query)) {
+            PreparedStatement preparedStatement = databaseConnection.prepareStatement(requestProjectQuery)) {
             
             preparedStatement.setInt(1, idProject);
             preparedStatement.setString(2, idStudent);
@@ -187,6 +186,7 @@ public class RequestProjectDAO implements IRequestProjectDAO {
 
     @Override
     public boolean assignStudentToProject(String idStudent, int idProject) throws OperationException {
+        boolean isAssigned = false;
         try (Connection connection = connectionManager.getConnection()) {
             connection.setAutoCommit(false);
             try {
@@ -195,7 +195,7 @@ public class RequestProjectDAO implements IRequestProjectDAO {
                 assignRequest(connection, idStudent, idProject);
                 cleanPendingRequests(connection, idStudent);
                 connection.commit();
-                return true;
+                isAssigned = true;
             } catch (SQLException e) {
                 connection.rollback();
                 throw new OperationException("Error al ejecutar la transacción de asignación", e);
@@ -206,16 +206,19 @@ public class RequestProjectDAO implements IRequestProjectDAO {
         } catch (SQLException e) {
             throw new OperationException("Error de conexión a la base de datos", e);
         }
+        return isAssigned;
     }
 
     private void ensureStudentNotAlreadyAssigned(Connection connection, String idStudent)
         throws SQLException, OperationException {
-        String query = "SELECT COUNT(*) FROM Solicita_Proyecto WHERE matricula = ? AND estatus = " + STATUS_ASSIGNED;
-        try (PreparedStatement preparedStatement = connection.prepareStatement(query)) {
+        String requestProjectQuery = "SELECT COUNT(*) FROM Solicita_Proyecto WHERE matricula = ? AND estatus = " 
+            + STATUS_ASSIGNED;
+        try (PreparedStatement preparedStatement = connection.prepareStatement(requestProjectQuery)) {
             preparedStatement.setString(1, idStudent);
             try (ResultSet resultSet = preparedStatement.executeQuery()) {
                 if (resultSet.next() && resultSet.getInt(1) > NO_RESULTS) {
-                    throw new OperationException("El estudiante ya cuenta con un proyecto asignado.", null);
+                    throw new OperationException("El estudiante ya cuenta con un proyecto asignado.", 
+                        null);
                 }
             }
         }
@@ -223,11 +226,11 @@ public class RequestProjectDAO implements IRequestProjectDAO {
 
     private void ensureProjectHasCapacity(Connection connection, int idProject)
             throws SQLException, OperationException {
-        String query = "SELECT (p.cupo - COUNT(sp.matricula)) AS " + COLUMN_AVAILABLE
+        String requestProjectQuery = "SELECT (p.cupo - COUNT(sp.matricula)) AS " + COLUMN_AVAILABLE
             + " FROM Proyecto p LEFT JOIN Solicita_Proyecto sp "
             + "ON p.idProyecto = sp.idProyecto AND sp.estatus = " + STATUS_ASSIGNED
             + " WHERE p.idProyecto = ? GROUP BY p.cupo";
-        try (PreparedStatement preparedStatement = connection.prepareStatement(query)) {
+        try (PreparedStatement preparedStatement = connection.prepareStatement(requestProjectQuery)) {
             preparedStatement.setInt(1, idProject);
             try (ResultSet resultSet = preparedStatement.executeQuery()) {
                 if (!resultSet.next()) {
@@ -241,9 +244,9 @@ public class RequestProjectDAO implements IRequestProjectDAO {
     }
 
     private void assignRequest(Connection connection, String idStudent, int idProject) throws SQLException {
-        String query = "UPDATE Solicita_Proyecto SET estatus = " + STATUS_ASSIGNED
-                    + " WHERE matricula = ? AND idProyecto = ?";
-        try (PreparedStatement preparedStatement = connection.prepareStatement(query)) {
+        String requestProjectQuery = "UPDATE Solicita_Proyecto SET estatus = " + STATUS_ASSIGNED
+            + " WHERE matricula = ? AND idProyecto = ?";
+        try (PreparedStatement preparedStatement = connection.prepareStatement(requestProjectQuery)) {
             preparedStatement.setString(1, idStudent);
             preparedStatement.setInt(2, idProject);
             preparedStatement.executeUpdate();
@@ -251,8 +254,9 @@ public class RequestProjectDAO implements IRequestProjectDAO {
     }
 
     private void cleanPendingRequests(Connection connection, String idStudent) throws SQLException {
-        String query = "DELETE FROM Solicita_Proyecto WHERE matricula = ? AND estatus = " + STATUS_REQUESTED;
-        try (PreparedStatement preparedStatement = connection.prepareStatement(query)) {
+        String requestProjectQuery = "DELETE FROM Solicita_Proyecto WHERE matricula = ? AND estatus = " 
+            + STATUS_REQUESTED;
+        try (PreparedStatement preparedStatement = connection.prepareStatement(requestProjectQuery)) {
             preparedStatement.setString(1, idStudent);
             preparedStatement.executeUpdate();
         }
@@ -260,11 +264,11 @@ public class RequestProjectDAO implements IRequestProjectDAO {
     
     @Override
     public void unassignStudentFromProject(String idStudent) throws OperationException {
-        String query = "UPDATE Proyecto p INNER JOIN Solicita_Proyecto sp ON p.idProyecto = sp.idProyecto "
-            + "SET p.cupo = p.cupo + 1 WHERE sp.matricula = ? AND sp.estatus = " + STATUS_ASSIGNED + ";";
+        String requestProjectQuery = "UPDATE Proyecto p INNER JOIN Solicita_Proyecto sp ON p.idProyecto = sp.idProyecto"
+            + " SET p.cupo = p.cupo + 1 WHERE sp.matricula = ? AND sp.estatus = " + STATUS_ASSIGNED + ";";
 
         try (Connection databaseConnection = connectionManager.getConnection();
-            PreparedStatement preparedStatement = databaseConnection.prepareStatement(query)) {
+            PreparedStatement preparedStatement = databaseConnection.prepareStatement(requestProjectQuery)) {
             
             preparedStatement.setString(1, idStudent);
             preparedStatement.executeUpdate();
@@ -277,14 +281,14 @@ public class RequestProjectDAO implements IRequestProjectDAO {
     @Override
     public List<String> getApplicantsByProjectId(int idProject) throws OperationException {
     List<String> applicants = new ArrayList<>();
-    String query = "SELECT u.nombre, u.apellidos, a.matricula "
+    String requestProjectQuery = "SELECT u.nombre, u.apellidos, a.matricula "
         + "FROM Usuario u " 
         + "INNER JOIN Alumno a ON u.idUsuario = a.idUsuario " 
         + "INNER JOIN Solicita_Proyecto sp ON a.matricula = sp.matricula "
         + "WHERE sp.idProyecto = ?";
 
     try (Connection databaseConnection = connectionManager.getConnection();
-         PreparedStatement statement = databaseConnection.prepareStatement(query)) {
+         PreparedStatement statement = databaseConnection.prepareStatement(requestProjectQuery)) {
          
         statement.setInt(1, idProject);
         
@@ -307,12 +311,12 @@ public class RequestProjectDAO implements IRequestProjectDAO {
     public String getProjectAssignedToStudent(String idStudent) throws OperationException {
         String projectName = "Sin proyecto asignado";
 
-        String query = "SELECT p.nombre FROM Proyecto p" 
+        String requestProjectQuery = "SELECT p.nombre FROM Proyecto p" 
             + " INNER JOIN Solicita_Proyecto sp ON p.idProyecto = sp.idProyecto "
             + "WHERE sp.matricula = ? AND sp.estatus = " + STATUS_ASSIGNED + ";";
 
         try (Connection databaseConnectio = connectionManager.getConnection();
-             PreparedStatement preparedStatement = databaseConnectio.prepareStatement(query)) {
+             PreparedStatement preparedStatement = databaseConnectio.prepareStatement(requestProjectQuery)) {
             
             preparedStatement.setString(1, idStudent);
             

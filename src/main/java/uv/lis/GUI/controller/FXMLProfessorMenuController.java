@@ -1,10 +1,9 @@
 package uv.lis.GUI.controller;
 
-
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
-import uv.lis.GUI.WindowHandler;
 
+import uv.lis.GUI.WindowHandler;
 
 public class FXMLProfessorMenuController extends WindowHandler  {
 

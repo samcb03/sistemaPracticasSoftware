@@ -1,12 +1,10 @@
 package uv.lis.logic.contracts;
 
-
 import java.util.ArrayList;
 import java.util.Optional;
 
 import uv.lis.logic.dto.AffiliatedOrganization;
 import uv.lis.logic.exceptions.OperationException;
-
 
 public interface IAffiliatedOrganizationDAO {
     AffiliatedOrganization getOrganizationById(int idAfilliatedOrganization) throws OperationException;

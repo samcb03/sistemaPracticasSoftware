@@ -1,17 +1,16 @@
 package uv.lis.logic.dao;
 
-
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
 import uv.lis.dataaccess.MySQLConnectionManager;
 import uv.lis.logic.contracts.IAutoevaluationDAO;
 import uv.lis.logic.dto.Autoevaluation;
 import uv.lis.logic.exceptions.OperationException;
-
 
 public class AutoevaluationDAO implements IAutoevaluationDAO {
     private static final int NO_ROWS_AFFECTED = 0;
@@ -78,14 +77,14 @@ public class AutoevaluationDAO implements IAutoevaluationDAO {
     public boolean registerAutoevaluation(Autoevaluation autoevaluation) throws OperationException {
     boolean isRegistered = false;
 
-        String query = "INSERT INTO Autoevaluacion (matricula, participacionProductiva, "
+        String autoevaluationQuery = "INSERT INTO Autoevaluacion (matricula, participacionProductiva, "
             + "conocimientoAplicado, confianzaEnActividades, interesEnActividades, " 
             + "apoyoOrganizacional, conocimientoDeReglas, orientacionSupervisor, " 
             + "seguimientoEfectivo, alineacionCarrera, importanciaPracticas, " 
             + "puntuacionFinal) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);";
 
         try (Connection databaseConnection = connectionManager.getConnection();
-            PreparedStatement preparedStatement = databaseConnection.prepareStatement(query)) {
+            PreparedStatement preparedStatement = databaseConnection.prepareStatement(autoevaluationQuery)) {
             
             preparedStatement.setString(1, autoevaluation.getIdStudent());
             preparedStatement.setInt(2, autoevaluation.getProductiveParticipation());
@@ -121,10 +120,10 @@ public class AutoevaluationDAO implements IAutoevaluationDAO {
     @Override
     public boolean existsByStudent(String idStudent) throws OperationException {
         boolean exists = false;
-        String query = "SELECT 1 FROM Autoevaluacion WHERE matricula = ? LIMIT 1";
+        String autoevaluationQuery = "SELECT 1 FROM Autoevaluacion WHERE matricula = ? LIMIT 1";
 
         try (Connection databaseConnection = connectionManager.getConnection();
-            PreparedStatement preparedStatement = databaseConnection.prepareStatement(query)) {
+            PreparedStatement preparedStatement = databaseConnection.prepareStatement(autoevaluationQuery)) {
 
             preparedStatement.setString(1, idStudent);
             

@@ -1,6 +1,5 @@
 package uv.lis.logic.dto;
 
-
 public class PartialReport extends Report {
 
     private int plannedTime;
@@ -49,5 +48,5 @@ public class PartialReport extends Report {
         PartialReport other = (PartialReport) object;
         return plannedTime == other.plannedTime 
         && realTime == other.realTime;
-        }
+    }
 }

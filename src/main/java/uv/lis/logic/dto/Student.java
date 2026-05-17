@@ -1,9 +1,7 @@
 package uv.lis.logic.dto;
 
-
 import java.util.Date;
 import java.util.Objects;
-
 
 public class Student extends User {
     private String idStudent;

@@ -6,11 +6,9 @@ import uv.lis.logic.dto.Professor;
 import uv.lis.logic.dto.Student;
 
 public class SessionManager {
-
     private static SessionManager instance;
     private Student currentStudent;
     private Professor currentProfessor;
-
 
     private SessionManager() {}
 
@@ -38,10 +36,11 @@ public class SessionManager {
     }
 
     public Optional<Professor> getCurrentCoordinator() {
+        Optional<Professor> currentProfessorOpt = Optional.empty();
         if (currentProfessor != null && currentProfessor.getIsCoordinator()) {
-            return Optional.of(currentProfessor);
+            currentProfessorOpt = Optional.of(currentProfessor);
         }
-            return Optional.empty();
+        return currentProfessorOpt;
     }
 
     public void setCurrentCoordinator(Professor coordinator) {

@@ -1,6 +1,5 @@
 package uv.lis.logic.dto;
 
-
 public class MonthlyReport extends Report {
 
     private String month;
@@ -47,6 +46,6 @@ public class MonthlyReport extends Report {
         MonthlyReport other = (MonthlyReport) object;
         return month == other.month 
         && reportedHours == other.reportedHours;
-        }
+    }
     
 }

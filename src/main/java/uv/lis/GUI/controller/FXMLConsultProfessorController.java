@@ -1,12 +1,13 @@
 package uv.lis.GUI.controller;
 
-
 import static uv.lis.logic.utils.InputValidator.PROFESSOR_ID_LENGTH;
 import static uv.lis.logic.utils.InputValidator.validateExactLength;
+
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Optional;
 import java.util.ResourceBundle;
+
 import javafx.fxml.FXML;
 import javafx.geometry.Side;
 import javafx.scene.control.Alert;
@@ -19,11 +20,11 @@ import javafx.scene.control.MenuItem;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.GridPane;
 import javafx.stage.Stage;
+
 import uv.lis.GUI.ValidationHandler;
 import uv.lis.logic.dao.ProfessorDAO;
 import uv.lis.logic.dto.Professor;
 import uv.lis.logic.exceptions.OperationException;
-
 
 public class FXMLConsultProfessorController extends ValidationHandler {
 

@@ -1,11 +1,10 @@
 package uv.lis.logic.contracts;
 
-
 import java.util.List;
 import java.util.Optional;
+
 import uv.lis.logic.dto.Project;
 import uv.lis.logic.exceptions.OperationException;
-
 
 public interface IRequestProjectDAO {
     int getActiveRequestCountByStudentId(String id) throws OperationException;

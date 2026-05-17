@@ -1,23 +1,24 @@
 package uv.lis.GUI.controller;
 
-
-import static uv.lis.logic.utils.InputValidator.validateLettersOnly;
 import static uv.lis.logic.utils.InputValidator.validateEmail;
+import static uv.lis.logic.utils.InputValidator.validateLettersOnly;
 import static uv.lis.logic.utils.InputValidator.validatePhoneNumber;
 import static uv.lis.logic.utils.InputValidator.validatePositiveInteger;
-import uv.lis.logic.dto.AffiliatedOrganization;
-import uv.lis.logic.exceptions.OperationException;
-import uv.lis.GUI.ValidationHandler;
-import uv.lis.logic.dao.AffiliatedOrganizationDAO;
+
 import java.net.URL;
 import java.util.Optional;
 import java.util.ResourceBundle;
 import java.util.stream.Stream;
+
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 
+import uv.lis.GUI.ValidationHandler;
+import uv.lis.logic.dao.AffiliatedOrganizationDAO;
+import uv.lis.logic.dto.AffiliatedOrganization;
+import uv.lis.logic.exceptions.OperationException;
 
 public class FXMLRegisterAffiliatedOrganizationController extends ValidationHandler {
 

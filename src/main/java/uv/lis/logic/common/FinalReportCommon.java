@@ -1,23 +1,23 @@
 package uv.lis.logic.common;
 
-
 import java.io.InputStream;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.Map;
+
 import net.sf.jasperreports.engine.JREmptyDataSource;
 import net.sf.jasperreports.engine.JRException;
 import net.sf.jasperreports.engine.JasperCompileManager;
 import net.sf.jasperreports.engine.JasperFillManager;
 import net.sf.jasperreports.engine.JasperPrint;
 import net.sf.jasperreports.engine.JasperReport;
+
 import uv.lis.logic.dao.ReportContextDAO;
 import uv.lis.logic.dto.Report;
 import uv.lis.logic.dto.Student;
 import uv.lis.logic.exceptions.OperationException;
 import uv.lis.logic.utils.SessionManager;
-
 
 public class FinalReportCommon {
 

@@ -1,9 +1,7 @@
 package uv.lis.logic.dto;
 
-
 import java.sql.Date;
 import java.util.Objects;
-
 
 public class SchoolPeriod {
     private int id;
@@ -44,6 +42,14 @@ public class SchoolPeriod {
         this.endDate = endDate;
     }
 
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
     @Override
     public boolean equals(Object object) {
         if (this == object) {
@@ -57,14 +63,6 @@ public class SchoolPeriod {
         return id == other.id
             && Objects.equals(startDate, other.startDate)
             && Objects.equals(endDate, other.endDate);
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
     }
 
 }

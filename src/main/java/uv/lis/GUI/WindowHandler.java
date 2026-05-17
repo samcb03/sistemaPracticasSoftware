@@ -1,19 +1,18 @@
 package uv.lis.GUI;
 
-
 import java.io.IOException;
 import java.util.ArrayList;
 
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
+
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.stage.Stage;
 import uv.lis.logic.utils.SessionManager;
-
 
 public abstract class WindowHandler implements Initializable {
 
@@ -36,7 +35,7 @@ public abstract class WindowHandler implements Initializable {
     protected void navigateToLogOut() {
         try {
             closeAllOpenStages();
-            SessionManager.getInstance();
+            SessionManager.getInstance().clearSession();
 
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/uv/lis/GUI/view/FXMLLogin.fxml"));
             Parent root = loader.load();

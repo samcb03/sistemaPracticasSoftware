@@ -1,11 +1,10 @@
 package uv.lis.GUI;
 
-
 import java.util.Optional;
+
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
-
 
 public abstract class ValidationHandler extends WindowHandler   {
 
