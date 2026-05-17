@@ -107,26 +107,26 @@ class ActivityDAOTest {
     }
 
     @Test
-    void getActivitiesById_successful_returnsActivityList() throws Exception {
+    void getActivityById_successful_returnsActivity() throws Exception {
         mockQueryExecution();
         when(resultSet.next()).thenReturn(true, true, false);
 
-        assertEquals(2, activityDAO.getActivitiesById(1).size());
+        assertTrue(activityDAO.getActivityById(1).isPresent());
     }
 
     @Test
-    void getActivitiesById_emptyList_returnsEmptyList() throws Exception {
+    void getActivityById_emptyList_returnsEmptyList() throws Exception {
         mockQueryExecution();
         when(resultSet.next()).thenReturn(false);
 
-        assertTrue(activityDAO.getActivitiesById(999).isEmpty());
+        assertTrue(activityDAO.getActivityById(999).isEmpty());
     }
 
     @Test
-    void getActivitiesById_sqlError_throwsOperationException() throws Exception {
+    void getActivityById_sqlError_throwsOperationException() throws Exception {
         when(connectionManager.getConnection()).thenThrow(new SQLException("Fallo"));
 
-        assertThrows(OperationException.class, () -> activityDAO.getActivitiesById(1));
+        assertThrows(OperationException.class, () -> activityDAO.getActivityById(1));
     }
 
     @Test

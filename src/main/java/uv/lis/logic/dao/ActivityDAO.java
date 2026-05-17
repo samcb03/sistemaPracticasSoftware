@@ -7,6 +7,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -50,8 +51,8 @@ public class ActivityDAO implements IActivityDAO {
     }
 
     @Override
-    public List<Activity> getActivitiesById(int idActivity) throws OperationException {
-        List<Activity> activities = new ArrayList<>();
+    public Optional<Activity> getActivityById(int idActivity) throws OperationException {
+        Optional<Activity> activityOptional = Optional.empty();
         String activityQuery = "SELECT * FROM Actividad WHERE idActividad = ?;";
 
         try (Connection databaseConnection = connectionManager.getConnection();
@@ -66,13 +67,13 @@ public class ActivityDAO implements IActivityDAO {
                 Date startDate = resultSet.getDate("Fecha de inicio");
                 Date endDate = resultSet.getDate("Fecha de fin");
                 
-                activities.add(new Activity(id, activityName, activityDescription, startDate, endDate));
+                activityOptional = Optional.of(new Activity(id, activityName, activityDescription, startDate, endDate));
             }
         } catch (SQLException e) {
             LOGGER.log(Level.SEVERE, "Error de conexion con la base de datos", e);
             throw new OperationException("Error al obtener las actividades", e);
         }
-        return activities;
+        return activityOptional;
     }
 
     @Override
