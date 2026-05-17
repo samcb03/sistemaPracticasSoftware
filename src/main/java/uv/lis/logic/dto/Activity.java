@@ -1,9 +1,7 @@
 package uv.lis.logic.dto;
 
-
 import java.sql.Date;
 import java.util.Objects;
-
 
 public class Activity {
     private int id;

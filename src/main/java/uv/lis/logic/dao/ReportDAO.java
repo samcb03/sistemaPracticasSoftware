@@ -1,6 +1,5 @@
 package uv.lis.logic.dao;
 
-
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -9,6 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
 import uv.lis.dataaccess.MySQLConnectionManager;
 import uv.lis.logic.contracts.IReportDAO;
 import uv.lis.logic.dto.FinalReport;
@@ -16,7 +16,6 @@ import uv.lis.logic.dto.MonthlyReport;
 import uv.lis.logic.dto.PartialReport;
 import uv.lis.logic.dto.Report;
 import uv.lis.logic.exceptions.OperationException;
-
 
 public class ReportDAO implements IReportDAO {
     private static final int NO_ROWS_AFFECTED = 0;
@@ -141,9 +140,9 @@ public class ReportDAO implements IReportDAO {
         boolean isRegistered = false;
 
         String reportQuery = "INSERT INTO Reporte (idReporte, descripcion, observaciones, actividad, matricula) "
-                + "VALUES (?, ?, ?, ?, ?)";
+            + "VALUES (?, ?, ?, ?, ?)";
         String monthlyQuery = "INSERT INTO ReporteMensual (idReporte, mes, horasReportadas) "
-                + "VALUES (?, ?, ?)";
+            + "VALUES (?, ?, ?)";
 
         try (Connection databaseConnection = connectionManager.getConnection()) {
             databaseConnection.setAutoCommit(false);

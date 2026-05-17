@@ -1,11 +1,10 @@
 package uv.lis.logic.contracts;
 
-
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
+
 import uv.lis.logic.dto.Professor;
 import uv.lis.logic.exceptions.OperationException;
-
 
 public interface IProfessorDAO {
     String getProfessorPersonnelNumberByName(String firstName, String lastName) throws OperationException;

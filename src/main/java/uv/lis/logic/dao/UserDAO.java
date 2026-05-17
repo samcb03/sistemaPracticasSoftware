@@ -1,20 +1,19 @@
 package uv.lis.logic.dao;
 
-
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.logging.Logger;
 import java.util.Optional;
 import java.util.logging.Level;
+import java.util.logging.Logger;
+
 import uv.lis.dataaccess.MySQLConnectionManager;
 import uv.lis.logic.contracts.IUserDAO;
 import uv.lis.logic.dto.User;
+import uv.lis.logic.exceptions.AuthenticateException;
 import uv.lis.logic.exceptions.OperationException;
 import uv.lis.logic.utils.PasswordHasher;
-import uv.lis.logic.exceptions.AuthenticateException;
-
 
 public class UserDAO implements IUserDAO{
     private static final int NO_ROWS_AFFECTED = 0;
@@ -102,7 +101,8 @@ public class UserDAO implements IUserDAO{
             }
 
         } catch (SQLException e) {
-            throw new AuthenticateException("Error al autenticar: " + e.getMessage());
+            LOGGER.log(Level.SEVERE, "Error al autenticar", e);
+            throw new AuthenticateException("Error al autenticar: " + e.getMessage(), e);
         }
         return validateUser;
     }

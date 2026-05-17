@@ -1,8 +1,6 @@
 package uv.lis.logic.dto;
 
-
 import java.util.Objects;
-
 
 public class Professor extends User {
     private String personnelNumber;

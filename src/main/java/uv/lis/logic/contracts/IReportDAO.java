@@ -1,12 +1,11 @@
 package uv.lis.logic.contracts;
 
-
 import java.util.List;
+
 import uv.lis.logic.dto.FinalReport;
+import uv.lis.logic.dto.PartialReport;
 import uv.lis.logic.dto.Report;
 import uv.lis.logic.exceptions.OperationException;
-import uv.lis.logic.dto.PartialReport;
-
 
 public interface IReportDAO {
     List<Report> getReports() throws  OperationException;

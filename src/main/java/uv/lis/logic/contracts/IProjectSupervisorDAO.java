@@ -1,12 +1,10 @@
 package uv.lis.logic.contracts;
 
-
 import java.util.ArrayList;
 import java.util.Optional;
 
 import uv.lis.logic.dto.ProjectSupervisor;
 import uv.lis.logic.exceptions.OperationException;
-
 
 public interface IProjectSupervisorDAO {
     ProjectSupervisor getProjectSupervisorById (int idProject) throws OperationException;

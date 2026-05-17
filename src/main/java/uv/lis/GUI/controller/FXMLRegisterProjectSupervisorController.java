@@ -1,5 +1,7 @@
 package uv.lis.GUI.controller;
 
+import static uv.lis.logic.utils.InputValidator.validateEmail;
+import static uv.lis.logic.utils.InputValidator.validateLettersOnly;
 
 import java.net.URL;
 import java.util.ArrayList;
@@ -13,13 +15,12 @@ import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
+
 import uv.lis.GUI.ValidationHandler;
 import uv.lis.logic.dao.AffiliatedOrganizationDAO;
 import uv.lis.logic.dao.ProjectSupervisorDAO;
 import uv.lis.logic.dto.ProjectSupervisor;
 import uv.lis.logic.exceptions.OperationException;
-import static uv.lis.logic.utils.InputValidator.validateEmail;
-import static uv.lis.logic.utils.InputValidator.validateLettersOnly;
 
 public class FXMLRegisterProjectSupervisorController extends ValidationHandler {
 

@@ -1,9 +1,7 @@
 package uv.lis.logic.contracts;
 
-
 import uv.lis.logic.dto.Autoevaluation;
 import uv.lis.logic.exceptions.OperationException;
-
 
 public interface IAutoevaluationDAO {
     boolean registerAutoevaluation(Autoevaluation autoevaluation) throws OperationException;

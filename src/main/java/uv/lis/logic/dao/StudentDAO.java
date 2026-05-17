@@ -1,6 +1,5 @@
 package uv.lis.logic.dao;
 
-
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -8,11 +7,11 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
 import uv.lis.dataaccess.MySQLConnectionManager;
 import uv.lis.logic.contracts.IStudentDAO;
 import uv.lis.logic.dto.Student;
 import uv.lis.logic.exceptions.OperationException;
-
 
 public class StudentDAO extends UserDAO implements IStudentDAO {
     private static final int NO_ROWS_AFFECTED = 0;
@@ -67,10 +66,10 @@ public class StudentDAO extends UserDAO implements IStudentDAO {
     @Override
     public int getIdUserByStudentId(String studentId) throws OperationException {
         int idUser = -1;
-        String query = "SELECT idUsuario FROM Alumno WHERE matricula = ?";
+        String studentQuery = "SELECT idUsuario FROM Alumno WHERE matricula = ?";
 
         try (Connection databaseConnection = connectionManager.getConnection();
-             PreparedStatement preparedStatement = databaseConnection.prepareStatement(query)) {
+             PreparedStatement preparedStatement = databaseConnection.prepareStatement(studentQuery)) {
             
             preparedStatement.setString(1, studentId);
             
@@ -92,7 +91,7 @@ public class StudentDAO extends UserDAO implements IStudentDAO {
     @Override
     public ArrayList<Student> getActiveStudentsNotInSubject() throws OperationException {
         ArrayList<Student> students = new ArrayList<>();
-        String query = "SELECT a.matricula, u.nombre, u.apellidos "
+        String studentQuery = "SELECT a.matricula, u.nombre, u.apellidos "
             + "FROM Alumno a "
             + "JOIN Usuario u ON a.idUsuario = u.idUsuario "
             + "WHERE u.estado = 1 "
@@ -100,7 +99,7 @@ public class StudentDAO extends UserDAO implements IStudentDAO {
             + "SELECT matricula FROM Alumno_Esta_EE)";
 
         try (Connection databaseConnection = connectionManager.getConnection();
-                PreparedStatement preparedStatement = databaseConnection.prepareStatement(query)) {
+                PreparedStatement preparedStatement = databaseConnection.prepareStatement(studentQuery)) {
 
             try (ResultSet resultSet = preparedStatement.executeQuery()) {
                 while (resultSet.next()) {
@@ -213,11 +212,11 @@ public class StudentDAO extends UserDAO implements IStudentDAO {
     @Override
     public boolean isStudentInactive(String studentId) throws OperationException {
         boolean isActive = false;
-        String query = "SELECT u.estado FROM Alumno a INNER JOIN Usuario u ON a.idUsuario = u.idUsuario"  
+        String studentQuery = "SELECT u.estado FROM Alumno a INNER JOIN Usuario u ON a.idUsuario = u.idUsuario"  
             + " WHERE a.matricula = ?";
 
         try (Connection databaseConnection = connectionManager.getConnection();
-            PreparedStatement preparedStatement = databaseConnection.prepareStatement(query)) {
+            PreparedStatement preparedStatement = databaseConnection.prepareStatement(studentQuery)) {
 
             preparedStatement.setString(1, studentId);
 
@@ -238,10 +237,10 @@ public class StudentDAO extends UserDAO implements IStudentDAO {
     @Override
     public ArrayList<String> searchStudentIds(String prefix) throws OperationException {
         ArrayList<String> studentIds = new ArrayList<>();
-        String query = "SELECT matricula FROM Alumno WHERE matricula LIKE ? LIMIT 10";
+        String studentQuery = "SELECT matricula FROM Alumno WHERE matricula LIKE ? LIMIT 10";
 
         try (Connection databaseConnection = connectionManager.getConnection();
-            PreparedStatement preparedStatement = databaseConnection.prepareStatement(query)) {
+            PreparedStatement preparedStatement = databaseConnection.prepareStatement(studentQuery)) {
 
             preparedStatement.setString(1, prefix + "%");
 
@@ -259,11 +258,11 @@ public class StudentDAO extends UserDAO implements IStudentDAO {
 
     public boolean hasProjectAssigned(String studentId) throws OperationException {
         boolean hasProject = false;
-        String query = "SELECT COUNT(*) FROM Solicita_Proyecto WHERE matricula = ? AND estatus = " 
+        String studentQuery = "SELECT COUNT(*) FROM Solicita_Proyecto WHERE matricula = ? AND estatus = " 
             + PROJECT_ASSIGNED + ";";
 
         try (Connection databaseConnection = connectionManager.getConnection();
-            PreparedStatement preparedStatement = databaseConnection.prepareStatement(query)) {
+            PreparedStatement preparedStatement = databaseConnection.prepareStatement(studentQuery)) {
             
             preparedStatement.setString(1, studentId);
 

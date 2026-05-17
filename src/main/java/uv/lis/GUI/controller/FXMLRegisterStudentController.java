@@ -1,24 +1,20 @@
 package uv.lis.GUI.controller;
 
-
 import static uv.lis.logic.utils.InputValidator.INVALID_ID;
 import static uv.lis.logic.utils.InputValidator.STUDENT_ID_LENGTH;
-import static uv.lis.logic.utils.InputValidator.validateLettersOnly;
-import static uv.lis.logic.utils.InputValidator.validatePassword;
-import static uv.lis.logic.utils.InputValidator.validateExactLength;
+import static uv.lis.logic.utils.InputValidator.validateBirthDate;
 import static uv.lis.logic.utils.InputValidator.validateComboBox;
 import static uv.lis.logic.utils.InputValidator.validateEmail;
-import static uv.lis.logic.utils.InputValidator.validateBirthDate;
-import uv.lis.logic.dto.Student;
-import uv.lis.logic.exceptions.OperationException;
-import uv.lis.GUI.ValidationHandler;
-import uv.lis.logic.dao.StudentDAO;
-import uv.lis.logic.dao.UserDAO;
+import static uv.lis.logic.utils.InputValidator.validateExactLength;
+import static uv.lis.logic.utils.InputValidator.validateLettersOnly;
+import static uv.lis.logic.utils.InputValidator.validatePassword;
+
 import java.net.URL;
 import java.sql.Date;
 import java.util.Optional;
 import java.util.ResourceBundle;
 import java.util.stream.Stream;
+
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
@@ -28,6 +24,11 @@ import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 
+import uv.lis.GUI.ValidationHandler;
+import uv.lis.logic.dao.StudentDAO;
+import uv.lis.logic.dao.UserDAO;
+import uv.lis.logic.dto.Student;
+import uv.lis.logic.exceptions.OperationException;
 
 public class FXMLRegisterStudentController extends ValidationHandler {
 

@@ -1,17 +1,16 @@
 package uv.lis.logic.dao;
 
-
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
 import uv.lis.dataaccess.MySQLConnectionManager;
 import uv.lis.logic.contracts.IReportContextDAO;
 import uv.lis.logic.dto.Report;
 import uv.lis.logic.exceptions.OperationException;
-
 
 public class ReportContextDAO implements IReportContextDAO {
 

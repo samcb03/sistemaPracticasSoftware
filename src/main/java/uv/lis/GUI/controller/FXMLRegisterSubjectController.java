@@ -1,8 +1,8 @@
 package uv.lis.GUI.controller;
 
-
-import static uv.lis.logic.utils.InputValidator.validatePositiveInteger;
 import static uv.lis.logic.utils.InputValidator.validateComboBox;
+import static uv.lis.logic.utils.InputValidator.validatePositiveInteger;
+
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -11,19 +11,20 @@ import java.util.ResourceBundle;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Stream;
+
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
+
 import uv.lis.GUI.ValidationHandler;
 import uv.lis.logic.dao.ProfessorDAO;
 import uv.lis.logic.dao.SchoolPeriodDAO;
 import uv.lis.logic.dao.SubjectDAO;
 import uv.lis.logic.dto.Subject;
 import uv.lis.logic.exceptions.OperationException;
-
 
 public class FXMLRegisterSubjectController extends ValidationHandler {
 

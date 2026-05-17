@@ -1,6 +1,5 @@
 package uv.lis.logic.dao;
 
-
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -9,11 +8,11 @@ import java.util.ArrayList;
 import java.util.Optional;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
 import uv.lis.dataaccess.MySQLConnectionManager;
 import uv.lis.logic.contracts.IAffiliatedOrganizationDAO;
 import uv.lis.logic.dto.AffiliatedOrganization;
 import uv.lis.logic.exceptions.OperationException;
-
 
 public class AffiliatedOrganizationDAO implements IAffiliatedOrganizationDAO{
     private static final int NO_ROWS_AFFECTED = 0;
@@ -121,13 +120,13 @@ public class AffiliatedOrganizationDAO implements IAffiliatedOrganizationDAO{
     public boolean modifyOrganization(AffiliatedOrganization affiliatedOrganization) throws OperationException {
         boolean isModified = false;
 
-        String afilliatedOrganizationQuery = "UPDATE organizacionVinculada " 
+        String affiliatedOrganizationQuery = "UPDATE organizacionVinculada " 
             + "SET nombreOv = ?, ciudad = ?, estado = ?, calle = ?, numeroDomicilio = ?, codigoPostal = ?, sector = ?," 
             + "correo = ?, telefono = ?, numUsuariosIndirectos = ?, numUsuariosDirectos = ? " 
             + "WHERE idOrganizacionVinculada = ?;";
 
         try (Connection databaseConnection = connectionManager.getConnection();
-            PreparedStatement preparedStatement = databaseConnection.prepareStatement(afilliatedOrganizationQuery)) {
+            PreparedStatement preparedStatement = databaseConnection.prepareStatement(affiliatedOrganizationQuery)) {
 
             preparedStatement.setString(1, affiliatedOrganization.getName());
             preparedStatement.setString(2, affiliatedOrganization.getCity());
@@ -163,12 +162,12 @@ public class AffiliatedOrganizationDAO implements IAffiliatedOrganizationDAO{
     public boolean inactivateOrganization(AffiliatedOrganization affiliatedOrganization) throws OperationException {
         boolean isInactive = false;
 
-        String afilliatedOrganizationQuery = "UPDATE organizacionVinculada " 
+        String affiliatedOrganizationQuery = "UPDATE organizacionVinculada " 
             + "SET estadoEnBD = '0'" 
             + "WHERE idOrganizacionVinculada = ?;";
 
         try (Connection databaseConnection = connectionManager.getConnection();
-             PreparedStatement preparedStatement = databaseConnection.prepareStatement(afilliatedOrganizationQuery)) {
+             PreparedStatement preparedStatement = databaseConnection.prepareStatement(affiliatedOrganizationQuery)) {
 
             preparedStatement.setInt(1, affiliatedOrganization.getId());
 
@@ -192,11 +191,11 @@ public class AffiliatedOrganizationDAO implements IAffiliatedOrganizationDAO{
 
     @Override
     public ArrayList<String> getAllOrganizationNames() throws OperationException{
-        String afilliatedOrganizationQuery = "SELECT nombreOV FROM OrganizacionVinculada";
+        String affiliatedOrganizationQuery = "SELECT nombreOV FROM OrganizacionVinculada";
         ArrayList<String> organizationNames = new ArrayList<>();
 
         try (Connection databaseConnection = connectionManager.getConnection();
-             PreparedStatement preparedStatement = databaseConnection.prepareStatement(afilliatedOrganizationQuery)) {
+             PreparedStatement preparedStatement = databaseConnection.prepareStatement(affiliatedOrganizationQuery)) {
                 try (ResultSet resultSet = preparedStatement.executeQuery()) {
                     while (resultSet.next()) {
                         organizationNames.add(resultSet.getString("nombreOV"));
@@ -212,9 +211,10 @@ public class AffiliatedOrganizationDAO implements IAffiliatedOrganizationDAO{
 
     @Override
     public int getOrganizationIdByName(String name) throws OperationException {
-        String query = "SELECT idOrganizacionVinculada FROM OrganizacionVinculada WHERE nombreOV = ?";
+        String affiliatedOrganizationQuery = "SELECT idOrganizacionVinculada FROM OrganizacionVinculada" 
+            + "WHERE nombreOV = ?";
         try (Connection databaseConnection = connectionManager.getConnection();
-            PreparedStatement preparedStatement = databaseConnection.prepareStatement(query)) {
+            PreparedStatement preparedStatement = databaseConnection.prepareStatement(affiliatedOrganizationQuery)) {
             preparedStatement.setString(1, name);
             try (ResultSet resultSet = preparedStatement.executeQuery()) {
                 if (resultSet.next()) {

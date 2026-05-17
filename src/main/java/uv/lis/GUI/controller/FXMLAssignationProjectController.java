@@ -1,26 +1,26 @@
 package uv.lis.GUI.controller;
 
-
 import java.net.URL;
 import java.util.List;
 import java.util.ResourceBundle;
 import java.util.stream.Collectors;
+
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
+
 import uv.lis.GUI.ValidationHandler;
 import uv.lis.logic.dao.AffiliatedOrganizationDAO;
 import uv.lis.logic.dao.ProjectDAO;
 import uv.lis.logic.dao.RequestProjectDAO;
 import uv.lis.logic.dto.AffiliatedOrganization;
-import uv.lis.logic.dto.Project;
 import uv.lis.logic.dto.Professor;
+import uv.lis.logic.dto.Project;
 import uv.lis.logic.exceptions.OperationException;
 import uv.lis.logic.utils.SessionManager;
-
 
 public class FXMLAssignationProjectController extends ValidationHandler {
 

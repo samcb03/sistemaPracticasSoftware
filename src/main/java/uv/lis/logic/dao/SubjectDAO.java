@@ -7,6 +7,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
 import uv.lis.dataaccess.MySQLConnectionManager;
 import uv.lis.logic.contracts.ISubjectDAO;
 import uv.lis.logic.dto.Subject;
@@ -100,10 +101,10 @@ public class SubjectDAO implements ISubjectDAO {
 
     public boolean assignStudentToSubject(String studentId, int subjectNrc) throws OperationException {
         boolean isAssigned = false;
-        String query = "INSERT INTO alumno_esta_ee (matricula, NRC) VALUES (?, ?);";
+        String subjectQuery = "INSERT INTO alumno_esta_ee (matricula, NRC) VALUES (?, ?);";
 
         try (Connection databaseConnection = connectionManager.getConnection();
-            PreparedStatement preparedStatement = databaseConnection.prepareStatement(query)) {
+            PreparedStatement preparedStatement = databaseConnection.prepareStatement(subjectQuery)) {
             
             preparedStatement.setString(1, studentId);
             preparedStatement.setInt(2, subjectNrc);
@@ -121,12 +122,12 @@ public class SubjectDAO implements ISubjectDAO {
     @Override
     public String getSubjectNRCByStudentID(String studentID) throws OperationException {
         String subjectNRC = "No tiene asignada una experiencia";
-        String query = "SELECT ee.NRC FROM ExperienciaEducativa ee "
+        String subjectQuery = "SELECT ee.NRC FROM ExperienciaEducativa ee "
             + "JOIN alumno_esta_ee aee ON ee.NRC = aee.NRC "
             + "WHERE aee.matricula = ?;";
 
         try (Connection databaseConnection = connectionManager.getConnection();
-            PreparedStatement preparedStatement = databaseConnection.prepareStatement(query)) {
+            PreparedStatement preparedStatement = databaseConnection.prepareStatement(subjectQuery)) {
                 
             preparedStatement.setString(1, studentID);
             try (ResultSet resultSet = preparedStatement.executeQuery()) {
@@ -144,7 +145,7 @@ public class SubjectDAO implements ISubjectDAO {
     @Override
     public void unassignProfessorFromSubject(String personnelNumber) throws OperationException {
         String subjectQuery = "DELETE FROM Profesor_Imparte_Experiencia"
-        + " WHERE numeroPersonal = ?";
+            + " WHERE numeroPersonal = ?";
 
 
         try (Connection databaseConnection = connectionManager.getConnection();
@@ -155,7 +156,7 @@ public class SubjectDAO implements ISubjectDAO {
         } catch (SQLException e) {
             LOGGER.log(Level.SEVERE, "Error al desasignar profesor a experiencia educativa", e);
             throw new OperationException("Error al desasignar profesor a experiencia educativa", e);
-         }
+        }
     }
 }
 

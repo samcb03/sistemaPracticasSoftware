@@ -1,11 +1,9 @@
 package uv.lis.logic.utils;
 
-
 import java.time.LocalDate;
 import java.time.Period;
 import java.util.Optional;
-
-
+//TODO modificar los mensajes de validacion y mejorar validateLetterOnly
 public final class InputValidator {
 
     private InputValidator() {
@@ -68,7 +66,6 @@ public final class InputValidator {
 
     public static Optional<String> validatePassword(String passwordValue, String fieldName) {
         passwordValue = passwordValue.trim();
-        
         Optional<String> validationResult;
         if (passwordValue.isEmpty()) {
             validationResult = Optional.of(fieldName + " no puede estar vacía");
@@ -127,7 +124,6 @@ public final class InputValidator {
 
     public static Optional<String> validateBirthDate(LocalDate birthDate, String fieldName) {
         Optional<String> validationResult;
-        
         if (birthDate == null) {
             validationResult = Optional.of("Seleccione una fecha de nacimiento");
         } else {

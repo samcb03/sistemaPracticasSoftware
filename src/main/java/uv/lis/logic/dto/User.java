@@ -1,8 +1,6 @@
 package uv.lis.logic.dto;
 
-
 import java.util.Objects;
-
 
 public class User {
     private int id;
@@ -14,6 +12,7 @@ public class User {
     private boolean isActive;
 
     public User(){
+
     }
 
     public User(int id, String firstName, String lastName, String password, String email, int roleId,
@@ -85,6 +84,7 @@ public class User {
 
     @Override
     public boolean equals(Object object) {
+    
         if (this == object) {
             return true;
         }

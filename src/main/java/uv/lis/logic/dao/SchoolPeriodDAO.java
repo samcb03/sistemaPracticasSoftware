@@ -1,6 +1,5 @@
 package uv.lis.logic.dao;
 
-
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -8,11 +7,11 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
 import uv.lis.dataaccess.MySQLConnectionManager;
 import uv.lis.logic.contracts.ISchoolPeriodDAO;
 import uv.lis.logic.dto.SchoolPeriod;
 import uv.lis.logic.exceptions.OperationException;
-
 
 public class SchoolPeriodDAO implements ISchoolPeriodDAO{
     private static final int NO_ROWS_AFFECTED = 0; 
@@ -30,10 +29,10 @@ public class SchoolPeriodDAO implements ISchoolPeriodDAO{
     @Override
     public ArrayList<String> getAllSchoolPeriodsNames() throws OperationException {
         ArrayList<String> periodsNames = new ArrayList<>();
-        String query = "SELECT nombre FROM PeriodoEscolar";
+        String schoolPeriodQuery = "SELECT nombre FROM PeriodoEscolar";
 
         try (Connection databaseConnection = connectionManager.getConnection();
-            PreparedStatement preparedStatement = databaseConnection.prepareStatement(query);
+            PreparedStatement preparedStatement = databaseConnection.prepareStatement(schoolPeriodQuery);
             ResultSet resultSet = preparedStatement.executeQuery()) {
 
             while (resultSet.next()) {
@@ -50,10 +49,10 @@ public class SchoolPeriodDAO implements ISchoolPeriodDAO{
     @Override
     public String getSchoolPeriodIdByName(String periodName) throws OperationException {
         String periodId = null;
-        String query = "SELECT idPeriodoEscolar FROM PeriodoEscolar WHERE nombre = ?";
+        String schoolPeriodQuery = "SELECT idPeriodoEscolar FROM PeriodoEscolar WHERE nombre = ?";
 
         try (Connection databaseConnection = connectionManager.getConnection();
-            PreparedStatement preparedStatement = databaseConnection.prepareStatement(query)) {
+            PreparedStatement preparedStatement = databaseConnection.prepareStatement(schoolPeriodQuery)) {
 
             preparedStatement.setString(1, periodName);
 

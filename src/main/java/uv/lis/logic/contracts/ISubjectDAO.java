@@ -1,10 +1,9 @@
 package uv.lis.logic.contracts;
 
-
 import java.util.ArrayList;
+
 import uv.lis.logic.dto.Subject;
 import uv.lis.logic.exceptions.OperationException;
-
 
 public interface ISubjectDAO {
   

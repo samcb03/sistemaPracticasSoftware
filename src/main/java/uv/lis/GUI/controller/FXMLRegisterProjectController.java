@@ -1,20 +1,15 @@
 package uv.lis.GUI.controller;
 
-
 import static uv.lis.logic.utils.InputValidator.validateComboBox;
 import static uv.lis.logic.utils.InputValidator.validateLettersOnly;
 import static uv.lis.logic.utils.InputValidator.validatePositiveInteger;
-import uv.lis.logic.dto.Project;
-import uv.lis.logic.exceptions.OperationException;
-import uv.lis.logic.dao.ProjectDAO;
-import uv.lis.logic.dao.ProjectSupervisorDAO;
-import uv.lis.GUI.ValidationHandler;
-import uv.lis.logic.dao.AffiliatedOrganizationDAO;
+
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Optional;
 import java.util.ResourceBundle;
 import java.util.stream.Stream;
+
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
@@ -23,6 +18,12 @@ import javafx.scene.control.Label;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 
+import uv.lis.GUI.ValidationHandler;
+import uv.lis.logic.dao.AffiliatedOrganizationDAO;
+import uv.lis.logic.dao.ProjectDAO;
+import uv.lis.logic.dao.ProjectSupervisorDAO;
+import uv.lis.logic.dto.Project;
+import uv.lis.logic.exceptions.OperationException;
 
 public class FXMLRegisterProjectController extends ValidationHandler {
 

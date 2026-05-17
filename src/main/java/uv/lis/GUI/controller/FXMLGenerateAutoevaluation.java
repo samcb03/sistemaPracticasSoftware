@@ -3,9 +3,6 @@ package uv.lis.GUI.controller;
 import java.net.URL;
 import java.util.ResourceBundle;
 
-import javax.swing.SwingUtilities;
-
-import javafx.concurrent.Task;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
