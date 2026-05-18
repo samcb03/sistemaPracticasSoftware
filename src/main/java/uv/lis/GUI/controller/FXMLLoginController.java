@@ -124,26 +124,37 @@ public class FXMLLoginController implements Initializable {
     private void loadSessionByRole(User user) {
         int roleId = user.getRoleId();
         int userId = user.getId();
-
-        try {
-            switch (roleId) {
-            case USER_TYPE_STUDENT -> {
-                Student student = new StudentDAO().getStudentById(userId);
-                SessionManager.getInstance().setCurrentStudent(student);
-            }
-            case USER_TYPE_PROFESSOR -> {
-                Professor professor = new ProfessorDAO().getProfessorById(userId);
-                SessionManager.getInstance().setCurrentProfessor(professor);
-            }
-            case USER_TYPE_COORDINATOR -> {
-                Professor coordinator = new ProfessorDAO().getProfessorById(userId);
-                SessionManager.getInstance().setCurrentCoordinator(coordinator);
-            }
-            case USER_TYPE_ADMINISTRATOR -> {
-                LOGGER.log(Level.INFO, "Inició sesión el administrador");
-            }
-            default -> LOGGER.log(Level.WARNING, "Rol desconocido: {0}", roleId);
-        }
+            try {
+                switch (roleId) {
+                    case USER_TYPE_STUDENT -> {
+                        Optional<Student> validateStudent = new StudentDAO().getStudentById(userId);
+                        if (validateStudent.isPresent()) {
+                            SessionManager.getInstance().setCurrentStudent(validateStudent.get());
+                        } else {
+                            showError("No se encontraron los datos del estudiante en la base de datos.");
+                        }
+                    }
+                    case USER_TYPE_PROFESSOR -> {
+                        Optional<Professor> validateProfessor = new ProfessorDAO().getProfessorById(userId);
+                        if (validateProfessor.isPresent()) {
+                            SessionManager.getInstance().setCurrentProfessor(validateProfessor.get());
+                        } else {
+                            showError("No se encontraron los datos del profesor en la base de datos.");
+                        }
+                    }
+                    case USER_TYPE_COORDINATOR -> {
+                        Optional<Professor> validateCoordinator = new ProfessorDAO().getProfessorById(userId);
+                        if (validateCoordinator.isPresent()) {
+                            SessionManager.getInstance().setCurrentCoordinator(validateCoordinator.get());
+                        } else {
+                            showError("No se encontraron los datos del coordinador en la base de datos.");
+                        }
+                    }
+                    case USER_TYPE_ADMINISTRATOR -> {
+                        LOGGER.log(Level.INFO, "Inició sesión el administrador");
+                    }
+                    default -> LOGGER.log(Level.WARNING, "Rol desconocido: {0}", roleId);
+                }
         } catch (OperationException e) {
             LOGGER.log(Level.SEVERE, "Error al cargar los datos del usuario para la sesión", e);
             showError("Error al cargar los datos del usuario. Intente de nuevo.");

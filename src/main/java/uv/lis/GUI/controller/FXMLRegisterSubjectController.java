@@ -23,6 +23,7 @@ import uv.lis.GUI.ValidationHandler;
 import uv.lis.logic.dao.ProfessorDAO;
 import uv.lis.logic.dao.SchoolPeriodDAO;
 import uv.lis.logic.dao.SubjectDAO;
+import uv.lis.logic.dto.SchoolPeriod;
 import uv.lis.logic.dto.Subject;
 import uv.lis.logic.exceptions.OperationException;
 
@@ -115,21 +116,31 @@ public class FXMLRegisterSubjectController extends ValidationHandler {
     }
 
     private Optional<Subject> buildSubject() {
-        Subject subject = new Subject();
-        subject.setNrc(Integer.parseInt(textFieldNRC.getText().trim()));
+        Optional<Subject> validateSubject = Optional.empty();
 
-        try {
-            String personnelNumber = professorsMap.get(comboBoxProfessorName.getValue());
-            subject.setProfessorPersonnelNumber(personnelNumber);
+            try {
+                Subject subject = new Subject();
+                subject.setNrc(Integer.parseInt(textFieldNRC.getText().trim()));
+                String personnelNumber = professorsMap.get(comboBoxProfessorName.getValue());
+                subject.setProfessorPersonnelNumber(personnelNumber);
+                String selectedPeriod = comboBoxPeriodName.getValue();
 
-            String selectedPeriod = comboBoxPeriodName.getValue();
-            String schoolPeriodId = schoolPeriodDAO.getSchoolPeriodIdByName(selectedPeriod);
-            subject.setSchoolPeriodId(Integer.parseInt(schoolPeriodId));
-        } catch (OperationException e) {
-            showError(e.getMessage());
-        }
+                Optional<String> validatePeriodId = schoolPeriodDAO.getSchoolPeriodIdByName(selectedPeriod);
 
-        return Optional.of(subject);
+                    if (validatePeriodId.isPresent()) {
+                        int periodId = Integer.parseInt(validatePeriodId.get());
+                        subject.setSchoolPeriodId(periodId);
+                        validateSubject = Optional.of(subject);
+                    } else {
+                        showError("No se encontró el ID para el periodo escolar seleccionado.");
+                    }
+            } catch (OperationException e) {
+                showError("Error al consultar la base de datos: " + e.getMessage());
+            } catch (NumberFormatException e) {
+                showError("El formato del NRC o el ID del periodo es incorrecto.");
+            }
+
+        return validateSubject; 
     }
 
     @Override

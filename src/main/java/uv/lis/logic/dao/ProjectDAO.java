@@ -26,7 +26,6 @@ public class ProjectDAO implements IProjectDAO{
 
     @Override
     public List<Project> getAllProjects() throws OperationException {
-        
         List<Project> projects = new ArrayList<>(); 
         String projectQuery = "SELECT * FROM Proyecto;";
 
@@ -54,8 +53,8 @@ public class ProjectDAO implements IProjectDAO{
     }
 
     @Override
-    public Project getProjectByName(String projectName) throws OperationException {
-        Project project = null; 
+    public Optional<Project> getProjectByName(String projectName) throws OperationException {
+        Optional<Project> validateProjectName = Optional.empty();
         String projectQuery = "SELECT * FROM Proyecto WHERE nombre = ?;";
 
         try (Connection databaseConnection = connectionManager.getConnection();
@@ -66,7 +65,7 @@ public class ProjectDAO implements IProjectDAO{
             
             try (ResultSet resultSet = preparedStatement.executeQuery()) {
                 if (resultSet.next()) {
-                    project = new Project();
+                    Project project = new Project();
                     project.setId(resultSet.getInt("idProyecto"));
                     project.setName(resultSet.getString("nombre"));
                     project.setDescription(resultSet.getString("descripcion"));
@@ -74,6 +73,7 @@ public class ProjectDAO implements IProjectDAO{
                     project.setMethodology(resultSet.getString("metodologiaProyecto"));
                     project.setObjective(resultSet.getString("objetivo"));
                     project.setIdAffiliatedOrganization(resultSet.getInt("idOrganizacionVinculada"));
+                    validateProjectName = Optional.of(project);
                 } else {
                     LOGGER.log(Level.INFO, "No se encontró el proyecto con nombre {0}.", projectName);
                     throw new OperationException("No se encontró el proyecto", null);
@@ -83,7 +83,7 @@ public class ProjectDAO implements IProjectDAO{
             LOGGER.log(Level.SEVERE, "Error al consultar proyecto", e);
             throw new OperationException("Error al consultar el proyecto", e);
         }
-        return project;
+        return validateProjectName;
     }
 
     @Override
@@ -91,8 +91,8 @@ public class ProjectDAO implements IProjectDAO{
         boolean isRegistered = false;
 
         String projectQuery = "INSERT INTO Proyecto(nombre, "  
-            + "descripcion, cupo, metodologiaProyecto, objetivo, estado, idOrganizacionVinculada)" 
-            + " VALUES(?, ?, ?, ?, ?, ?, ?);";
+                            + "descripcion, cupo, metodologiaProyecto, objetivo, estado, idOrganizacionVinculada)" 
+                            + " VALUES(?, ?, ?, ?, ?, ?, ?);";
 
         try (Connection databaseConnection = connectionManager.getConnection();
             PreparedStatement preparedStatement = databaseConnection.prepareStatement(projectQuery, 
@@ -131,11 +131,10 @@ public class ProjectDAO implements IProjectDAO{
     @Override
     public boolean modifyProject(Project project) throws OperationException {
         boolean isModified = false;
-
         String projectQuery = "UPDATE Proyecto " 
-            + " SET nombre = ?, descripcion = ?, cupo = ?, "
-            + " metodologiaProyecto = ?, objetivo = ?, estado = ? " 
-            + " WHERE idProyecto = ?;";
+                            + " SET nombre = ?, descripcion = ?, cupo = ?, "
+                            + " metodologiaProyecto = ?, objetivo = ?, estado = ? " 
+                            + " WHERE idProyecto = ?;";
 
         try (Connection databaseConnection = connectionManager.getConnection();
             PreparedStatement preparedStatement = databaseConnection.prepareStatement(projectQuery)) {
@@ -166,7 +165,6 @@ public class ProjectDAO implements IProjectDAO{
     @Override
     public boolean inactivateProject(Project project) throws OperationException {
         boolean isInactive = false;
-
         String projectQuery = "UPDATE Proyecto SET estado = 0 WHERE idProyecto = ?;";
 
         try (Connection databaseConnection = connectionManager.getConnection();
@@ -214,8 +212,8 @@ public class ProjectDAO implements IProjectDAO{
         Optional<String> project = Optional.empty();
         
         String supervisorQuery = "SELECT p.nombre FROM Proyecto p"  
-            + " JOIN ResponsableProyecto rp ON p.idResponsableProyecto = rp.idResponsableProyecto"
-            + " WHERE rp.nombre = ?";
+                                + " JOIN ResponsableProyecto rp ON p.idResponsableProyecto = rp.idResponsableProyecto"
+                                + " WHERE rp.nombre = ?";
 
             try(Connection databaseConnection = connectionManager.getConnection();
                     PreparedStatement preparedStatement = databaseConnection.prepareStatement(supervisorQuery)) {

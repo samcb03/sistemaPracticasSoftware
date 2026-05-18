@@ -70,6 +70,7 @@ public class FXMLConsultStudentController extends ValidationHandler{
     private void searchStudent() {
         clearFields();
         String studentId = textFieldStudentId.getText().trim();
+        boolean isStudentFound = false;
 
         Optional<String> validationError = validateExactLength(studentId, STUDENT_ID_LENGTH, "La matricula ");
 
@@ -77,23 +78,47 @@ public class FXMLConsultStudentController extends ValidationHandler{
             showError(validationError.get());
         } else {
             try {
-                int userId = studentDAO.getIdUserByStudentId(studentId);
-                Student student = studentDAO.getStudentById(userId);
+                Optional<Integer> userIdOptional = studentDAO.getIdUserByStudentId(studentId);
 
-                labelStudentId.setText(student.getIdStudent());
-                labelFirstName.setText(student.getFirstName());
-                labelLastName.setText(student.getLastName());
-                labelDateBirth.setText(student.getBirthDate().toString());
-                labelGender.setText(student.getGender());
-                labelSubject.setText(subjectDAO.getSubjectNRCByStudentID(studentId) + " - " 
-                    + subject.getSUBJECT_NAME());
-                labelProject.setText(requestProjectDAO.getProjectAssignedToStudent(studentId));
-                labelIsInactive.setText(studentDAO.isStudentInactive(studentId) ? "Inactivo" : "Activo");
+                if (userIdOptional.isPresent()) {
+                    int userId = userIdOptional.get();
+                    Optional<Student> studentOptional = studentDAO.getStudentById(userId);
+
+                    if (studentOptional.isPresent()) {
+                        Student student = studentOptional.get();
+                        
+                        labelStudentId.setText(student.getIdStudent());
+                        labelFirstName.setText(student.getFirstName());
+                        labelLastName.setText(student.getLastName());
+                        labelDateBirth.setText(student.getBirthDate().toString());
+                        labelGender.setText(student.getGender());
+                        
+                        String assignedNrc = subjectDAO.getSubjectNRCByStudentID(studentId);
+                        labelSubject.setText(assignedNrc != null ? assignedNrc : "Sin materia asignada");
+                        
+                        labelProject.setText(requestProjectDAO.getProjectAssignedToStudent(studentId));
+                        labelIsInactive.setText(studentDAO.isStudentInactive(studentId) ? "Inactivo" : "Activo");
+                        
+                        isStudentFound = true;
+                    }
+                }
+                
+                if (isStudentFound) {
+                    gridPaneStudentInfo.setVisible(true);
+                    buttonInactivate.setVisible(true);
+                } else {
+                    showError("No se encontró al alumno");
+                    gridPaneStudentInfo.setVisible(false);
+                    buttonInactivate.setVisible(false);
+                }
+
             } catch (OperationException e) {
-                showError(e.getMessage());
+                showError("Error de base de datos: " + e.getMessage());
+                gridPaneStudentInfo.setVisible(false);
+                buttonInactivate.setVisible(false);
             }
         }
-    }   
+    }
 
     private void setupAutocomplete() {
         textFieldStudentId.textProperty().addListener((observable, oldValue, newValue) -> {

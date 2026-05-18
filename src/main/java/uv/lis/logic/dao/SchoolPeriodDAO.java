@@ -5,6 +5,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Optional;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -47,8 +48,8 @@ public class SchoolPeriodDAO implements ISchoolPeriodDAO{
     }
 
     @Override
-    public String getSchoolPeriodIdByName(String periodName) throws OperationException {
-        String periodId = null;
+    public Optional<String> getSchoolPeriodIdByName(String periodName) throws OperationException {
+        Optional<String> validatePeriodId = Optional.empty();
         String schoolPeriodQuery = "SELECT idPeriodoEscolar FROM PeriodoEscolar WHERE nombre = ?";
 
         try (Connection databaseConnection = connectionManager.getConnection();
@@ -58,7 +59,8 @@ public class SchoolPeriodDAO implements ISchoolPeriodDAO{
 
             try (ResultSet resultSet = preparedStatement.executeQuery()) {
                 if (resultSet.next()) {
-                    periodId = resultSet.getString("idPeriodoEscolar");
+                    String periodId = resultSet.getString("idPeriodoEscolar");
+                    validatePeriodId = Optional.of(periodId);
                     LOGGER.log(Level.INFO, "ID de periodo escolar obtenido con exito");
                 } else {
                     LOGGER.log(Level.INFO, "No se encontro el periodo escolar");
@@ -71,14 +73,14 @@ public class SchoolPeriodDAO implements ISchoolPeriodDAO{
             throw new OperationException("Error al obtener el ID del periodo escolar", e);
         }
 
-        return periodId;
+        return validatePeriodId;
     }
 
     @Override
     public boolean registerSchoolPeriod(SchoolPeriod schoolPeriod) throws OperationException {
         boolean isRegistered = false;
         String schoolPeriodQuery = "INSERT INTO PeriodoEscolar(idPeriodoEscolar, FechaInicio, FechaFin) " 
-            + "VALUES(?, ?, ?);";
+                                    + "VALUES(?, ?, ?);";
 
         try (Connection databaseConnection = connectionManager.getConnection();
             PreparedStatement preparedStatement = databaseConnection.prepareStatement(schoolPeriodQuery)){
@@ -104,7 +106,7 @@ public class SchoolPeriodDAO implements ISchoolPeriodDAO{
     public boolean modifySchoolPeriod(SchoolPeriod schoolPeriod) throws OperationException {
         boolean isModified = false;
         String schoolPeriodQuery = "UPDATE PeriodoEscolar " 
-            + "SET FechaInicio = ? , FechaFin = ? WHERE idPeriodoEscolar = ?;";
+                                 + "SET FechaInicio = ? , FechaFin = ? WHERE idPeriodoEscolar = ?;";
 
         try (Connection databaseConnection = connectionManager.getConnection();
             PreparedStatement preparedStatement = databaseConnection.prepareStatement(schoolPeriodQuery)){

@@ -70,21 +70,29 @@ public class FXMLConsultProfessorController extends ValidationHandler {
         } else {
             try {
                 int userId = professorDAO.getIdUserByProfessorPersonnelNumber(personnelNumber);
-                Professor professor = professorDAO.getProfessorById(userId);
+                Optional<Professor> validateProfessor = professorDAO.getProfessorById(userId);
 
-                labelPersonnelNumber.setText(professor.getPersonnelNumber());
-                labelFirstName.setText(professor.getFirstName());
-                labelLastName.setText(professor.getLastName());
-                labelCoordinator.setText(professor.getIsCoordinator() ? "Coordinador" : "Profesor");
+                if(validateProfessor.isPresent()) {
+                    Professor professor = validateProfessor.get();
+                    labelPersonnelNumber.setText(professor.getPersonnelNumber());
+                    labelFirstName.setText(professor.getFirstName());
+                    labelLastName.setText(professor.getLastName());
+                    labelCoordinator.setText(professor.getIsCoordinator() ? "Coordinador" : "Profesor");
 
-                boolean isInactive = professorDAO.isProfessorInactive(professor.getPersonnelNumber());
-                labelStatus.setText(isInactive ? "Inactivo" : "Activo");
-                
-                buttonInactive.setDisable(isInactive);
-                
-                gridPaneProfessorInfo.setVisible(true);
-                buttonUpdate.setDisable(false);
-                labelMessage.setText("");
+                    boolean isInactive = professorDAO.isProfessorInactive(professor.getPersonnelNumber());
+                    labelStatus.setText(isInactive ? "Inactivo" : "Activo");
+                    
+                    buttonInactive.setDisable(isInactive);
+                    
+                    gridPaneProfessorInfo.setVisible(true);
+                    buttonUpdate.setDisable(false);
+                    labelMessage.setText("");
+                } else {
+                    showError("No se encontró al profesor");
+                    gridPaneProfessorInfo.setVisible(false);
+                    buttonInactive.setDisable(true);
+                    buttonUpdate.setDisable(true);
+                }
 
             } catch (OperationException e) {
                 showError(e.getMessage());

@@ -1,12 +1,13 @@
 package uv.lis.logic.contracts;
 
 import java.util.ArrayList;
+import java.util.Optional;
 
 import uv.lis.logic.dto.Student;
 import uv.lis.logic.exceptions.OperationException;
 
 public interface IStudentDAO {
-    Student getStudentById(int idStudent) throws OperationException;
+    Optional<Student> getStudentById(int idStudent) throws OperationException;
 
     ArrayList<Student> getActiveStudentsNotInSubject() throws OperationException;
 
@@ -16,7 +17,7 @@ public interface IStudentDAO {
 
     boolean inactivateStudent(String studentId) throws OperationException;
 
-    int getIdUserByStudentId(String studentId) throws OperationException;
+    Optional<Integer> getIdUserByStudentId(String studentId) throws OperationException;
 
     ArrayList<String> searchStudentIds(String prefix) throws OperationException;
 

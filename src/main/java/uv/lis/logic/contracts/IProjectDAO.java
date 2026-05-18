@@ -10,7 +10,7 @@ import uv.lis.logic.exceptions.OperationException;
 public interface IProjectDAO {
     List<Project> getAllProjects() throws OperationException;
 
-    Project getProjectByName(String projectName) throws OperationException;
+    Optional<Project> getProjectByName(String projectName) throws OperationException;
 
     boolean registerProject(Project project) throws OperationException;
 

@@ -30,20 +30,19 @@ public class AutoevaluationDAO implements IAutoevaluationDAO {
         Autoevaluation autoevaluationData = new Autoevaluation();
 
         String autoevaluationQuery = "SELECT "
-            + "u.nombre AS nombreAlumno, "         
-            + "u.apellidos AS apellidosAlumno, "
-            + "ov.nombreOV AS organizacion, "
-            + "p.nombre AS proyecto, "
-            + "rp.nombre AS responsable "
-            + "FROM Solicita_Proyecto sp "
-            + "JOIN Alumno a ON sp.matricula = a.matricula "
-            + "JOIN Usuario u ON a.idUsuario = u.idUsuario "
-            + "JOIN Proyecto p ON sp.idProyecto = p.idProyecto "
-            + "JOIN OrganizacionVinculada ov ON p.idOrganizacionVinculada = ov.idOrganizacionVinculada "
-            + "JOIN ResponsableProyecto rp ON p.idResponsableProyecto = rp.idResponsableProyecto "
-            + "WHERE sp.matricula = ? "
-            + "AND sp.estatus = 1 "
-            + "LIMIT 1";
+                                    + "u.nombre AS nombreAlumno, "         
+                                    + "u.apellidos AS apellidosAlumno, "
+                                    + "ov.nombreOV AS organizacion, "
+                                    + "p.nombre AS proyecto, "
+                                    + "rp.nombre AS responsable "
+                                    + "FROM Solicita_Proyecto sp "
+                                    + "JOIN Alumno a ON sp.matricula = a.matricula "
+                                    + "JOIN Usuario u ON a.idUsuario = u.idUsuario "
+                                    + "JOIN Proyecto p ON sp.idProyecto = p.idProyecto "
+                                    + "JOIN OrganizacionVinculada ov ON p.idOrganizacionVinculada = ov.idOrganizacionVinculada "
+                                    + "JOIN ResponsableProyecto rp ON p.idResponsableProyecto = rp.idResponsableProyecto "
+                                    + "WHERE sp.matricula = ? "
+                                    + "AND sp.estatus = 1 ";
 
         try (Connection connection = connectionManager.getConnection();
             PreparedStatement preparedStatement = connection.prepareStatement(autoevaluationQuery)) {
@@ -78,10 +77,10 @@ public class AutoevaluationDAO implements IAutoevaluationDAO {
     boolean isRegistered = false;
 
         String autoevaluationQuery = "INSERT INTO Autoevaluacion (matricula, participacionProductiva, "
-            + "conocimientoAplicado, confianzaEnActividades, interesEnActividades, " 
-            + "apoyoOrganizacional, conocimientoDeReglas, orientacionSupervisor, " 
-            + "seguimientoEfectivo, alineacionCarrera, importanciaPracticas, " 
-            + "puntuacionFinal) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);";
+                                    + "conocimientoAplicado, confianzaEnActividades, interesEnActividades, " 
+                                    + "apoyoOrganizacional, conocimientoDeReglas, orientacionSupervisor, " 
+                                    + "seguimientoEfectivo, alineacionCarrera, importanciaPracticas, " 
+                                    + "puntuacionFinal) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);";
 
         try (Connection databaseConnection = connectionManager.getConnection();
             PreparedStatement preparedStatement = databaseConnection.prepareStatement(autoevaluationQuery)) {
