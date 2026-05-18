@@ -95,17 +95,30 @@ public class FXMLRequestProjectController extends ValidationHandler {
 
     private void loadProjectDetails(String projectName) {
         try {
-            Project project = projectDAO.getProjectByName(projectName);
-            labelMethodology.setText(project.getMethodology());
-            labelCapacity.setText(String.valueOf(project.getCapacity()));
-            labelObjective.setText(project.getObjective());
-            labelDescription.setText(project.getDescription());
+            Optional<Project> validateProject = projectDAO.getProjectByName(projectName);
 
-            AffiliatedOrganization organization = affiliatedOrganizationDAO
-                .getOrganizationById(project.getIdAffiliatedOrganization());
-            labelOrganizationName.setText(organization.getName());
+            if (validateProject.isPresent()) {
+                Project project = validateProject.get();
+                
+                labelMethodology.setText(project.getMethodology());
+                labelCapacity.setText(String.valueOf(project.getCapacity()));
+                labelObjective.setText(project.getObjective());
+                labelDescription.setText(project.getDescription());
+
+                Optional<AffiliatedOrganization> validateOrganization = affiliatedOrganizationDAO
+                    .getOrganizationById(project.getIdAffiliatedOrganization());
+                
+                if (validateOrganization.isPresent()) {
+                    labelOrganizationName.setText(validateOrganization.get().getName());
+                } else {
+                    labelOrganizationName.setText("Organización no encontrada");
+                }
+                
+            } else {
+                showError("No se encontraron los detalles del proyecto seleccionado.");
+            }
         } catch (OperationException e) {
-            showError(e.getMessage());
+            showError("Error al cargar los detalles: " + e.getMessage());
         }
     }
 
@@ -113,23 +126,32 @@ public class FXMLRequestProjectController extends ValidationHandler {
     public void addProject() {
         String projectSelected = comboBoxProjects.getValue();
 
-        if (selectedProjects.containsKey(projectSelected)) {
+        if (projectSelected == null || projectSelected.trim().isEmpty()) {
+            showError("Por favor, selecciona un proyecto de la lista.");
+        } else if (selectedProjects.containsKey(projectSelected)) {
             showError("Ya agregaste este proyecto");
         } else if (selectedProjects.size() >= MAX_PROJECTS) {
             showError("Solo puedes solicitar " + MAX_PROJECTS + " proyectos");
         } else {
             try {
-                Project project = projectDAO.getProjectByName(projectSelected);
-                Optional<String> validationError = requestProjectDAO.validateProjectRequest(studentId, project.getId());
+                Optional<Project> validateProject = projectDAO.getProjectByName(projectSelected);
 
-                handleValidation(validationError, () -> {
-                    selectedProjects.put(projectSelected, project.getId());
-                    listViewSelectedProjects.getItems().add(projectSelected);
-                    updateSelectedCount();
-                    labelError.setText(""); 
-                });
+                if (validateProject.isPresent()) {
+                    Project project = validateProject.get();
+                    
+                    Optional<String> validationError = requestProjectDAO.validateProjectRequest(studentId, project.getId());
+
+                    handleValidation(validationError, () -> {
+                        selectedProjects.put(projectSelected, project.getId());
+                        listViewSelectedProjects.getItems().add(projectSelected);
+                        updateSelectedCount();
+                        labelError.setText(""); 
+                    });
+                } else {
+                    showError("El proyecto seleccionado no se encontró en la base de datos.");
+                }
             } catch (OperationException e) {
-                showError(e.getMessage());
+                showError("Error al procesar la solicitud: " + e.getMessage());
             }
         }   
     }

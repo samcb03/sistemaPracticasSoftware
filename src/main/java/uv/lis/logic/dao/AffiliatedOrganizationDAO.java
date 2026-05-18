@@ -28,9 +28,8 @@ public class AffiliatedOrganizationDAO implements IAffiliatedOrganizationDAO{
     }
     
     @Override
-    public AffiliatedOrganization getOrganizationById(int idAfilliatedOrganization) throws OperationException {
-        AffiliatedOrganization affiliatedOrganization = null;
-
+    public Optional<AffiliatedOrganization> getOrganizationById(int idAfilliatedOrganization) throws OperationException {
+        Optional<AffiliatedOrganization> validateOrganization = Optional.empty();
         String affiliatedOrganizationQuery = "SELECT * FROM organizacionVinculada " 
             + "WHERE idOrganizacionVinculada = ?"; 
 
@@ -41,8 +40,7 @@ public class AffiliatedOrganizationDAO implements IAffiliatedOrganizationDAO{
 
             try (ResultSet resultSet = preparedStatement.executeQuery()) {
                 if (resultSet.next()) {
-                    affiliatedOrganization = new AffiliatedOrganization();
-
+                    AffiliatedOrganization affiliatedOrganization = new AffiliatedOrganization();
                     affiliatedOrganization.setId(resultSet.getInt("idOrganizacionVinculada"));
                     affiliatedOrganization.setName(resultSet.getString("nombreOV"));
                     affiliatedOrganization.setCity(resultSet.getString("ciudad"));
@@ -52,6 +50,7 @@ public class AffiliatedOrganizationDAO implements IAffiliatedOrganizationDAO{
                     affiliatedOrganization.setPhoneNumber(resultSet.getString("telefono"));
                     affiliatedOrganization.setNumberOfDirectUsers(resultSet.getInt("numUsuariosDirectos"));
                     affiliatedOrganization.setNumberOfIndirectUsers(resultSet.getInt("numUsuariosIndirectos"));
+                    validateOrganization = Optional.of(affiliatedOrganization);
 
                 } else {
                     LOGGER.log(Level.INFO, "No se encontró una organización vinculada con el id {0}.", 
@@ -66,15 +65,16 @@ public class AffiliatedOrganizationDAO implements IAffiliatedOrganizationDAO{
             throw new OperationException("Error al obtener la organización vinculada", e);
         }
 
-        return affiliatedOrganization;   
+        return validateOrganization;   
     }
 
     @Override
     public boolean registerOrganization(AffiliatedOrganization affiliatedOrganization) throws OperationException {
         boolean isRegistered = false;
         String affiliatedOrganizationQuery = "INSERT INTO organizacionVinculada(nombreOV," 
-            + "ciudad, estado, calle, numeroDomicilio, codigoPostal, sector, correo, telefono, numUsuariosIndirectos,numUsuariosDirectos)" 
-            + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);";
+                                           + "ciudad, estado, calle, numeroDomicilio, codigoPostal, "
+                                           + "sector, correo, telefono, numUsuariosIndirectos,numUsuariosDirectos)" 
+                                           + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);";
 
         try (Connection databaseConnection = connectionManager.getConnection();
             PreparedStatement preparedStatement = databaseConnection.prepareStatement(affiliatedOrganizationQuery, 
@@ -119,11 +119,11 @@ public class AffiliatedOrganizationDAO implements IAffiliatedOrganizationDAO{
     @Override
     public boolean modifyOrganization(AffiliatedOrganization affiliatedOrganization) throws OperationException {
         boolean isModified = false;
-
         String affiliatedOrganizationQuery = "UPDATE organizacionVinculada " 
-            + "SET nombreOv = ?, ciudad = ?, estado = ?, calle = ?, numeroDomicilio = ?, codigoPostal = ?, sector = ?," 
-            + "correo = ?, telefono = ?, numUsuariosIndirectos = ?, numUsuariosDirectos = ? " 
-            + "WHERE idOrganizacionVinculada = ?;";
+                                           + "SET nombreOv = ?, ciudad = ?, "
+                                           + "estado = ?, calle = ?, numeroDomicilio = ?, codigoPostal = ?, sector = ?," 
+                                           + "correo = ?, telefono = ?, numUsuariosIndirectos = ?, numUsuariosDirectos = ? " 
+                                           + "WHERE idOrganizacionVinculada = ?;";
 
         try (Connection databaseConnection = connectionManager.getConnection();
             PreparedStatement preparedStatement = databaseConnection.prepareStatement(affiliatedOrganizationQuery)) {
@@ -161,10 +161,9 @@ public class AffiliatedOrganizationDAO implements IAffiliatedOrganizationDAO{
     @Override
     public boolean inactivateOrganization(AffiliatedOrganization affiliatedOrganization) throws OperationException {
         boolean isInactive = false;
-
         String affiliatedOrganizationQuery = "UPDATE organizacionVinculada " 
-            + "SET estadoEnBD = '0'" 
-            + "WHERE idOrganizacionVinculada = ?;";
+                                           + "SET estadoEnBD = '0'" 
+                                           + "WHERE idOrganizacionVinculada = ?;";
 
         try (Connection databaseConnection = connectionManager.getConnection();
              PreparedStatement preparedStatement = databaseConnection.prepareStatement(affiliatedOrganizationQuery)) {
@@ -212,7 +211,8 @@ public class AffiliatedOrganizationDAO implements IAffiliatedOrganizationDAO{
     @Override
     public int getOrganizationIdByName(String name) throws OperationException {
         String affiliatedOrganizationQuery = "SELECT idOrganizacionVinculada FROM OrganizacionVinculada" 
-            + "WHERE nombreOV = ?";
+                                           + "WHERE nombreOV = ?";
+
         try (Connection databaseConnection = connectionManager.getConnection();
             PreparedStatement preparedStatement = databaseConnection.prepareStatement(affiliatedOrganizationQuery)) {
             preparedStatement.setString(1, name);
@@ -233,7 +233,6 @@ public class AffiliatedOrganizationDAO implements IAffiliatedOrganizationDAO{
     @Override
     public Optional<String> getOrganizationBySupervisorName(String nombreSupervisor) throws OperationException {
         Optional<String> organization = Optional.empty();
-        
         String supervisorQuery = "SELECT nombreOV FROM OrganizacionVinculada ov" 
             + " JOIN Organizacion_Tiene_Responsable ot ON ov.idOrganizacionVinculada = ot.idOrganizacionVinculada" 
             + " JOIN ResponsableProyecto rp ON ot.idResponsableProyecto = rp.idResponsableProyecto"

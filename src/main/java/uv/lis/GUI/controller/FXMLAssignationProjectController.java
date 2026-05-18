@@ -2,6 +2,7 @@ package uv.lis.GUI.controller;
 
 import java.net.URL;
 import java.util.List;
+import java.util.Optional;
 import java.util.ResourceBundle;
 import java.util.stream.Collectors;
 
@@ -86,17 +87,26 @@ public class FXMLAssignationProjectController extends ValidationHandler {
 
     private void loadProjectDetails(String projectName) {
         try {
-            Project project = projectDAO.getProjectByName(projectName);
-            labelMethodology.setText(project.getMethodology());
-            labelCapacity.setText(String.valueOf(project.getCapacity()));
-            labelObjective.setText(project.getObjective());
-            labelDescription.setText(project.getDescription());
+            Optional<Project> validateProject = projectDAO.getProjectByName(projectName);
 
-            AffiliatedOrganization organization = affiliatedOrganizationDAO
-                .getOrganizationById(project.getIdAffiliatedOrganization());
-            labelOrganizationName.setText(organization.getName());
+            if(validateProject.isPresent()) {
+                Project project = validateProject.get();
+                labelMethodology.setText(project.getMethodology());
+                labelCapacity.setText(String.valueOf(project.getCapacity()));
+                labelObjective.setText(project.getObjective());
+                labelDescription.setText(project.getDescription());
 
+            Optional<AffiliatedOrganization> validateOrganization = affiliatedOrganizationDAO.getOrganizationById(project.getIdAffiliatedOrganization());
+
+            if (validateOrganization.isPresent()) {
+                labelOrganizationName.setText(validateOrganization.get().getName());
+            } else {
+                labelOrganizationName.setText("No se encontró la organización");
+            }
             loadApplicantsForProject(project.getId());
+            } else {
+                showError("Proyecto no encontrado");
+            }
 
         } catch (OperationException e) {
             showError(e.getMessage());
@@ -127,11 +137,13 @@ public class FXMLAssignationProjectController extends ValidationHandler {
             showError("Seleccione un proyecto y un alumno de la lista.");
         } else {
             try {
-            String matricula = selectedRow.substring(selectedRow.lastIndexOf("(") + INDEX_ADJUSTMENT, 
-            selectedRow.lastIndexOf(")"));
-    
+                String matricula = selectedRow.substring(selectedRow.lastIndexOf("(") + INDEX_ADJUSTMENT, 
+                selectedRow.lastIndexOf(")"));
 
-                Project project = projectDAO.getProjectByName(selectedProject);
+                Optional<Project> validateProject = projectDAO.getProjectByName(selectedProject);
+
+                if(validateProject.isPresent()) {
+                    Project project = validateProject.get();
 
                 if (requestProjectDAO.assignStudentToProject(matricula, project.getId())) {
                     showSuccess("Asignación exitosa para " + matricula);
@@ -142,6 +154,9 @@ public class FXMLAssignationProjectController extends ValidationHandler {
                         clearFields();
                     }
                 }
+        } else {
+            showError("El proyecto no se encontró");
+        }
             } catch (OperationException e) {
                 showError("No se pudo asignar: " + e.getMessage());
             }

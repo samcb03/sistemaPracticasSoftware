@@ -30,6 +30,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.sql.Date;
 import java.util.ArrayList;
+import java.util.Optional;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -73,15 +74,18 @@ class FXMLConsultStudentControllerTest {
                 injectField("labelGender", new Label());
                 injectField("labelSubject", new Label());
                 injectField("labelProject", new Label());
+                injectField("labelIsInactive", new Label()); 
                 injectField("buttonUpdate", new Button());
                 injectField("buttonInactivate", new Button());
                 injectField("buttonBack", new Button());
                 injectField("labelMessage", new Label());
                 injectField("contextMenuSuggestions", new ContextMenu());
+                
                 injectField("studentDAO", studentDAO);
                 injectField("requestProjectDAO", requestProjectDAO);
                 injectField("subjectDAO", subjectDAO);
                 injectField("subject", subject);
+                
                 invokeSetupControls();
                 invokeSetupAutocomplete();
             } catch (Exception e) {
@@ -193,16 +197,20 @@ class FXMLConsultStudentControllerTest {
 
     @Test
     void searchStudent_validId_displaysStudent() throws Exception {
-        when(studentDAO.getIdUserByStudentId(VALID_STUDENT_ID)).thenReturn(1);
-        when(studentDAO.getStudentById(1)).thenReturn(buildStudent());
+        // Arrange - Wrap the returned user ID into an Optional container
+        when(studentDAO.getIdUserByStudentId(VALID_STUDENT_ID)).thenReturn(Optional.of(1));
+        when(studentDAO.getStudentById(1)).thenReturn(Optional.of(buildStudent()));
         when(subjectDAO.getSubjectNRCByStudentID(VALID_STUDENT_ID)).thenReturn("NRC001");
         when(requestProjectDAO.getProjectAssignedToStudent(VALID_STUDENT_ID)).thenReturn("Proyecto A");
+        when(studentDAO.isStudentInactive(VALID_STUDENT_ID)).thenReturn(false);
 
+        // Act
         runOnFxThread(() -> {
             getTextField().setText(VALID_STUDENT_ID);
             invokeSearchStudent();
         });
 
+        // Assert
         assertEquals(VALID_STUDENT_ID, getLabel("labelStudentId").getText());
     }
 

@@ -265,7 +265,7 @@ public class RequestProjectDAO implements IRequestProjectDAO {
     @Override
     public void unassignStudentFromProject(String idStudent) throws OperationException {
         String requestProjectQuery = "UPDATE Proyecto p INNER JOIN Solicita_Proyecto sp ON p.idProyecto = sp.idProyecto"
-            + " SET p.cupo = p.cupo + 1 WHERE sp.matricula = ? AND sp.estatus = " + STATUS_ASSIGNED + ";";
+                                   + " SET p.cupo = p.cupo + 1 WHERE sp.matricula = ? AND sp.estatus = " + STATUS_ASSIGNED + ";";
 
         try (Connection databaseConnection = connectionManager.getConnection();
             PreparedStatement preparedStatement = databaseConnection.prepareStatement(requestProjectQuery)) {
@@ -282,10 +282,10 @@ public class RequestProjectDAO implements IRequestProjectDAO {
     public List<String> getApplicantsByProjectId(int idProject) throws OperationException {
     List<String> applicants = new ArrayList<>();
     String requestProjectQuery = "SELECT u.nombre, u.apellidos, a.matricula "
-        + "FROM Usuario u " 
-        + "INNER JOIN Alumno a ON u.idUsuario = a.idUsuario " 
-        + "INNER JOIN Solicita_Proyecto sp ON a.matricula = sp.matricula "
-        + "WHERE sp.idProyecto = ?";
+                               + "FROM Usuario u " 
+                               + "INNER JOIN Alumno a ON u.idUsuario = a.idUsuario " 
+                               + "INNER JOIN Solicita_Proyecto sp ON a.matricula = sp.matricula "
+                               + "WHERE sp.idProyecto = ?";
 
     try (Connection databaseConnection = connectionManager.getConnection();
          PreparedStatement statement = databaseConnection.prepareStatement(requestProjectQuery)) {

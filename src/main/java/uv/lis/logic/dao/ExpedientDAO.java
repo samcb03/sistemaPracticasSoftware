@@ -8,6 +8,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -36,7 +37,7 @@ public class ExpedientDAO implements IExpedientDAO {
     public int saveDocument(Expedient expedient) throws OperationException {
         int generatedId = -1;
         String expedientQuery = "INSERT INTO expediente (nombre, tipoDocumento,url, matricula,idTipoDocumento)" 
-            + " VALUES (?, ?, ?,?,?)";
+                              + " VALUES (?, ?, ?,?,?)";
 
         try (Connection databaseConnection = connectionManager.getConnection();
             PreparedStatement preparedStatement = databaseConnection.prepareStatement(expedientQuery, 
@@ -91,9 +92,9 @@ public class ExpedientDAO implements IExpedientDAO {
         
         return documents;
     }
-    //FIXME -1 es numero magico
-    public int getIdDocumentTypeByName(String typeName) throws OperationException {
-        int id = -1;
+
+    public Optional<Integer> getIdDocumentTypeByName(String typeName) throws OperationException {
+        Optional<Integer> idType = Optional.empty();
         String expedientQuery = "SELECT idTipoDocumento FROM Tipo_Documento WHERE nombreTipoDocumento = ?";
         
         try (Connection databaseConnection = connectionManager.getConnection();
@@ -103,7 +104,8 @@ public class ExpedientDAO implements IExpedientDAO {
             
             try (ResultSet resultSet = preparedStatement.executeQuery()) {
                 if (resultSet.next()) {
-                    id = resultSet.getInt("idTipoDocumento");
+                    int id = resultSet.getInt("idTipoDocumento");
+                    idType = Optional.of(id);
                 }
             }
         } catch (SQLException e) {
@@ -111,16 +113,18 @@ public class ExpedientDAO implements IExpedientDAO {
             throw new OperationException("Error al consultar el catálogo de documentos", e);
         }
         
-        return id;
+        return idType;
     }
 
     public void uploadDocument(String idStudent, String typeDocument, File file) throws OperationException {
         FileValidator.validateFile(file);
+        Optional<Integer> valideTypeDocument = getIdDocumentTypeByName(typeDocument);
 
-        int idTypeDocument = getIdDocumentTypeByName(typeDocument);
-        if (idTypeDocument == -1) {
+        if (valideTypeDocument.isEmpty()) {
             throw new OperationException("Tipo de documento no válido: " + typeDocument, null);
         }
+
+        int idTypeDocument = valideTypeDocument.get();
 
         deletePreviousDocumentIfExists(idStudent, idTypeDocument);
         String url = FileManager.saveFile(file, idStudent);
@@ -128,7 +132,7 @@ public class ExpedientDAO implements IExpedientDAO {
         Expedient expedient = new Expedient(file.getName(), typeDocument, url, idStudent, idTypeDocument);
         int generatedId = saveDocument(expedient);
 
-        if (generatedId <= 0) {
+        if (generatedId <= NO_ROWS_AFFECTED) {
             FileManager.deleteFile(url);
             throw new OperationException("No se pudo registrar el documento en la base de datos.", null);
         }

@@ -44,8 +44,8 @@ public class ProjectSupervisorDAO implements IProjectSupervisorDAO {
     }
 
     @Override
-    public ProjectSupervisor getProjectSupervisorById(int id) throws OperationException{
-        ProjectSupervisor supervisor = null;
+    public Optional<ProjectSupervisor> getProjectSupervisorById(int id) throws OperationException{
+        Optional<ProjectSupervisor> validateSupervisor = Optional.empty();
 
         String supervisorQuery = "SELECT * FROM ResponsableProyecto WHERE idResponsableProyecto = ?";
 
@@ -56,11 +56,12 @@ public class ProjectSupervisorDAO implements IProjectSupervisorDAO {
             ResultSet resultSet = preparedStatement.executeQuery();
 
             if (resultSet.next()) {
-                supervisor = new ProjectSupervisor();
+                ProjectSupervisor supervisor = new ProjectSupervisor();
                 supervisor.setId(resultSet.getInt("idResponsableProyecto"));
                 supervisor.setName(resultSet.getString("nombre"));
                 supervisor.setPosition(resultSet.getString("cargo"));
                 supervisor.setEmail(resultSet.getString("correo"));
+                validateSupervisor = Optional.of(supervisor);
             } else {
                 LOGGER.log(Level.INFO, "No se encontró un supervisor con el id {0}.", id);
                 throw new OperationException("No se encontró un supervisor con el id: " + id, null);
@@ -71,12 +72,12 @@ public class ProjectSupervisorDAO implements IProjectSupervisorDAO {
             throw new OperationException("Error al buscar al supervisor", e);
         }
 
-        return supervisor;
+        return validateSupervisor;
     }
- @Override
+    @Override
     public Optional<ProjectSupervisor> getProjectSupervisorByName(String supervisorName) throws OperationException {
 
-        Optional<ProjectSupervisor> supervisorOpt = Optional.empty();
+        Optional<ProjectSupervisor> validateSupervisor = Optional.empty();
 
         String supervisorQuery = "SELECT * FROM ResponsableProyecto WHERE nombre = ?";
 
@@ -93,7 +94,7 @@ public class ProjectSupervisorDAO implements IProjectSupervisorDAO {
                     supervisor.setPosition(resultSet.getString("cargo"));
                     supervisor.setEmail(resultSet.getString("correo"));
                     
-                    supervisorOpt = Optional.of(supervisor);
+                    validateSupervisor = Optional.of(supervisor);
                 } else {
                     LOGGER.log(Level.INFO, "No se encontró un supervisor con el nombre: {0}", supervisorName);
                 }
@@ -104,7 +105,7 @@ public class ProjectSupervisorDAO implements IProjectSupervisorDAO {
             throw new OperationException("Error al buscar al supervisor en la base de datos", e);
         }
 
-        return supervisorOpt;
+        return validateSupervisor;
     }
 
     @Override
@@ -112,7 +113,7 @@ public class ProjectSupervisorDAO implements IProjectSupervisorDAO {
         boolean isRegistered = false;
 
         String supervisorQuery = "INSERT INTO responsableProyecto(nombre, cargo," 
-            + "correo, estado) VALUES(?,?,?,?);";
+                               + "correo, estado) VALUES(?,?,?,?);";
 
         try (Connection databaseConnection = connectionManager.getConnection();
             PreparedStatement preparedStatement = databaseConnection.prepareStatement(supervisorQuery)) {
@@ -143,7 +144,7 @@ public class ProjectSupervisorDAO implements IProjectSupervisorDAO {
         boolean isModified = false;
 
         String supervisorQuery = "UPDATE responsableProyecto SET " 
-            + "nombre = ?, cargo = ?, correo = ? WHERE idResponsableProyecto = ?;";
+                               + "nombre = ?, cargo = ?, correo = ? WHERE idResponsableProyecto = ?;";
 
         try (Connection databaseConnection = connectionManager.getConnection();
              PreparedStatement preparedStatement = databaseConnection.prepareStatement(supervisorQuery)){
@@ -201,14 +202,14 @@ public class ProjectSupervisorDAO implements IProjectSupervisorDAO {
     }
 
     @Override
-    public ArrayList<String> searchProjectSupervisorName(String prefix) throws OperationException {
+    public ArrayList<String> searchProjectSupervisorName(String supervisorName) throws OperationException {
         ArrayList<String> projectSupervisorNames = new ArrayList<>();
         String supervisorQuery = "SELECT nombre FROM ResponsableProyecto WHERE nombre LIKE ? ";
 
         try (Connection databaseConnection = connectionManager.getConnection();
             PreparedStatement preparedStatement = databaseConnection.prepareStatement(supervisorQuery)) {
 
-            preparedStatement.setString(1, prefix + "%");
+            preparedStatement.setString(1, supervisorName + "%");
 
             try (ResultSet resultSet = preparedStatement.executeQuery()) {
                 while (resultSet.next()) {

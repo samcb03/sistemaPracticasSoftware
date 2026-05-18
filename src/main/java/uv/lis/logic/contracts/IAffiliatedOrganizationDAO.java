@@ -7,7 +7,7 @@ import uv.lis.logic.dto.AffiliatedOrganization;
 import uv.lis.logic.exceptions.OperationException;
 
 public interface IAffiliatedOrganizationDAO {
-    AffiliatedOrganization getOrganizationById(int idAfilliatedOrganization) throws OperationException;
+    Optional<AffiliatedOrganization> getOrganizationById(int idAfilliatedOrganization) throws OperationException;
 
     boolean registerOrganization(AffiliatedOrganization affiliatedOrganization) throws OperationException;
 

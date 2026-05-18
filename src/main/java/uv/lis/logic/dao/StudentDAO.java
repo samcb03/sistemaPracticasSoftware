@@ -5,6 +5,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Optional;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -28,8 +29,8 @@ public class StudentDAO extends UserDAO implements IStudentDAO {
     }
 
     @Override
-    public Student getStudentById(int idStudent) throws OperationException { 
-        Student student = null;
+    public Optional<Student> getStudentById(int idStudent) throws OperationException { 
+        Optional<Student> validateStudent = Optional.empty();
 
         String studentQuery = "SELECT e.matricula, u.nombre, u.apellidos, e.fechaNacimiento, e.genero "
             + "FROM Alumno e INNER JOIN Usuario u ON e.idUsuario = u.idUsuario "
@@ -42,12 +43,13 @@ public class StudentDAO extends UserDAO implements IStudentDAO {
             
             try (ResultSet resultSet = preparedStatement.executeQuery()) {
                 if (resultSet.next()) {
-                    student = new Student();
+                    Student student = new Student();
                     student.setIdStudent(resultSet.getString("matricula"));
                     student.setFirstName(resultSet.getString("nombre"));
                     student.setLastName(resultSet.getString("apellidos"));
                     student.setBirthDate(resultSet.getDate("fechaNacimiento"));
                     student.setGender(resultSet.getString("genero"));
+                    validateStudent = Optional.of(student);
 
                     LOGGER.log(Level.INFO, "Busqueda de alumno con matricula {0} exitosa.", 
                         idStudent);
@@ -60,12 +62,12 @@ public class StudentDAO extends UserDAO implements IStudentDAO {
             LOGGER.log(Level.SEVERE, "Error de conexion con la base de datos",e);
             throw new OperationException("No se pudo buscar el alumno. Intentelo mas tarde", e);
         }
-        return student;
+        return validateStudent;
     }
 
     @Override
-    public int getIdUserByStudentId(String studentId) throws OperationException {
-        int idUser = -1;
+    public Optional<Integer> getIdUserByStudentId(String studentId) throws OperationException {
+        Optional<Integer> validateUserId = Optional.empty();
         String studentQuery = "SELECT idUsuario FROM Alumno WHERE matricula = ?";
 
         try (Connection databaseConnection = connectionManager.getConnection();
@@ -75,17 +77,19 @@ public class StudentDAO extends UserDAO implements IStudentDAO {
             
             try (ResultSet resultSet = preparedStatement.executeQuery()) {
                 if (resultSet.next()) {
-                    idUser = resultSet.getInt("idUsuario");
+                    int userId = resultSet.getInt("idUsuario");
+                    validateUserId = Optional.of(userId);
                 } else {
-                    LOGGER.log(Level.INFO, "No se encontro un alumno con la matricula {0}.", studentId);
+                    LOGGER.log(Level.INFO, "No student found with studentId: {0}", studentId);
                     throw new OperationException("No se encontró un alumno con la matricula: " + studentId, null);
                 }
             }
         } catch (SQLException e) {
-            LOGGER.log(Level.SEVERE, "Error de conexion con la base de datos",e);
+            LOGGER.log(Level.SEVERE, "Database connection error", e);
             throw new OperationException("No se pudo buscar el alumno. Intentelo mas tarde", e);
         }
-        return idUser;
+        
+        return validateUserId;
     }
 
     @Override
@@ -213,7 +217,7 @@ public class StudentDAO extends UserDAO implements IStudentDAO {
     public boolean isStudentInactive(String studentId) throws OperationException {
         boolean isActive = false;
         String studentQuery = "SELECT u.estado FROM Alumno a INNER JOIN Usuario u ON a.idUsuario = u.idUsuario"  
-            + " WHERE a.matricula = ?";
+                            + " WHERE a.matricula = ?";
 
         try (Connection databaseConnection = connectionManager.getConnection();
             PreparedStatement preparedStatement = databaseConnection.prepareStatement(studentQuery)) {

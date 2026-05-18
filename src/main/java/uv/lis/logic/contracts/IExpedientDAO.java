@@ -3,6 +3,7 @@ package uv.lis.logic.contracts;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import uv.lis.logic.dto.Expedient;
 import uv.lis.logic.exceptions.OperationException;
@@ -12,7 +13,7 @@ public interface IExpedientDAO {
 
     List<Expedient> getAllDocuments() throws OperationException;
 
-    int getIdDocumentTypeByName(String name) throws OperationException;
+    Optional<Integer> getIdDocumentTypeByName(String name) throws OperationException;
 
     void uploadDocument(String idStudent, String typeDocument, File file) throws OperationException;
 

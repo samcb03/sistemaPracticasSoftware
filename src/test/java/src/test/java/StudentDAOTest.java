@@ -11,6 +11,8 @@ import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.Optional;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
@@ -59,7 +61,13 @@ public class StudentDAOTest {
         when(resultSet.getDate("fechaNacimiento")).thenReturn(new Date(System.currentTimeMillis()));
         when(resultSet.getString("genero")).thenReturn("Femenino");
 
-        assertEquals("S123", studentDAO.getStudentById(1).getIdStudent()); 
+        Optional<Student> result = studentDAO.getStudentById(1);
+        assertTrue(result.isPresent(), "El estudiante debería haber sido encontrado"); 
+        
+        Student student = result.get();
+        assertEquals("S123", student.getIdStudent()); 
+        assertEquals("Denisse", student.getFirstName());
+        assertEquals("Reyes", student.getLastName());
     }
 
     @Test
@@ -168,14 +176,14 @@ public class StudentDAOTest {
                 "S123"));
     }
 
-    @Test
+@Test
     void getIdUserByStudentId_successful_returnsIdUser() throws Exception {
         when(connection.prepareStatement(anyString())).thenReturn(preparedStatement);
         when(preparedStatement.executeQuery()).thenReturn(resultSet);
         when(resultSet.next()).thenReturn(true);
         when(resultSet.getInt("idUsuario")).thenReturn(1);
-
-        assertEquals(1, studentDAO.getIdUserByStudentId("S123"));
+        
+        assertEquals(1, studentDAO.getIdUserByStudentId("S123").get());
     }
 
     @Test

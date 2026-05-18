@@ -2,12 +2,13 @@ package uv.lis.logic.contracts;
 
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
+import java.util.Optional;
 
 import uv.lis.logic.dto.Professor;
 import uv.lis.logic.exceptions.OperationException;
 
 public interface IProfessorDAO {
-    String getProfessorPersonnelNumberByName(String firstName, String lastName) throws OperationException;
+    Optional<String> getProfessorPersonnelNumberByName(String firstName, String lastName) throws OperationException;
 
     boolean registerProfessor(Professor professor) throws OperationException;
 
@@ -15,7 +16,7 @@ public interface IProfessorDAO {
 
     LinkedHashMap<String, String> getAllActiveProfessorsMap() throws OperationException;
 
-    Professor getProfessorById(int id) throws OperationException;
+    Optional<Professor> getProfessorById(int id) throws OperationException;
 
     int getIdUserByProfessorPersonnelNumber(String personnelNumber) throws OperationException;
 

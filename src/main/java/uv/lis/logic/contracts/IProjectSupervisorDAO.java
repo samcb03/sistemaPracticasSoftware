@@ -7,7 +7,7 @@ import uv.lis.logic.dto.ProjectSupervisor;
 import uv.lis.logic.exceptions.OperationException;
 
 public interface IProjectSupervisorDAO {
-    ProjectSupervisor getProjectSupervisorById (int idProject) throws OperationException;
+    Optional<ProjectSupervisor> getProjectSupervisorById (int idProject) throws OperationException;
 
     boolean registerProjectSupervisor(ProjectSupervisor projectSupervisor) throws OperationException;
 
