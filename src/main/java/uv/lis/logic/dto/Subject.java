@@ -9,6 +9,15 @@ public class Subject {
     private int nrc;
     private String professorPersonnelNumber;
     private int schoolPeriodId;
+    private String schoolPeriodName;
+
+    public String getSchoolPeriodName() {
+        return schoolPeriodName;
+    }
+
+    public void setSchoolPeriodName(String schoolPeriodName) {
+        this.schoolPeriodName = schoolPeriodName;
+    }
 
     public Subject(){
 
@@ -80,6 +89,7 @@ public class Subject {
         return nrc == other.nrc
             && Objects.equals(nrc, other.nrc)
             && Objects.equals(professorPersonnelNumber, other.professorPersonnelNumber)
-            && schoolPeriodId == other.schoolPeriodId;
+            && Objects.equals(schoolPeriodId, other.schoolPeriodId)
+            && Objects.equals(schoolPeriodName, other.schoolPeriodName);
     }
 }
