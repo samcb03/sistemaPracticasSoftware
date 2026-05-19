@@ -158,5 +158,38 @@ public class SubjectDAO implements ISubjectDAO {
             throw new OperationException("Error al desasignar profesor a experiencia educativa", e);
         }
     }
+
+    @Override
+    public ArrayList<Subject> getSubjectsByProfessor(String personalNumber)throws OperationException {
+        ArrayList<Subject> subjects = new ArrayList<>();
+        String subjectQuery = "SELECT ee.nrc, ee.nombreExperiencia, pe.nombre, ee.idPeriodoEscolar "
+                            + "FROM ExperienciaEducativa ee "
+                            + "INNER JOIN Profesor_Imparte_Experiencia i ON ee.nrc = i.nrc "
+                            + "INNER JOIN PeriodoEscolar pe ON pe.idPeriodoEscolar = ee.idPeriodoEscolar "
+                            + "WHERE i.numeroPersonal = ?";
+
+        try (Connection databaseConnection = connectionManager.getConnection();
+             PreparedStatement preparedStatement = databaseConnection.prepareStatement(subjectQuery)) {
+
+            preparedStatement.setString(1, personalNumber);
+
+            try (ResultSet resultSet = preparedStatement.executeQuery()) {
+                while (resultSet.next()) {
+                    Subject subject = new Subject();
+                    subject.setNrc(resultSet.getInt("nrc"));
+                    subject.setName(resultSet.getString("nombreExperiencia"));
+                    subject.setSchoolPeriodName(resultSet.getString("nombre"));
+                    subject.setSchoolPeriodId(resultSet.getInt("idPeriodoEscolar"));
+                    subjects.add(subject);
+                }
+            }
+        } catch (SQLException sqlException) {
+            LOGGER.log(Level.SEVERE, "Error al consultar experiencias educativas", sqlException);
+            throw new OperationException("Error al cargar las experiencias educativas. "
+                + "Intente más tarde", sqlException);
+        }
+        return subjects;
+    }
+
 }
 

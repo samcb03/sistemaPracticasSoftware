@@ -1,75 +1,25 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.geometry.Insets?>
-<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
 <?import javafx.scene.control.Label?>
-<?import javafx.scene.layout.StackPane?>
-<?import javafx.scene.layout.VBox?>
-<?import javafx.scene.control.Separator?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TitledPane?>
+<?import javafx.scene.layout.AnchorPane?>
 
-<StackPane xmlns="http://javafx.com/javafx"
-           xmlns:fx="http://javafx.com/fxml"
-           fx:controller="uv.lis.GUI.controller.FXMLProfessorMenuController"
-           style="-fx-background-color: #F5F4F0;">
-
-    <VBox alignment="CENTER" spacing="16">
-
-        <VBox spacing="12"
-              style="-fx-background-color: white;
-                     -fx-background-radius: 12;
-                     -fx-border-color: #E0DED8;
-                     -fx-border-width: 0.5;
-                     -fx-border-radius: 12;
-                     -fx-padding: 40 32 40 32;"
-              maxWidth="360"
-              minWidth="360">
-
-            <Label text="Menu Profesor"
-                   style="-fx-font-size: 24;
-                          -fx-text-fill: #000000;">
-                <VBox.margin><Insets bottom="16"/></VBox.margin>
-            </Label>
-
-            <Button fx:id="buttonEvaluateReports"
-                    text="Evaluar Reportes"
-                    onAction="#goToEvaluateReports"
-                    maxWidth="Infinity"
-                    style="-fx-background-color: #87CEEB;
-                           -fx-text-fill: #ffffff;
-                           -fx-font-size: 14;
-                           -fx-font-weight: bold;
-                           -fx-background-radius: 8;
-                           -fx-pref-height: 44;
-                           -fx-cursor: hand;"/>
-
-            <Button fx:id="buttonRegisterNotifications"
-                    text="Registrar Notificaciones"
-                    onAction="#goToRegisterNotifications"
-                    maxWidth="Infinity"
-                    style="-fx-background-color: #87CEEB;
-                           -fx-text-fill: #ffffff;
-                           -fx-font-size: 14;
-                           -fx-font-weight: bold;
-                           -fx-background-radius: 8;
-                           -fx-pref-height: 44;
-                           -fx-cursor: hand;"/>
-
-              <Separator>
-                <VBox.margin><Insets top="8" bottom="8"/></VBox.margin>
-            </Separator>
-
-            <Button fx:id="buttonLogOut"
-                    text="Cerrar Sesion"
-                    onAction="#navigateToLogOut"
-                    maxWidth="Infinity"
-                    style="-fx-background-color: #E74C3C;
-                           -fx-text-fill: #FFFFFF;
-                           -fx-font-size: 14;
-                           -fx-font-weight: bold;
-                           -fx-background-radius: 8;
-                           -fx-pref-height: 44;
-                           -fx-cursor: hand;"/>
-
-        </VBox>
-    </VBox>
-</StackPane>
+<TitledPane animated="false" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" style="-fx-border-color: #87CEEB;" text="Experiencias Educativas" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="uv.lis.GUI.controller.FXMLProfessorMenuController">
+  <content>
+    <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0" style="-fx-background-color: #87CEEB; -fx-background-size: 20000;">
+         <children>
+            <TableView fx:id="tableViewSubjects" layoutX="42.0" layoutY="83.0" prefHeight="266.0" prefWidth="514.0">
+              <columns>
+                <TableColumn fx:id="tableColumnNrc" prefWidth="85.60000228881836" text="NRC" />
+                <TableColumn fx:id="tableColumnSubjectName" prefWidth="228.8000030517578" text="Experiencia Educativa" />
+                  <TableColumn fx:id="tableColumnPeriod" prefWidth="203.20001220703125" text="Periodo Escolar" />
+              </columns>
+            </TableView>
+            <ComboBox fx:id="comboBoxSchoolPeriod" layoutX="379.0" layoutY="43.0" prefHeight="26.0" prefWidth="177.0" />
+            <Label layoutX="333.0" layoutY="47.0" text="Periodo:" />
+         </children></AnchorPane>
+  </content>
+</TitledPane>

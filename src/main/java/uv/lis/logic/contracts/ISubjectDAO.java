@@ -14,4 +14,6 @@ public interface ISubjectDAO {
     String getSubjectNRCByStudentID(String studentID) throws OperationException;
 
     void unassignProfessorFromSubject(String personnelNumber) throws OperationException;
+
+    ArrayList<Subject> getSubjectsByProfessor(String personnelNumber) throws OperationException;
 }

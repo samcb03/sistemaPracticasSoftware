@@ -23,7 +23,6 @@ import uv.lis.GUI.ValidationHandler;
 import uv.lis.logic.dao.ProfessorDAO;
 import uv.lis.logic.dao.SchoolPeriodDAO;
 import uv.lis.logic.dao.SubjectDAO;
-import uv.lis.logic.dto.SchoolPeriod;
 import uv.lis.logic.dto.Subject;
 import uv.lis.logic.exceptions.OperationException;
 
