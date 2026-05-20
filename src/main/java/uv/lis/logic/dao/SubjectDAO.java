@@ -10,6 +10,7 @@ import java.util.logging.Logger;
 
 import uv.lis.dataaccess.MySQLConnectionManager;
 import uv.lis.logic.contracts.ISubjectDAO;
+import uv.lis.logic.dto.Student;
 import uv.lis.logic.dto.Subject;
 import uv.lis.logic.exceptions.OperationException;
 
@@ -29,10 +30,10 @@ public class SubjectDAO implements ISubjectDAO {
         boolean isRegistered = false;
 
         String subjectQuery = "INSERT INTO ExperienciaEducativa (NRC, nombreExperiencia, carrera, idPeriodoEscolar) "
-            + "VALUES (?, ?, ?, ?);";
+                              + "VALUES (?, ?, ?, ?);";
 
         String professorSubjectQuery = "INSERT INTO Profesor_Imparte_Experiencia (NRC, numeroPersonal) "
-            + "VALUES (?, ?);";
+                                       + "VALUES (?, ?);";
 
         try (Connection databaseConnection = connectionManager.getConnection()) {
 
@@ -191,5 +192,37 @@ public class SubjectDAO implements ISubjectDAO {
         return subjects;
     }
 
+   @Override
+    public ArrayList<Student> getEnrolledStudentsBySubject(int nrc) throws OperationException {
+        ArrayList<Student> enrolledStudents = new ArrayList<>();
+        String subjectQuery = "SELECT a.matricula, u.nombre, u.apellidos "
+                            + "FROM Alumno a "
+                            + "INNER JOIN Usuario u ON a.idUsuario = u.idUsuario "
+                            + "INNER JOIN alumno_esta_ee aee ON a.matricula = aee.matricula "
+                            + "WHERE aee.NRC = ? "
+                            + "ORDER BY u.apellidos, u.nombre";
+
+        try (Connection databaseConnection = connectionManager.getConnection();
+            PreparedStatement preparedStatement = databaseConnection.prepareStatement(subjectQuery)) {
+
+            preparedStatement.setInt(1, nrc);
+
+            try (ResultSet resultSet = preparedStatement.executeQuery()) {
+                while (resultSet.next()) {
+                    Student student = new Student();
+                    student.setIdStudent(resultSet.getString("matricula"));
+                    student.setFirstName(resultSet.getString("nombre"));
+                    student.setLastName(resultSet.getString("apellidos"));
+                    enrolledStudents.add(student);
+                }
+            }
+        } catch (SQLException sqlException) {
+            LOGGER.log(Level.SEVERE, "Error al obtener los alumnos inscritos", sqlException);
+            throw new OperationException("No se pudo obtener la lista de alumnos. Intente más tarde",
+                sqlException);
+        }
+
+        return enrolledStudents;
+    }
 }
 
