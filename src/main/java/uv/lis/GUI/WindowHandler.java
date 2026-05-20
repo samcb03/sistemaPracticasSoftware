@@ -2,6 +2,8 @@ package uv.lis.GUI;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -16,6 +18,7 @@ import uv.lis.logic.utils.SessionManager;
 
 public abstract class WindowHandler implements Initializable {
 
+     private static final Logger LOGGER = Logger.getLogger(WindowHandler.class.getName());
     @FXML protected Button buttonLogOut;
     @FXML protected Button buttonBack;
 
@@ -45,6 +48,21 @@ public abstract class WindowHandler implements Initializable {
         } catch (IOException e) {
             showError("Error al cerrar sesión");    
         }
+    }
+
+    protected FXMLLoader navigateToWithLoader(String fxml) {
+        FXMLLoader loader = null;
+        try {
+            loader = new FXMLLoader(getClass().getResource(fxml));
+            Parent root = loader.load();
+            Stage stage = new Stage();
+            stage.setScene(new Scene(root));
+            stage.show();
+        } catch (IOException ioException) {
+            LOGGER.log(Level.SEVERE, "Error al cargar la pantalla: {0}", fxml);
+            showError("No se pudo cargar la pantalla. Intente más tarde");
+        }
+        return loader;
     }
 
     @FXML

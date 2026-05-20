@@ -9,10 +9,12 @@ import java.util.logging.Logger;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.input.MouseEvent;
 
 import uv.lis.GUI.WindowHandler;
 import uv.lis.logic.dao.SchoolPeriodDAO;
@@ -25,6 +27,8 @@ import uv.lis.logic.utils.SessionManager;
 public class FXMLProfessorMenuController extends WindowHandler {
 
     private static final Logger LOGGER = Logger.getLogger(FXMLProfessorMenuController.class.getName());
+    private static final int DOUBLE_CLICK_COUNT = 2;
+    private static final String CONSULT_SUBJECT_VIEW = "/uv/lis/GUI/view/FXMLConsultSubject.fxml";
 
     @FXML private TableView<Subject> tableViewSubjects;
     @FXML private TableColumn<Subject, Integer> tableColumnNrc;
@@ -40,6 +44,7 @@ public class FXMLProfessorMenuController extends WindowHandler {
     public void initialize(URL location, ResourceBundle resources) {
         configureTableColumns();
         configureSchoolPeriodListener();
+        configureRowDoubleClick();
         loadSubjects();
         loadSchoolPeriods();
     }
@@ -55,6 +60,29 @@ public class FXMLProfessorMenuController extends WindowHandler {
             (observable, oldValue, newValue) -> filterSubjectsByPeriod(newValue));
     }
 
+    private void configureRowDoubleClick() {
+        tableViewSubjects.setOnMouseClicked(this::handleSubjectRowClicked);
+    }
+
+    @FXML
+    private void handleSubjectRowClicked(MouseEvent mouseEvent) {
+        boolean isDoubleClick = mouseEvent.getClickCount() == DOUBLE_CLICK_COUNT;
+        Subject selectedSubject = tableViewSubjects.getSelectionModel().getSelectedItem();
+
+        if (isDoubleClick && selectedSubject != null) {
+            navigateToConsultSubjectView(selectedSubject);
+        }
+    }
+
+    private void navigateToConsultSubjectView(Subject subject) {
+        FXMLLoader loader = navigateToWithLoader(CONSULT_SUBJECT_VIEW);
+
+        if (loader != null) {
+            FXMLConsultSubjectController controller = loader.getController();
+            controller.initializeData(subject);
+        }
+    }
+
     private void loadSchoolPeriods() {
         try {
             ArrayList<String> schoolPeriods = schoolPeriodDAO.getAllSchoolPeriodsNames();
@@ -64,7 +92,7 @@ public class FXMLProfessorMenuController extends WindowHandler {
 
             if (observableSchoolPeriods.isEmpty()) {
                 LOGGER.log(Level.WARNING, "No se encontraron periodos escolares registrados");
-            } 
+            }
         } catch (OperationException e) {
             LOGGER.log(Level.SEVERE, "Error al cargar periodos escolares", e);
             showError(e.getMessage());
@@ -78,26 +106,25 @@ public class FXMLProfessorMenuController extends WindowHandler {
         try {
             allSubjects = subjectDAO.getSubjectsByProfessor(personnelNumber);
             tableViewSubjects.setItems(FXCollections.observableArrayList(allSubjects));
-        } catch (OperationException operationException) {
-            LOGGER.log(Level.SEVERE, "Error al cargar experiencias educativas",
-                operationException);
-            showError(operationException.getMessage());
+        } catch (OperationException e) {
+            LOGGER.log(Level.SEVERE, "Error al cargar experiencias educativas", e);
+            showError(e.getMessage());
         }
     }
 
     private void filterSubjectsByPeriod(String selectedPeriod) {
-        ArrayList<Subject> filteredSubjects = new ArrayList<>();
+        if (selectedPeriod == null) {
+            tableViewSubjects.setItems(FXCollections.observableArrayList(allSubjects));
+        } else {
+            ArrayList<Subject> filteredSubjects = new ArrayList<>();
 
-        for(Subject subject : allSubjects) {
-            if(selectedPeriod.equals(subject.getSchoolPeriodName())) {
-                filteredSubjects.add(subject);
+            for (Subject subject : allSubjects) {
+                if (selectedPeriod.equals(subject.getSchoolPeriodName())) {
+                    filteredSubjects.add(subject);
+                }
             }
+
+            tableViewSubjects.setItems(FXCollections.observableArrayList(filteredSubjects));
         }
-
-        tableViewSubjects.setItems(FXCollections.observableArrayList(filteredSubjects));
-    }
-
-    public void goToConsultSubject() {
-        
     }
 }

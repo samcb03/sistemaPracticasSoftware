@@ -1,6 +1,5 @@
 package uv.lis.GUI.controller;
 
-
 import static uv.lis.logic.utils.InputValidator.STUDENT_ID_LENGTH;
 import static uv.lis.logic.utils.InputValidator.validateExactLength;
 
@@ -21,49 +20,92 @@ import javafx.scene.control.MenuItem;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.GridPane;
 import javafx.stage.Stage;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
+import uv.lis.logic.dto.Professor;
 import uv.lis.GUI.ValidationHandler;
 import uv.lis.logic.dao.RequestProjectDAO;
 import uv.lis.logic.dao.StudentDAO;
 import uv.lis.logic.dao.SubjectDAO;
 import uv.lis.logic.dto.Student;
-import uv.lis.logic.dto.Subject;
 import uv.lis.logic.exceptions.OperationException;
+import uv.lis.logic.utils.SessionManager;
 
 
 public class FXMLConsultStudentController extends ValidationHandler{
-    @FXML TextField textFieldStudentId;
-    @FXML Button buttonSearch;
-    @FXML GridPane gridPaneStudentInfo;
-    @FXML Label labelStudentId;
-    @FXML Label labelFirstName;
-    @FXML Label labelLastName;
-    @FXML Label labelDateBirth;
-    @FXML Label labelGender;
-    @FXML Button buttonUpdate;
-    @FXML Button buttonInactivate;
-    @FXML Button buttonBack;
-    @FXML Label labelMessage;
-    @FXML ContextMenu contextMenuSuggestions;
-    @FXML Label labelSubject;
-    @FXML Label labelProject;
-    @FXML Label labelIsInactive;
+    @FXML private TextField textFieldStudentId;
+    @FXML private Button buttonSearch;
+    @FXML private GridPane gridPaneStudentInfo;
+    @FXML private Label labelStudentId;
+    @FXML private Label labelFirstName;
+    @FXML private Label labelLastName;
+    @FXML private Label labelDateBirth;
+    @FXML private Label labelGender;
+    @FXML private Button buttonUpdate;
+    @FXML private Button buttonInactivate;
+    @FXML private Button buttonBack;
+    @FXML private Label labelMessage;
+    @FXML private ContextMenu contextMenuSuggestions;
+    @FXML private Label labelSubject;
+    @FXML private Label labelProject;
+    @FXML private Label labelIsInactive;
 
     private StudentDAO studentDAO;
     private RequestProjectDAO requestProjectDAO;
     private SubjectDAO subjectDAO;
-    private Subject subject;
-    private boolean studentLoaded = false;
+    private static final Logger LOGGER = Logger.getLogger(FXMLConsultStudentController.class.getName());
+    private static final String LABEL_INACTIVE = "Inactivo";
+    private static final String LABEL_ACTIVE = "Activo";
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         studentDAO = new StudentDAO();
         requestProjectDAO = new RequestProjectDAO();
         subjectDAO = new SubjectDAO();
-        subject = new Subject();
         setupControls(labelMessage, buttonBack);
         gridPaneStudentInfo.setVisible(true);
+        applyRolePermissions();
         setupAutocomplete();
+    }
+
+    public void initializeData(String studentId) {
+        try {
+            Optional<Integer> userIdOptional = studentDAO.getIdUserByStudentId(studentId);
+            Optional<Student> studentOptional = studentDAO.getStudentById(userIdOptional.get());
+
+            if (userIdOptional.isEmpty()) {
+                showError("No se encontró al alumno");
+                
+            } else if (studentOptional.isEmpty()) {
+                showError("No se encontró al alumno");
+            } else {
+                displayStudentInformation(studentOptional.get());
+                loadStudentAcademicInformation(studentId);
+                gridPaneStudentInfo.setVisible(true);
+                buttonInactivate.setVisible(true);
+            }
+        } catch (OperationException operationException) {
+            showError("Error al cargar la información del alumno: "
+                + operationException.getMessage());
+            gridPaneStudentInfo.setVisible(false);
+            buttonInactivate.setVisible(false);
+        }
+    }
+
+    private void displayStudentInformation(Student student) {
+        labelStudentId.setText(student.getIdStudent());
+        labelFirstName.setText(student.getFirstName());
+        labelLastName.setText(student.getLastName());
+        labelDateBirth.setText(student.getBirthDate().toString());
+        labelGender.setText(student.getGender());
+    }
+
+    private void loadStudentAcademicInformation(String studentId) throws OperationException {
+        String assignedNrc = subjectDAO.getSubjectNRCByStudentID(studentId);
+        labelSubject.setText(assignedNrc);
+        labelProject.setText(requestProjectDAO.getProjectAssignedToStudent(studentId));
+        labelIsInactive.setText(studentDAO.isStudentInactive(studentId) ? "Inactivo" : "Activo");
     }
 
     @FXML
@@ -72,7 +114,7 @@ public class FXMLConsultStudentController extends ValidationHandler{
         String studentId = textFieldStudentId.getText().trim();
         boolean isStudentFound = false;
 
-        Optional<String> validationError = validateExactLength(studentId, STUDENT_ID_LENGTH, "La matricula ");
+        Optional<String> validationError = validateExactLength(studentId, STUDENT_ID_LENGTH, "La studentId ");
 
         if (validationError.isPresent()) {
             showError(validationError.get());
@@ -94,7 +136,7 @@ public class FXMLConsultStudentController extends ValidationHandler{
                         labelGender.setText(student.getGender());
                         
                         String assignedNrc = subjectDAO.getSubjectNRCByStudentID(studentId);
-                        labelSubject.setText(assignedNrc != null ? assignedNrc : "Sin materia asignada");
+                        labelSubject.setText(assignedNrc);
                         
                         labelProject.setText(requestProjectDAO.getProjectAssignedToStudent(studentId));
                         labelIsInactive.setText(studentDAO.isStudentInactive(studentId) ? "Inactivo" : "Activo");
@@ -133,10 +175,10 @@ public class FXMLConsultStudentController extends ValidationHandler{
                     if (matches.isEmpty()) {
                         contextMenuSuggestions.hide();
                     } else {
-                        for (String matricula : matches) {
-                            MenuItem item = new MenuItem(matricula);
+                        for (String studentId : matches) {
+                            MenuItem item = new MenuItem(studentId);
                             item.setOnAction(e -> {
-                                textFieldStudentId.setText(matricula);
+                                textFieldStudentId.setText(studentId);
                                 contextMenuSuggestions.hide();
                             });
                             contextMenuSuggestions.getItems().add(item);
@@ -156,7 +198,7 @@ public class FXMLConsultStudentController extends ValidationHandler{
     @FXML
     private void inactivateStudent() {
         String studentId = labelStudentId.getText().trim();
-        Optional<String> validationError = validateExactLength(studentId, STUDENT_ID_LENGTH, "La matricula ");
+        Optional<String> validationError = validateExactLength(studentId, STUDENT_ID_LENGTH, "La studentId ");
 
         if (validationError.isPresent()) {
             showError(validationError.get());
@@ -218,6 +260,29 @@ public class FXMLConsultStudentController extends ValidationHandler{
         Optional<ButtonType> result = alert.showAndWait();
         confirmed = result.isPresent() && result.get() == yesButton;
         return confirmed;
+    }
+
+    private void applyRolePermissions() {
+        Professor currentProfessor = SessionManager.getInstance().getCurrentProfessor();
+
+        if (currentProfessor == null) {
+            LOGGER.log(Level.WARNING, "No hay profesor en sesión al cargar la vista de consulta de alumno");
+            hideCoordinatorOnlyControls();
+        } else if (!currentProfessor.getIsCoordinator()) {
+            hideCoordinatorOnlyControls();
+        }
+    }
+
+    private void hideCoordinatorOnlyControls() {
+        setNodeHidden(textFieldStudentId);
+        setNodeHidden(buttonSearch);
+        setNodeHidden(buttonUpdate);
+        setNodeHidden(buttonInactivate);
+    }
+
+    private void setNodeHidden(javafx.scene.Node node) {
+        node.setVisible(false);
+        node.setManaged(false);
     }
 
     @Override

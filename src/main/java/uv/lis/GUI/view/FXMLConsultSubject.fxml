@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ListView?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Pane?>
+<?import javafx.scene.layout.RowConstraints?>
+<?import javafx.scene.text.Font?>
+
+<AnchorPane prefHeight="520.0" prefWidth="647.0" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="uv.lis.GUI.controller.FXMLConsultSubjectController">
+
+    <children>
+
+        <Label layoutY="-1.0" prefHeight="20.0" prefWidth="647.0" style="-fx-background-color: orange; -fx-border-color: BLACK;" text="Experiencia Educativa" />
+
+        <Label layoutX="198.0" layoutY="29.0" text="Experiencia Educativa">
+            <font>
+                <Font name="System Bold" size="20.0" />
+            </font>
+        </Label>
+
+        <Pane layoutX="75.0" layoutY="60.0" prefHeight="439.0" prefWidth="510.0" style="-fx-background-color: #ffaf9c; -fx-background-radius: 20;">
+         <children>
+            <GridPane layoutX="66.0" layoutY="44.0" prefHeight="91.0" prefWidth="379.0">
+              <columnConstraints>
+                <ColumnConstraints hgrow="SOMETIMES" maxWidth="184.4000244140625" minWidth="10.0" prefWidth="126.0" />
+                <ColumnConstraints hgrow="SOMETIMES" maxWidth="253.0" minWidth="10.0" prefWidth="253.0" />
+              </columnConstraints>
+              <rowConstraints>
+                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+              </rowConstraints>
+               <children>
+                  <Label text="Experiencia Educativa:" />
+                  <Label text="NRC:" GridPane.rowIndex="1" />
+                  <Label text="Periodo:" GridPane.rowIndex="2" />
+                  <Label fx:id="labelSubject" prefHeight="18.0" prefWidth="250.0" GridPane.columnIndex="1" />
+                  <Label fx:id="labelNrc" prefHeight="18.0" prefWidth="259.0" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+                  <Label fx:id="labelSchoolPeriod" prefHeight="18.0" prefWidth="274.0" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+               </children>
+            </GridPane>
+            <ListView fx:id="listViewStudent" layoutX="66.0" layoutY="135.0" prefHeight="232.0" prefWidth="379.0" />
+            <HBox alignment="CENTER" layoutX="111.0" layoutY="386.0" prefHeight="30.0" prefWidth="289.0" spacing="20.0">
+               <children>
+                  <Button fx:id="buttonConsultStudent" mnemonicParsing="false" onAction="#handleConsultStudent" text="Consultar Alumno" />
+                  <Button fx:id="buttonConsultExpedient" mnemonicParsing="false" text="Ver archivos" />
+               </children>
+            </HBox>
+         </children>
+        </Pane>
+
+    </children>
+</AnchorPane>

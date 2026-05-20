@@ -2,6 +2,7 @@ package uv.lis.logic.contracts;
 
 import java.util.ArrayList;
 
+import uv.lis.logic.dto.Student;
 import uv.lis.logic.dto.Subject;
 import uv.lis.logic.exceptions.OperationException;
 
@@ -16,4 +17,6 @@ public interface ISubjectDAO {
     void unassignProfessorFromSubject(String personnelNumber) throws OperationException;
 
     ArrayList<Subject> getSubjectsByProfessor(String personnelNumber) throws OperationException;
+
+    ArrayList<Student> getEnrolledStudentsBySubject(int nrc) throws OperationException;
 }
