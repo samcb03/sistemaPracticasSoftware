@@ -1,11 +1,13 @@
 package uv.lis.GUI.controller;
 
 import static uv.lis.logic.utils.InputValidator.INVALID_ID;
+import static uv.lis.logic.utils.InputValidator.STUDENT_ENROLLMENT;
 import static uv.lis.logic.utils.InputValidator.STUDENT_ID_LENGTH;
 import static uv.lis.logic.utils.InputValidator.validateBirthDate;
 import static uv.lis.logic.utils.InputValidator.validateComboBox;
 import static uv.lis.logic.utils.InputValidator.validateEmail;
 import static uv.lis.logic.utils.InputValidator.validateExactLength;
+import static uv.lis.logic.utils.InputValidator.validateIdStudent;
 import static uv.lis.logic.utils.InputValidator.validateLettersOnly;
 import static uv.lis.logic.utils.InputValidator.validatePassword;
 
@@ -62,12 +64,14 @@ public class FXMLRegisterStudentController extends ValidationHandler {
     }
 
     private Optional<String> getFirstValidationError() {
+        String studentId = textFieldStudentId.getText().trim();
         Stream<Optional<String>> validationStream = Stream.of(
             validateLettersOnly(textFieldFirstName.getText(), "El nombre"),
             validateLettersOnly(textFieldLastName.getText(), "Los apellidos"),
             validateEmail(textFieldEmail.getText().trim(), "El correo electrónico"),
             validatePassword(passwordFieldPassword.getText().trim(), "La contraseña"),
             validateExactLength(textFieldStudentId.getText().trim(), STUDENT_ID_LENGTH, "La matrícula"),
+            validateIdStudent(studentId, STUDENT_ID_LENGTH, "La matricula"),
             validateBirthDate(datePickerBirthDate.getValue(), "La fecha de nacimiento"),
             validateComboBox(comboBoxGender.getValue(), "un género")
         );
@@ -83,6 +87,7 @@ public class FXMLRegisterStudentController extends ValidationHandler {
         try {
             int generatedUserId = userDAO.registerUser(student);
             if (generatedUserId != INVALID_ID) {
+                if(!student.getIdStudent().matches(STUDENT_ENROLLMENT))
                 student.setId(generatedUserId);
                 studentDAO.registerStudent(student);
                 showSuccess("Estudiante registrado correctamente");

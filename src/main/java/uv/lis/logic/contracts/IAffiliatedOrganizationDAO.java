@@ -20,4 +20,8 @@ public interface IAffiliatedOrganizationDAO {
     int getOrganizationIdByName(String name) throws OperationException;
 
     Optional<String> getOrganizationBySupervisorName(String nombreSupervisor) throws OperationException;
+
+    boolean isOrganizationInactive(int organizationId) throws OperationException;
+
+    ArrayList<String> searchOrganizationByName(String prefix) throws OperationException;
 }

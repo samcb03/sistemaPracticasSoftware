@@ -254,6 +254,58 @@ public class AffiliatedOrganizationDAO implements IAffiliatedOrganizationDAO{
                         throw new OperationException("Error al cargar el nombre de la organización", e);
                     }
             return organization;
+    }
+
+    @Override
+    public boolean isOrganizationInactive(int organizationId) throws OperationException {
+        boolean isInactive = false;
+        String organizationQuery = "SELECT estadoEnBD FROM OrganizacionVinculada WHERE idOrganizacionVinculado = ?";
+
+        try (Connection databaseConnection = connectionManager.getConnection();
+             PreparedStatement preparedStatement = databaseConnection.prepareStatement(organizationQuery)) {
+             
+            preparedStatement.setInt(1, organizationId);
+
+            try (ResultSet resultSet = preparedStatement.executeQuery()) {
+                if (resultSet.next()) {
+                    isInactive = resultSet.getInt("estadoEnBD") == 0;
+                } else {
+                    throw new OperationException("No se encontró la organización con ID: " + organizationId, null);
+                }
+            }
+
+        } catch (SQLException e) {
+            LOGGER.log(Level.SEVERE, "Error al verificar el estado de la organización", e);
+            throw new OperationException("No se pudo verificar la organización. Intente más tarde", e);
         }
 
+        return isInactive;
+    }
+
+    @Override
+    public ArrayList<String> searchOrganizationByName(String prefix) throws OperationException {
+        ArrayList<String> organizationNames = new ArrayList<>();
+        String query = "SELECT nombreOV FROM OrganizacionVinculada "
+            + "WHERE nombreOV LIKE ? AND estadoEnBD = 1 "
+            + "LIMIT 10";
+ 
+    try (Connection databaseConnection = connectionManager.getConnection();
+         PreparedStatement preparedStatement = databaseConnection.prepareStatement(query)) {
+ 
+        preparedStatement.setString(1, prefix + "%");
+ 
+        try (ResultSet resultSet = preparedStatement.executeQuery()) {
+            while (resultSet.next()) {
+                organizationNames.add(resultSet.getString("nombreOV"));
+            }
+        }
+ 
+    } catch (SQLException e) {
+        LOGGER.log(Level.SEVERE, "Error al buscar organizaciones por nombre", e);
+        throw new OperationException("Error al buscar organizaciones. Inténtelo más tarde.", e);
+    }
+ 
+    return organizationNames;
+    }
 }
+
