@@ -24,6 +24,7 @@ public final class InputValidator {
     public static final String PASSWORD_REGEX 
         =  "^(?=.*[A-Z])(?=.*\\d)(?=.*[!@#$%^&*()_+=\\[\\]{};':\"|,.<>/?-]).{8,}$";
     public static final String REPEAT_LETTERS_REGEX = "^.*([\\p{L}])\\1{2,}.*$";
+    public static final String STUDENT_ENROLLMENT = "^[Ss]\\d{8}$";
 
     public static Optional<String> validateLettersOnly(String fieldValue, String fieldName) {
         Optional<String> validationResult;
@@ -111,6 +112,19 @@ public final class InputValidator {
         }
         return validationResult;
     }
+
+    public static Optional<String> validateIdStudent(String fieldValue, int requiredLenght, String fieldName) {
+        Optional<String> validationResult;
+        if(fieldValue.isEmpty() || fieldValue.length() != requiredLenght) {
+            validationResult = Optional.of(fieldName + "debe tener exactamente " + requiredLenght + "caracteres");
+        } else if(!fieldValue.matches(STUDENT_ENROLLMENT)) {
+            validationResult = Optional.of(fieldName + " no sigue el formato establecido empezando con una 'S " );
+        } else {
+            validationResult = Optional.empty();
+        }
+        return validationResult;
+        }
+    
 
     public static Optional<String> validateComboBox(Object selectedValue, String fieldName) {
         Optional<String> validationResult;

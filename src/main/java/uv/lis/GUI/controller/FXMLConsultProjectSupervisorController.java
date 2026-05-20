@@ -48,12 +48,10 @@ public class FXMLConsultProjectSupervisorController extends ValidationHandler{
         affiliatedOrganizationDAO = new AffiliatedOrganizationDAO();
         projectSupervisorDAO      = new ProjectSupervisorDAO();
         projectSupervisor         = new ProjectSupervisor(); 
-        contextMenuSuggestions    = new ContextMenu();     
-
-        setupControls(labelMessage, buttonBack);        
-        gridPaneProjectSupervisorInfo.setVisible(false);  
-        buttonBack.setDisable(true);
-        buttonModify.setDisable(true);
+        contextMenuSuggestions    = new ContextMenu(); 
+        gridPaneProjectSupervisorInfo.setVisible(false); 
+        buttonModify.setDisable(true);    
+        setupControls(labelMessage, buttonBack);         
         setupAutocomplete();
     }
 
@@ -89,7 +87,6 @@ public class FXMLConsultProjectSupervisorController extends ValidationHandler{
                     );
 
                     gridPaneProjectSupervisorInfo.setVisible(true);
-                    buttonBack.setDisable(false);
                     buttonModify.setDisable(false);
                     labelMessage.setText("");
 
@@ -147,7 +144,6 @@ public class FXMLConsultProjectSupervisorController extends ValidationHandler{
         labelOrganization.setText("");
         labelProject.setText("");
         gridPaneProjectSupervisorInfo.setVisible(false);
-        buttonBack.setDisable(true);
         buttonModify.setDisable(true);
     }
 

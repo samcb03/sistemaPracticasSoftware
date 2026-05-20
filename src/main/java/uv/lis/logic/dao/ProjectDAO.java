@@ -233,4 +233,30 @@ public class ProjectDAO implements IProjectDAO{
             return project;
         }
 
+    @Override
+    public ArrayList<String> getProjectNamesByOrganizationId(int organizationId) throws OperationException {
+    ArrayList<String> projectNames = new ArrayList<>();
+    String query = "SELECT nombre FROM Proyecto "
+                 + "WHERE idOrganizacionVinculada = ? "
+                 + "AND estado = 1";
+ 
+    try (Connection databaseConnection = connectionManager.getConnection();
+         PreparedStatement preparedStatement = databaseConnection.prepareStatement(query)) {
+ 
+        preparedStatement.setInt(1, organizationId);
+ 
+        try (ResultSet resultSet = preparedStatement.executeQuery()) {
+            while (resultSet.next()) {
+                projectNames.add(resultSet.getString("nombre"));
+            }
+        }
+ 
+    } catch (SQLException e) {
+        LOGGER.log(Level.SEVERE, "Error al obtener proyectos por organización", e);
+        throw new OperationException("Error al obtener los proyectos de la organización.", e);
+    }
+ 
+    return projectNames;
+}
+
 }
