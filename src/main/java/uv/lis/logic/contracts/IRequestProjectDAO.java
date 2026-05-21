@@ -1,9 +1,11 @@
 package uv.lis.logic.contracts;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
 import uv.lis.logic.dto.Project;
+import uv.lis.logic.dto.Student;
 import uv.lis.logic.exceptions.OperationException;
 
 public interface IRequestProjectDAO {
@@ -26,5 +28,7 @@ public interface IRequestProjectDAO {
     String getProjectAssignedToStudent(String idStudent) throws OperationException;
 
     void unassignStudentFromProject(String idStudent) throws OperationException;
+
+    ArrayList<Student> getAssignedStudentsByProjectId(int idProject) throws OperationException;
 }
 

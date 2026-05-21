@@ -28,7 +28,7 @@ public class FXMLConsultProjectController extends WindowHandler {
 
     private static final Logger LOGGER = Logger.getLogger(FXMLConsultProjectController.class.getName());
     private static final int DOUBLE_CLICK_COUNT = 2;
-    private static final String CONSULT_PROJECT_VIEW = "/uv/lis/GUI/view/FXMLConsultProject.fxml";
+    private static final String CONSULT_PROJECT_VIEW = "/uv/lis/GUI/view/FXMLShowProjectDetail.fxml";
 
     @FXML private TableView<Project> tableViewProjects;
     @FXML private TableColumn<Project, String> tableColumnProjectName;
