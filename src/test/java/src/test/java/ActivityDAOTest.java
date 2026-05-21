@@ -16,6 +16,8 @@ import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.time.LocalDate;
+
 import uv.lis.dataaccess.MySQLConnectionManager;
 import uv.lis.logic.dao.ActivityDAO;
 import uv.lis.logic.dto.Activity;
@@ -60,16 +62,17 @@ class ActivityDAOTest {
         when(preparedStatement.executeUpdate()).thenReturn(rowsAffected);
     }
 
-    private void mockResultSetActivity() throws Exception {
+private void mockResultSetActivity() throws Exception {
         when(resultSet.next()).thenReturn(true, true, false);
 
         when(resultSet.getInt("idActividad")).thenReturn(1, 2);
         when(resultSet.getString("nombreActividad")).thenReturn("Actividad 1", "Actividad 2");
         when(resultSet.getString("descripcionActividad")).thenReturn("Descripción 1", "Descripción 2");
-        when(resultSet.getDate("FechaInicio"))
-                .thenReturn(Date.valueOf("2024-01-01"), Date.valueOf("2024-02-01"));
-        when(resultSet.getDate("FechaFin"))
-                .thenReturn(Date.valueOf("2024-12-31"), Date.valueOf("2024-11-30"));
+        when(resultSet.getObject("FechaInicio", LocalDate.class))
+                .thenReturn(LocalDate.of(2024, 1, 1), LocalDate.of(2024, 2, 1));
+        when(resultSet.getObject("FechaFin", LocalDate.class))
+                .thenReturn(LocalDate.of(2024, 12, 31), LocalDate.of(2024, 11, 30));
+        when(resultSet.getInt("idProyecto")).thenReturn(10, 11);
     }
 
     private Activity buildExpectedActivity() {
@@ -77,8 +80,9 @@ class ActivityDAOTest {
         expected.setId(1);
         expected.setName("Actividad 1");
         expected.setDescription("Descripción 1");
-        expected.setStartDate(Date.valueOf("2024-01-01"));
-        expected.setEndDate(Date.valueOf("2024-12-31"));
+        expected.setStartDate(LocalDate.of(2024, 1, 1));
+        expected.setEndDate(LocalDate.of(2024, 12, 31));
+        expected.setId(10);
         return expected;
     }
 

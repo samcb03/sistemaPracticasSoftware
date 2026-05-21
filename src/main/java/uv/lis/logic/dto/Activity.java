@@ -1,24 +1,27 @@
 package uv.lis.logic.dto;
 
-import java.sql.Date;
+
+import java.time.LocalDate;
 import java.util.Objects;
 
 public class Activity {
     private int id;
     private String name;
     private String description;
-    private Date startDate;
-    private Date endDate;
+    private LocalDate startDate;
+    private LocalDate endDate;
+    private int projectId;
 
     public Activity() {
     }
 
-    public Activity(int id, String name, String description, Date startDate, Date endDate) {
+    public Activity(int id, String name, String description, LocalDate startDate, LocalDate endDate, int projectId) {
         this.id = id;
         this.name = name;
         this.description = description;
         this.startDate = startDate;
         this.endDate = endDate;
+        this.projectId = projectId;
     }
 
     public int getId() {
@@ -45,22 +48,29 @@ public class Activity {
         this.description = description;
     }
 
-    public Date getStartDate() {
+    public LocalDate getStartDate() {
         return startDate;
     }
 
-    public void setStartDate(Date startDate) {
+    public void setStartDate(LocalDate startDate) {
         this.startDate = startDate;
     }
 
-    public Date getEndDate() {
+    public LocalDate getEndDate() {
         return endDate;
     }
 
-    public void setEndDate(Date endDate) {
+    public void setEndDate(LocalDate endDate) {
         this.endDate = endDate;
     }
+    
+    public int getProjectId() {
+        return projectId;
+    }
 
+    public void setProjectId(int projectId) {
+        this.projectId = projectId;
+    }
     
     @Override
     public boolean equals(Object object) {
@@ -78,4 +88,5 @@ public class Activity {
         && Objects.equals(startDate, other.startDate)
         && Objects.equals(endDate, other.endDate);
     }
+
 }

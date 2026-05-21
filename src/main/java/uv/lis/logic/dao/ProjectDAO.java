@@ -262,6 +262,35 @@ public class ProjectDAO implements IProjectDAO{
     }
  
     return projectNames;
-}
+    }
+
+    @Override
+    public Optional<Project> getProjectByStudentId(String studentId) throws OperationException {
+        Optional<Project> projectOptional = Optional.empty();
+        String projectQuery = "SELECT p.idProyecto, p.nombre FROM Proyecto p"
+                     + " JOIN Solicita_Proyecto sp ON p.idProyecto = sp.idProyecto"
+                     + " WHERE sp.matricula = ? "
+                     + " AND sp.estatus = 1";
+
+        try (Connection databaseConnection = connectionManager.getConnection();
+             PreparedStatement preparedStatement = databaseConnection.prepareStatement(projectQuery)) {
+
+            preparedStatement.setString(1, studentId);
+
+            try (ResultSet resultSet = preparedStatement.executeQuery()) {
+                if (resultSet.next()) {
+                    Project project = new Project();
+                    project.setId(resultSet.getInt("idProyecto")); 
+                    project.setName(resultSet.getString("nombre"));
+                    projectOptional = Optional.of(project);
+                }
+            }
+
+        } catch (SQLException e) {
+            LOGGER.log(Level.SEVERE, "Error al obtener el proyecto del alumno con matricula: " + studentId, e);
+            throw new OperationException("Error al obtener el proyecto del alumno.", e);
+        }
+        return projectOptional;
+    }
 
 }

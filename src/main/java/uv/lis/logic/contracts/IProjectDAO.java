@@ -22,5 +22,7 @@ public interface IProjectDAO {
 
     Optional<String> getProjectBySupervisorName(String supervisorName) throws OperationException;
 
+    Optional<Project> getProjectByStudentId(String studentId) throws OperationException;
+
     ArrayList<String> getProjectNamesByOrganizationId(int organizationId) throws OperationException;
 }

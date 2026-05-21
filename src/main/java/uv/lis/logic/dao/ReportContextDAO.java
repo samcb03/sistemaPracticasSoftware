@@ -9,10 +9,12 @@ import java.util.logging.Logger;
 
 import uv.lis.dataaccess.MySQLConnectionManager;
 import uv.lis.logic.contracts.IReportContextDAO;
+import uv.lis.logic.dto.MonthlyReport;
 import uv.lis.logic.dto.Report;
 import uv.lis.logic.exceptions.OperationException;
 
 public class ReportContextDAO implements IReportContextDAO {
+    private static final int NO_ROWS_AFFECTED = 0;
 
     private static final int REPORT_STATUS_ASSIGNED = 2;
     private static final Logger LOGGER = Logger.getLogger(ReportContextDAO.class.getName());
@@ -31,24 +33,24 @@ public class ReportContextDAO implements IReportContextDAO {
         Report report = new Report();
 
         String contextQuery = "SELECT u.nombre AS nombreAlumno, u.apellidos AS apellidosAlumno, "
-            + "ee.NRC AS nrc, "
-            + "pe.nombre AS periodo, "
-            + "uProf.nombre AS nombreProfesor, uProf.apellidos AS apellidosProfesor, "
-            + "p.nombre AS nombreProyecto, p.objetivo AS objetivoProyecto, "
-            + "p.metodologiaProyecto AS metodologiaProyecto, "
-            + "ov.nombreOV AS organizacion "
-            + "FROM Alumno a "
-            + "INNER JOIN Usuario u ON a.idUsuario = u.idUsuario "
-            + "INNER JOIN Alumno_Esta_EE aee ON a.matricula = aee.matricula "
-            + "INNER JOIN ExperienciaEducativa ee ON aee.NRC = ee.NRC "
-            + "INNER JOIN PeriodoEscolar pe ON ee.idPeriodoEscolar = pe.idPeriodoEscolar "
-            + "INNER JOIN Profesor_Imparte_Experiencia pie ON ee.NRC = pie.NRC "
-            + "INNER JOIN Profesor prof ON pie.numeroPersonal = prof.numeroPersonal "
-            + "INNER JOIN Usuario uProf ON prof.idUsuario = uProf.idUsuario "
-            + "INNER JOIN Solicita_Proyecto sp ON a.matricula = sp.matricula "
-            + "INNER JOIN Proyecto p ON sp.idProyecto = p.idProyecto "
-            + "INNER JOIN OrganizacionVinculada ov ON p.idOrganizacionVinculada = ov.idOrganizacionVinculada "
-            + "WHERE a.matricula = ? AND sp.estatus = " + REPORT_STATUS_ASSIGNED + ";";
+                            + "ee.NRC AS nrc, "
+                            + "pe.nombre AS periodo, "
+                            + "uProf.nombre AS nombreProfesor, uProf.apellidos AS apellidosProfesor, "
+                            + "p.nombre AS nombreProyecto, p.objetivo AS objetivoProyecto, "
+                            + "p.metodologiaProyecto AS metodologiaProyecto, "
+                            + "ov.nombreOV AS organizacion "
+                            + "FROM Alumno a "
+                            + "INNER JOIN Usuario u ON a.idUsuario = u.idUsuario "
+                            + "INNER JOIN Alumno_Esta_EE aee ON a.matricula = aee.matricula "
+                            + "INNER JOIN ExperienciaEducativa ee ON aee.NRC = ee.NRC "
+                            + "INNER JOIN PeriodoEscolar pe ON ee.idPeriodoEscolar = pe.idPeriodoEscolar "
+                            + "INNER JOIN Profesor_Imparte_Experiencia pie ON ee.NRC = pie.NRC "
+                            + "INNER JOIN Profesor prof ON pie.numeroPersonal = prof.numeroPersonal "
+                            + "INNER JOIN Usuario uProf ON prof.idUsuario = uProf.idUsuario "
+                            + "INNER JOIN Solicita_Proyecto sp ON a.matricula = sp.matricula "
+                            + "INNER JOIN Proyecto p ON sp.idProyecto = p.idProyecto "
+                            + "INNER JOIN OrganizacionVinculada ov ON p.idOrganizacionVinculada = ov.idOrganizacionVinculada "
+                            + "WHERE a.matricula = ? AND sp.estatus = " + REPORT_STATUS_ASSIGNED + ";";
 
         try (Connection databaseConnection = connectionManager.getConnection();
             PreparedStatement preparedStatement = databaseConnection.prepareStatement(contextQuery)) {
@@ -111,4 +113,97 @@ public class ReportContextDAO implements IReportContextDAO {
 
         return totalHours;
     }
+
+    @Override 
+    public MonthlyReport getMonthlyReportData(String studentId, int reportId) throws OperationException {
+        MonthlyReport monthlyReport = new MonthlyReport();
+        String monthlyReportQuery =   "SELECT "
+                                    + "u.nombre AS nombreAlumno, "
+                                    + "u.apellidos AS apellidosAlumno, "
+                                    + "r.idReporte AS numeroReporte, "
+                                    + "rm.mes AS mes, "
+                                    + "rm.horasReportadas AS horasReportadas, "
+                                    + "pe.nombre AS periodoPrincipal, "
+                                    + "uProf.nombre AS nombreAcademico, "
+                                    + "uProf.apellidos AS apellidosAcademico, "
+                                    + "ee.NRC AS nrc, "
+                                    + "(SELECT CONCAT(uCoord.nombre, ' ', uCoord.apellidos) "
+                                    + " FROM Profesor pCoord "
+                                    + " INNER JOIN Usuario uCoord ON pCoord.idUsuario = uCoord.idUsuario "
+                                    + " WHERE pCoord.idRol = 3 LIMIT 1) AS nombreCoordinador "
+                                    + "FROM Reporte r "
+                                    + "INNER JOIN Alumno a ON r.matricula = a.matricula "
+                                    + "INNER JOIN Usuario u ON a.idUsuario = u.idUsuario "
+                                    + "INNER JOIN ReporteMensual rm ON r.idReporte = rm.idReporte "
+                                    + "INNER JOIN Alumno_Esta_EE aee ON a.matricula = aee.matricula "
+                                    + "INNER JOIN ExperienciaEducativa ee ON aee.NRC = ee.NRC "
+                                    + "INNER JOIN PeriodoEscolar pe ON ee.idPeriodoEscolar = pe.idPeriodoEscolar "
+                                    + "INNER JOIN Profesor_Imparte_Experiencia pie ON ee.NRC = pie.NRC "
+                                    + "INNER JOIN Profesor prof ON pie.numeroPersonal = prof.numeroPersonal "
+                                    + "INNER JOIN Usuario uProf ON prof.idUsuario = uProf.idUsuario "
+                                    + "WHERE r.matricula = ? AND r.idReporte = ?";
+
+        try (Connection connection = connectionManager.getConnection();
+             PreparedStatement preparedStatement = connection.prepareStatement(monthlyReportQuery)) {
+
+            preparedStatement.setString(1, studentId); 
+            preparedStatement.setInt(2, reportId);
+
+            try (ResultSet resultSet = preparedStatement.executeQuery()) {
+                if (resultSet.next()) {
+                    String studentFullName = resultSet.getString("nombreAlumno") + " "
+                        + resultSet.getString("apellidosAlumno");
+                    
+                    monthlyReport.setStudentName(studentFullName);
+                    monthlyReport.setReportNumber(resultSet.getInt("numeroReporte"));
+                    monthlyReport.setMonth(resultSet.getString("mes"));
+                    monthlyReport.setReportedHours(resultSet.getInt("horasReportadas"));
+                    monthlyReport.setPeriod(resultSet.getString("periodoPrincipal"));
+                    monthlyReport.setProfessorName(
+                        resultSet.getString("nombreAcademico") + " "
+                        + resultSet.getString("apellidosAcademico"));
+                        
+                    monthlyReport.setCoordinadorName(resultSet.getString("nombreCoordinador"));
+                        
+                } else {
+                    throw new OperationException(
+                        "No se encontraron datos del reporte para la matrícula: "
+                        + studentId, null);
+                }
+            }
+
+        } catch (SQLException e) { 
+            LOGGER.log(Level.SEVERE, "Error al obtener encabezado del reporte mensual", e);
+            throw new OperationException("Error al obtener los datos del reporte mensual.", e);
+        }
+        return monthlyReport;
+    }
+
+
+    @Override
+    public String getHoursAccumulate(String studentId) throws OperationException {
+        String accumulateHours= "0";
+        String hoursQuery = "SELECT COALESCE(SUM(rm.horasReportadas), 0) AS total "
+                          + "FROM Reporte r "
+                          + "INNER JOIN ReporteMensual rm ON r.idReporte = rm.idReporte "
+                          + "WHERE r.matricula = ?";
+
+        try (Connection databaseConnection = connectionManager.getConnection();
+             PreparedStatement preparedStatement = databaseConnection.prepareStatement(hoursQuery)) {
+
+            preparedStatement.setString(1, studentId);
+
+            try (ResultSet resultSet = preparedStatement.executeQuery()) {
+                if (resultSet.next()) {
+                    hoursQuery = String.valueOf(resultSet.getInt("total"));
+                }
+            }
+        } catch (SQLException e) {
+            LOGGER.log(Level.SEVERE, "Error al calcular horas acumuladas", e);
+            throw new OperationException("Error al calcular las horas acumuladas", e);
+        }
+
+        return accumulateHours;
+    }
+
 }
