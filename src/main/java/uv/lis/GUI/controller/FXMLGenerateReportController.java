@@ -62,7 +62,7 @@ public class FXMLGenerateReportController extends ValidationHandler {
     }
 
     @FXML
-    public void generateReport() {
+    public void validatorReport() {
         validateFields();
     }
 
@@ -132,10 +132,10 @@ public class FXMLGenerateReportController extends ValidationHandler {
             .or(() -> resultObservation2Validation)
             .or(() -> generalObservationsValidation);
 
-        handleValidation(validationError, this::GenerateReport);
+        handleValidation(validationError, this::generateReport);
     }
 
-    private void GenerateReport() {
+    private void generateReport() {
         try {
             Report report = buildReport();
             JasperPrint jasperPrint = finalReportCommon.generateFinalReport(report);
