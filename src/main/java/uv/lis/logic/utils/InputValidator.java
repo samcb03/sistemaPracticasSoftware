@@ -152,7 +152,34 @@ public final class InputValidator {
                 validationResult = Optional.empty();
             }
         }
-        
+        return validationResult;
+    }
+
+    public static Optional<String> validateStartDate(LocalDate startDate, String fieldName) {
+        Optional<String> validationResult;
+        if (startDate == null) {
+            validationResult = Optional.of("Seleccione una fecha de inicio");
+        } else {
+            LocalDate today = LocalDate.now();
+            
+            if (startDate.isBefore(today)) {
+                validationResult = Optional.of(fieldName + " no puede ser pasada");
+            } else {
+                validationResult = Optional.empty();
+            }
+        }
+        return validationResult;
+    }
+
+    public static Optional<String> validateEndDate(LocalDate startDate, LocalDate endDate, String fieldName) {
+        Optional<String> validationResult;
+        if (endDate == null) {
+            validationResult = Optional.of("Seleccione una fecha de finalización");
+        } else if (startDate != null && endDate.isBefore(startDate)) {
+            validationResult = Optional.of(fieldName + " no puede ser anterior a la fecha de inicio");
+        } else {
+            validationResult = Optional.empty();
+        }
         return validationResult;
     }
 }
