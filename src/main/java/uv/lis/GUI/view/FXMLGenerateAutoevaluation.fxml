@@ -14,7 +14,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane prefHeight="750.0" prefWidth="850.0" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="uv.lis.GUI.controller.FXMLGenerateAutoevaluation">
+<AnchorPane prefHeight="750.0" prefWidth="850.0" xmlns="http://javafx.com/javafx/26" xmlns:fx="http://javafx.com/fxml/1" fx:controller="uv.lis.GUI.controller.FXMLGenerateAutoevaluation">
    <children>
       <ScrollPane fitToWidth="true" prefHeight="750.0" prefWidth="850.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
          <content>
@@ -70,7 +70,7 @@
                   </GridPane>
                   <Separator prefWidth="200.0" />
                   
-                  <Label text="INSTRUCCIONES: Responde a cada afirmación (1 = Totalmente en desacuerdo, 5 = Totalmente de acuerdo)." wrapText="true">
+                  <Label prefHeight="52.0" prefWidth="774.0" text="INSTRUCCIONES: Responde a cada afirmación (1 = Totalmente en desacuerdo, 2=En desacuerdo, 3= Indeciso, 4= De acuerdo                 5 = Totalmente de acuerdo)." wrapText="true">
                      <font>
                         <Font name="System Italic" size="14.0" />
                      </font>
@@ -186,8 +186,8 @@
                   
                   <HBox alignment="CENTER_RIGHT" spacing="15.0">
                      <children>
-                        <Button fx:id="buttonBack" text="Cancelar" prefHeight="35.0" prefWidth="100.0" />
-                        <Button fx:id="buttonGenerar" onAction="#generateAutoevaluation" text="Generar PDF" prefHeight="35.0" prefWidth="120.0" style="-fx-background-color: #3498db; -fx-text-fill: white;">
+                        <Button fx:id="buttonBack" prefHeight="35.0" prefWidth="100.0" text="Cancelar" />
+                        <Button fx:id="buttonGenerar" onAction="#generateAutoevaluation" prefHeight="35.0" prefWidth="120.0" style="-fx-background-color: #3498db; -fx-text-fill: white;" text="Generar PDF">
                            <font><Font name="System Bold" size="14.0" /></font>
                         </Button>
                      </children>

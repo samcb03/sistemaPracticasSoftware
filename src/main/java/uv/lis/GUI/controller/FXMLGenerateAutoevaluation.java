@@ -29,10 +29,8 @@ public class FXMLGenerateAutoevaluation extends ValidationHandler {
     @FXML private Label labelProject;
     @FXML private Label labelProjectSupervisor;
     @FXML private Label labelMessage;
-    
-    @FXML private Button buttonGenerar;
+    @FXML private Button buttonGenerate;
     @FXML private Button buttonBack;
-    
     @FXML private RadioButton rb1_1, rb1_2, rb1_3, rb1_4, rb1_5;
     @FXML private RadioButton rb2_1, rb2_2, rb2_3, rb2_4, rb2_5;
     @FXML private RadioButton rb3_1, rb3_2, rb3_3, rb3_4, rb3_5;
@@ -97,7 +95,7 @@ public class FXMLGenerateAutoevaluation extends ValidationHandler {
 
             } catch (OperationException e) {
                 showError("No se encontró un proyecto asignado: " + e.getMessage());
-                buttonGenerar.setDisable(true);
+                buttonGenerate.setDisable(true);
             }
         }
     }

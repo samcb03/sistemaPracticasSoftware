@@ -35,10 +35,9 @@ public class PracticeDAO implements IPracticeDAO {
 
             preparedStatement.setInt(1, practice.getIdPractice());
             preparedStatement.setString(2, practice.getPracticeName());
-            preparedStatement.setString(3, practice.getDescription());
-            preparedStatement.setString(4, practice.getStartDate()); 
-            preparedStatement.setString(5, practice.getFinalDate());
-            preparedStatement.setInt(6, practice.getProjectId());
+            preparedStatement.setString(3, practice.getStartDate()); 
+            preparedStatement.setString(4, practice.getFinalDate());
+            preparedStatement.setInt(5, practice.getProjectId());
 
                 if (preparedStatement.executeUpdate() > NO_ROWS_AFFECTED){
                     try(ResultSet resultSet = preparedStatement.getGeneratedKeys()) {

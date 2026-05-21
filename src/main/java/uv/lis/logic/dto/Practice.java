@@ -81,7 +81,6 @@ public class Practice {
         
         Practice other = (Practice) object;
         return idPractice == other.idPractice
-            && Objects.equals(description, other.description)
             && Objects.equals(startDate, other.startDate) 
             && Objects.equals(finalDate, other.finalDate)
             && Objects.equals(practiceName, other.practiceName)
@@ -93,6 +92,6 @@ public class Practice {
 
     @Override
     public int hashCode() {
-        return Objects.hash(idPractice, description, startDate, finalDate, practiceName, period, calification, student, subject);
+        return Objects.hash(idPractice, startDate, finalDate, practiceName, period, calification, student, subject);
     }
 }
