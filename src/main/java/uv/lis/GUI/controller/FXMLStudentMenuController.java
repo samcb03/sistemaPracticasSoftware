@@ -23,6 +23,7 @@ public class FXMLStudentMenuController extends ValidationHandler {
     @FXML private Button buttonAutoevaluation;
     @FXML private Button buttonUploadDocuments;
     @FXML private Button buttonLogOut;
+    @FXML private Button buttonRegisterActivity;
     @FXML private Label labelMessage;
 
     private Student student;
@@ -78,8 +79,14 @@ public class FXMLStudentMenuController extends ValidationHandler {
         navigateTo("/uv/lis/GUI/view/FXMLGenerateAutoevaluation.fxml");
     }
  
-    @FXML void goToUploadDocuments() {
+    @FXML 
+    public void goToUploadDocuments() {
         navigateTo("/uv/lis/GUI/view/FXMLUploadDocuments.fxml");
+    }
+
+    @FXML 
+    public void goToRegisterActivity() {
+        navigateTo("/uv/lis/GUI/view/FXMLRegisterActivity.fxml");
     }
 
     @Override

@@ -2,12 +2,13 @@ package uv.lis.GUI.controller;
 
 import java.net.URL;
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.Optional;
 import java.util.ResourceBundle;
 
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
-import javafx.scene.control.DatePicker;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import uv.lis.GUI.FormValidator;
@@ -22,6 +23,9 @@ import uv.lis.logic.utils.SessionManager;
 
 public class FXMLRegisterActivityController extends ValidationHandler {
 
+    private static final DateTimeFormatter DATE_FORMATTER
+        = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+
     @FXML private Button buttonRegister;
     @FXML private Button buttonBack;
     @FXML private Label labelActivityName;
@@ -33,19 +37,19 @@ public class FXMLRegisterActivityController extends ValidationHandler {
 
     @FXML private TextField textFieldActivity;
     @FXML private TextField textFieldDescription;
-    @FXML private DatePicker datePickerStarDate;
-    @FXML private DatePicker datePickerFinalDate;
+    @FXML private TextField textFieldStarDate;
+    @FXML private TextField textFieldFinalDate;
 
     private ActivityDAO activityDAO;
     private ProjectDAO projectDAO;
-    private int currentProjectId; 
+    private int currentProjectId;
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         activityDAO = new ActivityDAO();
         projectDAO = new ProjectDAO();
         setupControls(labelError, buttonBack);
-        loadStudentProject(); 
+        loadStudentProject();
     }
 
     @FXML
@@ -54,7 +58,7 @@ public class FXMLRegisterActivityController extends ValidationHandler {
             textFieldActivity.getText(),
             textFieldDescription.getText()
         );
-        
+
         handleValidation(validationError, this::registerActivity);
     }
 
@@ -76,10 +80,10 @@ public class FXMLRegisterActivityController extends ValidationHandler {
                 showError("No hay una sesión activa. Por favor, inicia sesión.");
                 disableForm();
             }
-            
-        } catch (Exception e) { 
+
+        } catch (Exception e) {
             showError("Error crítico al verificar tu proyecto.");
-            disableForm(); 
+            disableForm();
         }
     }
 
@@ -87,45 +91,71 @@ public class FXMLRegisterActivityController extends ValidationHandler {
         buttonRegister.setDisable(true);
         textFieldActivity.setDisable(true);
         textFieldDescription.setDisable(true);
-        datePickerStarDate.setDisable(true);
-        datePickerFinalDate.setDisable(true);
+        textFieldStarDate.setDisable(true);
+        textFieldFinalDate.setDisable(true);
     }
 
     private void registerActivity() {
-        Activity activity = buildActivity();
-        
-        try {
-            boolean registrationSuccessful = activityDAO.registerActivity(activity);
-            
-            if (registrationSuccessful) {
-                showSuccess("Actividad registrada correctamente");
-                clearFields();
-            } else {
-                showError("Error al registrar la actividad");
+        Optional<Activity> builtActivity = buildActivity();
+
+        if (!builtActivity.isEmpty()) {
+            try {
+                boolean registrationSuccessful = activityDAO.registerActivity(builtActivity.get());
+
+                if (registrationSuccessful) {
+                    showSuccess("Actividad registrada correctamente");
+                    clearFields();
+                } else {
+                    showError("Error al registrar la actividad");
+                }
+            } catch (OperationException operationException) {
+                showError(operationException.getMessage());
             }
-        } catch (OperationException operationException) {
-            showError(operationException.getMessage());
-        }
+        } 
     }
 
-    private Activity buildActivity() {
+    private Optional<Activity> buildActivity() {
+        Optional<LocalDate> startDate = parseDate(textFieldStarDate.getText(), "Fecha Inicio");
+        Optional<Activity> optionalActivity = Optional.empty();
+        if (startDate.isEmpty()) {
+            optionalActivity = Optional.empty();
+        }
+
+        Optional<LocalDate> endDate = parseDate(textFieldFinalDate.getText(), "Fecha Final");
+        if (endDate.isEmpty()) {
+            optionalActivity = Optional.empty();
+        }
+
         Activity activity = new Activity();
         activity.setName(textFieldActivity.getText().trim());
         activity.setDescription(textFieldDescription.getText().trim());
-        activity.setStartDate(datePickerStarDate.getValue());
-        activity.setEndDate(datePickerFinalDate.getValue());
+        activity.setStartDate(startDate.get());
+        activity.setEndDate(endDate.get());
         activity.setProjectId(currentProjectId);
 
-        return activity;
+        optionalActivity = Optional.of(activity);
+        return optionalActivity;
+    }
+
+    private Optional<LocalDate> parseDate(String rawDate, String fieldName) {
+        Optional<LocalDate> parsed = Optional.empty();
+
+        try {
+            parsed = Optional.of(LocalDate.parse(rawDate.trim(), DATE_FORMATTER));
+        } catch (DateTimeParseException dateTimeParseException) {
+            showError("El campo " + fieldName + " debe tener el formato dd/mm/yyyy");
+        }
+
+        return parsed;
     }
 
     @Override
     protected void clearFields() {
         textFieldActivity.clear();
         textFieldDescription.clear();
-        datePickerStarDate.setValue(null);
-        datePickerFinalDate.setValue(null);
-        
-        textFieldActivity.requestFocus(); 
+        textFieldStarDate.clear();
+        textFieldFinalDate.clear();
+
+        textFieldActivity.requestFocus();
     }
 }
