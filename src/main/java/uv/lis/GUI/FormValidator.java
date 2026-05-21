@@ -2,7 +2,7 @@ package uv.lis.GUI;
 
 import static uv.lis.logic.utils.InputValidator.validateEmail;
 import static uv.lis.logic.utils.InputValidator.validateEndDate;
-import static uv.lis.logic.utils.InputValidator.validateLettersOnly;
+import static uv.lis.logic.utils.InputValidator.validateText;
 import static uv.lis.logic.utils.InputValidator.validatePhoneNumber;
 import static uv.lis.logic.utils.InputValidator.validateStartDate;
 
@@ -22,8 +22,8 @@ public class FormValidator {
         LocalDate finalDate = Activity.getEndDate();
 
         Stream<Optional<String>> validationStream = Stream.of(
-            validateLettersOnly(activityName, "El nombre de la actividad"),
-            validateLettersOnly(description, "La descripción"),
+            validateText(activityName, "El nombre de la actividad"),
+            validateText(description, "La descripción"),
             validateStartDate(startDate, "La fecha de inicio"),
             validateEndDate(startDate, finalDate, "La fecha de finalización")
         );
@@ -38,10 +38,10 @@ public class FormValidator {
 
 public static Optional<String> validateOrganizationForm(AffiliatedOrganization organization) {
     return Stream.of(
-        validateLettersOnly(organization.getName(), "El nombre"),
-        validateLettersOnly(organization.getCity(), "La ciudad"),
-        validateLettersOnly(organization.getState(), "El estado"),
-        validateLettersOnly(organization.getSector(), "El sector"),
+        validateText(organization.getName(), "El nombre"),
+        validateText(organization.getCity(), "La ciudad"),
+        validateText(organization.getState(), "El estado"),
+        validateText(organization.getSector(), "El sector"),
         validateEmail(organization.getEmail(), "El correo electrónico"),
         validatePhoneNumber(organization.getPhoneNumber(), "El número de teléfono")
     )

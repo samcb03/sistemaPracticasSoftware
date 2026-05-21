@@ -8,7 +8,7 @@ import static uv.lis.logic.utils.InputValidator.validateComboBox;
 import static uv.lis.logic.utils.InputValidator.validateEmail;
 import static uv.lis.logic.utils.InputValidator.validateExactLength;
 import static uv.lis.logic.utils.InputValidator.validateIdStudent;
-import static uv.lis.logic.utils.InputValidator.validateLettersOnly;
+import static uv.lis.logic.utils.InputValidator.validateText;
 import static uv.lis.logic.utils.InputValidator.validatePassword;
 
 import java.net.URL;
@@ -66,8 +66,8 @@ public class FXMLRegisterStudentController extends ValidationHandler {
     private Optional<String> getFirstValidationError() {
         String studentId = textFieldStudentId.getText().trim();
         Stream<Optional<String>> validationStream = Stream.of(
-            validateLettersOnly(textFieldFirstName.getText(), "El nombre"),
-            validateLettersOnly(textFieldLastName.getText(), "Los apellidos"),
+            validateText(textFieldFirstName.getText(), "El nombre"),
+            validateText(textFieldLastName.getText(), "Los apellidos"),
             validateEmail(textFieldEmail.getText().trim(), "El correo electrónico"),
             validatePassword(passwordFieldPassword.getText().trim(), "La contraseña"),
             validateExactLength(textFieldStudentId.getText().trim(), STUDENT_ID_LENGTH, "La matrícula"),

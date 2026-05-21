@@ -1,7 +1,7 @@
 package uv.lis.GUI.controller;
 
 import static uv.lis.logic.utils.InputValidator.validateComboBox;
-import static uv.lis.logic.utils.InputValidator.validateLettersOnly;
+import static uv.lis.logic.utils.InputValidator.validateText;
 import static uv.lis.logic.utils.InputValidator.validatePositiveInteger;
 
 import java.net.URL;
@@ -66,11 +66,11 @@ public class FXMLRegisterProjectController extends ValidationHandler {
 
     private Optional<String> getFirstValidationError() {
         Stream<Optional<String>> validationStream = Stream.of(
-            validateLettersOnly(textFieldName.getText(), "El nombre"),
-            validateLettersOnly(textFieldMethodology.getText(), "La metodología"),
+            validateText(textFieldName.getText(), "El nombre"),
+            validateText(textFieldMethodology.getText(), "La metodología"),
             validatePositiveInteger(textFieldCapacity.getText().trim(), "El cupo"),
-            validateLettersOnly(textFieldObjective.getText(), "El objetivo"),
-            validateLettersOnly(textAreaDescription.getText(), "La descripción"),
+            validateText(textFieldObjective.getText(), "El objetivo"),
+            validateText(textAreaDescription.getText(), "La descripción"),
             validateComboBox(comboBoxOrganizationName.getValue(), " organización")
         );
         Optional<String> firstError = validationStream

@@ -3,6 +3,7 @@ package uv.lis.logic.utils;
 import java.time.LocalDate;
 import java.time.Period;
 import java.util.Optional;
+import java.util.stream.Stream;
 
 public final class InputValidator {
 
@@ -16,7 +17,10 @@ public final class InputValidator {
     public static final int MIN_POSITIVE_INTEGER = 1;
     public static final int INVALID_ID = -1;
     private static final int MINIMUM_AGE = 18;
-    public static final String LETTERS_ONLY_REGEX = "^(?!\\s)(?!.*\\s{2,})(?!.*\\s$)[\\p{L}\\s]+$";
+    public static final String LETTERS_ONLY_REGEX = "^[\\p{L}\\s]+$";
+    public static final String LEADING_SPACE_REGEX = "^\\s.*";
+    public static final String TRAILING_SPACE_REGEX = ".*\\s$";
+    public static final String CONSECUTIVE_SPACES_REGEX = ".*\\s{2,}.*";
     public static final String ONLY_NUMBERS_REGEX = "\\d+";
     public static final String EMAIL_REGEX 
         = "^[a-zA-Z0-9_+&*-]+(?:\\.[a-zA-Z0-9_+&*-]+)*@(?:[a-zA-Z0-9-]+\\.)+[a-zA-Z]{2,7}$";
@@ -26,20 +30,101 @@ public final class InputValidator {
     public static final String REPEAT_LETTERS_REGEX = "^.*([\\p{L}])\\1{2,}.*$";
     public static final String STUDENT_ENROLLMENT = "^[Ss]\\d{8}$";
 
-    public static Optional<String> validateLettersOnly(String fieldValue, String fieldName) {
+    public static Optional<String> validateNotEmpty(String fieldValue, String fieldName) {
         Optional<String> validationResult;
-        if (fieldValue.isEmpty() || fieldValue.length() > MAX_TEXT_LENGTH) {
-            validationResult = Optional.of(fieldName + " no puede estar vacío o tener más de "
-                + MAX_TEXT_LENGTH + " caracteres");
-        } else if (!fieldValue.matches(LETTERS_ONLY_REGEX)) {
-            validationResult = Optional.of(fieldName + " solo acepta letras");
-        } else if (fieldValue.matches(REPEAT_LETTERS_REGEX)) {
-            validationResult = Optional.of(fieldName + " no puede contener caracteres repetidos consecutivamente");
-        }  else {
+
+        if (fieldValue == null || fieldValue.trim().isEmpty()) {
+            validationResult = Optional.of(fieldName + " no puede estar vacío");
+        } else {
+            validationResult = Optional.empty();
+        }
+
+        return validationResult;
+    }
+
+    public static Optional<String> validateMaxLength(String fieldValue, int maxLength,
+            String fieldName) {
+        Optional<String> validationResult;
+
+        if (fieldValue.length() > maxLength) {
+            validationResult = Optional.of(
+                fieldName + " no puede exceder los " + maxLength + " caracteres");
+        } else {
+            validationResult = Optional.empty();
+        }
+
+        return validationResult;
+    }
+
+    public static Optional<String> validateLettersOnly(String fieldValue, String fieldName) {
+        Optional<String> validationResult = Optional.empty();
+
+        if (!fieldValue.matches(LETTERS_ONLY_REGEX)) {
+            validationResult = Optional.of(
+                fieldName + " solo acepta letras y espacios");
+        }
+
+        return validationResult;
+    }
+
+    public static Optional<String> validateNoLeadingSpace(String fieldValue, String fieldName) {
+        Optional<String> validationResult = Optional.empty();
+
+        if (fieldValue.matches(LEADING_SPACE_REGEX)) {
+            validationResult = Optional.of(
+                fieldName + " no puede comenzar con un espacio");
+        }
+
+        return validationResult;
+    }
+
+    public static Optional<String> validateNoTrailingSpace(String fieldValue, String fieldName) {
+        Optional<String> validationResult = Optional.empty();
+
+        if (fieldValue.matches(TRAILING_SPACE_REGEX)) {
+            validationResult = Optional.of(
+                fieldName + " no puede terminar con un espacio");
+        }
+
+        return validationResult;
+    }
+
+    public static Optional<String> validateNoConsecutiveSpaces(String fieldValue,
+            String fieldName) {
+        Optional<String> validationResult = Optional.empty();
+
+        if (fieldValue.matches(CONSECUTIVE_SPACES_REGEX)) {
+            validationResult = Optional.of(
+                fieldName + " no puede contener espacios consecutivos");
+        }
+
+        return validationResult;
+    }
+
+    public static Optional<String> validateNoConsecutiveRepeatedLetters(String fieldValue,
+            String fieldName) {
+        Optional<String> validationResult;
+
+        if (fieldValue.matches(REPEAT_LETTERS_REGEX)) {
+            validationResult = Optional.of(
+                fieldName + " no puede contener la misma letra repetida 3 veces o más");
+        } else {
             validationResult = Optional.empty();
         }
         return validationResult;
     }
+
+    public static Optional<String> validateText(String name, String fieldName) {
+    return Stream.of(
+            InputValidator.validateLettersOnly(name, fieldName),
+            InputValidator.validateNoLeadingSpace(name, fieldName),
+            InputValidator.validateNoTrailingSpace(name, fieldName),
+            InputValidator.validateNoConsecutiveSpaces(name, fieldName),
+            InputValidator.validateNoConsecutiveRepeatedLetters(name, fieldName))
+        .filter(Optional::isPresent)
+        .findFirst()
+        .orElse(Optional.empty());
+}
 
     public static Optional<String> validateEmail(String emailValue, String fieldName) {
         Optional<String> validationResult;

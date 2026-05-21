@@ -1,7 +1,7 @@
 package uv.lis.GUI.controller;
 
 import static uv.lis.logic.utils.InputValidator.validateEmail;
-import static uv.lis.logic.utils.InputValidator.validateLettersOnly;
+import static uv.lis.logic.utils.InputValidator.validateText;
 import static uv.lis.logic.utils.InputValidator.validatePhoneNumber;
 import static uv.lis.logic.utils.InputValidator.validatePositiveInteger;
 
@@ -49,10 +49,10 @@ public class FXMLRegisterAffiliatedOrganizationController extends ValidationHand
 
     private Optional<String> getFirstValidationError() {
         Stream<Optional<String>> validationStream = Stream.of(
-            validateLettersOnly(textFieldName.getText(), "El nombre"),
-            validateLettersOnly(textFieldCity.getText(), "La ciudad"),
-            validateLettersOnly(textFieldState.getText(), "El estado"),
-            validateLettersOnly(textFieldSector.getText(), "El sector"),
+            validateText(textFieldName.getText(), "El nombre"),
+            validateText(textFieldCity.getText(), "La ciudad"),
+            validateText(textFieldState.getText(), "El estado"),
+            validateText(textFieldSector.getText(), "El sector"),
             validateEmail(textFieldEmail.getText().trim(), "El correo electrónico"),
             validatePhoneNumber(textFieldPhoneNumber.getText().trim(), "El número de teléfono"),
             validatePositiveInteger(textFieldNumberOfDirectUsers.getText().trim(), 

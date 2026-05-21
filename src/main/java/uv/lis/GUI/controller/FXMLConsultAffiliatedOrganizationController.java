@@ -1,6 +1,6 @@
 package uv.lis.GUI.controller;
 
-import static uv.lis.logic.utils.InputValidator.validateLettersOnly;
+import static uv.lis.logic.utils.InputValidator.validateText;
 
 import java.net.URL;
 import java.util.ArrayList;
@@ -69,7 +69,7 @@ public class FXMLConsultAffiliatedOrganizationController extends ValidationHandl
         clearFields();
         String organizationName = textFieldOrganizationName.getText().trim();
 
-        Optional<String> validationError = validateLettersOnly(organizationName, "La organización");
+        Optional<String> validationError = validateText(organizationName, "La organización");
 
         if(validationError.isPresent()) {
             showError(validationError.get());

@@ -1,6 +1,6 @@
 package uv.lis.GUI.controller;
 
-import static uv.lis.logic.utils.InputValidator.validateLettersOnly;
+import static uv.lis.logic.utils.InputValidator.validateText;
 
 import java.net.URL;
 import java.util.ArrayList;
@@ -61,7 +61,7 @@ public class FXMLConsultProjectSupervisorController extends ValidationHandler{
         clearFields();
         String supervisorName = textFieldNameProjectSupervisor.getText().trim();
 
-        Optional<String> validateError = validateLettersOnly(supervisorName, "Nombre del responsable");
+        Optional<String> validateError = validateText(supervisorName, "Nombre del responsable");
 
         if (validateError.isPresent()) {
             showError(validateError.get());
