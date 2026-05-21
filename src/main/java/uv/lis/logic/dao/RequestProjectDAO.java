@@ -13,6 +13,7 @@ import java.util.logging.Logger;
 import uv.lis.dataaccess.MySQLConnectionManager;
 import uv.lis.logic.contracts.IRequestProjectDAO;
 import uv.lis.logic.dto.Project;
+import uv.lis.logic.dto.Student;
 import uv.lis.logic.exceptions.OperationException;
 
 public class RequestProjectDAO implements IRequestProjectDAO {
@@ -212,7 +213,7 @@ public class RequestProjectDAO implements IRequestProjectDAO {
     private void ensureStudentNotAlreadyAssigned(Connection connection, String idStudent)
         throws SQLException, OperationException {
         String requestProjectQuery = "SELECT COUNT(*) FROM Solicita_Proyecto WHERE matricula = ? AND estatus = " 
-            + STATUS_ASSIGNED;
+                                     + STATUS_ASSIGNED;
         try (PreparedStatement preparedStatement = connection.prepareStatement(requestProjectQuery)) {
             preparedStatement.setString(1, idStudent);
             try (ResultSet resultSet = preparedStatement.executeQuery()) {
@@ -227,9 +228,9 @@ public class RequestProjectDAO implements IRequestProjectDAO {
     private void ensureProjectHasCapacity(Connection connection, int idProject)
             throws SQLException, OperationException {
         String requestProjectQuery = "SELECT (p.cupo - COUNT(sp.matricula)) AS " + COLUMN_AVAILABLE
-            + " FROM Proyecto p LEFT JOIN Solicita_Proyecto sp "
-            + "ON p.idProyecto = sp.idProyecto AND sp.estatus = " + STATUS_ASSIGNED
-            + " WHERE p.idProyecto = ? GROUP BY p.cupo";
+                                     + " FROM Proyecto p LEFT JOIN Solicita_Proyecto sp "
+                                     + "ON p.idProyecto = sp.idProyecto AND sp.estatus = " + STATUS_ASSIGNED
+                                     + " WHERE p.idProyecto = ? GROUP BY p.cupo";
         try (PreparedStatement preparedStatement = connection.prepareStatement(requestProjectQuery)) {
             preparedStatement.setInt(1, idProject);
             try (ResultSet resultSet = preparedStatement.executeQuery()) {
@@ -312,8 +313,8 @@ public class RequestProjectDAO implements IRequestProjectDAO {
         String projectName = "Sin proyecto asignado";
 
         String requestProjectQuery = "SELECT p.nombre FROM Proyecto p" 
-            + " INNER JOIN Solicita_Proyecto sp ON p.idProyecto = sp.idProyecto "
-            + "WHERE sp.matricula = ? AND sp.estatus = " + STATUS_ASSIGNED + ";";
+                                     + " INNER JOIN Solicita_Proyecto sp ON p.idProyecto = sp.idProyecto "
+                                     + "WHERE sp.matricula = ? AND sp.estatus = " + STATUS_ASSIGNED + ";";
 
         try (Connection databaseConnectio = connectionManager.getConnection();
              PreparedStatement preparedStatement = databaseConnectio.prepareStatement(requestProjectQuery)) {
@@ -331,5 +332,36 @@ public class RequestProjectDAO implements IRequestProjectDAO {
         }
         return projectName;
     }
-    
+
+    @Override
+    public ArrayList<Student> getAssignedStudentsByProjectId(int idProject) throws OperationException {
+        ArrayList<Student> assignedStudents = new ArrayList<>();
+        String requestProjectQuery = "SELECT a.matricula, u.nombre, u.apellidos "
+                                     + "FROM Solicita_Proyecto sp "
+                                     + "INNER JOIN Alumno a ON sp.matricula = a.matricula "
+                                     + "INNER JOIN Usuario u ON a.idUsuario = u.idUsuario "
+                                     + "WHERE sp.idProyecto = ? AND sp.estatus = ?";
+
+        try (Connection databaseConnection = connectionManager.getConnection();
+            PreparedStatement preparedStatement = databaseConnection.prepareStatement(requestProjectQuery)) {
+
+            preparedStatement.setInt(1, idProject);
+            preparedStatement.setInt(2, STATUS_ASSIGNED);
+
+            try (ResultSet resultSet = preparedStatement.executeQuery()) {
+                while (resultSet.next()) {
+                    Student student = new Student();
+                    student.setIdStudent(resultSet.getString("matricula"));
+                    student.setFirstName(resultSet.getString("nombre"));
+                    student.setLastName(resultSet.getString("apellidos"));
+                    assignedStudents.add(student);
+                }
+            }
+        } catch (SQLException e) {
+            LOGGER.log(Level.SEVERE, "Error al obtener alumnos asignados al proyecto", e);
+            throw new OperationException("Error al obtener los alumnos asignados al proyecto", e);
+        }
+
+        return assignedStudents;
+    }    
 }
