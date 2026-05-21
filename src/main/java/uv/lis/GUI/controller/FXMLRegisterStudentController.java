@@ -84,20 +84,28 @@ public class FXMLRegisterStudentController extends ValidationHandler {
 
     private void registerStudent() {
         Student student = buildStudent();
-        try {
-            int generatedUserId = userDAO.registerUser(student);
-            if (generatedUserId != INVALID_ID) {
-                if(!student.getIdStudent().matches(STUDENT_ENROLLMENT))
-                student.setId(generatedUserId);
-                studentDAO.registerStudent(student);
-                showSuccess("Estudiante registrado correctamente");
-                clearFields();
-            } else {
-                showError("Error al registrar el usuario");
+
+        if (!student.getIdStudent().matches(STUDENT_ENROLLMENT)) {
+            showError("La matrícula no tiene un formato válido");
+        } else {
+            try {
+                int generatedUserId = userDAO.registerUser(student);
+
+                if (generatedUserId == INVALID_ID) {
+                    showError("Error al registrar el usuario");
+                } else {
+                    student.setId(generatedUserId);
+                    studentDAO.registerStudent(student);
+
+                    showSuccess("Estudiante registrado correctamente");
+                    clearFields();
+                }
+            } catch (OperationException operationException) {
+                showError(operationException.getMessage());
             }
-        } catch (OperationException operationException) {
-            showError(operationException.getMessage());
         }
+
+        
     }
 
     private Student buildStudent() {

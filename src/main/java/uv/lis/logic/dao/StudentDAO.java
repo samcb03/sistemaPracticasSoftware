@@ -127,7 +127,7 @@ public class StudentDAO extends UserDAO implements IStudentDAO {
         boolean isRegistered = false;
 
         String studentQuery = "INSERT INTO Alumno (idUsuario, matricula, fechaNacimiento, genero)" 
-            + " VALUES (?, ?, ?, ?);";
+                              + " VALUES (?, ?, ?, ?);";
 
         try (Connection databaseConnection = connectionManager.getConnection();
              PreparedStatement preparedStatement = databaseConnection.prepareStatement(studentQuery)) {
