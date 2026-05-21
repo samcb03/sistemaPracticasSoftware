@@ -209,19 +209,19 @@ public class AffiliatedOrganizationDAO implements IAffiliatedOrganizationDAO{
     }
 
     @Override
-    public int getOrganizationIdByName(String name) throws OperationException {
+    public int getOrganizationIdByName(String organizationName) throws OperationException {
         String affiliatedOrganizationQuery = "SELECT idOrganizacionVinculada FROM OrganizacionVinculada" 
-                                           + "WHERE nombreOV = ?";
+                                           + " WHERE nombreOV = ?";
 
         try (Connection databaseConnection = connectionManager.getConnection();
             PreparedStatement preparedStatement = databaseConnection.prepareStatement(affiliatedOrganizationQuery)) {
-            preparedStatement.setString(1, name);
+            preparedStatement.setString(1, organizationName);
             try (ResultSet resultSet = preparedStatement.executeQuery()) {
                 if (resultSet.next()) {
                     int organizationId = resultSet.getInt("idOrganizacionVinculada");
                     return organizationId;
                 } else {
-                    throw new OperationException("No se encontró la organización: " + name, null);
+                    throw new OperationException("No se encontró la organización: " + organizationName, null);
                 }
             }
         } catch (SQLException e) {
@@ -259,7 +259,7 @@ public class AffiliatedOrganizationDAO implements IAffiliatedOrganizationDAO{
     @Override
     public boolean isOrganizationInactive(int organizationId) throws OperationException {
         boolean isInactive = false;
-        String organizationQuery = "SELECT estadoEnBD FROM OrganizacionVinculada WHERE idOrganizacionVinculado = ?";
+        String organizationQuery = "SELECT estadoEnBD FROM OrganizacionVinculada WHERE idOrganizacionVinculada = ?";
 
         try (Connection databaseConnection = connectionManager.getConnection();
              PreparedStatement preparedStatement = databaseConnection.prepareStatement(organizationQuery)) {
