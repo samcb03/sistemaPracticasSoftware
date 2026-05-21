@@ -12,10 +12,9 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
-import javafx.util.Callback;
-import javafx.scene.control.ListCell;
 
 import uv.lis.GUI.WindowHandler;
+import uv.lis.GUI.cell.StudentListCell;
 import uv.lis.logic.dao.SubjectDAO;
 import uv.lis.logic.dto.Student;
 import uv.lis.logic.dto.Subject;
@@ -39,7 +38,7 @@ public class FXMLConsultSubjectController extends WindowHandler {
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        configureStudentListCellFactory();
+        configureStudentListCell();
     }
 
     public void initializeData(Subject subject) {
@@ -48,24 +47,8 @@ public class FXMLConsultSubjectController extends WindowHandler {
         loadEnrolledStudents();
     }
 
-    private void configureStudentListCellFactory() {
-        listViewStudent.setCellFactory(new Callback<ListView<Student>, ListCell<Student>>() {
-            @Override
-            public ListCell<Student> call(ListView<Student> listView) {
-                return new ListCell<Student>() {
-                    @Override
-                    protected void updateItem(Student student, boolean empty) {
-                        super.updateItem(student, empty);
-                        if (empty || student == null) {
-                            setText(null);
-                        } else {
-                            setText(student.getIdStudent() + " - "
-                                + student.getFirstName() + " " + student.getLastName());
-                        }
-                    }
-                };
-            }
-        });
+    private void configureStudentListCell() {
+        listViewStudent.setCellFactory(listView -> new StudentListCell());
     }
 
     private void displaySubjectInformation() {
@@ -113,6 +96,6 @@ public class FXMLConsultSubjectController extends WindowHandler {
 
     @FXML
     private void handleConsultExpedient() {
-        // TODO implement navigation to consult expedient view
+
     }
 }

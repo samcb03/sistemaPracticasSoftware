@@ -34,6 +34,9 @@ import uv.lis.logic.utils.SessionManager;
 
 
 public class FXMLConsultStudentController extends ValidationHandler{
+    private static final Logger LOGGER = Logger.getLogger(FXMLConsultStudentController.class.getName());
+    private static final String LABEL_INACTIVE = "Inactivo";
+    private static final String LABEL_ACTIVE = "Activo";
     @FXML private TextField textFieldStudentId;
     @FXML private Button buttonSearch;
     @FXML private GridPane gridPaneStudentInfo;
@@ -54,9 +57,7 @@ public class FXMLConsultStudentController extends ValidationHandler{
     private StudentDAO studentDAO;
     private RequestProjectDAO requestProjectDAO;
     private SubjectDAO subjectDAO;
-    private static final Logger LOGGER = Logger.getLogger(FXMLConsultStudentController.class.getName());
-    private static final String LABEL_INACTIVE = "Inactivo";
-    private static final String LABEL_ACTIVE = "Activo";
+    
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {

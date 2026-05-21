@@ -3,7 +3,7 @@ package uv.lis.logic.utils;
 import java.time.LocalDate;
 import java.time.Period;
 import java.util.Optional;
-//TODO modificar los mensajes de validacion y mejorar validateLetterOnly
+
 public final class InputValidator {
 
     private InputValidator() {
