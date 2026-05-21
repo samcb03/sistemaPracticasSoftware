@@ -54,10 +54,10 @@ public class FXMLRegisterActivityController extends ValidationHandler {
 
     @FXML
     public void validateFields() {
-        Optional<String> validationError = FormValidator.validateActivityForm(
-            textFieldActivity.getText(),
-            textFieldDescription.getText()
-        );
+        Activity activity = new Activity();
+        activity.setName(textFieldActivity.getText());
+        activity.setDescription(textFieldDescription.getText());
+        Optional<String> validationError = FormValidator.validateActivityForm(activity);
 
         handleValidation(validationError, this::registerActivity);
     }

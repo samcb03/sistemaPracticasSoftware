@@ -15,11 +15,11 @@ import uv.lis.logic.dto.AffiliatedOrganization;
 
 public class FormValidator {
 
-    public static Optional<String> validateActivityForm(Activity avActivity) {
-        String activityName = avActivity.getName();
-        String description = avActivity.getDescription();
-        LocalDate startDate = avActivity.getStartDate();
-        LocalDate finalDate = avActivity.getEndDate();
+    public static Optional<String> validateActivityForm(Activity Activity) {
+        String activityName = Activity.getName();
+        String description = Activity.getDescription();
+        LocalDate startDate = Activity.getStartDate();
+        LocalDate finalDate = Activity.getEndDate();
 
         Stream<Optional<String>> validationStream = Stream.of(
             validateLettersOnly(activityName, "El nombre de la actividad"),
