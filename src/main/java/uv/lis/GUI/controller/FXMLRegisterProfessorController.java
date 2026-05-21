@@ -5,7 +5,7 @@ import static uv.lis.logic.utils.InputValidator.PROFESSOR_ID_LENGTH;
 import static uv.lis.logic.utils.InputValidator.validateComboBox;
 import static uv.lis.logic.utils.InputValidator.validateEmail;
 import static uv.lis.logic.utils.InputValidator.validateExactLength;
-import static uv.lis.logic.utils.InputValidator.validateLettersOnly;
+import static uv.lis.logic.utils.InputValidator.validateText;
 import static uv.lis.logic.utils.InputValidator.validatePassword;
 
 import java.net.URL;
@@ -61,8 +61,8 @@ public class FXMLRegisterProfessorController extends ValidationHandler {
 
     private Optional<String> getFirstValidationError() {
         Stream<Optional<String>> validationStream = Stream.of(
-            validateLettersOnly(textFieldFirstName.getText(), "El nombre"),
-            validateLettersOnly(textFieldLastName.getText(), "El apellido"),
+            validateText(textFieldFirstName.getText(), "El nombre"),
+            validateText(textFieldLastName.getText(), "El apellido"),
             validateEmail(textFieldEmail.getText().trim(), "El correo electrónico"),
             validatePassword(passwordFieldPassword.getText().trim(), "La contraseña"),
             validateExactLength(textFieldPersonnelNumber.getText().trim(), PROFESSOR_ID_LENGTH, 

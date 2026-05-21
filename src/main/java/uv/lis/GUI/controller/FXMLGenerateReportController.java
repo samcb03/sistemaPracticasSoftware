@@ -73,47 +73,47 @@ public class FXMLGenerateReportController extends ValidationHandler {
             reportType, "un tipo de reporte"
         );
 
-        Optional<String> activity1Validation = InputValidator.validateLettersOnly(
+        Optional<String> activity1Validation = InputValidator.validateText(
             textFieldActivity1.getText(), "Actividad 1"
         );
         Optional<String> advance1Validation = InputValidator.validatePositiveInteger(
             textFieldAdvance1.getText(), "Porcentaje de Avance de Actividad 1"
         );
-        Optional<String> observation1Validation = InputValidator.validateLettersOnly(
+        Optional<String> observation1Validation = InputValidator.validateText(
             textAreaObservation1.getText(), "Observación de Actividad 1"
         );
 
-        Optional<String> activity2Validation = InputValidator.validateLettersOnly(
+        Optional<String> activity2Validation = InputValidator.validateText(
             textFieldActivity2.getText(), "Actividad 2"
         );
         Optional<String> advance2Validation = InputValidator.validatePositiveInteger(
             textFieldAdvance2.getText(), "Porcentaje de Avance de Actividad 2"
         );
-        Optional<String> observation2Validation = InputValidator.validateLettersOnly(
+        Optional<String> observation2Validation = InputValidator.validateText(
             textAreaObservation2.getText(), "Observación de Actividad 2"
         );
 
-        Optional<String> result1Validation = InputValidator.validateLettersOnly(
+        Optional<String> result1Validation = InputValidator.validateText(
             textFieldResult1.getText(), "Entregable 1"
         );
         Optional<String> resultAdvance1Validation = InputValidator.validatePositiveInteger(
             textFieldResultAdvance1.getText(), "Porcentaje de Avance de Entregable 1"
         );
-        Optional<String> resultObservation1Validation = InputValidator.validateLettersOnly(
+        Optional<String> resultObservation1Validation = InputValidator.validateText(
             textAreaObservationResult1.getText(), "Observación de Entregable 1"
         );
 
-        Optional<String> result2Validation = InputValidator.validateLettersOnly(
+        Optional<String> result2Validation = InputValidator.validateText(
             textFieldResult2.getText(), "Entregable 2"
         );
         Optional<String> resultAdvance2Validation = InputValidator.validatePositiveInteger(
             textFieldAdvanceResult2.getText(), "Porcentaje de Avance de Entregable 2"
         );
-        Optional<String> resultObservation2Validation = InputValidator.validateLettersOnly(
+        Optional<String> resultObservation2Validation = InputValidator.validateText(
             textAreaObservationResult2.getText(), "Observación de Entregable 2"
         );
 
-        Optional<String> generalObservationsValidation = InputValidator.validateLettersOnly(
+        Optional<String> generalObservationsValidation = InputValidator.validateText(
             textAreaGeneralObservations.getText(), "Observaciones Generales"
         );
 

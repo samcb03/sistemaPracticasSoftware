@@ -1,7 +1,7 @@
 package uv.lis.GUI.controller;
 
 import static uv.lis.logic.utils.InputValidator.validateEmail;
-import static uv.lis.logic.utils.InputValidator.validateLettersOnly;
+import static uv.lis.logic.utils.InputValidator.validateText;
 
 import java.net.URL;
 import java.util.ArrayList;
@@ -60,8 +60,8 @@ public class FXMLRegisterProjectSupervisorController extends ValidationHandler {
 
     private Optional<String> getFirstValidationError() {
         Stream<Optional<String>> validationStream = Stream.of(
-            validateLettersOnly(textFieldName.getText(), "El nombre"),
-            validateLettersOnly(textFieldPosition.getText(), "El cargo"),
+            validateText(textFieldName.getText(), "El nombre"),
+            validateText(textFieldPosition.getText(), "El cargo"),
             validateEmail(textFieldEmail.getText().trim(), "El correo electrónico")
         );
         Optional<String> firstError = validationStream
