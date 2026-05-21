@@ -1,7 +1,5 @@
 package uv.lis.GUI.controller;
 
-import static uv.lis.logic.utils.InputValidator.LETTERS_ONLY_REGEX;
-import static uv.lis.logic.utils.InputValidator.validateExactLength;
 import static uv.lis.logic.utils.InputValidator.validateLettersOnly;
 
 import java.net.URL;
@@ -24,10 +22,9 @@ import uv.lis.logic.dao.AffiliatedOrganizationDAO;
 import uv.lis.logic.dao.ProjectDAO;
 import uv.lis.logic.dao.ProjectSupervisorDAO;
 import uv.lis.logic.dto.AffiliatedOrganization;
-import uv.lis.logic.dto.Professor;
 import uv.lis.logic.exceptions.OperationException;
 
-public class FXMLConsultAffiliatedOrganization extends ValidationHandler  {
+public class FXMLConsultAffiliatedOrganizationController extends ValidationHandler  {
 
     @FXML private Button buttonBack;
     @FXML private Button buttonSearch;

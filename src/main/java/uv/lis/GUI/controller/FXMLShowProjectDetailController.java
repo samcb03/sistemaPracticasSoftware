@@ -11,10 +11,10 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
-import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
 
 import uv.lis.GUI.WindowHandler;
+import uv.lis.GUI.cell.StudentListCell;
 import uv.lis.logic.dao.RequestProjectDAO;
 import uv.lis.logic.dto.Project;
 import uv.lis.logic.dto.Student;
@@ -51,18 +51,7 @@ public class FXMLShowProjectDetailController extends WindowHandler {
     }
 
     private void configureStudentListCellFactory() {
-        listViewStudent.setCellFactory(listView -> new ListCell<Student>() {
-            @Override
-            protected void updateItem(Student student, boolean empty) {
-                super.updateItem(student, empty);
-                if (empty || student == null) {
-                    setText(null);
-                } else {
-                    setText(student.getIdStudent() + " - "
-                        + student.getFirstName() + " " + student.getLastName());
-                }
-            }
-        });
+        listViewStudent.setCellFactory(listView -> new StudentListCell());
     }
 
     private void configureActionButtons() {
@@ -97,11 +86,11 @@ public class FXMLShowProjectDetailController extends WindowHandler {
 
     @FXML
     private void handleModifyProject(ActionEvent actionEvent) {
-        //TODO implement navigation to modify project view
+        
     }
 
     @FXML
     private void handleInactivateProject(ActionEvent actionEvent) {
-        //TODO implement project inactivation flow with confirmation dialog
+        
     }
 }
