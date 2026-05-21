@@ -23,7 +23,7 @@ public class FXMLProjectManagementController extends WindowHandler {
     }
 
     @FXML public void goToConsultProject() { 
-        navigateTo("/uv/lis/GUI/view/FXMLConsultSProject.fxml"); 
+        navigateTo("/uv/lis/GUI/view/FXMLConsultProject.fxml"); 
     }
 
     @FXML public void goToAssignationProject() {

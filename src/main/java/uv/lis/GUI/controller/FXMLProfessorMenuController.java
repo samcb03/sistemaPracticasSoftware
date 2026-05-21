@@ -10,6 +10,7 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
@@ -35,6 +36,7 @@ public class FXMLProfessorMenuController extends WindowHandler {
     @FXML private TableColumn<Subject, String> tableColumnSubjectName;
     @FXML private TableColumn<Subject, Integer> tableColumnPeriod;
     @FXML private ComboBox<String> comboBoxSchoolPeriod;
+    @FXML private Button buttonLogOut;
 
     private final SubjectDAO subjectDAO = new SubjectDAO();
     private final SchoolPeriodDAO schoolPeriodDAO = new SchoolPeriodDAO();

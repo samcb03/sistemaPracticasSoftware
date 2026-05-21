@@ -44,13 +44,14 @@ public class FXMLConsultProjectSupervisorController extends ValidationHandler{
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        projectDAO                = new ProjectDAO();
+        projectDAO = new ProjectDAO();
         affiliatedOrganizationDAO = new AffiliatedOrganizationDAO();
-        projectSupervisorDAO      = new ProjectSupervisorDAO();
-        projectSupervisor         = new ProjectSupervisor(); 
-        contextMenuSuggestions    = new ContextMenu(); 
+        projectSupervisorDAO = new ProjectSupervisorDAO();
+        projectSupervisor  = new ProjectSupervisor(); 
+        contextMenuSuggestions = new ContextMenu(); 
         gridPaneProjectSupervisorInfo.setVisible(false); 
         buttonModify.setDisable(true);    
+        buttonBack.setDisable(false);
         setupControls(labelMessage, buttonBack);         
         setupAutocomplete();
     }

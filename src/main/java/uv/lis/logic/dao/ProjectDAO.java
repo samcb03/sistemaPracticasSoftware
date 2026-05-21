@@ -5,7 +5,6 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Optional;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -25,9 +24,14 @@ public class ProjectDAO implements IProjectDAO{
     }
 
     @Override
-    public List<Project> getAllProjects() throws OperationException {
-        List<Project> projects = new ArrayList<>(); 
-        String projectQuery = "SELECT * FROM Proyecto;";
+    public ArrayList<Project> getAllProjects() throws OperationException {
+        ArrayList<Project> projects = new ArrayList<>(); 
+        String projectQuery = "SELECT p.idProyecto, p.nombre, p.metodologiaProyecto, p.cupo, "
+                              + "p.objetivo, p.descripcion, p.idOrganizacionVinculada, "
+                              + "o.nombreOV AS nombreOrganizacion "
+                              + "FROM Proyecto p "
+                              + "INNER JOIN OrganizacionVinculada o "
+                              + "ON p.idOrganizacionVinculada = o.idOrganizacionVinculada";
 
         try (Connection databaseConnection = connectionManager.getConnection();
             PreparedStatement preparedStatement = databaseConnection.prepareStatement(projectQuery)) {
@@ -41,6 +45,7 @@ public class ProjectDAO implements IProjectDAO{
                 project.setCapacity(resultSet.getInt("cupo"));
                 project.setObjective(resultSet.getString("objetivo"));
                 project.setDescription(resultSet.getString("descripcion"));
+                project.setAffiliatedOrganizationName(resultSet.getString("nombreOrganizacion"));
                 
                 projects.add(project);
             }
