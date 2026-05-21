@@ -10,6 +10,7 @@ import uv.lis.GUI.WindowHandler;
 public class FXMLSubjectManagementController extends WindowHandler{
         @FXML private Button buttonRegisterSubject;
         @FXML private Button buttonAssignStudentSubject;
+        @FXML private Button buttonConsultSubject;
         @FXML private Button buttonBack;
 
         @Override
@@ -21,7 +22,11 @@ public class FXMLSubjectManagementController extends WindowHandler{
         }
 
         @FXML public void goToAssignationStudentSubject() {
-        navigateTo("/uv/lis/GUI/view/FXMLAssignStudentSubject.fxml");
+            navigateTo("/uv/lis/GUI/view/FXMLAssignStudentSubject.fxml");
+        }
+
+        @FXML public void goToProfessorMenu() {
+            navigateTo("/uv/lis/GUI/view/FXMLProfessorMenu.fxml");
         }
 
 
