@@ -270,7 +270,7 @@ public class ProjectDAO implements IProjectDAO{
         String projectQuery = "SELECT p.idProyecto, p.nombre FROM Proyecto p"
                      + " JOIN Solicita_Proyecto sp ON p.idProyecto = sp.idProyecto"
                      + " WHERE sp.matricula = ? "
-                     + " AND sp.estatus = 1";
+                     + " AND sp.estatus = 2";
 
         try (Connection databaseConnection = connectionManager.getConnection();
              PreparedStatement preparedStatement = databaseConnection.prepareStatement(projectQuery)) {
