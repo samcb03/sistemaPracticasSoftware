@@ -2,6 +2,7 @@ package uv.lis.GUI.controller;
 
 import static uv.lis.logic.utils.InputValidator.LETTERS_ONLY_REGEX;
 import static uv.lis.logic.utils.InputValidator.validateExactLength;
+import static uv.lis.logic.utils.InputValidator.validateLettersOnly;
 
 import java.net.URL;
 import java.util.ArrayList;
@@ -54,6 +55,7 @@ public class FXMLConsultAffiliatedOrganization extends ValidationHandler  {
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
+        projectDAO = new ProjectDAO();
         affiliatedOrganizationDAO = new AffiliatedOrganizationDAO();
         projectSupervisorDAO = new ProjectSupervisorDAO();
         contextMenuSuggestions = new ContextMenu();
@@ -70,7 +72,7 @@ public class FXMLConsultAffiliatedOrganization extends ValidationHandler  {
         clearFields();
         String organizationName = textFieldOrganizationName.getText().trim();
 
-        Optional<String> validationError = validateExactLength(organizationName, 0, "El nombre de la organizacion");
+        Optional<String> validationError = validateLettersOnly(organizationName, "La organización");
 
         if(validationError.isPresent()) {
             showError(validationError.get());
@@ -96,6 +98,7 @@ public class FXMLConsultAffiliatedOrganization extends ValidationHandler  {
                         buttonUpdate.setDisable(false);
                         gridPaneOrganizationInfo.setVisible(true);
                         labelMessage.setText("");
+                        loadAssignedProjects(id);
                                         
                 } else {
                     showError("No se encontró la organización");
@@ -110,6 +113,21 @@ public class FXMLConsultAffiliatedOrganization extends ValidationHandler  {
                 buttonInactive.setDisable(true);
                 buttonUpdate.setDisable(true);
             }
+        }
+    }
+
+    private void loadAssignedProjects(int organizationId) {
+        listViewProjects.getItems().clear();
+        try {
+            ArrayList<String> projects = projectDAO.getProjectNamesByOrganizationId(organizationId);
+            if (projects != null && !projects.isEmpty()) {
+                listViewProjects.getItems().addAll(projects);
+            } else {
+                listViewProjects.getItems().add("No hay proyectos asignados a esta organización.");
+            }
+        } catch (OperationException e) {
+            listViewProjects.getItems().add("Error al cargar los proyectos de la organización.");
+            showError("Error de base de datos al recuperar proyectos: " + e.getMessage());
         }
     }
         
