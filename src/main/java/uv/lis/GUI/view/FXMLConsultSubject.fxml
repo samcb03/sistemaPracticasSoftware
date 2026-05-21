@@ -45,10 +45,11 @@
                </children>
             </GridPane>
             <ListView fx:id="listViewStudent" layoutX="66.0" layoutY="135.0" prefHeight="232.0" prefWidth="379.0" />
-            <HBox alignment="CENTER" layoutX="111.0" layoutY="386.0" prefHeight="30.0" prefWidth="289.0" spacing="20.0">
+            <HBox alignment="CENTER" layoutX="80.0" layoutY="386.0" prefHeight="30.0" prefWidth="320.0" spacing="20.0">
                <children>
                   <Button fx:id="buttonConsultStudent" mnemonicParsing="false" onAction="#handleConsultStudent" text="Consultar Alumno" />
                   <Button fx:id="buttonConsultExpedient" mnemonicParsing="false" text="Ver archivos" />
+                  <Button fx:id="buttonBack" mnemonicParsing="false" onAction="#goBack" prefHeight="26.0" prefWidth="66.0" text="Cancelar" />
                </children>
             </HBox>
          </children>

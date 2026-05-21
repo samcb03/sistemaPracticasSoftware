@@ -32,6 +32,7 @@ public class FXMLConsultSubjectController extends WindowHandler {
     @FXML private ListView<Student> listViewStudent;
     @FXML private Button buttonConsultStudent;
     @FXML private Button buttonConsultExpedient;
+    @FXML private Button buttonBack;
 
     private final SubjectDAO subjectDAO = new SubjectDAO();
     private Subject currentSubject;
