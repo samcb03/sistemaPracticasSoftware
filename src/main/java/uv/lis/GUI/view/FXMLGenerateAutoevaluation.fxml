@@ -186,8 +186,8 @@
                   
                   <HBox alignment="CENTER_RIGHT" spacing="15.0">
                      <children>
-                        <Button fx:id="buttonBack" prefHeight="35.0" prefWidth="100.0" text="Cancelar" />
-                        <Button fx:id="buttonGenerar" onAction="#generateAutoevaluation" prefHeight="35.0" prefWidth="120.0" style="-fx-background-color: #3498db; -fx-text-fill: white;" text="Generar PDF">
+                        <Button fx:id="buttonBack" onAction="#goBack" prefHeight="35.0" prefWidth="100.0" text="Cancelar" />
+                        <Button fx:id="buttonGenerate" onAction="#generateAutoevaluation" prefHeight="35.0" prefWidth="120.0" style="-fx-background-color: #3498db; -fx-text-fill: white;" text="Generar PDF">
                            <font><Font name="System Bold" size="14.0" /></font>
                         </Button>
                      </children>

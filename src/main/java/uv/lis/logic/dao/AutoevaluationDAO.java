@@ -42,7 +42,7 @@ public class AutoevaluationDAO implements IAutoevaluationDAO {
                                     + "JOIN OrganizacionVinculada ov ON p.idOrganizacionVinculada = ov.idOrganizacionVinculada "
                                     + "JOIN ResponsableProyecto rp ON p.idResponsableProyecto = rp.idResponsableProyecto "
                                     + "WHERE sp.matricula = ? "
-                                    + "AND sp.estatus = 1 ";
+                                    + "AND sp.estatus = 2;";
 
         try (Connection connection = connectionManager.getConnection();
             PreparedStatement preparedStatement = connection.prepareStatement(autoevaluationQuery)) {
