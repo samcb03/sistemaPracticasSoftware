@@ -233,10 +233,11 @@ public class AffiliatedOrganizationDAO implements IAffiliatedOrganizationDAO{
     @Override
     public Optional<String> getOrganizationBySupervisorName(String nombreSupervisor) throws OperationException {
         Optional<String> organization = Optional.empty();
-        String supervisorQuery = "SELECT nombreOV FROM OrganizacionVinculada ov" 
-            + " JOIN Organizacion_Tiene_Responsable ot ON ov.idOrganizacionVinculada = ot.idOrganizacionVinculada" 
-            + " JOIN ResponsableProyecto rp ON ot.idResponsableProyecto = rp.idResponsableProyecto"
-            + " WHERE rp.nombre = ?";
+        String supervisorQuery = "SELECT ov.nombreOV" 
+                            + " FROM OrganizacionVinculada ov" 
+                            + " INNER JOIN ResponsableProyecto rp"
+                            + " ON ov.idOrganizacionVinculada = rp.idOrganizacionVinculada" 
+                            + " WHERE rp.nombre = ?;";
 
             try(Connection databaseConnection = connectionManager.getConnection();
                     PreparedStatement preparedStatement = databaseConnection.prepareStatement(supervisorQuery)) {

@@ -23,6 +23,7 @@ import uv.lis.logic.dao.AffiliatedOrganizationDAO;
 import uv.lis.logic.dao.ProjectDAO;
 import uv.lis.logic.dao.ProjectSupervisorDAO;
 import uv.lis.logic.dto.Project;
+import uv.lis.logic.dto.ProjectSupervisor;
 import uv.lis.logic.exceptions.OperationException;
 
 public class FXMLRegisterProjectController extends ValidationHandler {
@@ -35,10 +36,12 @@ public class FXMLRegisterProjectController extends ValidationHandler {
     @FXML private TextField textFieldObjective;
     @FXML private TextArea textAreaDescription;
     @FXML private ComboBox<String> comboBoxOrganizationName;
+    @FXML private ComboBox<String> comboBoxResponsableName;
 
     private ProjectDAO projectDAO;
     private AffiliatedOrganizationDAO affiliatedOrganizationDAO;
     private ProjectSupervisorDAO projectSupervisorDAO;
+    private ProjectSupervisor supervisor;
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
@@ -59,6 +62,24 @@ public class FXMLRegisterProjectController extends ValidationHandler {
     }
 
     @FXML
+    public void filterSupervisors() {
+        String selectedOrganization = comboBoxOrganizationName.getValue();
+        if (selectedOrganization != null) {
+            try {
+                comboBoxResponsableName.getItems().clear(); 
+                
+                int orgId = affiliatedOrganizationDAO.getOrganizationIdByName(selectedOrganization);
+                ArrayList<String> supervisorNames = projectSupervisorDAO.getSupervisorsByOrganizationId(orgId);
+                comboBoxResponsableName.setItems(FXCollections.observableArrayList(supervisorNames));
+                
+            } catch (OperationException e) {
+                System.out.println("X. ERROR: " + e.getMessage());
+                showError("Error al cargar los responsables: " + e.getMessage());
+            }
+        }
+    }
+
+    @FXML
     public void validateFields() {
         Optional<String> firstValidationError = getFirstValidationError();
         handleValidation(firstValidationError, this::registerProject);
@@ -71,7 +92,8 @@ public class FXMLRegisterProjectController extends ValidationHandler {
             validatePositiveInteger(textFieldCapacity.getText().trim(), "El cupo"),
             validateText(textFieldObjective.getText(), "El objetivo"),
             validateText(textAreaDescription.getText(), "La descripción"),
-            validateComboBox(comboBoxOrganizationName.getValue(), " organización")
+            validateComboBox(comboBoxOrganizationName.getValue(), " organización"),
+            validateComboBox(comboBoxResponsableName.getValue(), " responsable técnico")
         );
         Optional<String> firstError = validationStream
             .filter(Optional::isPresent)
@@ -95,7 +117,7 @@ public class FXMLRegisterProjectController extends ValidationHandler {
         }
     }
 
-    private Project buildProject() {
+private Project buildProject() {
         Project project = new Project();
         project.setName(textFieldName.getText().trim());
         project.setMethodology(textFieldMethodology.getText().trim());
@@ -104,9 +126,15 @@ public class FXMLRegisterProjectController extends ValidationHandler {
         project.setDescription(textAreaDescription.getText().trim());
 
         String selectedOrganization = comboBoxOrganizationName.getValue();
+        String selectedSupervisor = comboBoxResponsableName.getValue();
+        
         try {
             int organizationId = affiliatedOrganizationDAO.getOrganizationIdByName(selectedOrganization);
+            int supervisorId = projectSupervisorDAO.getSupervisorIdByName(selectedSupervisor); 
+            
             project.setIdAffiliatedOrganization(organizationId);
+            project.setIdSupervisor(supervisorId); 
+            
         } catch (OperationException e) {
             showError(e.getMessage());
         }
@@ -120,5 +148,8 @@ public class FXMLRegisterProjectController extends ValidationHandler {
         textFieldCapacity.clear();
         textFieldObjective.clear();
         textAreaDescription.clear();
+        comboBoxOrganizationName.getSelectionModel().clearSelection();
+        comboBoxResponsableName.getSelectionModel().clearSelection();
+        comboBoxResponsableName.getItems().clear(); 
     }
 }
