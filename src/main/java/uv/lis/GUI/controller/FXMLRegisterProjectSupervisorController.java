@@ -1,5 +1,6 @@
 package uv.lis.GUI.controller;
 
+import static uv.lis.logic.utils.InputValidator.validateComboBox;
 import static uv.lis.logic.utils.InputValidator.validateEmail;
 import static uv.lis.logic.utils.InputValidator.validateText;
 
@@ -62,7 +63,8 @@ public class FXMLRegisterProjectSupervisorController extends ValidationHandler {
         Stream<Optional<String>> validationStream = Stream.of(
             validateText(textFieldName.getText(), "El nombre"),
             validateText(textFieldPosition.getText(), "El cargo"),
-            validateEmail(textFieldEmail.getText().trim(), "El correo electrónico")
+            validateEmail(textFieldEmail.getText().trim(), "El correo electrónico"),
+            validateComboBox(comboBoxOrganizationName.getValue(), "la organización")
         );
         Optional<String> firstError = validationStream
             .filter(Optional::isPresent)
@@ -87,19 +89,31 @@ public class FXMLRegisterProjectSupervisorController extends ValidationHandler {
     }
 
     private ProjectSupervisor buildProjectSupervisor() {
-        ProjectSupervisor projectSupervisor = new ProjectSupervisor();
-        projectSupervisor.setName(textFieldName.getText().trim());
-        projectSupervisor.setPosition(textFieldPosition.getText().trim());
-        projectSupervisor.setEmail(textFieldEmail.getText().trim());
-        projectSupervisor.setIsActive(true);
-        return projectSupervisor;
-        
+    ProjectSupervisor projectSupervisor = new ProjectSupervisor();
+    projectSupervisor.setName(textFieldName.getText().trim());
+    projectSupervisor.setPosition(textFieldPosition.getText().trim());
+    projectSupervisor.setEmail(textFieldEmail.getText().trim());
+    projectSupervisor.setIsActive(true);
+    
+    String selectedOrganization = comboBoxOrganizationName.getValue();
+    
+    if (selectedOrganization != null) {
+        try {
+            int organizationId = affiliatedOrganizationDAO.getOrganizationIdByName(selectedOrganization);
+            projectSupervisor.setOrganizationInt(organizationId); 
+        } catch (OperationException e) {
+            showError("Error al recuperar la organización seleccionada");
+        }
     }
+    
+    return projectSupervisor;
+}
 
     @Override
     protected void clearFields() {
         textFieldName.clear();
         textFieldPosition.clear();
         textFieldEmail.clear();
+        comboBoxOrganizationName.setValue(null);
     }
 }

@@ -96,8 +96,8 @@ public class ProjectDAO implements IProjectDAO{
         boolean isRegistered = false;
 
         String projectQuery = "INSERT INTO Proyecto(nombre, "  
-                            + "descripcion, cupo, metodologiaProyecto, objetivo, estado, idOrganizacionVinculada)" 
-                            + " VALUES(?, ?, ?, ?, ?, ?, ?);";
+                            + "descripcion, cupo, metodologiaProyecto, objetivo, estado, idOrganizacionVinculada,idResponsableProyecto)" 
+                            + " VALUES(?, ?, ?, ?, ?, ?, ?,?);";
 
         try (Connection databaseConnection = connectionManager.getConnection();
             PreparedStatement preparedStatement = databaseConnection.prepareStatement(projectQuery, 
@@ -110,6 +110,7 @@ public class ProjectDAO implements IProjectDAO{
             preparedStatement.setString(5, project.getObjective());
             preparedStatement.setBoolean(6, true);
             preparedStatement.setInt(7, project.getIdAffiliatedOrganization());
+            preparedStatement.setInt(8, project.getIdSupervisor());
             if (preparedStatement.executeUpdate() > NO_ROWS_AFFECTED){
                 try(ResultSet resultSet = preparedStatement.getGeneratedKeys()) {
                     if (resultSet.next()) {

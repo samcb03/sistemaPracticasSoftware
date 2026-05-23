@@ -112,8 +112,8 @@ public class ProjectSupervisorDAO implements IProjectSupervisorDAO {
     public boolean registerProjectSupervisor(ProjectSupervisor projectSupervisor) throws OperationException {
         boolean isRegistered = false;
 
-        String supervisorQuery = "INSERT INTO responsableProyecto(nombre, cargo," 
-                               + "correo, estado) VALUES(?,?,?,?);";
+        String supervisorQuery = "INSERT INTO ResponsableProyecto(nombre, cargo," 
+                               + "correo, estado, idOrganizacionVinculada) VALUES(?,?,?,?,?);";
 
         try (Connection databaseConnection = connectionManager.getConnection();
             PreparedStatement preparedStatement = databaseConnection.prepareStatement(supervisorQuery)) {
@@ -121,7 +121,8 @@ public class ProjectSupervisorDAO implements IProjectSupervisorDAO {
             preparedStatement.setString(1, projectSupervisor.getName());
             preparedStatement.setString(2, projectSupervisor.getPosition());
             preparedStatement.setString(3, projectSupervisor.getEmail());
-            preparedStatement.setString(4, "0");
+            preparedStatement.setBoolean(4, projectSupervisor.getIsActive());
+            preparedStatement.setInt(5,projectSupervisor.getOrganizationInt());
 
             if (preparedStatement.executeUpdate() > NO_ROWS_AFFECTED) {
                 isRegistered = true;
@@ -132,8 +133,10 @@ public class ProjectSupervisorDAO implements IProjectSupervisorDAO {
             }
 
         } catch (SQLException e){
+            e.printStackTrace();
             LOGGER.log(Level.SEVERE, "Error de conexión con la base de datos al registrar", e);
             throw new OperationException("Error al registrar al supervisor del proyecto", e);
+            
         }
 
         return isRegistered;
@@ -243,5 +246,54 @@ public class ProjectSupervisorDAO implements IProjectSupervisorDAO {
         }
 
         return supervisorId;
+    }
+
+    @Override
+    public ArrayList<String> getSupervisorsByOrganizationId(int organizationId) throws OperationException {
+        ArrayList<String> supervisorNames = new ArrayList<>();
+        String supervisorQuery = "SELECT nombre FROM ResponsableProyecto WHERE idOrganizacionVinculada = ? AND estado = 1;";
+
+        try (Connection databaseConnection = connectionManager.getConnection();
+             PreparedStatement preparedStatement = databaseConnection.prepareStatement(supervisorQuery)) {
+
+            preparedStatement.setInt(1, organizationId);
+
+            try (ResultSet resultSet = preparedStatement.executeQuery()) {
+                while (resultSet.next()) {
+                    supervisorNames.add(resultSet.getString("nombre"));
+                }
+            }
+        } catch (SQLException e) {
+            LOGGER.log(Level.SEVERE, "Error de conexion con la base de datos al filtrar responsables", e);
+            throw new OperationException("Error al filtrar los responsables por organización", e);
+        }
+
+        return supervisorNames;
+    }
+
+    public boolean assignSupervisorToOrganization(int supervisorId, int organizationId) throws OperationException {
+        boolean isAssigned = false;
+        String query = "INSERT INTO Organizacion_Tiene_Responsable (idOrganizacionVinculada, idResponsableProyecto) VALUES (?, ?)";
+
+        try (Connection databaseConnection = connectionManager.getConnection();
+             PreparedStatement preparedStatement = databaseConnection.prepareStatement(query)) {
+
+            preparedStatement.setInt(1, organizationId);
+            preparedStatement.setInt(2, supervisorId);
+
+            if (preparedStatement.executeUpdate() > NO_ROWS_AFFECTED) {
+                isAssigned = true;
+                LOGGER.log(Level.INFO, "Responsable vinculado a la organización exitosamente");
+            } else {
+                LOGGER.log(Level.WARNING, "No se pudo vincular el responsable a la organización");
+                throw new OperationException("No se pudo vincular el responsable a la organización", null);
+            }
+
+        } catch (SQLException e) {
+            LOGGER.log(Level.SEVERE, "Error al vincular responsable con organización", e);
+            throw new OperationException("Error al vincular el responsable con la organización", e);
+        }
+
+        return isAssigned;
     }
 }
