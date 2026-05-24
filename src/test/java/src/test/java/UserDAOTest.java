@@ -197,7 +197,7 @@ class UserDAOTest {
                 .thenReturn(false);
 
             
-                assertThrows(AuthenticateException.class, () ->
+            assertThrows(AuthenticateException.class, () ->
                 userDAO.authenticate("gom03@gmail.com", "wrongPassword"));
         }
     }

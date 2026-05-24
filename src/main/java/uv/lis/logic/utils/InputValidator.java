@@ -232,7 +232,7 @@ public final class InputValidator {
             if (birthDate.isAfter(today)) {
                 validationResult = Optional.of(fieldName + " no puede ser futura");
             } else if (age < MINIMUM_AGE) {
-                validationResult = Optional.of(fieldName + "debe ser mayor de " + MINIMUM_AGE + " años");
+                validationResult = Optional.of("El alumno debe ser mayor de " + MINIMUM_AGE + " años");
             } else {
                 validationResult = Optional.empty();
             }
