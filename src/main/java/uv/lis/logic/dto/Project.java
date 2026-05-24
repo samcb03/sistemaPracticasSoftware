@@ -15,6 +15,7 @@ public class Project {
     private String idStudent;
     private int idAffiliatedOrganization;
     private String affiliatedOrganizationName;
+    private int idSupervisor;
 
 
 
@@ -118,6 +119,20 @@ public class Project {
 
     public void setAffiliatedOrganizationName(String affiliatedOrganizationName) {
         this.affiliatedOrganizationName = affiliatedOrganizationName;
+    }
+
+    
+
+    public void setActivities(ArrayList<Activity> activities) {
+        this.activities = activities;
+    }
+
+    public int getIdSupervisor() {
+        return idSupervisor;
+    }
+
+    public void setIdSupervisor(int idSupervisor) {
+        this.idSupervisor = idSupervisor;
     }
 
     @Override

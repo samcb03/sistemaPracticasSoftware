@@ -107,7 +107,7 @@ public class FXMLRegisterProjectSupervisorController extends ValidationHandler {
     }
     
     return projectSupervisor;
-}
+    }
 
     @Override
     protected void clearFields() {

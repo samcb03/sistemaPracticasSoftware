@@ -9,6 +9,7 @@ public class ProjectSupervisor {
     private String email;
     private boolean isActive;
     private String affiliatedOrganizationName;
+    private int organizationInt;
     private String projectName;
 
     public ProjectSupervisor(){
@@ -75,6 +76,14 @@ public class ProjectSupervisor {
 
     public void setProjectName(String projectName) {
         this.projectName = projectName;
+    }
+
+    public int getOrganizationInt() {
+        return organizationInt;
+    }
+
+    public void setOrganizationInt(int organizationInt) {
+        this.organizationInt = organizationInt;
     }
 
         @Override
