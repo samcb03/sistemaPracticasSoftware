@@ -58,7 +58,9 @@
             <Button fx:id="buttonBack" layoutX="276.0" layoutY="350.0" mnemonicParsing="false" onAction="#goBack" prefHeight="18.0" prefWidth="62.0" style="-fx-background-color: white;" text="Cancelar" />
             <TextArea fx:id="textAreaDescription" layoutX="160.0" layoutY="205.0" prefHeight="42.0" prefWidth="250.0" />
             <Label layoutX="18.0" layoutY="272.0" text="Organizacion Vinculada" />
-            <ComboBox fx:id="comboBoxOrganizationName" layoutX="160.0" layoutY="268.0" prefHeight="25.0" prefWidth="250.0" />
+            <ComboBox fx:id="comboBoxOrganizationName" layoutX="160.0" layoutY="268.0" prefHeight="25.0" prefWidth="250.0" onAction="#filterSupervisors" />
+            <Label layoutX="18.0" layoutY="310.0" text="Responsable Tecnico:" />
+            <ComboBox fx:id="comboBoxResponsableName" layoutX="160.0" layoutY="306.0" prefHeight="25.0" prefWidth="250.0" />
          </children>
       </Pane>
       <Label layoutX="179.0" layoutY="18.0" text="Registrar Nuevo Proyecto">

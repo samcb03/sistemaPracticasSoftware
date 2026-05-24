@@ -4,12 +4,16 @@ import java.util.Optional;
 
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
+import javafx.scene.control.ButtonBar;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.Label;
+import javafx.stage.Stage;
 
 public abstract class ValidationHandler extends WindowHandler   {
 
     protected Label messageLabel;
     protected Button backButton;
+    protected Button buttonInactive;
 
     protected void setupControls(Label messageLabel, Button backButton) {
         this.messageLabel = messageLabel;
@@ -40,6 +44,27 @@ public abstract class ValidationHandler extends WindowHandler   {
             messageLabel.setText("");
             registrationAction.run();
         }
+    }
+
+        protected boolean showConfirmation(String title, String message) {
+        boolean confirmed = false;
+        ButtonType yesButton = new ButtonType("Sí", ButtonBar.ButtonData.YES);
+        ButtonType noButton = new ButtonType("No", ButtonBar.ButtonData.NO);
+
+        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+        alert.setTitle(title);
+        alert.setHeaderText(null);
+        alert.setContentText(message);
+        alert.getButtonTypes().setAll(yesButton, noButton);
+
+        if (messageLabel != null && messageLabel.getScene() != null) {
+            Stage owner = (Stage) messageLabel.getScene().getWindow();
+            alert.initOwner(owner);
+        }
+
+        Optional<ButtonType> result = alert.showAndWait();
+        confirmed = result.isPresent() && result.get() == yesButton;
+        return confirmed;
     }
 
     
