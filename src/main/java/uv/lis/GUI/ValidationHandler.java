@@ -46,7 +46,7 @@ public abstract class ValidationHandler extends WindowHandler   {
         }
     }
 
-        protected boolean showConfirmation(String title, String message) {
+    protected boolean showConfirmation(String title, String message) {
         boolean confirmed = false;
         ButtonType yesButton = new ButtonType("Sí", ButtonBar.ButtonData.YES);
         ButtonType noButton = new ButtonType("No", ButtonBar.ButtonData.NO);

@@ -1,7 +1,6 @@
 package uv.lis.GUI.controller;
 
 import static uv.lis.logic.utils.InputValidator.validateEmail;
-import static uv.lis.logic.utils.InputValidator.validateLettersOnly;
 import static uv.lis.logic.utils.InputValidator.validateText;
 
 import java.net.URL;
@@ -10,7 +9,6 @@ import java.util.Optional;
 import java.util.ResourceBundle;
 
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
 import javafx.geometry.Side;
 import javafx.scene.control.Button;
 import javafx.scene.control.ContextMenu;
