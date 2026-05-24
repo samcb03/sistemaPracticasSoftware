@@ -13,8 +13,6 @@ public interface IProjectSupervisorDAO {
 
     boolean modifyProjectSupervisor(ProjectSupervisor projectSupervisor) throws OperationException;
 
-    boolean inactivateProjectSupervisor(ProjectSupervisor projectSupervisor) throws OperationException;
-
     ArrayList<String> getAllSupervisorNames() throws OperationException;
 
     ArrayList<String> searchProjectSupervisorName(String prefix) throws OperationException;
@@ -22,4 +20,10 @@ public interface IProjectSupervisorDAO {
     Optional<ProjectSupervisor> getProjectSupervisorByName(String supervisorName) throws OperationException;
 
     int getSupervisorIdByName(String supervisorName) throws OperationException;
+
+    ArrayList<String> getSupervisorsByOrganizationId(int organizationId) throws OperationException;
+
+    boolean isSupervisorInactive(String name) throws OperationException;
+
+    boolean inactivateProjectSupervisor(String projectSupervisorName) throws OperationException;
 }

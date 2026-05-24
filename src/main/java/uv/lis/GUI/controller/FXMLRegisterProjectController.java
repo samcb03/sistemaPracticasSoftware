@@ -23,7 +23,6 @@ import uv.lis.logic.dao.AffiliatedOrganizationDAO;
 import uv.lis.logic.dao.ProjectDAO;
 import uv.lis.logic.dao.ProjectSupervisorDAO;
 import uv.lis.logic.dto.Project;
-import uv.lis.logic.dto.ProjectSupervisor;
 import uv.lis.logic.exceptions.OperationException;
 
 public class FXMLRegisterProjectController extends ValidationHandler {
@@ -41,7 +40,6 @@ public class FXMLRegisterProjectController extends ValidationHandler {
     private ProjectDAO projectDAO;
     private AffiliatedOrganizationDAO affiliatedOrganizationDAO;
     private ProjectSupervisorDAO projectSupervisorDAO;
-    private ProjectSupervisor supervisor;
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
@@ -103,8 +101,8 @@ public class FXMLRegisterProjectController extends ValidationHandler {
     }
 
     private void registerProject() {
-        Project project = buildProject();
         try {
+            Project project = buildProject();
             boolean projectRegistered = projectDAO.registerProject(project);
             if (projectRegistered) {
                 showSuccess("Proyecto registrado correctamente");
@@ -117,7 +115,7 @@ public class FXMLRegisterProjectController extends ValidationHandler {
         }
     }
 
-private Project buildProject() {
+    private Project buildProject() throws OperationException {
         Project project = new Project();
         project.setName(textFieldName.getText().trim());
         project.setMethodology(textFieldMethodology.getText().trim());
@@ -128,16 +126,12 @@ private Project buildProject() {
         String selectedOrganization = comboBoxOrganizationName.getValue();
         String selectedSupervisor = comboBoxResponsableName.getValue();
         
-        try {
-            int organizationId = affiliatedOrganizationDAO.getOrganizationIdByName(selectedOrganization);
-            int supervisorId = projectSupervisorDAO.getSupervisorIdByName(selectedSupervisor); 
-            
-            project.setIdAffiliatedOrganization(organizationId);
-            project.setIdSupervisor(supervisorId); 
-            
-        } catch (OperationException e) {
-            showError(e.getMessage());
-        }
+        int organizationId = affiliatedOrganizationDAO.getOrganizationIdByName(selectedOrganization);
+        int supervisorId = projectSupervisorDAO.getSupervisorIdByName(selectedSupervisor); 
+        
+        project.setIdAffiliatedOrganization(organizationId);
+        project.setIdSupervisor(supervisorId); 
+        
         return project;
     }
 
