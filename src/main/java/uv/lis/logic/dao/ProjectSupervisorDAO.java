@@ -176,24 +176,23 @@ public class ProjectSupervisorDAO implements IProjectSupervisorDAO {
     }
 
     @Override
-    public boolean inactivateProjectSupervisor(ProjectSupervisor projectSupervisor) throws OperationException {
+    public boolean inactivateProjectSupervisor(String projectSupervisorName) throws OperationException {
         boolean isInactive = false;
-
         String supervisorQuery = "UPDATE responsableProyecto SET estado = '0' WHERE idResponsableProyecto = ?;";
 
         try (Connection databaseConnection = connectionManager.getConnection();
              PreparedStatement preparedStatement = databaseConnection.prepareStatement(supervisorQuery)) {
 
-            preparedStatement.setInt(1, projectSupervisor.getId());
+            preparedStatement.setString(1,projectSupervisorName);
 
             if (preparedStatement.executeUpdate() > NO_ROWS_AFFECTED) {
                 isInactive = true;
                 LOGGER.log(Level.INFO, "Supervisor dado de baja exitosamente");
             } else {
                 LOGGER.log(Level.WARNING, "No se pudo dar de baja al supervisor del proyecto con ID {0}", 
-                    projectSupervisor.getId());
+                    projectSupervisorName);
                 throw new OperationException("No se pudo dar de baja al supervisor del proyecto con ID: " 
-                    + projectSupervisor.getId(), null);
+                    + projectSupervisorName, null);
             }
 
         } catch (SQLException e) {
@@ -295,5 +294,32 @@ public class ProjectSupervisorDAO implements IProjectSupervisorDAO {
         }
 
         return isAssigned;
+    }
+
+    @Override
+    public boolean isSupervisorInactive(String supervisorName) throws OperationException {
+        boolean isInactive = false;
+        String supervisorQuery = "SELECT estado FROM ResponsableProyecto WHERE nombre = ?";
+
+        try (Connection databaseConnection = connectionManager.getConnection();
+             PreparedStatement preparedStatement = databaseConnection.prepareStatement(supervisorQuery)) {
+
+            preparedStatement.setString(1, supervisorName);
+
+            try (ResultSet resultSet = preparedStatement.executeQuery()) {
+                if (resultSet.next()) {
+                    isInactive = resultSet.getInt("estado") == 0;
+                } else {
+                    throw new OperationException("No se encontró al profesor con número: "
+                        + supervisorName, null);
+                }
+            }
+
+        } catch (SQLException e) {
+            LOGGER.log(Level.SEVERE, "Error al verificar el estado del profesor", e);
+            throw new OperationException("No se pudo verificar al profesor. Intente más tarde", e);
+        }
+
+        return isInactive;
     }
 }

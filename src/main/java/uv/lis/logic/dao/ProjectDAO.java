@@ -241,10 +241,10 @@ public class ProjectDAO implements IProjectDAO{
 
     @Override
     public ArrayList<String> getProjectNamesByOrganizationId(int organizationId) throws OperationException {
-    ArrayList<String> projectNames = new ArrayList<>();
-    String query = "SELECT nombre FROM Proyecto "
-                 + "WHERE idOrganizacionVinculada = ? "
-                 + "AND estado = 1";
+        ArrayList<String> projectNames = new ArrayList<>();
+        String query = "SELECT nombre FROM Proyecto "
+                    + "WHERE idOrganizacionVinculada = ? "
+                    + "AND estado = 1";
  
     try (Connection databaseConnection = connectionManager.getConnection();
          PreparedStatement preparedStatement = databaseConnection.prepareStatement(query)) {

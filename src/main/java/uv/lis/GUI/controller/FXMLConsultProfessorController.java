@@ -10,16 +10,12 @@ import java.util.ResourceBundle;
 
 import javafx.fxml.FXML;
 import javafx.geometry.Side;
-import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
-import javafx.scene.control.ButtonBar;
-import javafx.scene.control.ButtonType;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Label;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.GridPane;
-import javafx.stage.Stage;
 
 import uv.lis.GUI.ValidationHandler;
 import uv.lis.logic.dao.ProfessorDAO;
@@ -194,25 +190,6 @@ public class FXMLConsultProfessorController extends ValidationHandler {
         } else {
             showError("Inactivación cancelada.");
         }
-    }
-
-    private boolean showConfirmation(String title, String message) {
-        boolean confirmed = false;
-        ButtonType yesButton = new ButtonType("Sí", ButtonBar.ButtonData.YES);
-        ButtonType noButton = new ButtonType("No", ButtonBar.ButtonData.NO);
-
-        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
-        alert.setTitle(title);
-        alert.setHeaderText(null);
-        alert.setContentText(message);
-        alert.getButtonTypes().setAll(yesButton, noButton);
-
-        Stage owner = (Stage) buttonInactive.getScene().getWindow();
-        alert.initOwner(owner);
-
-        Optional<ButtonType> result = alert.showAndWait();
-        confirmed = result.isPresent() && result.get() == yesButton;
-        return confirmed;
     }
 
     @Override
