@@ -81,33 +81,20 @@ public class FXMLGenerateAutoevaluation extends ValidationHandler {
         return group;
     }
 
-private void loadAutomaticData() { 
+    private void loadAutomaticData() { 
         if (currentStudent != null) {
             labelStudentName.setText(currentStudent.getFirstName() + " " + currentStudent.getLastName());
             labelStudentId.setText(currentStudent.getIdStudent());
 
             try {
                 Autoevaluation contextData = autoevaluationDAO.getAutoevaluationData(currentStudent.getIdStudent());
-                
-                // --- PUNTO DE VERIFICACIÓN ---
-                if (contextData == null) {
-                    showError("No se encontraron datos de autoevaluación para este estudiante.");
-                    return;
-                }
-                
-                // Imprime en consola para verificar los valores reales
-                System.out.println("Org: " + contextData.getOrganizationName());
-                System.out.println("Proj: " + contextData.getProjectName());
-                System.out.println("Sup: " + contextData.getProjectSupervisorName());
-                // -----------------------------
 
-                // Usamos validación simple para evitar strings "null" o vacíos
-                labelOrganization.setText(contextData.getOrganizationName() != null ? contextData.getOrganizationName() : "Sin asignar");
-                labelProject.setText(contextData.getProjectName() != null ? contextData.getProjectName() : "Sin proyecto");
-                labelProjectSupervisor.setText(contextData.getProjectSupervisorName() != null ? contextData.getProjectSupervisorName() : "Sin supervisor");
+                labelOrganization.setText(contextData.getOrganizationName());
+                labelProject.setText(contextData.getProjectName());
+                labelProjectSupervisor.setText(contextData.getProjectSupervisorName());
 
             } catch (OperationException e) {
-                showError("Error al cargar datos: " + e.getMessage());
+                showError("No se encontró un proyecto asignado: " + e.getMessage());
                 buttonGenerate.setDisable(true);
             }
         }
