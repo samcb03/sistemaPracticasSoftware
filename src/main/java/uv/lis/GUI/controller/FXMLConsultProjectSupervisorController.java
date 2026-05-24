@@ -1,5 +1,7 @@
 package uv.lis.GUI.controller;
 
+import static uv.lis.logic.utils.InputValidator.validateEmail;
+import static uv.lis.logic.utils.InputValidator.validateLettersOnly;
 import static uv.lis.logic.utils.InputValidator.validateText;
 
 import java.net.URL;
@@ -8,6 +10,7 @@ import java.util.Optional;
 import java.util.ResourceBundle;
 
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.geometry.Side;
 import javafx.scene.control.Button;
 import javafx.scene.control.ContextMenu;
@@ -15,7 +18,7 @@ import javafx.scene.control.Label;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.GridPane;
-
+import javafx.scene.layout.StackPane;
 import uv.lis.GUI.ValidationHandler;
 import uv.lis.logic.dao.AffiliatedOrganizationDAO;
 import uv.lis.logic.dao.ProjectDAO;
@@ -24,22 +27,31 @@ import uv.lis.logic.dto.ProjectSupervisor;
 import uv.lis.logic.exceptions.OperationException;
 
 public class FXMLConsultProjectSupervisorController extends ValidationHandler{
-    @FXML private Button buttonBack;
+@FXML private Button buttonBack;
     @FXML private Button buttonModify;
     @FXML private Button buttonSearch;
+    @FXML private TextField textFieldName;
+    @FXML private TextField textFieldPosition;
+    @FXML private TextField textFieldEmail;
+    @FXML private TextField textFieldNameProjectSupervisor;
     @FXML private Label labelName;
     @FXML private Label labelPosition;
     @FXML private Label labelEmail;
     @FXML private Label labelMessage;
-    @FXML private TextField textFieldNameProjectSupervisor;
+    @FXML private Label labelStatus;
     @FXML private Label labelOrganization;
     @FXML private Label labelProject;
     @FXML private GridPane gridPaneProjectSupervisorInfo;
+    @FXML private StackPane stackPaneName;
+    @FXML private StackPane stackPanePosition;
+    @FXML private StackPane stackEPanemail;
+    
     private ContextMenu contextMenuSuggestions;
     private ProjectDAO projectDAO;
     private AffiliatedOrganizationDAO affiliatedOrganizationDAO;
     private ProjectSupervisorDAO projectSupervisorDAO;
     private ProjectSupervisor projectSupervisor;
+    private boolean isEditing = false;
 
 
     @Override
@@ -54,6 +66,24 @@ public class FXMLConsultProjectSupervisorController extends ValidationHandler{
         buttonBack.setDisable(false);
         setupControls(labelMessage, buttonBack);         
         setupAutocomplete();
+        toggleEditingMode(false);
+    }
+
+    private void toggleEditingMode(boolean editing) {
+        isEditing = editing;
+        buttonModify.setText(editing ? "Guardar datos" : "Modificar");
+        labelName.setVisible(!editing); labelName.setManaged(!editing);
+        textFieldName.setVisible(editing); textFieldName.setManaged(editing);
+        labelPosition.setVisible(!editing); labelPosition.setManaged(!editing);
+        textFieldPosition.setVisible(editing); textFieldPosition.setManaged(editing);
+        labelEmail.setVisible(!editing); labelEmail.setManaged(!editing);
+        textFieldEmail.setVisible(editing); textFieldEmail.setManaged(editing);
+
+        if (editing) {
+            textFieldName.setText(labelName.getText());
+            textFieldPosition.setText(labelPosition.getText());
+            textFieldEmail.setText(labelEmail.getText());
+        }
     }
 
     @FXML
@@ -137,17 +167,38 @@ public class FXMLConsultProjectSupervisorController extends ValidationHandler{
         );
     }
 
-    @Override
-    protected void clearFields() {
-        labelName.setText("");
-        labelPosition.setText("");
-        labelEmail.setText("");
-        labelOrganization.setText("");
-        labelProject.setText("");
-        gridPaneProjectSupervisorInfo.setVisible(false);
-        buttonModify.setDisable(true);
+
+    @FXML
+    private void handleModifyToggle() {
+        if(!isEditing) {
+            toggleEditingMode(true);
+        } else {
+            if(validateEmail(textFieldEmail.getText().trim(), "Email").isPresent()) {
+                showError("Email inválido");
+            } else {
+                try {
+                    projectSupervisor.setName(textFieldName.getText().trim());
+                    projectSupervisor.setPosition(textFieldPosition.getText().trim());
+                    projectSupervisor.setEmail(textFieldEmail.getText().trim());
+                            
+                    if (projectSupervisorDAO.modifyProjectSupervisor(projectSupervisor)) {
+                        showSuccess("Modificación exitosa");
+                        labelName.setText(projectSupervisor.getName());
+                        labelPosition.setText(projectSupervisor.getPosition());
+                        labelEmail.setText(projectSupervisor.getEmail());
+                        toggleEditingMode(false);
+                    } else showError("Falló la modificación");
+                } catch (OperationException e) { 
+                    showError(e.getMessage()); 
+                }
+            }
+        }
     }
 
-
-
+    @Override
+    protected void clearFields() {
+        gridPaneProjectSupervisorInfo.setVisible(false);
+        buttonModify.setDisable(true);
+        toggleEditingMode(false);
+    }
 }
