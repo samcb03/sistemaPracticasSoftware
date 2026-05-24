@@ -10,6 +10,7 @@
 <?import javafx.scene.layout.Pane?>
 <?import javafx.scene.layout.RowConstraints?>
 <?import javafx.scene.text.Font?>
+<?import javafx.scene.layout.StackPane?>
 
 <AnchorPane prefHeight="480.0" prefWidth="600.0"
     xmlns="http://javafx.com/javafx/25"
@@ -47,14 +48,12 @@
                         text="Buscar" />
 
                 <GridPane fx:id="gridPaneProjectSupervisorInfo"
-                          layoutX="57.0" layoutY="62.0"
-                          prefHeight="250.0" prefWidth="334.0"
-                          visible="false">
+                        layoutX="57.0" layoutY="62.0"
+                        prefHeight="250.0" prefWidth="334.0"
+                        visible="false">
                     <columnConstraints>
-                        <ColumnConstraints hgrow="SOMETIMES"
-                            minWidth="10.0" prefWidth="130.0" />
-                        <ColumnConstraints hgrow="SOMETIMES"
-                            minWidth="10.0" prefWidth="204.0" />
+                        <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="130.0" />
+                        <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="204.0" />
                     </columnConstraints>
                     <rowConstraints>
                         <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
@@ -65,28 +64,30 @@
                     </rowConstraints>
                     <children>
                         <Label text="Nombre:" />
-                        <Label text="Cargo:"          GridPane.rowIndex="1" />
-                        <Label text="Correo:"         GridPane.rowIndex="2" />
-                        <Label text="Organización:"   GridPane.rowIndex="3" />
-                        <Label text="Proyecto:"       GridPane.rowIndex="4" />
+                        <Label text="Cargo:" GridPane.rowIndex="1" />
+                        <Label text="Correo:" GridPane.rowIndex="2" />
+                        <Label text="Organización:" GridPane.rowIndex="3" />
+                        <Label text="Proyecto:" GridPane.rowIndex="4" />
 
-                        <Label fx:id="labelName"
-                               prefHeight="18.0" prefWidth="204.0"
-                               GridPane.columnIndex="1" />
-                        <Label fx:id="labelPosition"
-                               prefHeight="18.0" prefWidth="204.0"
-                               GridPane.columnIndex="1" GridPane.rowIndex="1" />
-                        <Label fx:id="labelEmail"
-                               prefHeight="18.0" prefWidth="204.0"
-                               GridPane.columnIndex="1" GridPane.rowIndex="2" />
-                        <Label fx:id="labelOrganization"
-                               prefHeight="18.0" prefWidth="204.0"
-                               wrapText="true"
-                               GridPane.columnIndex="1" GridPane.rowIndex="3" />
-                        <Label fx:id="labelProject"
-                               prefHeight="18.0" prefWidth="204.0"
-                               wrapText="true"
-                               GridPane.columnIndex="1" GridPane.rowIndex="4" />
+                    <StackPane fx:id="stackPaneName" alignment="CENTER_LEFT" GridPane.columnIndex="1" GridPane.rowIndex="0">
+                        <Label fx:id="labelName" prefWidth="204.0" maxWidth="204.0" />
+                        <TextField fx:id="textFieldName" prefWidth="204.0" maxWidth="204.0" visible="false" managed="false" />
+                    </StackPane>
+
+                    <StackPane fx:id="stackPanePosition" alignment="CENTER_LEFT" GridPane.columnIndex="1" GridPane.rowIndex="1">
+                        <Label fx:id="labelPosition" prefWidth="204.0" maxWidth="204.0" />
+                        <TextField fx:id="textFieldPosition" prefWidth="204.0" maxWidth="204.0" visible="false" managed="false" />
+                    </StackPane>
+
+                    <StackPane fx:id="stackPaneEmail" alignment="CENTER_LEFT" GridPane.columnIndex="1" GridPane.rowIndex="2">
+                        <Label fx:id="labelEmail" prefWidth="204.0" maxWidth="204.0" />
+                        <TextField fx:id="textFieldEmail" prefWidth="204.0" maxWidth="204.0" visible="false" managed="false" />
+                    </StackPane>
+
+                        <Label fx:id="labelOrganization" prefHeight="18.0" prefWidth="204.0" wrapText="true"
+                            GridPane.columnIndex="1" GridPane.rowIndex="3" />
+                        <Label fx:id="labelProject" prefHeight="18.0" prefWidth="204.0" wrapText="true"
+                            GridPane.columnIndex="1" GridPane.rowIndex="4" />
                     </children>
                 </GridPane>
 
@@ -103,6 +104,7 @@
                         <Button fx:id="buttonModify"
                                 disable="true"
                                 mnemonicParsing="false"
+                                onAction="#handleModifyToggle"
                                 text="Modificar" />
                         <Button fx:id="buttonBack"
                                 disable="true"
