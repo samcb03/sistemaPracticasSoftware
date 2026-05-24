@@ -1,5 +1,7 @@
 package uv.lis.logic.dao;
 
+import static uv.lis.logic.utils.InputValidator.STATUS_ASSIGNED;
+
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -11,12 +13,9 @@ import uv.lis.dataaccess.MySQLConnectionManager;
 import uv.lis.logic.contracts.IReportContextDAO;
 import uv.lis.logic.dto.MonthlyReport;
 import uv.lis.logic.dto.Report;
-import uv.lis.logic.exceptions.OperationException;
+import uv.lis.logic.exceptions.OperationException;;
 
 public class ReportContextDAO implements IReportContextDAO {
-    private static final int NO_ROWS_AFFECTED = 0;
-
-    private static final int REPORT_STATUS_ASSIGNED = 2;
     private static final Logger LOGGER = Logger.getLogger(ReportContextDAO.class.getName());
     private MySQLConnectionManager connectionManager;
 
@@ -50,7 +49,7 @@ public class ReportContextDAO implements IReportContextDAO {
                             + "INNER JOIN Solicita_Proyecto sp ON a.matricula = sp.matricula "
                             + "INNER JOIN Proyecto p ON sp.idProyecto = p.idProyecto "
                             + "INNER JOIN OrganizacionVinculada ov ON p.idOrganizacionVinculada = ov.idOrganizacionVinculada "
-                            + "WHERE a.matricula = ? AND sp.estatus = " + REPORT_STATUS_ASSIGNED + ";";
+                            + "WHERE a.matricula = ? AND sp.estatus = " + STATUS_ASSIGNED + ";";
 
         try (Connection databaseConnection = connectionManager.getConnection();
             PreparedStatement preparedStatement = databaseConnection.prepareStatement(contextQuery)) {

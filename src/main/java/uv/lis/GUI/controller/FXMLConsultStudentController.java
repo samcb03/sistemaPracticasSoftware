@@ -43,11 +43,9 @@ public class FXMLConsultStudentController extends ValidationHandler {
 
     private static final String LABEL_INACTIVE = "Inactivo";
     private static final String LABEL_ACTIVE = "Activo";
-    private static final String GENDER_MALE = "Masculino";
-    private static final String GENDER_FEMALE = "Femenino";
+    private static final String GENDER_MALE = "Hombre";
+    private static final String GENDER_FEMALE = "Mujer";
     private static final String GENDER_OTHER = "Otro";
-    private static final int MIN_NAME_LENGTH = 2;
-    private static final int MAX_NAME_LENGTH = 50;
 
     @FXML private TextField textFieldStudentId;
     @FXML private Button buttonSearch;

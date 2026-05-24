@@ -1,5 +1,7 @@
 package uv.lis.logic.dao;
 
+import static uv.lis.logic.utils.InputValidator.NO_ROWS_AFFECTED;
+
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -15,8 +17,6 @@ import uv.lis.logic.dto.Subject;
 import uv.lis.logic.exceptions.OperationException;
 
 public class SubjectDAO implements ISubjectDAO {
-    private static final int STATUS_ASSIGNED = 2;
-    private static final int NO_ROWS_AFFECTED = 0;
     private static final Logger LOGGER = Logger.getLogger(SubjectDAO.class.getName());
     private MySQLConnectionManager connectionManager;
 

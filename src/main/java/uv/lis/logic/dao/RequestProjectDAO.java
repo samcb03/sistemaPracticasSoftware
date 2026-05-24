@@ -1,5 +1,10 @@
 package uv.lis.logic.dao;
 
+import static uv.lis.logic.utils.InputValidator.MAX_REQUESTS;
+import static uv.lis.logic.utils.InputValidator.NO_ROWS_AFFECTED;
+import static uv.lis.logic.utils.InputValidator.STATUS_ASSIGNED;
+import static uv.lis.logic.utils.InputValidator.STATUS_REQUESTED;
+
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -17,14 +22,10 @@ import uv.lis.logic.dto.Student;
 import uv.lis.logic.exceptions.OperationException;
 
 public class RequestProjectDAO implements IRequestProjectDAO {
-    private static final int NO_RESULTS = 0;
-    private static final int MAX_REQUESTS = 3;
-    private static final int STATUS_REQUESTED = 1;
-    private static final int STATUS_ASSIGNED = 2;
-
+   
     private static final String COLUMN_AVAILABLE = "disponibles";
-    private static final String ERROR_ALREADY_ASSIGNED = "ALUMNO_YA_ASIGNADO";
-    private static final String ERROR_FULL_CAPACITY = "CUPO_LLENO";
+    private static final String ERROR_ALREADY_ASSIGNED = "alumno ya asignado";
+    private static final String ERROR_FULL_CAPACITY = "cupo lleno";
     private static final Logger LOGGER = Logger.getLogger(RequestProjectDAO.class.getName());
     private MySQLConnectionManager connectionManager;
 
@@ -102,7 +103,7 @@ public class RequestProjectDAO implements IRequestProjectDAO {
             
             try (ResultSet resultSet = preparedStatement.executeQuery()) {
                 if (resultSet.next()) {
-                    hasRequested = resultSet.getInt("total") > NO_RESULTS;
+                    hasRequested = resultSet.getInt("total") > NO_ROWS_AFFECTED;
                 }
             }
         } catch (SQLException e) {
@@ -155,7 +156,7 @@ public class RequestProjectDAO implements IRequestProjectDAO {
             preparedStatement.setString(2, idStudent);
             preparedStatement.setInt(3, STATUS_REQUESTED);
 
-            if (preparedStatement.executeUpdate() > NO_RESULTS) {
+            if (preparedStatement.executeUpdate() > NO_ROWS_AFFECTED) {
                 isRegistered = true;
             }
         } catch (SQLException e) {
@@ -217,7 +218,7 @@ public class RequestProjectDAO implements IRequestProjectDAO {
         try (PreparedStatement preparedStatement = connection.prepareStatement(requestProjectQuery)) {
             preparedStatement.setString(1, idStudent);
             try (ResultSet resultSet = preparedStatement.executeQuery()) {
-                if (resultSet.next() && resultSet.getInt(1) > NO_RESULTS) {
+                if (resultSet.next() && resultSet.getInt(1) > NO_ROWS_AFFECTED) {
                     throw new OperationException("El estudiante ya cuenta con un proyecto asignado.", 
                         null);
                 }
@@ -237,7 +238,7 @@ public class RequestProjectDAO implements IRequestProjectDAO {
                 if (!resultSet.next()) {
                     throw new OperationException("El proyecto no existe.", null);
                 }
-                if (resultSet.getInt(COLUMN_AVAILABLE) <= NO_RESULTS) {
+                if (resultSet.getInt(COLUMN_AVAILABLE) <= NO_ROWS_AFFECTED) {
                     throw new OperationException("El cupo del proyecto se ha agotado.", null);
                 }
             }

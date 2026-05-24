@@ -50,8 +50,8 @@ public class FXMLGenerateAutoevaluation extends ValidationHandler {
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         autoevaluationCommon = new AutoevaluationCommon();
-        autoevaluationDAO    = new AutoevaluationDAO();
-        currentStudent       = SessionManager.getInstance().getCurrentStudent();
+        autoevaluationDAO = new AutoevaluationDAO();
+        currentStudent = SessionManager.getInstance().getCurrentStudent();
         setupControls(labelMessage, buttonBack);
         setupToggleGroups();
         loadAutomaticData(); 
@@ -104,12 +104,12 @@ public class FXMLGenerateAutoevaluation extends ValidationHandler {
     private void generateAutoevaluation() {
         int[] answers = new int[10];
 
-        for (int i = 0; i < groups.length; i++) {
-            if (groups[i].getSelectedToggle() == null) {
+        for (int questionIndex = 0; questionIndex < groups.length; questionIndex++) {
+            if (groups[questionIndex].getSelectedToggle() == null) {
                 showError("Por favor, responda todas las preguntas antes de generar.");
-                return;
+            } else {
+                answers[questionIndex] = (int) groups[questionIndex].getSelectedToggle().getUserData();
             }
-            answers[i] = (int) groups[i].getSelectedToggle().getUserData();
         }
 
         try {

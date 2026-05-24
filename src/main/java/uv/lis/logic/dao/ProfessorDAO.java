@@ -1,5 +1,9 @@
 package uv.lis.logic.dao;
 
+import static uv.lis.logic.utils.InputValidator.INVALID_ID;
+import static uv.lis.logic.utils.InputValidator.IS_COORDINATOR;
+import static uv.lis.logic.utils.InputValidator.NO_ROWS_AFFECTED;
+
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -13,13 +17,10 @@ import java.util.logging.Logger;
 import uv.lis.dataaccess.MySQLConnectionManager;
 import uv.lis.logic.contracts.IProfessorDAO;
 import uv.lis.logic.dto.Professor;
-import uv.lis.logic.exceptions.OperationException;
+import uv.lis.logic.exceptions.OperationException;;
 
 public class ProfessorDAO extends UserDAO implements IProfessorDAO {
-
-    private static final int NO_ROWS_AFFECTED = 0;
-    private static final int ID_ERROR = -1;
-    private static final int IS_COORDINATOR = 3;
+    private static final int IS_PROFESSOR = 2;
     private static final Logger LOGGER = Logger.getLogger(ProfessorDAO.class.getName());
     private MySQLConnectionManager connectionManager;
 
@@ -161,7 +162,7 @@ public class ProfessorDAO extends UserDAO implements IProfessorDAO {
         try (Connection databaseConnection = connectionManager.getConnection();
              PreparedStatement preparedStatement = databaseConnection.prepareStatement(professorQuery)) {
 
-            preparedStatement.setInt(1, professor.getIsCoordinator() ? 3 : 2);
+            preparedStatement.setInt(1, professor.getIsCoordinator() ? IS_COORDINATOR : IS_PROFESSOR);
             preparedStatement.setString(2, professor.getFirstName());
             preparedStatement.setString(3, professor.getLastName());
             preparedStatement.setString(4, professor.getPersonnelNumber());
@@ -240,7 +241,7 @@ public class ProfessorDAO extends UserDAO implements IProfessorDAO {
 
     @Override
     public int getIdUserByProfessorPersonnelNumber(String personnelNumber) throws OperationException {
-        int idUser = ID_ERROR;
+        int idUser = INVALID_ID;
         String professorQuery = "SELECT idUsuario FROM Profesor WHERE numeroPersonal = ?";
 
         try (Connection databaseConnection = connectionManager.getConnection();
