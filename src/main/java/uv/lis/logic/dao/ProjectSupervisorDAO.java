@@ -1,5 +1,7 @@
 package uv.lis.logic.dao;
 
+import static uv.lis.logic.utils.InputValidator.NO_ROWS_AFFECTED;
+
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -15,7 +17,6 @@ import uv.lis.logic.dto.ProjectSupervisor;
 import uv.lis.logic.exceptions.OperationException;
 
 public class ProjectSupervisorDAO implements IProjectSupervisorDAO {
-    private static final int NO_ROWS_AFFECTED = 0;
     private static final Logger LOGGER = Logger.getLogger(ProjectSupervisorDAO.class.getName());
     private MySQLConnectionManager connectionManager;
 

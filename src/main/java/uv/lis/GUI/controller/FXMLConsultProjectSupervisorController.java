@@ -51,7 +51,6 @@ public class FXMLConsultProjectSupervisorController extends ValidationHandler{
     private ProjectSupervisor projectSupervisor;
     private boolean isEditing = false;
 
-
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         projectDAO = new ProjectDAO();

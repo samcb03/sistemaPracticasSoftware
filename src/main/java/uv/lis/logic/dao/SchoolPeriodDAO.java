@@ -1,5 +1,7 @@
 package uv.lis.logic.dao;
 
+import static uv.lis.logic.utils.InputValidator.NO_ROWS_AFFECTED;
+
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -12,10 +14,9 @@ import java.util.logging.Logger;
 import uv.lis.dataaccess.MySQLConnectionManager;
 import uv.lis.logic.contracts.ISchoolPeriodDAO;
 import uv.lis.logic.dto.SchoolPeriod;
-import uv.lis.logic.exceptions.OperationException;
+import uv.lis.logic.exceptions.OperationException;;
 
 public class SchoolPeriodDAO implements ISchoolPeriodDAO{
-    private static final int NO_ROWS_AFFECTED = 0; 
     private static final Logger LOGGER = Logger.getLogger(SchoolPeriodDAO.class.getName());
     private MySQLConnectionManager connectionManager;
 

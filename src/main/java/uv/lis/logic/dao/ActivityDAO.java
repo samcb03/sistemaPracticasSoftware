@@ -1,10 +1,12 @@
 package uv.lis.logic.dao;
 
+import static uv.lis.logic.utils.InputValidator.NO_ROWS_AFFECTED;
+
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.time.LocalDate; 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -15,9 +17,7 @@ import uv.lis.dataaccess.MySQLConnectionManager;
 import uv.lis.logic.contracts.IActivityDAO;
 import uv.lis.logic.dto.Activity;
 import uv.lis.logic.exceptions.OperationException;
-
 public class ActivityDAO implements IActivityDAO {
-        private static final int NO_ROWS_AFFECTED = 0;
         private static final Logger LOGGER = Logger.getLogger(ActivityDAO.class.getName());
         private MySQLConnectionManager connectionManager;
 

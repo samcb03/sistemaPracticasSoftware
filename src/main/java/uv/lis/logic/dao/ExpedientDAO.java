@@ -1,5 +1,7 @@
 package uv.lis.logic.dao;
 
+import static uv.lis.logic.utils.InputValidator.NO_ROWS_AFFECTED;
+
 import java.io.File;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -20,7 +22,6 @@ import uv.lis.logic.utils.FileManager;
 import uv.lis.logic.utils.FileValidator;
 
 public class ExpedientDAO implements IExpedientDAO {
-    private static final int NO_ROWS_AFFECTED = 0;
     private static final Logger LOGGER = Logger.getLogger(ExpedientDAO.class.getName());
     private MySQLConnectionManager connectionManager;
 

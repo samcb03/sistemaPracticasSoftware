@@ -11,6 +11,11 @@ public final class InputValidator {
 
     }
 
+    public static final int IS_COORDINATOR = 3;
+    public static final int NO_ROWS_AFFECTED = 0;
+    public static final int MAX_REQUESTS = 3;
+    public static final int STATUS_REQUESTED = 1;
+    public static final int STATUS_ASSIGNED = 2;
     public static final int MAX_TEXT_LENGTH = 255;
     public static final int STUDENT_ID_LENGTH = 9;
     public static final int PROFESSOR_ID_LENGTH = 5;

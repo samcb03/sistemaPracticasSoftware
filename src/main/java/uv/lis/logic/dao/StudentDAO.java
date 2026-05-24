@@ -1,5 +1,8 @@
 package uv.lis.logic.dao;
 
+import static uv.lis.logic.utils.InputValidator.NO_ROWS_AFFECTED;
+import static uv.lis.logic.utils.InputValidator.STATUS_ASSIGNED;
+
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -15,9 +18,8 @@ import uv.lis.logic.dto.Student;
 import uv.lis.logic.exceptions.OperationException;
 
 public class StudentDAO extends UserDAO implements IStudentDAO {
-    private static final int NO_ROWS_AFFECTED = 0;
     private static final Logger LOGGER = Logger.getLogger(UserDAO.class.getName());
-    private static final int PROJECT_ASSIGNED = 2;
+    
     private MySQLConnectionManager connectionManager;
 
     public StudentDAO(){
@@ -265,7 +267,7 @@ public class StudentDAO extends UserDAO implements IStudentDAO {
     public boolean hasProjectAssigned(String studentId) throws OperationException {
         boolean hasProject = false;
         String studentQuery = "SELECT COUNT(*) FROM Solicita_Proyecto WHERE matricula = ? AND estatus = " 
-            + PROJECT_ASSIGNED + ";";
+            + STATUS_ASSIGNED + ";";
 
         try (Connection databaseConnection = connectionManager.getConnection();
             PreparedStatement preparedStatement = databaseConnection.prepareStatement(studentQuery)) {

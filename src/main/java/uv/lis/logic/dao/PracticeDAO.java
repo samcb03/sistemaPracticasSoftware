@@ -1,18 +1,19 @@
 package uv.lis.logic.dao;
-import java.sql.Connection;
+import static uv.lis.logic.utils.InputValidator.NO_ROWS_AFFECTED;
 
-import uv.lis.logic.contracts.IPracticeDAO;
-import uv.lis.logic.dto.Practice;
-import uv.lis.logic.exceptions.OperationException;
+import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import uv.lis.dataaccess.MySQLConnectionManager;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import uv.lis.dataaccess.MySQLConnectionManager;
+import uv.lis.logic.contracts.IPracticeDAO;
+import uv.lis.logic.dto.Practice;
+import uv.lis.logic.exceptions.OperationException;
+
 public class PracticeDAO implements IPracticeDAO {
-    private final static int NO_ROWS_AFFECTED = 0;
     private static final Logger LOGGER = Logger.getLogger(ProjectDAO.class.getName());
     private MySQLConnectionManager connectionManager;
 
