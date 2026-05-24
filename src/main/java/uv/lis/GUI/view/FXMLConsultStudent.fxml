@@ -1,7 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
 <?import javafx.scene.control.ContextMenu?>
+<?import javafx.scene.control.DatePicker?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.MenuItem?>
 <?import javafx.scene.control.TextField?>
@@ -69,11 +71,16 @@
                   <Label fx:id="labelProject" prefHeight="18.0" prefWidth="245.0" GridPane.columnIndex="1" GridPane.rowIndex="6" />
                   <Label text="Estado:" GridPane.rowIndex="7" />
                   <Label fx:id="labelIsInactive" prefHeight="18.0" prefWidth="215.0" GridPane.columnIndex="1" GridPane.rowIndex="7" />
+                  <TextField fx:id="textFieldName" managed="false" visible="false" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+                  <TextField fx:id="textFieldLastName" managed="false" visible="false" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+                  <DatePicker fx:id="datePickerBirthDate" managed="false" prefHeight="26.0" prefWidth="191.0" visible="false" GridPane.columnIndex="1" GridPane.rowIndex="3" />
+                  <ComboBox fx:id="comboBoxGender" managed="false" prefHeight="26.0" prefWidth="190.0" visible="false" GridPane.columnIndex="1" GridPane.rowIndex="4" />
                </children>
             </GridPane>
             <HBox alignment="CENTER" layoutX="53.0" layoutY="339.0" prefHeight="38.0" prefWidth="343.0" spacing="20.0">
                <children>
-                  <Button fx:id="buttonUpdate" mnemonicParsing="false" text="Actualizar" />
+                  <Button fx:id="buttonUpdate" mnemonicParsing="false" onAction="#enableEditMode" text="Actualizar" />
+                  <Button fx:id="buttonSave" mnemonicParsing="false" onAction="#saveStudent" text="Guardar" managed="false" visible="false" />
                   <Button fx:id="buttonInactivate" mnemonicParsing="false" onAction="#inactivateStudent" text="Inactivar" />
                   <Button fx:id="buttonBack" mnemonicParsing="false" onAction="#goBack" text="Cancelar" />
                </children>

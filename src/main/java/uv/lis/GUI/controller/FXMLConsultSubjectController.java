@@ -90,7 +90,7 @@ public class FXMLConsultSubjectController extends WindowHandler {
 
         if (loader != null) {
             FXMLConsultStudentController controller = loader.getController();
-            controller.initializeData(student.getIdStudent());
+            controller.loadStudentData(student.getIdStudent());
         }
     }
 

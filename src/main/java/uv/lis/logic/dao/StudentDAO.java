@@ -80,7 +80,7 @@ public class StudentDAO extends UserDAO implements IStudentDAO {
                     int userId = resultSet.getInt("idUsuario");
                     validateUserId = Optional.of(userId);
                 } else {
-                    LOGGER.log(Level.INFO, "No student found with studentId: {0}", studentId);
+                    LOGGER.log(Level.INFO, "No se encontro estudiante con la matricula: {0}", studentId);
                     throw new OperationException("No se encontró un alumno con la matricula: " + studentId, null);
                 }
             }
@@ -159,17 +159,19 @@ public class StudentDAO extends UserDAO implements IStudentDAO {
     public boolean modifyStudent(Student student) throws OperationException {
         boolean isModified = false;
 
-        String studentQuery = "UPDATE Alumno e " 
-            + "INNER JOIN Usuario u ON e.idUsuario = u.idUsuario SET e.matricula = ?, u.nombre = ?, u.apellidos = ? " 
-            + "WHERE e.idUsuario = ?;";
+        String studentQuery = "UPDATE Alumno a " 
+                              + "INNER JOIN Usuario u ON a.idUsuario = u.idUsuario SET u.nombre = ?, u.apellidos = ?, " 
+                              + "a.fechanacimiento = ?, a.genero = ? "
+                              + "WHERE a.matricula = ?;";
 
         try (Connection databaseConnection = connectionManager.getConnection();
-             PreparedStatement preparedStatement = databaseConnection.prepareStatement(studentQuery)) {
+            PreparedStatement preparedStatement = databaseConnection.prepareStatement(studentQuery)) {
             
-            preparedStatement.setString(1, student.getIdStudent());
-            preparedStatement.setString(2, student.getFirstName());
-            preparedStatement.setString(3, student.getLastName());
-            preparedStatement.setInt(4, student.getId());
+            preparedStatement.setString(1, student.getFirstName());
+            preparedStatement.setString(2, student.getLastName());
+            preparedStatement.setDate(3, student.getBirthDate());
+            preparedStatement.setString(4, student.getGender());
+            preparedStatement.setString(5, student.getIdStudent());
 
             if (preparedStatement.executeUpdate() > NO_ROWS_AFFECTED) {
                 isModified = true;
