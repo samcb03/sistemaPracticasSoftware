@@ -23,7 +23,7 @@ public interface IRequestProjectDAO {
 
     boolean assignStudentToProject(String idStudent, int idProject) throws OperationException;
 
-    List<String> getApplicantsByProjectId(int idProject) throws OperationException;
+    List<Student> getApplicantsByProjectId(int idProject) throws OperationException;
 
     String getProjectAssignedToStudent(String idStudent) throws OperationException;
 

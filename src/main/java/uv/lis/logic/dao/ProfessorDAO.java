@@ -156,11 +156,11 @@ public class ProfessorDAO extends UserDAO implements IProfessorDAO {
     public boolean modifyProfessor(Professor professor) throws OperationException {
         boolean isModified = false;
         String professorQuery = "UPDATE Profesor p INNER JOIN Usuario u ON p.idUsuario = u.idUsuario "
-                              + "SET p.idRol = ?, u.nombre = ?, u.apellidos = ? "
+                              + "SET u.idRol = ?, u.nombre = ?, u.apellidos = ? "
                               + "WHERE p.numeroPersonal = ?";
 
         try (Connection databaseConnection = connectionManager.getConnection();
-             PreparedStatement preparedStatement = databaseConnection.prepareStatement(professorQuery)) {
+            PreparedStatement preparedStatement = databaseConnection.prepareStatement(professorQuery)) {
 
             preparedStatement.setInt(1, professor.getIsCoordinator() ? IS_COORDINATOR : IS_PROFESSOR);
             preparedStatement.setString(2, professor.getFirstName());
@@ -175,7 +175,6 @@ public class ProfessorDAO extends UserDAO implements IProfessorDAO {
                 throw new OperationException("No se pudo modificar al profesor con número: "
                     + professor.getPersonnelNumber(), null);
             }
-
         } catch (SQLException e) {
             LOGGER.log(Level.SEVERE, "Error de conexión con la base de datos", e);
             throw new OperationException("Error al modificar el profesor", e);
@@ -191,7 +190,7 @@ public class ProfessorDAO extends UserDAO implements IProfessorDAO {
                               + "WHERE p.numeroPersonal = ?;";
 
         try (Connection databaseConnection = connectionManager.getConnection();
-             PreparedStatement preparedStatement = databaseConnection.prepareStatement(professorQuery)) {
+            PreparedStatement preparedStatement = databaseConnection.prepareStatement(professorQuery)) {
 
             preparedStatement.setString(1, personalNumber);
 
@@ -272,7 +271,7 @@ public class ProfessorDAO extends UserDAO implements IProfessorDAO {
     public ArrayList<String> searchProfessorPersonalNumbers(String prefix) throws OperationException {
         ArrayList<String> professorPersonnelNumbers = new ArrayList<>();
         String professorQuery = "SELECT numeroPersonal FROM Profesor"
-            + " WHERE numeroPersonal LIKE ? LIMIT 10";
+                              + " WHERE numeroPersonal LIKE ? LIMIT 10";
 
         try (Connection databaseConnection = connectionManager.getConnection();
              PreparedStatement preparedStatement = databaseConnection.prepareStatement(professorQuery)) {
@@ -316,9 +315,10 @@ public class ProfessorDAO extends UserDAO implements IProfessorDAO {
         return hasSubject;
     }
 
-    public ArrayList<String> getSubjectHistoryByProfessor(String personnelNumber) throws OperationException {
+    @Override
+    public ArrayList<String> getSubjectsByProfessor(String personnelNumber) throws OperationException {
         ArrayList<String> history = new ArrayList<>();
-        String professorQuery = "SELECT ee.nombreExperiencia, ee.carrera, pe.nombre AS periodo "
+        String professorQuery = "SELECT ee.nrc, ee.nombreExperiencia, ee.carrera, pe.nombre AS periodo "
                               + "FROM Profesor_Imparte_Experiencia pie "
                               + "JOIN ExperienciaEducativa ee ON pie.NRC = ee.NRC "
                               + "JOIN PeriodoEscolar pe ON ee.idPeriodoEscolar = pe.idPeriodoEscolar "
@@ -332,9 +332,10 @@ public class ProfessorDAO extends UserDAO implements IProfessorDAO {
 
             try (ResultSet resultSet = preparedStatement.executeQuery()) {
                 while (resultSet.next()) {
-                    String entry = resultSet.getString("nombreExperiencia")
-                        + " — " + resultSet.getString("carrera")
-                        + " (" + resultSet.getString("periodo") + ")";
+                    String entry = "NRC: " + resultSet.getInt("NRC")
+                    + " — " + resultSet.getString("nombreExperiencia")
+                    + " — " + resultSet.getString("carrera")
+                    + " (" + resultSet.getString("periodo") + ")";
                     history.add(entry);
                 }
             }

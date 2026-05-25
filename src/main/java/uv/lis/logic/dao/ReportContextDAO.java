@@ -1,16 +1,21 @@
 package uv.lis.logic.dao;
 
+import static uv.lis.logic.utils.InputValidator.NO_ROWS_AFFECTED;
 import static uv.lis.logic.utils.InputValidator.STATUS_ASSIGNED;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import uv.lis.dataaccess.MySQLConnectionManager;
 import uv.lis.logic.contracts.IReportContextDAO;
+import uv.lis.logic.dto.Activity;
 import uv.lis.logic.dto.MonthlyReport;
 import uv.lis.logic.dto.Report;
 import uv.lis.logic.exceptions.OperationException;;
@@ -114,95 +119,102 @@ public class ReportContextDAO implements IReportContextDAO {
     }
 
     @Override 
-    public MonthlyReport getMonthlyReportData(String studentId, int reportId) throws OperationException {
+    public MonthlyReport getMonthlyReportData(String studentId) throws OperationException {
         MonthlyReport monthlyReport = new MonthlyReport();
-        String monthlyReportQuery =   "SELECT "
-                                    + "u.nombre AS nombreAlumno, "
-                                    + "u.apellidos AS apellidosAlumno, "
-                                    + "r.idReporte AS numeroReporte, "
-                                    + "rm.mes AS mes, "
-                                    + "rm.horasReportadas AS horasReportadas, "
-                                    + "pe.nombre AS periodoPrincipal, "
-                                    + "uProf.nombre AS nombreAcademico, "
-                                    + "uProf.apellidos AS apellidosAcademico, "
-                                    + "ee.NRC AS nrc, "
-                                    + "(SELECT CONCAT(uCoord.nombre, ' ', uCoord.apellidos) "
-                                    + " FROM Profesor pCoord "
-                                    + " INNER JOIN Usuario uCoord ON pCoord.idUsuario = uCoord.idUsuario "
-                                    + " WHERE pCoord.idRol = 3 LIMIT 1) AS nombreCoordinador "
-                                    + "FROM Reporte r "
-                                    + "INNER JOIN Alumno a ON r.matricula = a.matricula "
-                                    + "INNER JOIN Usuario u ON a.idUsuario = u.idUsuario "
-                                    + "INNER JOIN ReporteMensual rm ON r.idReporte = rm.idReporte "
-                                    + "INNER JOIN Alumno_Esta_EE aee ON a.matricula = aee.matricula "
-                                    + "INNER JOIN ExperienciaEducativa ee ON aee.NRC = ee.NRC "
-                                    + "INNER JOIN PeriodoEscolar pe ON ee.idPeriodoEscolar = pe.idPeriodoEscolar "
-                                    + "INNER JOIN Profesor_Imparte_Experiencia pie ON ee.NRC = pie.NRC "
-                                    + "INNER JOIN Profesor prof ON pie.numeroPersonal = prof.numeroPersonal "
-                                    + "INNER JOIN Usuario uProf ON prof.idUsuario = uProf.idUsuario "
-                                    + "WHERE r.matricula = ? AND r.idReporte = ?";
+        String query = "SELECT * FROM v_contexto_academico WHERE matricula = ?";
 
         try (Connection connection = connectionManager.getConnection();
-             PreparedStatement preparedStatement = connection.prepareStatement(monthlyReportQuery)) {
+            PreparedStatement ps = connection.prepareStatement(query)) {
+            ps.setString(1, studentId);
 
-            preparedStatement.setString(1, studentId); 
-            preparedStatement.setInt(2, reportId);
-
-            try (ResultSet resultSet = preparedStatement.executeQuery()) {
-                if (resultSet.next()) {
-                    String studentFullName = resultSet.getString("nombreAlumno") + " "
-                        + resultSet.getString("apellidosAlumno");
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    monthlyReport.setStudentName(rs.getString("nombreAlumno") + " " + rs.getString("apellidosAlumno"));
+                    monthlyReport.setPeriod(rs.getString("periodoPrincipal"));
+                    monthlyReport.setProfessorName(rs.getString("nombreAcademico")); // Nota: ajusta si necesitas apellidos
+                    monthlyReport.setCoordinadorName(rs.getString("nombreCoordinador"));
+                    monthlyReport.setNrcSubject(rs.getString("nrc"));
+                    monthlyReport.setMonth(rs.getString("mes"));
+                    monthlyReport.setReportNumber(rs.getInt("numeroReporte"));
                     
-                    monthlyReport.setStudentName(studentFullName);
-                    monthlyReport.setReportNumber(resultSet.getInt("numeroReporte"));
-                    monthlyReport.setMonth(resultSet.getString("mes"));
-                    monthlyReport.setReportedHours(resultSet.getInt("horasReportadas"));
-                    monthlyReport.setPeriod(resultSet.getString("periodoPrincipal"));
-                    monthlyReport.setProfessorName(
-                        resultSet.getString("nombreAcademico") + " "
-                        + resultSet.getString("apellidosAcademico"));
-                        
-                    monthlyReport.setCoordinadorName(resultSet.getString("nombreCoordinador"));
-                        
                 } else {
-                    throw new OperationException(
-                        "No se encontraron datos del reporte para la matrícula: "
-                        + studentId, null);
+                    throw new OperationException("No se encontró contexto para: " + studentId, null);
                 }
             }
-
-        } catch (SQLException e) { 
-            LOGGER.log(Level.SEVERE, "Error al obtener encabezado del reporte mensual", e);
-            throw new OperationException("Error al obtener los datos del reporte mensual.", e);
+        } catch (SQLException e) {
+            throw new OperationException("Error al consultar la vista de contexto.", e);
         }
         return monthlyReport;
     }
 
-
     @Override
-    public String getHoursAccumulate(String studentId) throws OperationException {
-        String accumulateHours= "0";
-        String hoursQuery = "SELECT COALESCE(SUM(rm.horasReportadas), 0) AS total "
-                          + "FROM Reporte r "
-                          + "INNER JOIN ReporteMensual rm ON r.idReporte = rm.idReporte "
-                          + "WHERE r.matricula = ?";
+    public List<Activity> getRecordedActivities(String studentId) throws OperationException {
+        List<Activity> list = new ArrayList<>();
+        
+        String query = "SELECT a.nombreActividad, a.descripcionActividad "
+                    + "FROM Actividad a "
+                    + "JOIN Proyecto p ON a.idActividad = p.idActividad "
+                    + "JOIN Solicita_Proyecto sp ON p.idProyecto = sp.idProyecto "
+                    + "WHERE sp.matricula = ?";
 
-        try (Connection databaseConnection = connectionManager.getConnection();
-             PreparedStatement preparedStatement = databaseConnection.prepareStatement(hoursQuery)) {
-
-            preparedStatement.setString(1, studentId);
-
-            try (ResultSet resultSet = preparedStatement.executeQuery()) {
-                if (resultSet.next()) {
-                    hoursQuery = String.valueOf(resultSet.getInt("total"));
+        try (Connection connection = connectionManager.getConnection();
+            PreparedStatement ps = connection.prepareStatement(query)) {
+            
+            ps.setString(1, studentId);
+            
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    Activity activity = new Activity();
+                    activity.setName(rs.getString("nombreActividad"));
+                    activity.setDescription(rs.getString("descripcionActividad"));
+                    list.add(activity);
                 }
             }
         } catch (SQLException e) {
-            LOGGER.log(Level.SEVERE, "Error al calcular horas acumuladas", e);
-            throw new OperationException("Error al calcular las horas acumuladas", e);
+            throw new OperationException("Error al obtener actividades.", e);
         }
+        return list;
+    }
 
-        return accumulateHours;
+    @Override
+    public boolean registerMonthlyReport(MonthlyReport monthlyReport) throws OperationException {
+        boolean isRegistered = false; 
+
+        String queryReporte = "INSERT INTO Reporte (matricula, actividad) VALUES (?, ?);";
+        String queryMensual = "INSERT INTO ReporteMensual (idReporte, mes, horasReportadas) VALUES (?, ?, ?);";
+
+        try (Connection conn = connectionManager.getConnection()) {
+            conn.setAutoCommit(false); 
+
+            try (PreparedStatement ps1 = conn.prepareStatement(queryReporte, Statement.RETURN_GENERATED_KEYS)) {
+                ps1.setString(1, monthlyReport.getStudentId());
+                ps1.setString(2, "Reporte Mensual");
+                int rows1 = ps1.executeUpdate();
+
+                try (ResultSet generatedKeys = ps1.getGeneratedKeys()) {
+                    if (generatedKeys.next()) {
+                        int idGenerado = generatedKeys.getInt(1);
+
+                        try (PreparedStatement ps2 = conn.prepareStatement(queryMensual)) {
+                            ps2.setInt(1, idGenerado);
+                            ps2.setString(2, monthlyReport.getMonth());
+                            ps2.setInt(3, monthlyReport.getReportedHours());
+                            int rows2 = ps2.executeUpdate();
+
+                            if (rows1 > 0 && rows2 > 0) {
+                                isRegistered = true;
+                                conn.commit(); 
+                            } else {
+                                conn.rollback(); 
+                            }
+                        }
+                    }
+                }
+            }
+        } catch (SQLException e) {
+            throw new OperationException("Error al registrar el reporte mensual", e);
+        }
+        return isRegistered; 
     }
 
 }

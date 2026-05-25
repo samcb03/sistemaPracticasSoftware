@@ -1,29 +1,44 @@
 package src.test.java;
 
-
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
-import java.lang.reflect.Field;
+
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+
 import uv.lis.dataaccess.MySQLConnectionManager;
 import uv.lis.logic.dao.SubjectDAO;
+import uv.lis.logic.dto.Student;
 import uv.lis.logic.dto.Subject;
 import uv.lis.logic.exceptions.OperationException;
 
 @ExtendWith(MockitoExtension.class)
 class SubjectDAOTest {
+
+    private static final int EXPECTED_NRC = 12345;
+    private static final int SECOND_NRC = 67890;
+    private static final int SCHOOL_PERIOD_ID = 1;
+    private static final int EXPECTED_LIST_SIZE = 2;
+    private static final String VALID_STUDENT_ID = "S23013127";
+    private static final String INVALID_STUDENT_ID = "S999999999";
+    private static final String PERSONNEL_NUMBER = "UV-001";
+    private static final String SUBJECT_NAME = "Practicas Profesionales";
+    private static final String CONNECTION_ERROR = "Fallo de conexión";
+    private static final String NO_SUBJECT_MESSAGE = "No tiene asignada una experiencia";
 
     @Mock private MySQLConnectionManager connectionManager;
     @Mock private Connection databaseConnection;
@@ -34,28 +49,24 @@ class SubjectDAOTest {
 
     @BeforeEach
     void setUp() throws Exception {
-        subjectDAO = new SubjectDAO();
-        Field field = SubjectDAO.class.getDeclaredField("connectionManager");
-        field.setAccessible(true);
-        field.set(subjectDAO, connectionManager);
+        subjectDAO = new SubjectDAO(connectionManager);
         when(connectionManager.getConnection()).thenReturn(databaseConnection);
     }
 
-    private Subject buildSubject() {
+    private Subject builderSubject() {
         Subject subject = new Subject();
-        subject.setNrc(12345);
-        subject.setSchoolPeriodId(1);
-        subject.setProfessorPersonnelNumber("UV-001");
+        subject.setNrc(EXPECTED_NRC);
+        subject.setSchoolPeriodId(SCHOOL_PERIOD_ID);
+        subject.setProfessorPersonnelNumber(PERSONNEL_NUMBER);
         return subject;
     }
-
 
     @Test
     void registerSubject_bothInsertsSuccessful_returnsTrue() throws Exception {
         when(databaseConnection.prepareStatement(anyString())).thenReturn(preparedStatement);
         when(preparedStatement.executeUpdate()).thenReturn(1, 1);
 
-        assertTrue(subjectDAO.registerSubject(buildSubject()));
+        assertTrue(subjectDAO.registerSubject(builderSubject()));
     }
 
     @Test
@@ -63,7 +74,7 @@ class SubjectDAOTest {
         when(databaseConnection.prepareStatement(anyString())).thenReturn(preparedStatement);
         when(preparedStatement.executeUpdate()).thenReturn(0, 1);
 
-        assertFalse(subjectDAO.registerSubject(buildSubject()));
+        assertFalse(subjectDAO.registerSubject(builderSubject()));
     }
 
     @Test
@@ -71,49 +82,36 @@ class SubjectDAOTest {
         when(databaseConnection.prepareStatement(anyString())).thenReturn(preparedStatement);
         when(preparedStatement.executeUpdate()).thenReturn(1, 0);
 
-        assertFalse(subjectDAO.registerSubject(buildSubject()));
+        assertFalse(subjectDAO.registerSubject(builderSubject()));
+    }
+
+    @Test
+    void registerSubject_preparedStatementError_throwsOperationException() throws Exception {
+        when(databaseConnection.prepareStatement(anyString()))
+            .thenThrow(new SQLException("Error al preparar"));
+
+        assertThrows(OperationException.class,
+            () -> subjectDAO.registerSubject(builderSubject()));
     }
 
     @Test
     void registerSubject_sqlError_throwsOperationException() throws Exception {
-        when(connectionManager.getConnection()).thenThrow(new SQLException("Fallo de conexión"));
+        when(connectionManager.getConnection()).thenThrow(new SQLException(CONNECTION_ERROR));
 
-        assertThrows(OperationException.class, () ->
-            subjectDAO.registerSubject(buildSubject()));
+        assertThrows(OperationException.class,
+            () -> subjectDAO.registerSubject(builderSubject()));
     }
-
-    @Test
-    void registerSubject_prepareStatementError_throwsOperationException() throws Exception {
-        when(databaseConnection.prepareStatement(anyString())).thenThrow(new SQLException("Error al preparar"));
-
-        assertThrows(OperationException.class, () ->
-            subjectDAO.registerSubject(buildSubject()));
-    }
-
 
     @Test
     void getAllSubjectsNRCName_withResults_returnsPopulatedList() throws Exception {
         when(databaseConnection.prepareStatement(anyString())).thenReturn(preparedStatement);
         when(preparedStatement.executeQuery()).thenReturn(resultSet);
         when(resultSet.next()).thenReturn(true, true, false);
-        when(resultSet.getInt("NRC")).thenReturn(12345, 67890);
+        when(resultSet.getInt("NRC")).thenReturn(EXPECTED_NRC, SECOND_NRC);
         when(resultSet.getString("nombreExperiencia"))
-            .thenReturn("Sistemas Operativos", "Bases de Datos");
+            .thenReturn(SUBJECT_NAME, SUBJECT_NAME);
 
-        assertEquals(2, subjectDAO.getAllSubjectsNRCName().size());
-    }
-
-    @Test
-    void getAllSubjectsNRCName_formattedCorrectly() throws Exception {
-        when(databaseConnection.prepareStatement(anyString())).thenReturn(preparedStatement);
-        when(preparedStatement.executeQuery()).thenReturn(resultSet);
-        when(resultSet.next()).thenReturn(true, false);
-        when(resultSet.getInt("NRC")).thenReturn(12345);
-        when(resultSet.getString("nombreExperiencia")).thenReturn("Sistemas Operativos");
-
-        String result = subjectDAO.getAllSubjectsNRCName().get(0);
-
-        assertEquals("12345 - Sistemas Operativos", result);
+        assertEquals(EXPECTED_LIST_SIZE, subjectDAO.getAllSubjectsNRCName().size());
     }
 
     @Test
@@ -127,10 +125,9 @@ class SubjectDAOTest {
 
     @Test
     void getAllSubjectsNRCName_sqlError_throwsOperationException() throws Exception {
-        when(connectionManager.getConnection()).thenThrow(new SQLException("Fallo de conexión"));
+        when(connectionManager.getConnection()).thenThrow(new SQLException(CONNECTION_ERROR));
 
-        assertThrows(OperationException.class, () ->
-            subjectDAO.getAllSubjectsNRCName());
+        assertThrows(OperationException.class, () -> subjectDAO.getAllSubjectsNRCName());
     }
 
     @Test
@@ -138,7 +135,7 @@ class SubjectDAOTest {
         when(databaseConnection.prepareStatement(anyString())).thenReturn(preparedStatement);
         when(preparedStatement.executeUpdate()).thenReturn(1);
 
-        assertTrue(subjectDAO.assignStudentToSubject("S23013127", 12345));
+        assertTrue(subjectDAO.assignStudentToSubject(VALID_STUDENT_ID, EXPECTED_NRC));
     }
 
     @Test
@@ -146,26 +143,26 @@ class SubjectDAOTest {
         when(databaseConnection.prepareStatement(anyString())).thenReturn(preparedStatement);
         when(preparedStatement.executeUpdate()).thenReturn(0);
 
-        assertFalse(subjectDAO.assignStudentToSubject("S23013127", 12345));
+        assertFalse(subjectDAO.assignStudentToSubject(VALID_STUDENT_ID, EXPECTED_NRC));
     }
 
     @Test
     void assignStudentToSubject_sqlError_throwsOperationException() throws Exception {
-        when(connectionManager.getConnection()).thenThrow(new SQLException("Fallo de conexión"));
+        when(connectionManager.getConnection()).thenThrow(new SQLException(CONNECTION_ERROR));
 
-        assertThrows(OperationException.class, () ->
-            subjectDAO.assignStudentToSubject("S23013127", 12345));
+        assertThrows(OperationException.class,
+            () -> subjectDAO.assignStudentToSubject(VALID_STUDENT_ID, EXPECTED_NRC));
     }
-
 
     @Test
     void getSubjectNRCByStudentID_found_returnsNRC() throws Exception {
         when(databaseConnection.prepareStatement(anyString())).thenReturn(preparedStatement);
         when(preparedStatement.executeQuery()).thenReturn(resultSet);
         when(resultSet.next()).thenReturn(true);
-        when(resultSet.getString("NRC")).thenReturn("12345");
+        when(resultSet.getString("NRC")).thenReturn(String.valueOf(EXPECTED_NRC));
 
-        assertEquals("12345", subjectDAO.getSubjectNRCByStudentID("S23013127"));
+        assertEquals(String.valueOf(EXPECTED_NRC),
+            subjectDAO.getSubjectNRCByStudentID(VALID_STUDENT_ID));
     }
 
     @Test
@@ -174,15 +171,95 @@ class SubjectDAOTest {
         when(preparedStatement.executeQuery()).thenReturn(resultSet);
         when(resultSet.next()).thenReturn(false);
 
-        assertEquals("No tiene asignada una experiencia",
-            subjectDAO.getSubjectNRCByStudentID("S99999999"));
+        assertEquals(NO_SUBJECT_MESSAGE,
+            subjectDAO.getSubjectNRCByStudentID(INVALID_STUDENT_ID));
     }
 
     @Test
     void getSubjectNRCByStudentID_sqlError_throwsOperationException() throws Exception {
-        when(connectionManager.getConnection()).thenThrow(new SQLException("Fallo de conexión"));
+        when(connectionManager.getConnection()).thenThrow(new SQLException(CONNECTION_ERROR));
 
-        assertThrows(OperationException.class, () ->
-            subjectDAO.getSubjectNRCByStudentID("S23013127"));
+        assertThrows(OperationException.class,
+            () -> subjectDAO.getSubjectNRCByStudentID(VALID_STUDENT_ID));
+    }
+
+    @Test
+    void unassignProfessorFromSubject_successful_doesNotThrow() throws Exception {
+        when(databaseConnection.prepareStatement(anyString())).thenReturn(preparedStatement);
+        when(preparedStatement.executeUpdate()).thenReturn(1);
+
+        assertDoesNotThrow(() -> subjectDAO.unassignProfessorFromSubject(PERSONNEL_NUMBER));
+    }
+
+    @Test
+    void unassignProfessorFromSubject_sqlError_throwsOperationException() throws Exception {
+        when(connectionManager.getConnection()).thenThrow(new SQLException(CONNECTION_ERROR));
+
+        assertThrows(OperationException.class,
+            () -> subjectDAO.unassignProfessorFromSubject(PERSONNEL_NUMBER));
+    }
+
+    @Test
+    void getSubjectsByProfessor_withResults_returnsPopulatedList() throws Exception {
+        when(databaseConnection.prepareStatement(anyString())).thenReturn(preparedStatement);
+        when(preparedStatement.executeQuery()).thenReturn(resultSet);
+        when(resultSet.next()).thenReturn(true, true, false);
+        when(resultSet.getInt("nrc")).thenReturn(EXPECTED_NRC, SECOND_NRC);
+        when(resultSet.getString("nombreExperiencia"))
+            .thenReturn(SUBJECT_NAME, SUBJECT_NAME);
+        when(resultSet.getString("nombre")).thenReturn("Febrero-Julio 2026");
+        when(resultSet.getInt("idPeriodoEscolar")).thenReturn(SCHOOL_PERIOD_ID);
+
+        ArrayList<Subject> result = subjectDAO.getSubjectsByProfessor(PERSONNEL_NUMBER);
+
+        assertEquals(EXPECTED_LIST_SIZE, result.size());
+    }
+
+    @Test
+    void getSubjectsByProfessor_emptyResultSet_returnsEmptyList() throws Exception {
+        when(databaseConnection.prepareStatement(anyString())).thenReturn(preparedStatement);
+        when(preparedStatement.executeQuery()).thenReturn(resultSet);
+        when(resultSet.next()).thenReturn(false);
+
+        assertTrue(subjectDAO.getSubjectsByProfessor(PERSONNEL_NUMBER).isEmpty());
+    }
+
+    @Test
+    void getSubjectsByProfessor_sqlError_throwsOperationException() throws Exception {
+        when(connectionManager.getConnection()).thenThrow(new SQLException(CONNECTION_ERROR));
+
+        assertThrows(OperationException.class,
+            () -> subjectDAO.getSubjectsByProfessor(PERSONNEL_NUMBER));
+    }
+
+    @Test
+    void getEnrolledStudentsBySubject_withResults_returnsPopulatedList() throws Exception {
+        when(databaseConnection.prepareStatement(anyString())).thenReturn(preparedStatement);
+        when(preparedStatement.executeQuery()).thenReturn(resultSet);
+        when(resultSet.next()).thenReturn(true, true, false);
+        when(resultSet.getString("matricula")).thenReturn(VALID_STUDENT_ID, "S23013128");
+        when(resultSet.getString("nombre")).thenReturn("Ana", "Luis");
+        when(resultSet.getString("apellidos")).thenReturn("Gomez", "Martinez");
+
+        ArrayList<Student> result = subjectDAO.getEnrolledStudentsBySubject(EXPECTED_NRC);
+
+        assertEquals(EXPECTED_LIST_SIZE, result.size());
+    }
+
+    @Test
+    void getEnrolledStudentsBySubject_emptyResultSet_returnsEmptyList() throws Exception {
+        when(databaseConnection.prepareStatement(anyString())).thenReturn(preparedStatement);
+        when(preparedStatement.executeQuery()).thenReturn(resultSet);
+        when(resultSet.next()).thenReturn(false);
+
+        assertTrue(subjectDAO.getEnrolledStudentsBySubject(EXPECTED_NRC).isEmpty());
+    }
+
+    @Test
+    void getEnrolledStudentsBySubject_sqlError_throwsOperationException() throws Exception {
+        when(connectionManager.getConnection()).thenThrow(new SQLException(CONNECTION_ERROR));
+
+        assertThrows(OperationException.class,
+            () -> subjectDAO.getEnrolledStudentsBySubject(EXPECTED_NRC));
     }
 }

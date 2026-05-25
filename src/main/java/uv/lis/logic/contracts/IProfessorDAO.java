@@ -27,4 +27,6 @@ public interface IProfessorDAO {
     boolean inactivateProfessor(String personalNumber) throws OperationException;
 
     boolean hasSubjectAssigned(String personnelNumber) throws OperationException;
+
+    ArrayList<String> getSubjectsByProfessor(String personnelNumber) throws OperationException;
 }

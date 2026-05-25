@@ -32,7 +32,7 @@
                <children>
                   <Button fx:id="buttonGenerate" mnemonicParsing="false" onAction="#validatorReport" text="Generar" />
                   <Button fx:id="buttonBack" mnemonicParsing="false" onAction="#goBack" text="Cancelar" />
-               </children>
+               </children> 
             </HBox>
             <HBox alignment="CENTER" layoutX="84.0" layoutY="8.0" prefHeight="63.0" prefWidth="430.0" spacing="40.0">
                <children>
