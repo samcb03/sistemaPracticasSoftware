@@ -5,6 +5,7 @@ import java.util.List;
 
 public class MonthlyReport extends Report {
 
+    private int idReport;
     private String month;
     private String studentName;
     private String professorName;
@@ -19,6 +20,7 @@ public class MonthlyReport extends Report {
     private List<String> periods = new ArrayList<>();
     private List<String> activities = new ArrayList<>();
     private List<String> observations = new ArrayList<>();
+    private Activity activity;
 
     public MonthlyReport() {
 
@@ -127,6 +129,15 @@ public class MonthlyReport extends Report {
 
     public void setAccumulateHour(int accumulateHour) {
         this.accumulateHour = accumulateHour;
+    }
+
+
+    public int getIdReport() {
+        return idReport;
+    }
+
+    public void setIdReport(int idReport) {
+        this.idReport = idReport;
     }
 
     public String getPeriod(int i) { 

@@ -1,0 +1,210 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.21.3.final using JasperReports Library version 6.21.3-4a3078d20785ebe464f18037d738d12fc98c13cf  -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="MonthlyReport" pageWidth="1040" pageHeight="842" columnWidth="1040" leftMargin="0" rightMargin="0" topMargin="0" bottomMargin="0" uuid="df946189-0f89-490d-b6fb-c3ee405670d9">
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="One Empty Record"/>
+	<parameter name="Mes" class="java.lang.String"/>
+	<parameter name="HorasReportadas" class="java.lang.String"/>
+	<parameter name="NombreAlumno" class="java.lang.String"/>
+	<parameter name="NombreResponsable" class="java.lang.String"/>
+	<parameter name="Periodo1" class="java.lang.String"/>
+	<parameter name="Periodo2" class="java.lang.String"/>
+	<parameter name="Periodo3" class="java.lang.String"/>
+	<parameter name="Periodo4" class="java.lang.String"/>
+	<parameter name="Periodo5" class="java.lang.String"/>
+	<parameter name="Periodo6" class="java.lang.String"/>
+	<parameter name="Periodo7" class="java.lang.String"/>
+	<parameter name="Actividad1" class="java.lang.String"/>
+	<parameter name="Actividad2" class="java.lang.String"/>
+	<parameter name="Actividad3" class="java.lang.String"/>
+	<parameter name="Actividad4" class="java.lang.String"/>
+	<parameter name="Actividad5" class="java.lang.String"/>
+	<parameter name="Actividad6" class="java.lang.String"/>
+	<parameter name="Actividad7" class="java.lang.String"/>
+	<parameter name="Observacion1" class="java.lang.String"/>
+	<parameter name="Observacion2" class="java.lang.String"/>
+	<parameter name="Observacion3" class="java.lang.String"/>
+	<parameter name="Observacion4" class="java.lang.String"/>
+	<parameter name="Observacion5" class="java.lang.String"/>
+	<parameter name="Observacion6" class="java.lang.String"/>
+	<parameter name="Observacion7" class="java.lang.String"/>
+	<parameter name="numeroReporte" class="java.lang.String"/>
+	<parameter name="HorasAcumuladas" class="java.lang.String"/>
+	<parameter name="Bloque" class="java.lang.String"/>
+	<parameter name="Seccion" class="java.lang.String"/>
+	<parameter name="PeriodoPrincipal" class="java.lang.String"/>
+	<parameter name="Academico" class="java.lang.String"/>
+	<queryString>
+		<![CDATA[]]>
+	</queryString>
+	<background>
+		<band height="811" splitType="Stretch">
+			<property name="com.jaspersoft.studio.unit.height" value="px"/>
+			<image>
+				<reportElement x="0" y="0" width="1039" height="811" uuid="e7c8a473-db70-4c6a-8b2e-917a07656a0f">
+					<property name="com.jaspersoft.studio.unit.x" value="px"/>
+					<property name="com.jaspersoft.studio.unit.y" value="px"/>
+				</reportElement>
+				<imageExpression><![CDATA["C:/Users/dom99/Downloads/ReporteMensual.jpg"]]></imageExpression>
+			</image>
+			<textField>
+				<reportElement x="130" y="205" width="170" height="30" uuid="605adc2f-663a-4e55-9ea3-54411a032680"/>
+				<textFieldExpression><![CDATA[$P{Mes}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="490" y="204" width="100" height="30" uuid="b0772d70-ebff-4ddc-84f4-e93ea2a035c1"/>
+				<textFieldExpression><![CDATA[$P{HorasReportadas}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="880" y="204" width="60" height="30" uuid="8a79b4f5-90d4-4379-b9bb-9540f91f9782"/>
+				<textFieldExpression><![CDATA[$P{HorasAcumuladas}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="866" y="150" width="30" height="30" uuid="18aab643-f5ce-4863-ba54-5ce871a4e8ff"/>
+				<textFieldExpression><![CDATA[$P{numeroReporte}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="810" y="234" width="40" height="16" uuid="f77f8312-b058-4ec6-b4c6-721cc1a7856d"/>
+				<textFieldExpression><![CDATA[$P{Bloque}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="910" y="236" width="30" height="14" uuid="9861e6a5-2e2d-4d2f-9555-92e1dec0973a"/>
+				<textFieldExpression><![CDATA[$P{Seccion}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="220" y="236" width="370" height="14" uuid="09cf5cd2-ba2e-4ec8-81ae-cc40d57def66"/>
+				<textFieldExpression><![CDATA[$P{NombreAlumno}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="390" y="254" width="460" height="12" uuid="eb1e78e9-dd2d-41ff-834d-760446a7fca2"/>
+				<textFieldExpression><![CDATA[$P{NombreResponsable}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="90" y="319" width="100" height="30" uuid="02f10ab6-82a4-4578-b00f-86f79ba62d37"/>
+				<textFieldExpression><![CDATA[$P{Periodo1}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="90" y="349" width="100" height="30" uuid="6f3d9f3d-65ea-438a-b263-22b291470ab2"/>
+				<textFieldExpression><![CDATA[$P{Periodo2}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="90" y="380" width="100" height="30" uuid="37d82aff-27a9-47e4-85a2-40c5890a34fd"/>
+				<textFieldExpression><![CDATA[$P{Periodo3}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="90" y="410" width="100" height="30" uuid="d3072a8b-6837-4dce-838c-fe97a6e999d4"/>
+				<textFieldExpression><![CDATA[$P{Periodo4}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="90" y="441" width="100" height="30" uuid="4206900b-ec3d-47f6-95e4-4829fdb374d7"/>
+				<textFieldExpression><![CDATA[$P{Periodo5}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="90" y="471" width="100" height="30" uuid="57789125-a89d-4700-bbc2-76022ab8fbc2"/>
+				<textFieldExpression><![CDATA[$P{Periodo6}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="90" y="501" width="100" height="30" uuid="e7b586e3-f1c5-4d9a-9b82-492c04a314ee"/>
+				<textFieldExpression><![CDATA[$P{Periodo7}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="200" y="319" width="470" height="30" uuid="43efff7d-b796-4a64-ade7-92ec5d1ed99a"/>
+				<textFieldExpression><![CDATA[$P{Actividad1}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="200" y="349" width="470" height="30" uuid="f7d67d63-2769-4885-b514-997af134bebf"/>
+				<textFieldExpression><![CDATA[$P{Actividad2}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="200" y="381" width="470" height="28" uuid="37853468-cbbd-44be-8d52-0046edecb74c"/>
+				<textFieldExpression><![CDATA[$P{Actividad3}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="200" y="412" width="470" height="28" uuid="546d0f61-2ceb-4a44-b4e9-7fecf24ae5b6"/>
+				<textFieldExpression><![CDATA[$P{Actividad4}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="200" y="441" width="470" height="30" uuid="5e6facc9-d4b3-4123-be20-c6b733902ee5"/>
+				<textFieldExpression><![CDATA[$P{Actividad5}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="200" y="471" width="470" height="30" uuid="408822b7-cb20-4c70-8afb-d83318f99c50"/>
+				<textFieldExpression><![CDATA[$P{Actividad6}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="200" y="501" width="470" height="30" uuid="fd17f0a8-9e86-44d3-b137-faa4499136a8"/>
+				<textFieldExpression><![CDATA[$P{Actividad7}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="690" y="319" width="250" height="30" uuid="0eec3be5-8cc1-431f-89c2-24d870fd7f39"/>
+				<textFieldExpression><![CDATA[$P{Observacion1}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="690" y="349" width="250" height="30" uuid="76555972-1458-45b4-a40a-376bac1dfcac"/>
+				<textFieldExpression><![CDATA[$P{Observacion2}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="690" y="380" width="250" height="30" uuid="f2691766-23cd-4c3e-95cd-d44f5ac132b0"/>
+				<textFieldExpression><![CDATA[$P{Observacion3}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="690" y="412" width="250" height="28" uuid="790704e9-6680-4c27-9877-b15842a91976"/>
+				<textFieldExpression><![CDATA[$P{Observacion4}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="690" y="441" width="250" height="30" uuid="849a3713-1683-43a1-829b-74db5b2444dc"/>
+				<textFieldExpression><![CDATA[$P{Observacion5}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="690" y="470" width="250" height="30" uuid="dbee149c-b172-48df-9a68-d05e1ee8736a"/>
+				<textFieldExpression><![CDATA[$P{Observacion6}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="690" y="501" width="250" height="30" uuid="5411d86a-f49a-4c47-9c59-7a6a2257f9c0"/>
+				<textFieldExpression><![CDATA[$P{Observacion7}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="464" y="182" width="180" height="20" uuid="9330780f-21fd-44e0-ac0f-a443d7cd9b7f"/>
+				<textFieldExpression><![CDATA[$P{PeriodoPrincipal}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="330" y="268" width="280" height="14" uuid="4d13dad5-9223-4db5-8ef5-c32376431ae3"/>
+				<textFieldExpression><![CDATA[$P{Academico}]]></textFieldExpression>
+			</textField>
+		</band>
+	</background>
+	<title>
+		<band splitType="Stretch">
+			<property name="com.jaspersoft.studio.unit.height" value="px"/>
+		</band>
+	</title>
+	<pageHeader>
+		<band splitType="Stretch">
+			<property name="com.jaspersoft.studio.unit.height" value="px"/>
+		</band>
+	</pageHeader>
+	<columnHeader>
+		<band splitType="Stretch">
+			<property name="com.jaspersoft.studio.unit.height" value="px"/>
+		</band>
+	</columnHeader>
+	<detail>
+		<band splitType="Stretch">
+			<property name="com.jaspersoft.studio.unit.height" value="px"/>
+		</band>
+	</detail>
+	<columnFooter>
+		<band splitType="Stretch">
+			<property name="com.jaspersoft.studio.unit.height" value="px"/>
+		</band>
+	</columnFooter>
+	<pageFooter>
+		<band splitType="Stretch">
+			<property name="com.jaspersoft.studio.unit.height" value="px"/>
+		</band>
+	</pageFooter>
+	<summary>
+		<band splitType="Stretch">
+			<property name="com.jaspersoft.studio.unit.height" value="px"/>
+		</band>
+	</summary>
+</jasperReport>
