@@ -17,7 +17,7 @@ import uv.lis.logic.dto.Subject;
 import uv.lis.logic.exceptions.OperationException;
 
 public class SubjectDAO implements ISubjectDAO {
-    private static final Logger LOGGER = Logger.getLogger(UserDAO.class.getName());
+    private static final Logger LOGGER = Logger.getLogger(SubjectDAO.class.getName());
     private MySQLConnectionManager connectionManager;
 
     public SubjectDAO() {
