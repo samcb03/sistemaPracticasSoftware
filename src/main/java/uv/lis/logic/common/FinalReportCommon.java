@@ -5,6 +5,8 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import net.sf.jasperreports.engine.JREmptyDataSource;
 import net.sf.jasperreports.engine.JRException;
@@ -21,8 +23,10 @@ import uv.lis.logic.utils.SessionManager;
 
 public class FinalReportCommon {
 
+    private static final Logger LOGGER = Logger.getLogger(FinalReportCommon.class.getName());
     private static final String REPORT_TEMPLATE_PATH = "/uv/lis/GUI/view/templates/finalReport.jrxml";
-    private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+    private static final DateTimeFormatter DATE_FORMATTER = 
+        DateTimeFormatter.ofPattern("dd/MM/yyyy");
 
     private final ReportContextDAO reportContextDAO;
 
@@ -30,7 +34,8 @@ public class FinalReportCommon {
         this.reportContextDAO = new ReportContextDAO();
     }
 
-    public JasperPrint generateFinalReport(Report finalReport) throws JRException, OperationException {
+    public JasperPrint generateFinalReport(Report finalReport) 
+            throws JRException, OperationException {
         Student currentStudent = SessionManager.getInstance().getCurrentStudent();
         if (currentStudent == null) {
             throw new OperationException("No hay un estudiante en sesión", null);
@@ -38,19 +43,33 @@ public class FinalReportCommon {
 
         mergeContextIntoReport(finalReport, currentStudent.getIdStudent());
 
-        InputStream reportStream = getClass().getResourceAsStream(REPORT_TEMPLATE_PATH);
-        if (reportStream == null) {
-            throw new OperationException("No se encontró la plantilla del reporte: "
-                + REPORT_TEMPLATE_PATH, null);
+        JasperPrint jasperPrint;
+        try (InputStream templateStream = 
+                getClass().getResourceAsStream(REPORT_TEMPLATE_PATH)) {
+
+            if (templateStream == null) {
+                LOGGER.log(Level.SEVERE, "No se encontró la plantilla: {0}", 
+                    REPORT_TEMPLATE_PATH);
+                throw new OperationException(
+                    "No se encontró la plantilla del reporte.", null);
+            }
+
+            JasperReport jasperReport = JasperCompileManager.compileReport(templateStream);
+            Map<String, Object> parameters = buildReportParameters(finalReport);
+            jasperPrint = JasperFillManager.fillReport(
+                jasperReport, parameters, new JREmptyDataSource());
+
+        } catch (java.io.IOException ioException) {
+            LOGGER.log(Level.SEVERE, "Error al leer la plantilla del reporte", ioException);
+            throw new OperationException(
+                "Error al cargar la plantilla del reporte.", ioException);
         }
 
-        JasperReport jasperReport = JasperCompileManager.compileReport(reportStream);
-        Map<String, Object> parameters = buildReportParameters(finalReport);
-        JasperPrint jasperPrint = JasperFillManager.fillReport(jasperReport, parameters, new JREmptyDataSource());
         return jasperPrint;
     }
 
-    private void mergeContextIntoReport(Report report, String studentId) throws OperationException {
+    private void mergeContextIntoReport(Report report, String studentId) 
+            throws OperationException {
         Report context = reportContextDAO.getReportContextByStudentId(studentId);
 
         report.setStudentName(context.getStudentName());
