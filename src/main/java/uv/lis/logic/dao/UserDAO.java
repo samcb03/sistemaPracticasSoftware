@@ -17,12 +17,16 @@ import uv.lis.logic.exceptions.AuthenticateException;
 import uv.lis.logic.exceptions.OperationException;
 import uv.lis.logic.utils.PasswordHasher;
 
-public class UserDAO implements IUserDAO{
+public class UserDAO implements IUserDAO {
     private static final Logger LOGGER = Logger.getLogger(UserDAO.class.getName());
     private MySQLConnectionManager connectionManager;
 
     public UserDAO() {
         this.connectionManager = new MySQLConnectionManager();
+    }
+
+    public UserDAO(MySQLConnectionManager connectionManager) {
+        this.connectionManager = connectionManager;
     }
 
     @Override 

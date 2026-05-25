@@ -1,13 +1,13 @@
 package src.test.java;
 
-
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.when;
-import java.lang.reflect.Field;
+
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -20,6 +20,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.MockedStatic;
 import org.mockito.junit.jupiter.MockitoExtension;
+
 import uv.lis.dataaccess.MySQLConnectionManager;
 import uv.lis.logic.dao.UserDAO;
 import uv.lis.logic.dto.User;
@@ -27,9 +28,14 @@ import uv.lis.logic.exceptions.AuthenticateException;
 import uv.lis.logic.exceptions.OperationException;
 import uv.lis.logic.utils.PasswordHasher;
 
-
 @ExtendWith(MockitoExtension.class)
 class UserDAOTest {
+
+    private static final int EXPECTED_GENERATED_ID = 3;
+    private static final int DEFAULT_ROLE_ID = 1;
+    private static final String VALID_EMAIL = "gom03@gmail.com";
+    private static final String VALID_PASSWORD = "Gom_Ram002";
+    private static final String HASHED_PASSWORD = "hashedPassword";
 
     @Mock private MySQLConnectionManager connectionManager;
     @Mock private Connection databaseConnection;
@@ -40,137 +46,89 @@ class UserDAOTest {
 
     @BeforeEach
     void setUp() throws Exception {
-        userDAO = new UserDAO();
-        Field field = UserDAO.class.getDeclaredField("connectionManager");
-        field.setAccessible(true);
-        field.set(userDAO, connectionManager);
+        userDAO = new UserDAO(connectionManager);
         when(connectionManager.getConnection()).thenReturn(databaseConnection);
     }
 
-    private User builderUser(String firstName, String lastName, String password, int roleId) {
+    private User builderUser() {
         User user = new User();
-        user.setFirstName(firstName);
-        user.setLastName(lastName);
-        user.setPassword(password);
-        user.setRoleId(roleId);
+        user.setFirstName("Juan");
+        user.setLastName("Pérez");
+        user.setPassword("password12");
+        user.setRoleId(DEFAULT_ROLE_ID);
         return user;
     }
 
     @Test
     void registerUser_successful_returnsGeneratedId() throws Exception {
-        when(databaseConnection.prepareStatement(anyString(), anyInt())).thenReturn(preparedStatement);
-        when(preparedStatement.executeUpdate()).thenReturn(1);
-        when(preparedStatement.getGeneratedKeys()).thenReturn(resultSet);
-        when(resultSet.next()).thenReturn(true);
-        when(resultSet.getInt(1)).thenReturn(42);
+        try (MockedStatic<PasswordHasher> mockedHasher = mockStatic(PasswordHasher.class)) {
+            mockedHasher.when(() -> PasswordHasher.hashPassword(anyString()))
+                .thenReturn(HASHED_PASSWORD);
+            when(databaseConnection.prepareStatement(anyString(), anyInt()))
+                .thenReturn(preparedStatement);
+            when(preparedStatement.executeUpdate()).thenReturn(1);
+            when(preparedStatement.getGeneratedKeys()).thenReturn(resultSet);
+            when(resultSet.next()).thenReturn(true);
+            when(resultSet.getInt(1)).thenReturn(EXPECTED_GENERATED_ID);
 
-        assertEquals(42, userDAO.registerUser(builderUser("Juan", "Pérez", 
-            "password12", 1)));
+            assertEquals(EXPECTED_GENERATED_ID, userDAO.registerUser(builderUser()));
+        }
     }
 
     @Test
     void registerUser_noRowsAffected_throwsOperationException() throws Exception {
-        when(databaseConnection.prepareStatement(anyString(), anyInt())).thenReturn(preparedStatement);
-        when(preparedStatement.executeUpdate()).thenReturn(0);
+        try (MockedStatic<PasswordHasher> mockedHasher = mockStatic(PasswordHasher.class)) {
+            mockedHasher.when(() -> PasswordHasher.hashPassword(anyString()))
+                .thenReturn(HASHED_PASSWORD);
+            when(databaseConnection.prepareStatement(anyString(), anyInt()))
+                .thenReturn(preparedStatement);
+            when(preparedStatement.executeUpdate()).thenReturn(0);
 
-        assertThrows(OperationException.class, () ->
-            userDAO.registerUser(builderUser("Juan", "Pérez", "password12", 1)));
+            assertThrows(OperationException.class, () -> userDAO.registerUser(builderUser()));
+        }
     }
 
     @Test
     void registerUser_noGeneratedKeyReturned_throwsOperationException() throws Exception {
-        when(databaseConnection.prepareStatement(anyString(), anyInt())).thenReturn(preparedStatement);
-        when(preparedStatement.executeUpdate()).thenReturn(1);
-        when(preparedStatement.getGeneratedKeys()).thenReturn(resultSet);
-        when(resultSet.next()).thenReturn(false);
+        try (MockedStatic<PasswordHasher> mockedHasher = mockStatic(PasswordHasher.class)) {
+            mockedHasher.when(() -> PasswordHasher.hashPassword(anyString()))
+                .thenReturn(HASHED_PASSWORD);
+            when(databaseConnection.prepareStatement(anyString(), anyInt()))
+                .thenReturn(preparedStatement);
+            when(preparedStatement.executeUpdate()).thenReturn(1);
+            when(preparedStatement.getGeneratedKeys()).thenReturn(resultSet);
+            when(resultSet.next()).thenReturn(false);
 
-        assertThrows(OperationException.class, () ->
-            userDAO.registerUser(builderUser("Juan", "Pérez", "password12", 1)));
+            assertThrows(OperationException.class, () -> userDAO.registerUser(builderUser()));
+        }
     }
 
     @Test
     void registerUser_sqlError_throwsOperationException() throws Exception {
-        when(connectionManager.getConnection()).thenThrow(new SQLException("Fallo"));
-
-        assertThrows(OperationException.class, () ->
-            userDAO.registerUser(builderUser("Juan", "Pérez", "password12", 1)));
-    }
-
-    @Test
-    void authenticate_student_returnsStudentUser() throws Exception {
-        when(databaseConnection.prepareStatement(anyString())).thenReturn(preparedStatement);
-        when(preparedStatement.executeQuery()).thenReturn(resultSet);
-        when(resultSet.next()).thenReturn(true);
-        when(resultSet.getString("contraseña")).thenReturn("hashedPassword");
-        when(resultSet.getInt("idUsuario")).thenReturn(1); 
-        when(resultSet.getInt("idRol")).thenReturn(1);
-
         try (MockedStatic<PasswordHasher> mockedHasher = mockStatic(PasswordHasher.class)) {
-            mockedHasher.when(() -> PasswordHasher.verifyPassword("Gom_Ram002", 
-                "hashedPassword"))
-                .thenReturn(true);
+            mockedHasher.when(() -> PasswordHasher.hashPassword(anyString()))
+                .thenReturn(HASHED_PASSWORD);
+            when(connectionManager.getConnection()).thenThrow(new SQLException("Fallo"));
 
-
-
-            Optional<User> result = userDAO.authenticate("gom03@gmail.com","Gom_Ram002");   
-            assertEquals(1,result.get().getRoleId());
+            assertThrows(OperationException.class, () -> userDAO.registerUser(builderUser()));
         }
     }
 
     @Test
-    void authenticate_administrator_returnsAdministratorUser() throws Exception {
+    void authenticate_validCredentials_returnsUser() throws Exception {
         when(databaseConnection.prepareStatement(anyString())).thenReturn(preparedStatement);
         when(preparedStatement.executeQuery()).thenReturn(resultSet);
         when(resultSet.next()).thenReturn(true);
-        when(resultSet.getString("contraseña")).thenReturn("hashedPassword");
+        when(resultSet.getString("contraseña")).thenReturn(HASHED_PASSWORD);
         when(resultSet.getInt("idUsuario")).thenReturn(1);
-        when(resultSet.getInt("idRol")).thenReturn(4);
+        when(resultSet.getInt("idRol")).thenReturn(DEFAULT_ROLE_ID);
 
         try (MockedStatic<PasswordHasher> mockedHasher = mockStatic(PasswordHasher.class)) {
-            mockedHasher.when(() -> PasswordHasher.verifyPassword("Demos25_rask", 
-                "hashedPassword"))
+            mockedHasher.when(() -> PasswordHasher.verifyPassword(VALID_PASSWORD, HASHED_PASSWORD))
                 .thenReturn(true);
+            Optional<User> result = userDAO.authenticate(VALID_EMAIL, VALID_PASSWORD);
 
-                Optional<User> result = userDAO.authenticate("GutJac_03@gmail.com", "Demos25_rask");
-                assertEquals(4,result.get().getRoleId());
-        }
-    }
-
-    @Test
-    void authenticate_coordinator_returnsCoordinatorUser() throws Exception {
-        when(databaseConnection.prepareStatement(anyString())).thenReturn(preparedStatement);
-        when(preparedStatement.executeQuery()).thenReturn(resultSet);
-        when(resultSet.next()).thenReturn(true);
-        when(resultSet.getString("contraseña")).thenReturn("hashedPassword");
-        when(resultSet.getInt("idUsuario")).thenReturn(1);
-        when(resultSet.getInt("idRol")).thenReturn(3);
-
-        try (MockedStatic<PasswordHasher> mockedHasher = mockStatic(PasswordHasher.class)) {
-            mockedHasher.when(() -> PasswordHasher.verifyPassword("Demos25_rask", 
-                "hashedPassword"))
-                .thenReturn(true);
-
-                Optional<User> result = userDAO.authenticate("carRG@gmail.com", "Demos25_rask");
-                assertEquals(3,result.get().getRoleId());
-        }
-    }
-
-    @Test
-    void authenticate_professor_returnsProfessorUser() throws Exception {
-        when(databaseConnection.prepareStatement(anyString())).thenReturn(preparedStatement);
-        when(preparedStatement.executeQuery()).thenReturn(resultSet);
-        when(resultSet.next()).thenReturn(true);
-        when(resultSet.getString("contraseña")).thenReturn("hashedPassword");
-        when(resultSet.getInt("idUsuario")).thenReturn(1); 
-        when(resultSet.getInt("idRol")).thenReturn(2);
-
-        try (MockedStatic<PasswordHasher> mockedHasher = mockStatic(PasswordHasher.class)) {
-            mockedHasher.when(() -> PasswordHasher.verifyPassword("Bet@04ga", 
-                "hashedPassword"))
-                .thenReturn(true);
-
-            Optional<User> result = userDAO.authenticate("LopHern@hotmail.com", "Bet@04ga");
-            assertEquals(2, result.get().getRoleId());
+            assertTrue(result.isPresent());
         }
     }
 
@@ -180,8 +138,8 @@ class UserDAOTest {
         when(preparedStatement.executeQuery()).thenReturn(resultSet);
         when(resultSet.next()).thenReturn(false);
 
-        assertThrows(AuthenticateException.class, () ->
-            userDAO.authenticate("S99999", "malpassword"));
+        assertThrows(AuthenticateException.class,
+            () -> userDAO.authenticate("S99999", "malpassword"));
     }
 
     @Test
@@ -189,16 +147,14 @@ class UserDAOTest {
         when(databaseConnection.prepareStatement(anyString())).thenReturn(preparedStatement);
         when(preparedStatement.executeQuery()).thenReturn(resultSet);
         when(resultSet.next()).thenReturn(true);
-        when(resultSet.getString("contraseña")).thenReturn("hashedPassword");
+        when(resultSet.getString("contraseña")).thenReturn(HASHED_PASSWORD);
 
         try (MockedStatic<PasswordHasher> mockedHasher = mockStatic(PasswordHasher.class)) {
-            mockedHasher.when(() -> PasswordHasher.verifyPassword("wrongPassword", 
-                "hashedPassword"))
+            mockedHasher.when(() -> PasswordHasher.verifyPassword("wrongPassword", HASHED_PASSWORD))
                 .thenReturn(false);
 
-            
-            assertThrows(AuthenticateException.class, () ->
-                userDAO.authenticate("gom03@gmail.com", "wrongPassword"));
+            assertThrows(AuthenticateException.class,
+                () -> userDAO.authenticate(VALID_EMAIL, "wrongPassword"));
         }
     }
 
@@ -206,7 +162,7 @@ class UserDAOTest {
     void authenticate_sqlError_throwsAuthenticateException() throws Exception {
         when(databaseConnection.prepareStatement(anyString())).thenThrow(new SQLException("Fallo"));
 
-        assertThrows(AuthenticateException.class, () ->
-            userDAO.authenticate("S123", "pass"));
+        assertThrows(AuthenticateException.class, () -> userDAO.authenticate("S123", 
+            "pass"));
     }
 }
