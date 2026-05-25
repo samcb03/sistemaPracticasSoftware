@@ -26,6 +26,7 @@ import uv.lis.logic.utils.InputValidator;
 public class FXMLGenerateReportController extends ValidationHandler {
 
     private static final String PARTIAL_REPORT = "Reporte Parcial";
+    private static final String MONTHLY_REPORT = "Reporte Mensual";
     private static final String FINAL_REPORT = "Reporte Final";
 
     private final FinalReportCommon finalReportCommon = new FinalReportCommon();

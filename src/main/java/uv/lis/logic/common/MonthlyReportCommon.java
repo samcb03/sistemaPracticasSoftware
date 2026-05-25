@@ -19,6 +19,8 @@ import uv.lis.logic.utils.SessionManager;
 
 public class MonthlyReportCommon {
     private static final String TEMPLATE_PATH = "/uv/lis/GUI/view/templates/MonthlyReport.jrxml";
+    private static final String IMAGE_PATH = "/uv/lis/GUI/view/images/ReporteMensual.jpg";
+    private static final int MAX_ACTIVITIES = 7;
     private final ReportContextDAO reportContextDAO;
 
     public MonthlyReportCommon() {
@@ -32,11 +34,17 @@ public class MonthlyReportCommon {
         }
 
         mergeContextIntoMonthlyReport(monthlyReport, currentStudent.getIdStudent());
-
+        reportContextDAO.registerMonthlyReport(monthlyReport);
         InputStream reportStream = getClass().getResourceAsStream(TEMPLATE_PATH);
         if (reportStream == null) {
-            throw new OperationException("No se encontró la plantilla del reporte: " + TEMPLATE_PATH, null);
+            throw new OperationException("Error al cargar reporte", null);
         }
+
+        InputStream imageStream = getClass().getResourceAsStream(IMAGE_PATH);
+        if (imageStream == null) {
+            throw new OperationException("No se encontró la imagen de fondo del reporte", null);
+        }
+
 
         JasperReport jasperReport = JasperCompileManager.compileReport(reportStream);
         Map<String, Object> parameters = buildReportParameters(monthlyReport);
@@ -44,12 +52,12 @@ public class MonthlyReportCommon {
     }
 
     private void mergeContextIntoMonthlyReport(MonthlyReport report, String studentId) throws OperationException {
-        MonthlyReport context = reportContextDAO.getMonthlyReportData(studentId, 0);
+        MonthlyReport context = reportContextDAO.getMonthlyReportData(studentId);
         report.setStudentName(context.getStudentName());
         report.setCoordinadorName(context.getCoordinadorName()); 
         report.setMonth(context.getMonth());
         report.setReportNumber(context.getReportNumber());
-        String totalHoras = reportContextDAO.getHoursAccumulate(studentId);
+        String totalHoras = reportContextDAO.getTotalReportedHoursByStudentId(studentId);
         report.setAccumulateHour(Integer.parseInt(totalHoras));
         report.setBlock(context.getBlock());
         report.setSection(context.getSection());
@@ -66,12 +74,12 @@ public class MonthlyReportCommon {
         parameters.put("NombreResponsable", report.getCoordinadorName()); 
         parameters.put("numeroReporte", String.valueOf(report.getReportNumber()));
         parameters.put("HorasAcumuladas", String.valueOf(report.getAccumulateHour()));
-        parameters.put("Bloque", report.getNrcSubject()); 
+        parameters.put("Bloque", report.getBlock()); 
         parameters.put("Seccion", report.getSection()); 
         parameters.put("PeriodoPrincipal", report.getPeriod()); 
         parameters.put("Academico", report.getProfessorName());
 
-        for (int i = 1; i <= 7; i++) {
+        for (int i = 1; i <= MAX_ACTIVITIES; i++) {
             parameters.put("Periodo" + i, report.getPeriod(i));
             parameters.put("Actividad" + i, report.getActivity(i));
             parameters.put("Observacion" + i, report.getObservation(i));
