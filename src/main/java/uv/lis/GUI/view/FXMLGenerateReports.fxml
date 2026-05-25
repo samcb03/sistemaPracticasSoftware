@@ -30,7 +30,7 @@
          <children>
             <HBox alignment="CENTER" layoutX="170.0" layoutY="477.0" prefHeight="30.0" prefWidth="259.0" spacing="30.0">
                <children>
-                  <Button fx:id="buttonGenerate" mnemonicParsing="false" onAction="#generateReport" text="Generar" />
+                  <Button fx:id="buttonGenerate" mnemonicParsing="false" onAction="#validatorReport" text="Generar" />
                   <Button fx:id="buttonBack" mnemonicParsing="false" onAction="#goBack" text="Cancelar" />
                </children>
             </HBox>
