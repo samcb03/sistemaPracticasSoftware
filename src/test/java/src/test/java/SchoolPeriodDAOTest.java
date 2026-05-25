@@ -1,30 +1,43 @@
 package src.test.java;
 
-
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
-import uv.lis.dataaccess.MySQLConnectionManager;
-import uv.lis.logic.dao.SchoolPeriodDAO;
-import uv.lis.logic.dto.SchoolPeriod;
-import uv.lis.logic.exceptions.OperationException;
+
 import java.sql.Connection;
 import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.Optional;
 
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+
+import uv.lis.dataaccess.MySQLConnectionManager;
+import uv.lis.logic.dao.SchoolPeriodDAO;
+import uv.lis.logic.dto.SchoolPeriod;
+import uv.lis.logic.exceptions.OperationException;
 
 @ExtendWith(MockitoExtension.class)
 class SchoolPeriodDAOTest {
+
+    private static final int VALID_PERIOD_ID = 1;
+    private static final int INVALID_PERIOD_ID = 99;
+    private static final int EXPECTED_LIST_SIZE = 2;
+    private static final String EXPECTED_PERIOD_ID_STRING = "1";
+    private static final String VALID_PERIOD_NAME = "Febrero-Julio 2026";
+    private static final String SECOND_PERIOD_NAME = "Agosto 2026-Enero 2027";
+    private static final String INVALID_PERIOD_NAME = "NoExiste";
+    private static final String START_DATE = "2025-01-20";
+    private static final String END_DATE = "2025-06-20";
+    private static final String CONNECTION_ERROR = "Fallo";
 
     @Mock private MySQLConnectionManager connectionManager;
     @Mock private Connection connection;
@@ -39,11 +52,11 @@ class SchoolPeriodDAOTest {
         when(connectionManager.getConnection()).thenReturn(connection);
     }
 
-    private SchoolPeriod buildSchoolPeriod() {
+    private SchoolPeriod builderSchoolPeriod() {
         SchoolPeriod schoolPeriod = new SchoolPeriod();
-        schoolPeriod.setId(1);
-        schoolPeriod.setStartDate(Date.valueOf("2025-01-20"));
-        schoolPeriod.setEndDate(Date.valueOf("2025-06-20"));
+        schoolPeriod.setId(VALID_PERIOD_ID);
+        schoolPeriod.setStartDate(Date.valueOf(START_DATE));
+        schoolPeriod.setEndDate(Date.valueOf(END_DATE));
         return schoolPeriod;
     }
 
@@ -52,9 +65,9 @@ class SchoolPeriodDAOTest {
         when(connection.prepareStatement(anyString())).thenReturn(preparedStatement);
         when(preparedStatement.executeQuery()).thenReturn(resultSet);
         when(resultSet.next()).thenReturn(true, true, false);
-        when(resultSet.getString("nombre")).thenReturn("2025-1", "2025-2");
+        when(resultSet.getString("nombre")).thenReturn(VALID_PERIOD_NAME, SECOND_PERIOD_NAME);
 
-        assertEquals(2, schoolPeriodDAO.getAllSchoolPeriodsNames().size());
+        assertEquals(EXPECTED_LIST_SIZE, schoolPeriodDAO.getAllSchoolPeriodsNames().size());
     }
 
     @Test
@@ -68,10 +81,10 @@ class SchoolPeriodDAOTest {
 
     @Test
     void getAllSchoolPeriodsNames_sqlError_throwsOperationException() throws Exception {
-        when(connectionManager.getConnection()).thenThrow(new SQLException("Fallo"));
+        when(connectionManager.getConnection()).thenThrow(new SQLException(CONNECTION_ERROR));
 
-        assertThrows(OperationException.class, () ->
-            schoolPeriodDAO.getAllSchoolPeriodsNames());
+        assertThrows(OperationException.class,
+            () -> schoolPeriodDAO.getAllSchoolPeriodsNames());
     }
 
     @Test
@@ -79,9 +92,11 @@ class SchoolPeriodDAOTest {
         when(connection.prepareStatement(anyString())).thenReturn(preparedStatement);
         when(preparedStatement.executeQuery()).thenReturn(resultSet);
         when(resultSet.next()).thenReturn(true);
-        when(resultSet.getString("idPeriodoEscolar")).thenReturn("1");
+        when(resultSet.getString("idPeriodoEscolar")).thenReturn(EXPECTED_PERIOD_ID_STRING);
 
-        assertEquals("1", schoolPeriodDAO.getSchoolPeriodIdByName("2025-1"));
+        Optional<String> result = schoolPeriodDAO.getSchoolPeriodIdByName(VALID_PERIOD_NAME);
+
+        assertEquals(EXPECTED_PERIOD_ID_STRING, result.get());
     }
 
     @Test
@@ -90,16 +105,16 @@ class SchoolPeriodDAOTest {
         when(preparedStatement.executeQuery()).thenReturn(resultSet);
         when(resultSet.next()).thenReturn(false);
 
-        assertThrows(OperationException.class, () ->
-            schoolPeriodDAO.getSchoolPeriodIdByName("NoExiste"));
+        assertThrows(OperationException.class,
+            () -> schoolPeriodDAO.getSchoolPeriodIdByName(INVALID_PERIOD_NAME));
     }
 
     @Test
     void getSchoolPeriodIdByName_sqlError_throwsOperationException() throws Exception {
-        when(connectionManager.getConnection()).thenThrow(new SQLException("Fallo"));
+        when(connectionManager.getConnection()).thenThrow(new SQLException(CONNECTION_ERROR));
 
-        assertThrows(OperationException.class, () ->
-            schoolPeriodDAO.getSchoolPeriodIdByName("2025-1"));
+        assertThrows(OperationException.class,
+            () -> schoolPeriodDAO.getSchoolPeriodIdByName(VALID_PERIOD_NAME));
     }
 
     @Test
@@ -107,7 +122,7 @@ class SchoolPeriodDAOTest {
         when(connection.prepareStatement(anyString())).thenReturn(preparedStatement);
         when(preparedStatement.executeUpdate()).thenReturn(1);
 
-        assertTrue(schoolPeriodDAO.registerSchoolPeriod(buildSchoolPeriod()));
+        assertTrue(schoolPeriodDAO.registerSchoolPeriod(builderSchoolPeriod()));
     }
 
     @Test
@@ -115,16 +130,16 @@ class SchoolPeriodDAOTest {
         when(connection.prepareStatement(anyString())).thenReturn(preparedStatement);
         when(preparedStatement.executeUpdate()).thenReturn(0);
 
-        assertThrows(OperationException.class, () ->
-            schoolPeriodDAO.registerSchoolPeriod(buildSchoolPeriod()));
+        assertThrows(OperationException.class,
+            () -> schoolPeriodDAO.registerSchoolPeriod(builderSchoolPeriod()));
     }
 
     @Test
     void registerSchoolPeriod_sqlError_throwsOperationException() throws Exception {
-        when(connectionManager.getConnection()).thenThrow(new SQLException("Fallo"));
+        when(connectionManager.getConnection()).thenThrow(new SQLException(CONNECTION_ERROR));
 
-        assertThrows(OperationException.class, () ->
-            schoolPeriodDAO.registerSchoolPeriod(buildSchoolPeriod()));
+        assertThrows(OperationException.class,
+            () -> schoolPeriodDAO.registerSchoolPeriod(builderSchoolPeriod()));
     }
 
     @Test
@@ -132,7 +147,7 @@ class SchoolPeriodDAOTest {
         when(connection.prepareStatement(anyString())).thenReturn(preparedStatement);
         when(preparedStatement.executeUpdate()).thenReturn(1);
 
-        assertTrue(schoolPeriodDAO.modifySchoolPeriod(buildSchoolPeriod()));
+        assertTrue(schoolPeriodDAO.modifySchoolPeriod(builderSchoolPeriod()));
     }
 
     @Test
@@ -140,16 +155,16 @@ class SchoolPeriodDAOTest {
         when(connection.prepareStatement(anyString())).thenReturn(preparedStatement);
         when(preparedStatement.executeUpdate()).thenReturn(0);
 
-        assertThrows(OperationException.class, () ->
-            schoolPeriodDAO.modifySchoolPeriod(buildSchoolPeriod()));
+        assertThrows(OperationException.class,
+            () -> schoolPeriodDAO.modifySchoolPeriod(builderSchoolPeriod()));
     }
 
     @Test
     void modifySchoolPeriod_sqlError_throwsOperationException() throws Exception {
-        when(connectionManager.getConnection()).thenThrow(new SQLException("Fallo"));
+        when(connectionManager.getConnection()).thenThrow(new SQLException(CONNECTION_ERROR));
 
-        assertThrows(OperationException.class, () ->
-            schoolPeriodDAO.modifySchoolPeriod(buildSchoolPeriod()));
+        assertThrows(OperationException.class,
+            () -> schoolPeriodDAO.modifySchoolPeriod(builderSchoolPeriod()));
     }
 
     @Test
@@ -158,7 +173,7 @@ class SchoolPeriodDAOTest {
         when(preparedStatement.executeQuery()).thenReturn(resultSet);
         when(resultSet.next()).thenReturn(true);
 
-        assertTrue(schoolPeriodDAO.existsSchoolPeriod(1));
+        assertTrue(schoolPeriodDAO.existsSchoolPeriod(VALID_PERIOD_ID));
     }
 
     @Test
@@ -167,14 +182,14 @@ class SchoolPeriodDAOTest {
         when(preparedStatement.executeQuery()).thenReturn(resultSet);
         when(resultSet.next()).thenReturn(false);
 
-        assertFalse(schoolPeriodDAO.existsSchoolPeriod(99));
+        assertFalse(schoolPeriodDAO.existsSchoolPeriod(INVALID_PERIOD_ID));
     }
 
     @Test
     void existsSchoolPeriod_sqlError_throwsOperationException() throws Exception {
-        when(connectionManager.getConnection()).thenThrow(new SQLException("Fallo"));
+        when(connectionManager.getConnection()).thenThrow(new SQLException(CONNECTION_ERROR));
 
-        assertThrows(OperationException.class, () ->
-            schoolPeriodDAO.existsSchoolPeriod(1));
+        assertThrows(OperationException.class,
+            () -> schoolPeriodDAO.existsSchoolPeriod(VALID_PERIOD_ID));
     }
 }

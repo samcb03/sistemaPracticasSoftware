@@ -20,6 +20,7 @@ import uv.lis.logic.dao.RequestProjectDAO;
 import uv.lis.logic.dto.AffiliatedOrganization;
 import uv.lis.logic.dto.Professor;
 import uv.lis.logic.dto.Project;
+import uv.lis.logic.dto.Student;
 import uv.lis.logic.exceptions.OperationException;
 import uv.lis.logic.utils.SessionManager;
 
@@ -115,16 +116,20 @@ public class FXMLAssignationProjectController extends ValidationHandler {
 
     private void loadApplicantsForProject(int idProject) {
         try {
-            List<String> applicants = requestProjectDAO.getApplicantsByProjectId(idProject);
-            listViewApplicants.setItems(FXCollections.observableArrayList(applicants));
+            List<Student> applicants = requestProjectDAO.getApplicantsByProjectId(idProject);
+            List<String> applicantNames = applicants.stream().
+                map(student -> student.getFirstName() + " " + student.getLastName() + " - " + student.getIdStudent())
+                .collect(Collectors.toList());
             
-            if(applicants.isEmpty()) {
+            listViewApplicants.setItems(FXCollections.observableArrayList(applicantNames));
+            
+            if (applicants.isEmpty()) {
                 showError("No hay solicitudes para este proyecto.");
             } else {
-                labelError.setText(""); 
+                labelError.setText("");
             }
         } catch (OperationException e) {
-             showError(e.getMessage());
+            showError(e.getMessage());
         }
     }
 
