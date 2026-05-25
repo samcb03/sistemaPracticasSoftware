@@ -47,7 +47,7 @@ public class FXMLStudentMenuController extends ValidationHandler {
     public void goToReports() {
         try {
             if (canGenerateReport()) {
-                navigateTo("/uv/lis/GUI/view/FXMLReports.fxml");
+                navigateTo("/uv/lis/GUI/view/FXMLGenerateReports.fxml");
             }
         } catch (OperationException e) {
             showError(e.getMessage());

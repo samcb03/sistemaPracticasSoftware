@@ -114,6 +114,7 @@ class UserDAOTest {
         }
     }
 
+    //FIXME usar conjunto de datos cargados para probar autenticaciones de todo los tipos de usuario
     @Test
     void authenticate_validCredentials_returnsUser() throws Exception {
         when(databaseConnection.prepareStatement(anyString())).thenReturn(preparedStatement);

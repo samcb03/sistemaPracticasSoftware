@@ -146,6 +146,7 @@ public class FXMLGenerateReportController extends ValidationHandler {
         } catch (OperationException e) {
             showError(e.getMessage());
         } catch (JRException e) {
+            e.printStackTrace();
             showError("Error al generar el reporte");
         }
     }
