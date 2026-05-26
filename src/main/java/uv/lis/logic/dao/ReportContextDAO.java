@@ -123,19 +123,19 @@ public class ReportContextDAO implements IReportContextDAO {
         MonthlyReport monthlyReport = new MonthlyReport();
         String query = "SELECT * FROM v_contexto_academico WHERE matricula = ?";
 
-        try (Connection connection = connectionManager.getConnection();
-            PreparedStatement ps = connection.prepareStatement(query)) {
-            ps.setString(1, studentId);
+        try (Connection databaseConnection = connectionManager.getConnection();
+            PreparedStatement preparedStatement = databaseConnection.prepareStatement(query)) {
+            preparedStatement.setString(1, studentId);
 
-            try (ResultSet rs = ps.executeQuery()) {
-                if (rs.next()) {
-                    monthlyReport.setStudentName(rs.getString("nombreAlumno") + " " + rs.getString("apellidosAlumno"));
-                    monthlyReport.setPeriod(rs.getString("periodoPrincipal"));
-                    monthlyReport.setProfessorName(rs.getString("nombreAcademico"));
-                    monthlyReport.setCoordinadorName(rs.getString("nombreCoordinador"));
-                    monthlyReport.setNrcSubject(rs.getString("nrc"));
-                    monthlyReport.setMonth(rs.getString("mes"));
-                    monthlyReport.setReportNumber(rs.getInt("numeroReporte"));
+            try (ResultSet resultSet = preparedStatement.executeQuery()) {
+                if (resultSet.next()) {
+                    monthlyReport.setStudentName(resultSet.getString("nombreAlumno") + " " + resultSet.getString("apellidosAlumno"));
+                    monthlyReport.setPeriod(resultSet.getString("periodoPrincipal"));
+                    monthlyReport.setProfessorName(resultSet.getString("nombreAcademico"));
+                    monthlyReport.setCoordinadorName(resultSet.getString("nombreCoordinador"));
+                    monthlyReport.setNrcSubject(resultSet.getString("nrc"));
+                    monthlyReport.setMonth(resultSet.getString("mes"));
+                    monthlyReport.setReportNumber(resultSet.getInt("numeroReporte"));
                     
                 } else {
                     throw new OperationException("No se encontró contexto para: " + studentId, null);
@@ -157,16 +157,16 @@ public class ReportContextDAO implements IReportContextDAO {
                     + "JOIN Solicita_Proyecto sp ON p.idProyecto = sp.idProyecto "
                     + "WHERE sp.matricula = ?";
 
-        try (Connection connection = connectionManager.getConnection();
-            PreparedStatement ps = connection.prepareStatement(query)) {
+        try (Connection databaseConnection = connectionManager.getConnection();
+            PreparedStatement preparedStatement = databaseConnection.prepareStatement(query)) {
             
-            ps.setString(1, studentId);
+            preparedStatement.setString(1, studentId);
             
-            try (ResultSet rs = ps.executeQuery()) {
-                while (rs.next()) {
+            try (ResultSet resultSet = preparedStatement.executeQuery()) {
+                while (resultSet.next()) {
                     Activity activity = new Activity();
-                    activity.setName(rs.getString("nombreActividad"));
-                    activity.setDescription(rs.getString("descripcionActividad"));
+                    activity.setName(resultSet.getString("nombreActividad"));
+                    activity.setDescription(resultSet.getString("descripcionActividad"));
                     list.add(activity);
                 }
             }
