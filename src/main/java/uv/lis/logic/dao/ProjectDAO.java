@@ -28,7 +28,7 @@ public class ProjectDAO implements IProjectDAO{
     public ArrayList<Project> getAllProjects() throws OperationException {
         ArrayList<Project> projects = new ArrayList<>(); 
         String projectQuery = "SELECT p.idProyecto, p.nombre, p.metodologiaProyecto, p.cupo, "
-                              + "p.objetivo, p.descripcion, p.idOrganizacionVinculada, "
+                              + "p.objetivo, p.descripcion, p.idOrganizacionVinculada, p.estado, "
                               + "o.nombreOV AS nombreOrganizacion "
                               + "FROM Proyecto p "
                               + "INNER JOIN OrganizacionVinculada o "
@@ -47,6 +47,7 @@ public class ProjectDAO implements IProjectDAO{
                 project.setObjective(resultSet.getString("objetivo"));
                 project.setDescription(resultSet.getString("descripcion"));
                 project.setAffiliatedOrganizationName(resultSet.getString("nombreOrganizacion"));
+                project.setActive(resultSet.getBoolean("estado"));
                 
                 projects.add(project);
             }
@@ -97,8 +98,8 @@ public class ProjectDAO implements IProjectDAO{
         boolean isRegistered = false;
 
         String projectQuery = "INSERT INTO Proyecto(nombre, "  
-                            + "descripcion, cupo, metodologiaProyecto, objetivo, estado, idOrganizacionVinculada,idResponsableProyecto)" 
-                            + " VALUES(?, ?, ?, ?, ?, ?, ?,?);";
+                            + "descripcion, cupo, metodologiaProyecto, objetivo, estado, idOrganizacionVinculada," 
+                            + "idResponsableProyecto) VALUES(?, ?, ?, ?, ?, ?, ?,?);";
 
         try (Connection databaseConnection = connectionManager.getConnection();
             PreparedStatement preparedStatement = databaseConnection.prepareStatement(projectQuery, 
@@ -109,7 +110,7 @@ public class ProjectDAO implements IProjectDAO{
             preparedStatement.setInt(3, project.getCapacity());
             preparedStatement.setString(4, project.getMethodology());
             preparedStatement.setString(5, project.getObjective());
-            preparedStatement.setBoolean(6, true);
+            preparedStatement.setBoolean(6, project.isActive());
             preparedStatement.setInt(7, project.getIdAffiliatedOrganization());
             preparedStatement.setInt(8, project.getIdSupervisor());
             if (preparedStatement.executeUpdate() > NO_ROWS_AFFECTED){
@@ -181,6 +182,7 @@ public class ProjectDAO implements IProjectDAO{
 
             if (preparedStatement.executeUpdate() > NO_ROWS_AFFECTED) {
                 isInactive = true;
+                project.setActive(false);
             } else {
                 LOGGER.log(Level.WARNING, "No se pudo inactivar el proyecto con ID {0}.", project.getId());
                 throw new OperationException("No se pudo inactivar el proyecto", null);

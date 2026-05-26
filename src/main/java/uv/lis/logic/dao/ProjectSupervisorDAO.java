@@ -134,7 +134,6 @@ public class ProjectSupervisorDAO implements IProjectSupervisorDAO {
             }
 
         } catch (SQLException e){
-            e.printStackTrace();
             LOGGER.log(Level.SEVERE, "Error de conexión con la base de datos al registrar", e);
             throw new OperationException("Error al registrar al supervisor del proyecto", e);
             

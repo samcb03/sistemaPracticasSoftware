@@ -16,8 +16,7 @@ public class Project {
     private int idAffiliatedOrganization;
     private String affiliatedOrganizationName;
     private int idSupervisor;
-
-
+    private boolean isActive;
 
     public Project() {
         
@@ -133,6 +132,14 @@ public class Project {
 
     public void setIdSupervisor(int idSupervisor) {
         this.idSupervisor = idSupervisor;
+    }
+
+    public boolean isActive() {
+        return isActive;
+    }
+
+    public void setActive(boolean isActive) {
+        this.isActive = isActive;
     }
 
     @Override

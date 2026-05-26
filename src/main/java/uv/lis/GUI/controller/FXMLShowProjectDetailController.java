@@ -14,7 +14,10 @@ import java.util.stream.Stream;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
 import javafx.scene.control.TextArea;
@@ -34,6 +37,7 @@ public class FXMLShowProjectDetailController extends ValidationHandler {
 
     private static final int MINIMUM_CAPACITY = 1;
     private static final int MAXIMUM_CAPACITY = 99;
+    private static final boolean INACTIVE_PROJECT = false;
 
     @FXML private Label labelName;
     @FXML private Label labelDescription;
@@ -67,6 +71,7 @@ public class FXMLShowProjectDetailController extends ValidationHandler {
         this.currentProject = project;
         displayProjectInformation();
         loadAssignedStudents();
+        disableInactiveControl(currentProject);
     }
 
     private void configureStudentListCellFactory() {
@@ -212,6 +217,60 @@ public class FXMLShowProjectDetailController extends ValidationHandler {
     private void setNodeVisibility(Node node, boolean isVisible) {
         node.setVisible(isVisible);
         node.setManaged(isVisible);
+    }
+
+    @FXML
+    private void handleInactivateProject() {
+        if (currentProject == null) {
+            showError("No hay información del proyecto cargada");
+        } else if (hasAssignedStudents()) {
+            showError("No se puede inactivar el proyecto porque tiene alumnos asignados");
+        } else if (confirmInactivation()) {
+            executeInactivation();
+        }
+    }
+
+    private boolean hasAssignedStudents() {
+        boolean isEmpty = !listViewStudent.getItems().isEmpty();
+        return isEmpty;
+    }
+
+    private boolean confirmInactivation() {
+        Alert confirmationAlert = new Alert(AlertType.CONFIRMATION);
+        confirmationAlert.setTitle("Confirmar inactivación");
+        confirmationAlert.setHeaderText(null);
+        confirmationAlert.setContentText("¿Está seguro de que desea inactivar este proyecto?");
+
+        Optional<ButtonType> userChoice = confirmationAlert.showAndWait();
+        return userChoice.isPresent() && userChoice.get() == ButtonType.OK;
+    }
+
+    private void executeInactivation() {
+        try {
+            boolean isInactivated = projectDAO.inactivateProject(currentProject);
+            handleInactivationResult(isInactivated);
+        } catch (OperationException e) {
+            LOGGER.log(Level.SEVERE, "Error al inactivar el proyecto", e);
+            showError(e.getMessage());
+        }
+    }
+
+    private void handleInactivationResult(boolean isInactivated) {
+        if (!isInactivated) {
+            showError("No se pudo inactivar el proyecto");
+        } else {
+            showSuccess("Proyecto inactivado correctamente");
+            buttonInactivateProject.setDisable(true);
+            buttonModifyProject.setDisable(true);
+            LOGGER.log(Level.INFO, "Proyecto inactivado: {0}", currentProject.getId());
+        }
+    }
+
+    private void disableInactiveControl(Project project) {
+        if (project.isActive() == INACTIVE_PROJECT) {
+            buttonInactivateProject.setDisable(true);
+            buttonModifyProject.setDisable(true);
+        }
     }
 
     /* This view does not require field clearing because it does not have 

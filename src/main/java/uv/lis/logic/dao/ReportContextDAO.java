@@ -131,7 +131,7 @@ public class ReportContextDAO implements IReportContextDAO {
                 if (rs.next()) {
                     monthlyReport.setStudentName(rs.getString("nombreAlumno") + " " + rs.getString("apellidosAlumno"));
                     monthlyReport.setPeriod(rs.getString("periodoPrincipal"));
-                    monthlyReport.setProfessorName(rs.getString("nombreAcademico")); // Nota: ajusta si necesitas apellidos
+                    monthlyReport.setProfessorName(rs.getString("nombreAcademico"));
                     monthlyReport.setCoordinadorName(rs.getString("nombreCoordinador"));
                     monthlyReport.setNrcSubject(rs.getString("nrc"));
                     monthlyReport.setMonth(rs.getString("mes"));
