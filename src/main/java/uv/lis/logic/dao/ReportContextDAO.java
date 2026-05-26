@@ -121,15 +121,16 @@ public class ReportContextDAO implements IReportContextDAO {
     @Override 
     public MonthlyReport getMonthlyReportData(String studentId) throws OperationException {
         MonthlyReport monthlyReport = new MonthlyReport();
-        String query = "SELECT * FROM v_contexto_academico WHERE matricula = ?";
+        String mothlyReportQuery = "SELECT * FROM v_contexto_academico WHERE matricula = ?";
 
         try (Connection databaseConnection = connectionManager.getConnection();
-            PreparedStatement preparedStatement = databaseConnection.prepareStatement(query)) {
+            PreparedStatement preparedStatement = databaseConnection.prepareStatement(mothlyReportQuery)) {
             preparedStatement.setString(1, studentId);
 
             try (ResultSet resultSet = preparedStatement.executeQuery()) {
                 if (resultSet.next()) {
-                    monthlyReport.setStudentName(resultSet.getString("nombreAlumno") + " " + resultSet.getString("apellidosAlumno"));
+                    monthlyReport.setStudentName(resultSet.getString("nombreAlumno") + " " 
+                        + resultSet.getString("apellidosAlumno"));
                     monthlyReport.setPeriod(resultSet.getString("periodoPrincipal"));
                     monthlyReport.setProfessorName(resultSet.getString("nombreAcademico"));
                     monthlyReport.setCoordinadorName(resultSet.getString("nombreCoordinador"));
@@ -151,14 +152,14 @@ public class ReportContextDAO implements IReportContextDAO {
     public List<Activity> getRecordedActivities(String studentId) throws OperationException {
         List<Activity> list = new ArrayList<>();
         
-        String query = "SELECT a.nombreActividad, a.descripcionActividad "
+        String mothlyReportQuery = "SELECT a.nombreActividad, a.descripcionActividad "
                     + "FROM Actividad a "
                     + "JOIN Proyecto p ON a.idActividad = p.idActividad "
                     + "JOIN Solicita_Proyecto sp ON p.idProyecto = sp.idProyecto "
                     + "WHERE sp.matricula = ?";
 
         try (Connection databaseConnection = connectionManager.getConnection();
-            PreparedStatement preparedStatement = databaseConnection.prepareStatement(query)) {
+            PreparedStatement preparedStatement = databaseConnection.prepareStatement(mothlyReportQuery)) {
             
             preparedStatement.setString(1, studentId);
             
