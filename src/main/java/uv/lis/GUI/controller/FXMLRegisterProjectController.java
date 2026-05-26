@@ -122,6 +122,7 @@ public class FXMLRegisterProjectController extends ValidationHandler {
         project.setCapacity(Integer.parseInt(textFieldCapacity.getText().trim()));
         project.setObjective(textFieldObjective.getText().trim());
         project.setDescription(textAreaDescription.getText().trim());
+        project.setActive(true);
 
         String selectedOrganization = comboBoxOrganizationName.getValue();
         String selectedSupervisor = comboBoxResponsableName.getValue();

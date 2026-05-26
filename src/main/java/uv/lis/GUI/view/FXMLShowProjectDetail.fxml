@@ -65,7 +65,7 @@
                <children>
                   <Button fx:id="buttonModifyProject" mnemonicParsing="false" onAction="#enableEditMode" text="Actualizar" />
                   <Button fx:id="buttonSave" managed="false" mnemonicParsing="false" onAction="#saveProject" text="Guardar" visible="false" />
-                  <Button fx:id="buttonInactivateProject" mnemonicParsing="false" text="Inactivar" />
+                  <Button fx:id="buttonInactivateProject" mnemonicParsing="false" onAction="#handleInactivateProject" text="Inactivar" />
                   <Button fx:id="buttonBack" mnemonicParsing="false" onAction="#goBack" prefHeight="26.0" prefWidth="66.0" text="Cancelar" />
                </children>
             </HBox>
