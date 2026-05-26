@@ -10,10 +10,8 @@ import java.util.logging.Logger;
 
 import net.sf.jasperreports.engine.JREmptyDataSource;
 import net.sf.jasperreports.engine.JRException;
-import net.sf.jasperreports.engine.JasperCompileManager;
 import net.sf.jasperreports.engine.JasperFillManager;
 import net.sf.jasperreports.engine.JasperPrint;
-import net.sf.jasperreports.engine.JasperReport;
 
 import uv.lis.logic.dao.ReportContextDAO;
 import uv.lis.logic.dto.Report;
@@ -24,7 +22,7 @@ import uv.lis.logic.utils.SessionManager;
 public class FinalReportCommon {
 
     private static final Logger LOGGER = Logger.getLogger(FinalReportCommon.class.getName());
-    private static final String REPORT_TEMPLATE_PATH = "/uv/lis/GUI/view/templates/finalReport.jrxml";
+    private static final String REPORT_TEMPLATE_PATH = "/uv/lis/GUI/view/templates/finalReport.jasper";
     private static final DateTimeFormatter DATE_FORMATTER = 
         DateTimeFormatter.ofPattern("dd/MM/yyyy");
 
@@ -54,10 +52,9 @@ public class FinalReportCommon {
                     "No se encontró la plantilla del reporte.", null);
             }
 
-            JasperReport jasperReport = JasperCompileManager.compileReport(templateStream);
             Map<String, Object> parameters = buildReportParameters(finalReport);
             jasperPrint = JasperFillManager.fillReport(
-                jasperReport, parameters, new JREmptyDataSource());
+                templateStream, parameters, new JREmptyDataSource());
 
         } catch (java.io.IOException ioException) {
             LOGGER.log(Level.SEVERE, "Error al leer la plantilla del reporte", ioException);
