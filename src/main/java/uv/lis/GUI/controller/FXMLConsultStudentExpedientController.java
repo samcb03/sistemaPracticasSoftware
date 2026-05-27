@@ -19,11 +19,12 @@ import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
-import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 
 import uv.lis.GUI.ValidationHandler;
+import uv.lis.GUI.cell.ActionTableCell;
+import uv.lis.GUI.cell.ValidationTableCell;
 import uv.lis.logic.dao.ExpedientDAO;
 import uv.lis.logic.dto.Expedient;
 import uv.lis.logic.exceptions.OperationException;
@@ -32,7 +33,6 @@ public class FXMLConsultStudentExpedientController extends ValidationHandler {
 
     private static final Logger LOGGER = Logger.getLogger(FXMLConsultStudentExpedientController.class.getName());
 
-    private static final String OPEN_BUTTON_LABEL = "Abrir";
     private static final String NO_DOCUMENTS_MESSAGE = "El alumno no tiene documentos registrados";
     private static final String NO_DOCUMENTS_FOR_FILTER_MESSAGE = "No hay documentos en esta categoría";
 
@@ -90,11 +90,14 @@ public class FXMLConsultStudentExpedientController extends ValidationHandler {
     }
 
     private void configureTableColumns() {
-        columnName.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getName()));
-        columnDocumentType.setCellValueFactory(cellData 
+        columnName.setCellValueFactory(cellData
+            -> new SimpleStringProperty(cellData.getValue().getName()));
+        columnDocumentType.setCellValueFactory(cellData
             -> new SimpleStringProperty(cellData.getValue().getTypeDocument()));
-        columnValidated.setCellFactory(column -> new ValidationTableCell(this));
-        columnAction.setCellFactory(column -> new ActionTableCell(this));
+        columnValidated.setCellFactory(column
+            -> new ValidationTableCell(this::handleValidationToggle));
+        columnAction.setCellFactory(column
+            -> new ActionTableCell(this::openDocument));
     }
 
     private void handleValidationToggle(Expedient expedient, CheckBox checkBox) {
@@ -124,8 +127,7 @@ public class FXMLConsultStudentExpedientController extends ValidationHandler {
             new Object[] { expedient.getId(), newStatus });
     }
 
-    private void revertCheckBox(CheckBox checkBox, boolean appliedStatus,
-            String errorMessage) {
+    private void revertCheckBox(CheckBox checkBox, boolean appliedStatus, String errorMessage) {
         checkBox.setSelected(!appliedStatus);
         showError(errorMessage);
     }
@@ -240,58 +242,5 @@ public class FXMLConsultStudentExpedientController extends ValidationHandler {
         labelMessage.setText("");
         labelTotal.setText("");
         tableViewArchives.getItems().clear();
-    }
-
-    private static class ValidationTableCell extends TableCell<Expedient, Void> {
-
-        private final CheckBox validationCheckBox;
-        private final FXMLConsultStudentExpedientController parentController;
-
-        ValidationTableCell(FXMLConsultStudentExpedientController parentController) {
-            this.parentController = parentController;
-            this.validationCheckBox = new CheckBox();
-            this.validationCheckBox.setOnAction(event -> onCheckBoxAction());
-        }
-
-        private void onCheckBoxAction() {
-            Expedient expedient = getTableView().getItems().get(getIndex());
-            parentController.handleValidationToggle(expedient, validationCheckBox);
-        }
-
-        @Override
-        protected void updateItem(Void item, boolean empty) {
-            super.updateItem(item, empty);
-
-            if (empty) {
-                setGraphic(null);
-            } else {
-                Expedient expedient = getTableView().getItems().get(getIndex());
-                validationCheckBox.setSelected(expedient.getIsValidated());
-                setGraphic(validationCheckBox);
-            }
-        }
-    }
-
-    private static class ActionTableCell extends TableCell<Expedient, Void> {
-
-        private final Button openButton;
-        private final FXMLConsultStudentExpedientController parentController;
-
-        ActionTableCell(FXMLConsultStudentExpedientController parentController) {
-            this.parentController = parentController;
-            this.openButton = new Button(OPEN_BUTTON_LABEL);
-            this.openButton.setOnAction(event -> onOpenButtonAction());
-        }
-
-        private void onOpenButtonAction() {
-            Expedient expedient = getTableView().getItems().get(getIndex());
-            parentController.openDocument(expedient);
-        }
-
-        @Override
-        protected void updateItem(Void item, boolean empty) {
-            super.updateItem(item, empty);
-            setGraphic(empty ? null : openButton);
-        }
     }
 }
