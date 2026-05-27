@@ -1,5 +1,6 @@
 package uv.lis.GUI.controller;
 
+
 import static uv.lis.logic.utils.InputValidator.validateText;
 import static uv.lis.logic.utils.InputValidator.validateEmail;
 import static uv.lis.logic.utils.InputValidator.validateExactLength;
@@ -70,7 +71,6 @@ public class FXMLConsultAffiliatedOrganizationController extends ValidationHandl
     @FXML private TextField textFieldPhoneNumber;
     @FXML private TextField textFieldNumberOfDirectUsers;
     @FXML private TextField textFieldNumberOfIndirectUsers;
-
 
     @FXML private GridPane  gridPaneOrganizationInfo;
 
@@ -283,26 +283,11 @@ public class FXMLConsultAffiliatedOrganizationController extends ValidationHandl
         if (!confirmed) {
             showError("Inactivación cancelada");
         } else if(affiliatedOrganizationDAO.hasProjectsActives(organizationName)){
-            handleInactivationWithProject(organizationName);
+            showError("La organización cuenta con Proyectos activos");
         } else {
             affiliatedOrganizationDAO.inactivateOrganization(organizationName);
             showSuccess("Organización inactivada con éxito");
             updateInactivationState();
-        }
-    }
-
-    private void handleInactivationWithProject(String organizationName) throws OperationException {
-        boolean confirmedAnyway = showConfirmation(
-            "Organizacion tiene proyectos activos",
-            "¿Desea inactivarla y removerla de sus proyectos de todas formas?"
-        );
-
-        if (confirmedAnyway) {
-            affiliatedOrganizationDAO.inactivateOrganization(organizationName);
-            showSuccess("La organización ha sido inactivado y removida de sus proyectos correctamente.");
-            updateInactivationState();
-        } else {
-            showError("Inactivación cancelada");
         }
     }
 
@@ -389,22 +374,22 @@ public class FXMLConsultAffiliatedOrganizationController extends ValidationHandl
 
     @Override
     protected void clearFields() {
-    labelName.setText("-");
-    labelCity.setText("-");
-    labelStreet.setText("-");
-    labelStreetNumber.setText("-");
-    labelPostalCode.setText("-");
-    labelState.setText("-");
-    labelSector.setText("-");
-    labelEmail.setText("-");
-    labelPhoneNumber.setText("-");
-    labelNumberOfDirectUsers.setText("-");
-    labelNumberOfIndirectUsers.setText("-");
-    labelStatus.setText("-");
-    labelMessage.setText("");
-    listViewProjects.getItems().clear();
-    gridPaneOrganizationInfo.setVisible(false);
-    buttonInactive.setDisable(true);
-    buttonUpdate.setDisable(true);
+        labelName.setText("-");
+        labelCity.setText("-");
+        labelStreet.setText("-");
+        labelStreetNumber.setText("-");
+        labelPostalCode.setText("-");
+        labelState.setText("-");
+        labelSector.setText("-");
+        labelEmail.setText("-");
+        labelPhoneNumber.setText("-");
+        labelNumberOfDirectUsers.setText("-");
+        labelNumberOfIndirectUsers.setText("-");
+        labelStatus.setText("-");
+        labelMessage.setText("");
+        listViewProjects.getItems().clear();
+        gridPaneOrganizationInfo.setVisible(false);
+        buttonInactive.setDisable(true);
+        buttonUpdate.setDisable(true);
     }
 }

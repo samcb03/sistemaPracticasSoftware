@@ -292,8 +292,8 @@ public class AffiliatedOrganizationDAO implements IAffiliatedOrganizationDAO{
     public ArrayList<String> searchOrganizationByName(String prefix) throws OperationException {
         ArrayList<String> organizationNames = new ArrayList<>();
         String query = "SELECT nombreOV FROM OrganizacionVinculada "
-            + "WHERE nombreOV LIKE ? AND estadoEnBD = 1 "
-            + "LIMIT 10";
+                     + "WHERE nombreOV LIKE ? AND estadoEnBD = 1 "
+                     + "LIMIT 10";
  
     try (Connection databaseConnection = connectionManager.getConnection();
          PreparedStatement preparedStatement = databaseConnection.prepareStatement(query)) {
