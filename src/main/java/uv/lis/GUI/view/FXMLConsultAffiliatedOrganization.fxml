@@ -4,7 +4,6 @@
 <?import javafx.scene.control.ContextMenu?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.ListView?>
-<?import javafx.scene.control.MenuItem?>
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.ColumnConstraints?>
@@ -14,71 +13,96 @@
 <?import javafx.scene.layout.RowConstraints?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane prefHeight="600.0" prefWidth="800.0" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="uv.lis.GUI.controller.FXMLConsultAffiliatedOrganizationController">
+<AnchorPane prefHeight="600.0" prefWidth="800.0" xmlns="http://javafx.com/javafx/26" xmlns:fx="http://javafx.com/fxml/1" fx:controller="uv.lis.GUI.controller.FXMLConsultAffiliatedOrganizationController">
 
     <children>
-
         <Label layoutY="-1.0" prefHeight="20.0" prefWidth="800.0" style="-fx-background-color: orange; -fx-border-color: BLACK;" text="Consultar Organización" />
 
-        <Label fx:id="label" layoutX="250.0" layoutY="29.0" text="Consultar Organización Vinculada">
+        <Label layoutX="250.0" layoutY="29.0" text="Consultar Organización Vinculada">
             <font>
                 <Font name="System Bold" size="20.0" />
             </font>
         </Label>
 
         <Pane layoutX="40.0" layoutY="70.0" prefHeight="500.0" prefWidth="720.0" style="-fx-background-color: #ffaf9c; -fx-background-radius: 20;">
-
             <children>
-                
                 <TextField fx:id="textFieldOrganizationName" layoutX="40.0" layoutY="35.0" prefHeight="25.0" prefWidth="350.0" promptText="Escribe el nombre de la organización">
-                   <contextMenu>
-                      <ContextMenu fx:id="contextMenuSuggestions">
-                        <items>
-                          <MenuItem mnemonicParsing="false" text="Unspecified Action" />
-                        </items>
-                      </ContextMenu>
-                   </contextMenu>
+                    <contextMenu>
+                        <ContextMenu fx:id="contextMenuSuggestions" />
+                    </contextMenu>
                 </TextField>
                 
                 <Button fx:id="buttonSearch" layoutX="410.0" layoutY="35.0" mnemonicParsing="false" onAction="#searchAffiliatedOrganization" text="Buscar" />
                 
-                <GridPane fx:id="gridPaneOrganizationInfo" layoutX="40.0" layoutY="85.0" prefHeight="270.0" prefWidth="350.0">
-                  <columnConstraints>
-                    <ColumnConstraints hgrow="SOMETIMES" maxWidth="160.0" minWidth="10.0" prefWidth="135.0" />
-                    <ColumnConstraints hgrow="SOMETIMES" maxWidth="215.0" minWidth="10.0" prefWidth="215.0" />
-                  </columnConstraints>
-                  <rowConstraints>
-                    <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                    <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                    <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                    <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                    <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                    <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                    <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                    <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                    <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                  </rowConstraints>
-                   <children>
-                      <Label text="Nombre:" />
-                      <Label text="Ciudad:" GridPane.rowIndex="1" />
-                      <Label text="Estado:" GridPane.rowIndex="2" />
-                      <Label text="Sector:" GridPane.rowIndex="3" />
-                      <Label text="Correo:" GridPane.rowIndex="4" />
-                      <Label text="Teléfono:" GridPane.rowIndex="5" />
-                      <Label text="Usuarios Directos:" GridPane.rowIndex="6" />
-                      <Label text="Usuarios Indirectos:" GridPane.rowIndex="7" />
-                      <Label text="Estado actual:" GridPane.rowIndex="8" />
-                      
-                      <Label fx:id="labelName" prefHeight="18.0" prefWidth="215.0" GridPane.columnIndex="1" />
-                      <Label fx:id="labelCity" prefHeight="18.0" prefWidth="215.0" GridPane.columnIndex="1" GridPane.rowIndex="1" />
-                      <Label fx:id="labelState" prefHeight="18.0" prefWidth="215.0" GridPane.columnIndex="1" GridPane.rowIndex="2" />
-                      <Label fx:id="labelSector" prefHeight="18.0" prefWidth="215.0" GridPane.columnIndex="1" GridPane.rowIndex="3" />
-                      <Label fx:id="labelEmail" prefHeight="18.0" prefWidth="215.0" GridPane.columnIndex="1" GridPane.rowIndex="4" />
-                      <Label fx:id="labelPhoneNumber" prefHeight="18.0" prefWidth="215.0" GridPane.columnIndex="1" GridPane.rowIndex="5" />
-                      <Label fx:id="labelNumberOfDirectUsers" prefHeight="18.0" prefWidth="215.0" GridPane.columnIndex="1" GridPane.rowIndex="6" />
-                      <Label fx:id="labelNumberOfIndirectUsers" prefHeight="18.0" prefWidth="215.0" GridPane.columnIndex="1" GridPane.rowIndex="7" />
-                      <Label fx:id="labelStatus" prefHeight="18.0" prefWidth="215.0" GridPane.columnIndex="1" GridPane.rowIndex="8" />
-                   </children>
+                <GridPane fx:id="gridPaneOrganizationInfo" layoutX="40.0" layoutY="75.0" prefHeight="350.0" prefWidth="350.0">
+                    <columnConstraints>
+                        <ColumnConstraints hgrow="SOMETIMES" maxWidth="160.0" minWidth="10.0" prefWidth="135.0" />
+                        <ColumnConstraints hgrow="SOMETIMES" maxWidth="215.0" minWidth="10.0" prefWidth="215.0" />
+                    </columnConstraints>
+                    <rowConstraints>
+                        <RowConstraints maxHeight="26.599981689453124" minHeight="10.0" prefHeight="23.4" vgrow="SOMETIMES" />
+                        <RowConstraints maxHeight="42.60001220703125" minHeight="10.0" prefHeight="27.4000244140625" vgrow="SOMETIMES" />
+                        <RowConstraints maxHeight="44.999975585937506" minHeight="10.0" prefHeight="30.399987792968744" vgrow="SOMETIMES" />
+                        <RowConstraints maxHeight="46.600012207031256" minHeight="10.0" prefHeight="36.00001831054689" vgrow="SOMETIMES" />
+                        <RowConstraints maxHeight="43.199987792968756" minHeight="10.0" prefHeight="29.60000000000001" vgrow="SOMETIMES" />
+                        <RowConstraints maxHeight="43.20001831054688" minHeight="10.0" prefHeight="28.00000610351563" vgrow="SOMETIMES" />
+                        <RowConstraints maxHeight="44.79999389648438" minHeight="10.0" prefHeight="25.599987792968733" vgrow="SOMETIMES" />
+                        <RowConstraints maxHeight="49.600012207031256" minHeight="10.0" prefHeight="28.799963378906256" vgrow="SOMETIMES" />
+                        <RowConstraints maxHeight="49.60003662109372" minHeight="10.0" prefHeight="44.80001220703127" vgrow="SOMETIMES" />
+                  <RowConstraints maxHeight="53.59998779296876" minHeight="22.400048828125023" prefHeight="29.399987792968773" />
+                  <RowConstraints maxHeight="0.0" minHeight="0.0" prefHeight="0.0" />
+                  <RowConstraints maxHeight="18.399999999999977" minHeight="17.600000000000023" prefHeight="18.399999999999977" />
+                  <RowConstraints />
+                  <RowConstraints minHeight="10.0" prefHeight="30.0" />
+                    </rowConstraints>
+                    <children>
+                        <Label text="Nombre:" />
+                        <Label fx:id="labelName" GridPane.columnIndex="1" />
+                        <TextField fx:id="textFieldName" managed="false" visible="false" GridPane.columnIndex="1" />
+
+                        <Label text="Ciudad:" GridPane.rowIndex="1" />
+                        <Label fx:id="labelCity" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+                        <TextField fx:id="textFieldCity" managed="false" visible="false" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+
+                        <Label text="Estado:" GridPane.rowIndex="2" />
+                        <Label fx:id="labelState" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+                        <TextField fx:id="textFieldState" managed="false" visible="false" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+
+                        <Label text="Calle:" GridPane.rowIndex="3" />
+                        <Label fx:id="labelStreet" GridPane.columnIndex="1" GridPane.rowIndex="3" />
+                        <TextField fx:id="textFieldStreet" managed="false" visible="false" GridPane.columnIndex="1" GridPane.rowIndex="3" />
+
+                        <Label text="Numero de domicilio:" GridPane.rowIndex="4" />
+                        <Label fx:id="labelStreetNumber" GridPane.columnIndex="1" GridPane.rowIndex="4" />
+                        <TextField fx:id="textFieldStreetNumber" managed="false" visible="false" GridPane.columnIndex="1" GridPane.rowIndex="4" />
+
+                        <Label text="Código postal:" GridPane.rowIndex="5" />
+                        <Label fx:id="labelPostalCode" GridPane.columnIndex="1" GridPane.rowIndex="5" />
+                        <TextField fx:id="textFieldPostalCode" managed="false" visible="false" GridPane.columnIndex="1" GridPane.rowIndex="5" />
+
+                        <Label text="Sector:" GridPane.rowIndex="6" />
+                        <Label fx:id="labelSector" GridPane.columnIndex="1" GridPane.rowIndex="6" />
+                        <TextField fx:id="textFieldSector" managed="false" visible="false" GridPane.columnIndex="1" GridPane.rowIndex="6" />
+
+                        <Label text="Correo:" GridPane.rowIndex="7" />
+                        <Label fx:id="labelEmail" GridPane.columnIndex="1" GridPane.rowIndex="7" />
+                        <TextField fx:id="textFieldEmail" managed="false" visible="false" GridPane.columnIndex="1" GridPane.rowIndex="7" />
+
+                        <Label text="Teléfono:" GridPane.rowIndex="8" />
+                        <Label fx:id="labelPhoneNumber" GridPane.columnIndex="1" GridPane.rowIndex="8" />
+                        <TextField fx:id="textFieldPhoneNumber" managed="false" visible="false" GridPane.columnIndex="1" GridPane.rowIndex="8" />
+
+                        <Label text="Usuarios Directos:" GridPane.rowIndex="11" />
+                        <Label fx:id="labelNumberOfDirectUsers" GridPane.columnIndex="1" GridPane.rowIndex="11" />
+                        <TextField fx:id="textFieldNumberOfDirectUsers" managed="false" visible="false" GridPane.columnIndex="1" GridPane.rowIndex="11" />
+
+                        <Label text="Usuarios Indirectos:" GridPane.rowIndex="9" />
+                        <Label fx:id="labelNumberOfIndirectUsers" GridPane.columnIndex="1" GridPane.rowIndex="9" />
+                        <TextField fx:id="textFieldNumberOfIndirectUsers" managed="false" visible="false" GridPane.columnIndex="1" GridPane.rowIndex="9" />
+                        <Label fx:id="labelStatus" GridPane.columnIndex="1" GridPane.rowIndex="13" />
+
+                        <Label text="Estado actual:" GridPane.rowIndex="13" />
+                    </children>
                 </GridPane>
 
                 <Label layoutX="410.0" layoutY="85.0" text="Proyectos Asociados:">
@@ -88,18 +112,17 @@
                 </Label>
                 <ListView fx:id="listViewProjects" layoutX="410.0" layoutY="110.0" prefHeight="245.0" prefWidth="270.0" />
                 
-                <Label fx:id="labelMessage" alignment="CENTER" layoutX="40.0" layoutY="385.0" prefHeight="17.0" prefWidth="640.0" textAlignment="CENTER" />
+                <Label fx:id="labelMessage" alignment="CENTER" layoutX="40.0" layoutY="450.0" prefHeight="17.0" prefWidth="640.0" textAlignment="CENTER" />
                 
-                <HBox alignment="CENTER" layoutX="40.0" layoutY="420.0" prefHeight="38.0" prefWidth="640.0" spacing="30.0">
-                   <children>
-                      <Button fx:id="buttonUpdate" mnemonicParsing="false" text="Actualizar" />
-                      <Button fx:id="buttonInactive" mnemonicParsing="false" text="Inactivar" />
-                      <Button fx:id="buttonBack" mnemonicParsing="false" onAction="#goBack" text="Cancelar" />
-                   </children>
+                <HBox alignment="CENTER" layoutX="40.0" layoutY="460.0" prefHeight="38.0" prefWidth="640.0" spacing="30.0">
+                    <children>
+                        <Button fx:id="buttonUpdate" mnemonicParsing="false" onAction="#enableEditMode" text="Actualizar" />
+                        <Button fx:id="buttonSave" mnemonicParsing="false" onAction="#saveOrganization" text="Guardar" />
+                        <Button fx:id="buttonInactive" mnemonicParsing="false" onAction="#inactiveOrganization" text="Inactivar" />
+                        <Button fx:id="buttonBack" mnemonicParsing="false" onAction="#goBack" text="Cancelar" />
+                    </children>
                 </HBox>
-
             </children>
         </Pane>
-
     </children>
 </AnchorPane>

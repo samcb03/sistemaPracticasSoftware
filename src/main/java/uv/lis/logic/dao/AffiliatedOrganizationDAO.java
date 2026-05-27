@@ -41,10 +41,14 @@ public class AffiliatedOrganizationDAO implements IAffiliatedOrganizationDAO{
 
             try (ResultSet resultSet = preparedStatement.executeQuery()) {
                 if (resultSet.next()) {
+
                     AffiliatedOrganization affiliatedOrganization = new AffiliatedOrganization();
                     affiliatedOrganization.setId(resultSet.getInt("idOrganizacionVinculada"));
                     affiliatedOrganization.setName(resultSet.getString("nombreOV"));
                     affiliatedOrganization.setCity(resultSet.getString("ciudad"));
+                    affiliatedOrganization.setStreet(resultSet.getString("calle"));
+                    affiliatedOrganization.setStreetNumber(resultSet.getString("numeroDomicilio"));
+                    affiliatedOrganization.setPostalCode(resultSet.getString("codigoPostal")); 
                     affiliatedOrganization.setState(resultSet.getString("estado"));
                     affiliatedOrganization.setSector(resultSet.getString("sector"));
                     affiliatedOrganization.setEmail(resultSet.getString("correo"));
@@ -86,7 +90,7 @@ public class AffiliatedOrganizationDAO implements IAffiliatedOrganizationDAO{
             preparedStatement.setString(3, affiliatedOrganization.getState());
             preparedStatement.setString(4, affiliatedOrganization.getStreet());
             preparedStatement.setString(5, affiliatedOrganization.getStreetNumber());
-            preparedStatement.setInt(6, affiliatedOrganization.getPostalCode());
+            preparedStatement.setString(6, affiliatedOrganization.getPostalCode());
             preparedStatement.setString(7, affiliatedOrganization.getSector());
             preparedStatement.setString(8, affiliatedOrganization.getEmail());
             preparedStatement.setString(9, affiliatedOrganization.getPhoneNumber());
@@ -134,7 +138,7 @@ public class AffiliatedOrganizationDAO implements IAffiliatedOrganizationDAO{
             preparedStatement.setString(3, affiliatedOrganization.getState());
             preparedStatement.setString(4, affiliatedOrganization.getStreet());
             preparedStatement.setString(5, affiliatedOrganization.getStreetNumber());
-            preparedStatement.setInt(6, affiliatedOrganization.getPostalCode());
+            preparedStatement.setString(6, affiliatedOrganization.getPostalCode());
             preparedStatement.setString(7, affiliatedOrganization.getSector());
             preparedStatement.setString(8, affiliatedOrganization.getEmail());
             preparedStatement.setString(9, affiliatedOrganization.getPhoneNumber());
@@ -160,24 +164,24 @@ public class AffiliatedOrganizationDAO implements IAffiliatedOrganizationDAO{
     }
 
     @Override
-    public boolean inactivateOrganization(AffiliatedOrganization affiliatedOrganization) throws OperationException {
+    public boolean inactivateOrganization(String organizationName) throws OperationException {
         boolean isInactive = false;
         String affiliatedOrganizationQuery = "UPDATE organizacionVinculada " 
                                            + "SET estadoEnBD = '0'" 
-                                           + "WHERE idOrganizacionVinculada = ?;";
+                                           + "WHERE nombreOV = ?;";
 
         try (Connection databaseConnection = connectionManager.getConnection();
              PreparedStatement preparedStatement = databaseConnection.prepareStatement(affiliatedOrganizationQuery)) {
 
-            preparedStatement.setInt(1, affiliatedOrganization.getId());
+            preparedStatement.setString(1, organizationName);
 
             if (preparedStatement.executeUpdate() > NO_ROWS_AFFECTED) {
                 isInactive = true;
             } else {
                 LOGGER.log(Level.WARNING, "No se pudo inactivar la organización vinculada con ID {0}.", 
-                    affiliatedOrganization.getId());
+                    organizationName);
                 throw new OperationException("No se pudo inactivar la organización vinculada con ID: " 
-                    + affiliatedOrganization.getId(), null);     
+                    + organizationName, null);     
             }
 
         } catch (SQLException e) {
@@ -259,20 +263,20 @@ public class AffiliatedOrganizationDAO implements IAffiliatedOrganizationDAO{
     }
 
     @Override
-    public boolean isOrganizationInactive(int organizationId) throws OperationException {
+    public boolean isOrganizationInactive(String organizationName) throws OperationException {
         boolean isInactive = false;
-        String organizationQuery = "SELECT estadoEnBD FROM OrganizacionVinculada WHERE idOrganizacionVinculada = ?";
+        String organizationQuery = "SELECT estadoEnBD FROM OrganizacionVinculada WHERE nombreOV = ?";
 
         try (Connection databaseConnection = connectionManager.getConnection();
              PreparedStatement preparedStatement = databaseConnection.prepareStatement(organizationQuery)) {
              
-            preparedStatement.setInt(1, organizationId);
+            preparedStatement.setString(1, organizationName);
 
             try (ResultSet resultSet = preparedStatement.executeQuery()) {
                 if (resultSet.next()) {
                     isInactive = resultSet.getInt("estadoEnBD") == 0;
                 } else {
-                    throw new OperationException("No se encontró la organización con ID: " + organizationId, null);
+                    throw new OperationException("No se encontró la organización con ID: " + organizationName, null);
                 }
             }
 
@@ -309,5 +313,97 @@ public class AffiliatedOrganizationDAO implements IAffiliatedOrganizationDAO{
  
     return organizationNames;
     }
+
+    @Override
+    public Optional<AffiliatedOrganization> getOrganizationByName(String organizationName) throws OperationException {
+        Optional<AffiliatedOrganization> validateOrganization = Optional.empty();
+        String organizationQuery = "SELECT * FROM OrganizacionVinculada WHERE nombreOV = ?";
+
+        try(Connection databaseConnection = connectionManager.getConnection();
+            PreparedStatement preparedStatement = databaseConnection.prepareStatement(organizationQuery)) {
+                preparedStatement.setString(1, organizationName);
+
+                try(ResultSet resultSet = preparedStatement.executeQuery()) {
+                    if (resultSet.next()) {
+                        AffiliatedOrganization organization = new AffiliatedOrganization();
+                        organization.setId(resultSet.getInt("idOrganizacionVinculada"));
+                        organization.setName(resultSet.getString("nombreOv"));
+                        organization.setCity(resultSet.getString("ciudad"));
+                        organization.setState(resultSet.getString("estado"));
+                        organization.setStreet(resultSet.getString("calle"));
+                        organization.setStreetNumber(resultSet.getString("numeroDomicilio"));
+                        organization.setPostalCode(resultSet.getString("codigoPostal"));
+                        organization.setSector(resultSet.getString("sector"));
+                        organization.setEmail(resultSet.getString("correo"));
+                        organization.setPhoneNumber(resultSet.getString("telefono"));
+                        organization.setNumberOfDirectUsers(resultSet.getInt("numUsuariosDirectos"));
+                        organization.setNumberOfIndirectUsers(resultSet.getInt("numUsuariosIndirectos"));
+                        validateOrganization = Optional.of(organization);
+                    } else {
+                        LOGGER.log(Level.INFO, "No se encontró un supervisor con el nombre: {0}", organizationName);
+                    }
+                } 
+            }catch (SQLException e) {
+                LOGGER.log(Level.SEVERE, "Error buscando a la Organización", e);
+                throw new OperationException("Error al buscar a la Organizacion en la base de datos", e);
+            }
+        return validateOrganization;
+    }
+
+    @Override
+    public ArrayList<String> getProjectsByOrganization(String organizationName) throws OperationException {
+        ArrayList<String> projectList = new ArrayList<>();
+        String projectQuery = "SELECT p.idProyecto, p.nombre, p.descripcion "
+                            + "FROM Proyecto p "
+                            + "JOIN OrganizacionVinculada ov ON p.idOrganizacionVinculada = ov.idOrganizacionVinculada "
+                            + "WHERE ov.nombreOV = ? "
+                            + "ORDER BY p.nombre ASC";
+
+        try (Connection databaseConnection = connectionManager.getConnection();
+            PreparedStatement preparedStatement = databaseConnection.prepareStatement(projectQuery)) {
+
+            preparedStatement.setString(1, organizationName);
+
+            try (ResultSet resultSet = preparedStatement.executeQuery()) {
+                while (resultSet.next()) {
+                    String entry = "ID: " + resultSet.getInt("idProyecto")
+                                + " — " + resultSet.getString("nombre")
+                                + " (" + resultSet.getString("descripcion") + ")";
+                    projectList.add(entry);
+                }
+            }
+
+        } catch (SQLException e) {
+            LOGGER.log(Level.SEVERE, "Error al obtener proyectos de la organización: " + organizationName, e);
+            throw new OperationException("No se pudo obtener la lista de proyectos de la organización.", e);
+        }
+
+        return projectList;
+    }
+
+    @Override
+    public boolean hasProjectsActives(String organizationName) throws OperationException{
+        boolean hasProjectsActives = false;
+        String organizationQuery= "SELECT 1 FROM Proyecto p " 
+                                + "JOIN OrganizacionVinculada ov ON p.idOrganizacionVinculada = ov.idOrganizacionVinculada "
+                                + "WHERE ov.nombreOV = ? LIMIT 1";
+        try (Connection databaseConnection = connectionManager.getConnection();
+             PreparedStatement preparedStatement = databaseConnection.prepareStatement(organizationQuery)) {
+
+            preparedStatement.setString(1, organizationName);
+
+            try (ResultSet resultSet = preparedStatement.executeQuery()) {
+                hasProjectsActives = resultSet.next();
+            }
+
+        } catch (SQLException e) {
+            LOGGER.log(Level.SEVERE, "Error al verificar Proyectos asignados", e);
+            throw new OperationException("No se pudo verificar los proyectos activos .Intente más tarde", e);
+        }
+
+        return hasProjectsActives;
+    }
+        
 }
+
 
