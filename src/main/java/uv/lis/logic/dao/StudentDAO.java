@@ -195,7 +195,7 @@ public class StudentDAO extends UserDAO implements IStudentDAO {
         boolean isInactive = false;
         
         String studentQuery = "UPDATE Alumno a INNER JOIN Usuario u ON a.idUsuario = u.idUsuario SET u.estado = 0" 
-            + " WHERE a.matricula = ?;";
+                            + " WHERE a.matricula = ?;";
 
         try (Connection databaseConnection = connectionManager.getConnection();
             PreparedStatement preparedStatement = databaseConnection.prepareStatement(studentQuery)) {
