@@ -1,6 +1,5 @@
 package uv.lis.logic.dao;
 
-import static uv.lis.logic.utils.InputValidator.NO_ROWS_AFFECTED;
 import static uv.lis.logic.utils.InputValidator.STATUS_ASSIGNED;
 
 import java.sql.Connection;
