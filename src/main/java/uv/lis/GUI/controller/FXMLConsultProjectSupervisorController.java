@@ -1,5 +1,6 @@
 package uv.lis.GUI.controller;
 
+import java.util.logging.Logger;
 import static uv.lis.logic.utils.InputValidator.validateEmail;
 import static uv.lis.logic.utils.InputValidator.validateText;
 
@@ -7,6 +8,8 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Optional;
 import java.util.ResourceBundle;
+import java.util.logging.Level;
+import java.util.stream.Stream;
 
 import javafx.fxml.FXML;
 import javafx.geometry.Side;
@@ -51,6 +54,9 @@ public class FXMLConsultProjectSupervisorController extends ValidationHandler{
     private ProjectSupervisor projectSupervisor;
     private boolean isEditing = false;
 
+    private static final Logger LOGGER = Logger.getLogger(
+        FXMLConsultProjectSupervisorController.class.getName());
+
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         projectDAO = new ProjectDAO();
@@ -66,9 +72,113 @@ public class FXMLConsultProjectSupervisorController extends ValidationHandler{
         toggleEditingMode(false);
     }
 
+    @FXML
+    private void searchProjectSupervisor() {
+        clearFields();
+        String supervisorName = textFieldNameProjectSupervisor.getText().trim();
+        Optional<String> validateError = validateText(supervisorName, "Nombre del responsable");
+
+        if (validateError.isPresent()) {
+            showError(validateError.get());
+        } else {
+            executeSupervisorSearch(supervisorName);
+        }
+    }
+
+    private void executeSupervisorSearch(String supervisorName) {
+        try {
+            Optional<ProjectSupervisor> supervisorOpt = projectSupervisorDAO.getProjectSupervisorByName(supervisorName);
+            if (supervisorOpt.isPresent()) {
+                projectSupervisor = supervisorOpt.get();
+                displaySupervisorInformation(supervisorName);
+            } else {
+                showError("No se encontró ningún responsable con ese nombre.");
+            }
+        } catch (OperationException e) {
+            LOGGER.log(Level.SEVERE, "Error al buscar supervisor", e);
+            showError(e.getMessage());
+        }
+    }
+
+    private void displaySupervisorInformation(String name) {
+        try {
+            labelName.setText(projectSupervisor.getName());
+            labelPosition.setText(projectSupervisor.getPosition());
+            labelEmail.setText(projectSupervisor.getEmail());
+            labelOrganization.setText(affiliatedOrganizationDAO.getOrganizationBySupervisorName(name)
+                .orElse("Sin organización"));
+            labelProject.setText(projectDAO.getProjectBySupervisorName(name)
+                .orElse("Sin proyecto"));
+
+            gridPaneProjectSupervisorInfo.setVisible(true);
+            buttonModify.setDisable(false);
+            labelMessage.setText("");
+            
+        } catch (OperationException e) {
+            LOGGER.log(Level.SEVERE, "Error al cargar información adicional del supervisor", e);
+            showError("Error al cargar datos relacionados: " + e.getMessage());
+        }
+    }
+
+    @FXML
+    private void handleModifyToggle() {
+        if (!isEditing) {
+            toggleEditingMode(true);
+        } else {
+            Optional<String> validationError = validateInputs();
+            if (validationError.isPresent()) {
+                showError(validationError.get());
+            } else {
+                executeSupervisorUpdate();
+            }
+        }
+    }
+
+    private void executeSupervisorUpdate() {
+        try {
+            ProjectSupervisor updatedSupervisor = buildUpdatedSupervisor();
+            boolean isUpdated = projectSupervisorDAO.modifyProjectSupervisor(updatedSupervisor);
+            handleUpdateResult(isUpdated, updatedSupervisor);
+        } catch (OperationException e) {
+            LOGGER.log(Level.SEVERE, "Error al actualizar al supervisor", e);
+            showError(e.getMessage());
+        }
+    }
+
+    private Optional<String> validateInputs() {
+        return Stream.of(
+            validateText(textFieldName.getText().trim(), "El nombre"),
+            validateText(textFieldPosition.getText().trim(), "El puesto"),
+            validateEmail(textFieldEmail.getText().trim(), "El email")
+        )
+        .filter(Optional::isPresent)
+        .map(Optional::get)
+        .findFirst();
+    }
+
+    private ProjectSupervisor buildUpdatedSupervisor() {
+        projectSupervisor.setName(textFieldName.getText().trim());
+        projectSupervisor.setPosition(textFieldPosition.getText().trim());
+        projectSupervisor.setEmail(textFieldEmail.getText().trim());
+        return projectSupervisor;
+    }
+
+    private void handleUpdateResult(boolean isUpdated, ProjectSupervisor updated) {
+        if (!isUpdated) {
+            showError("No se pudieron guardar los cambios");
+        } else {
+            showSuccess("Modificación exitosa");
+            labelName.setText(updated.getName());
+            labelPosition.setText(updated.getPosition());
+            labelEmail.setText(updated.getEmail());
+            toggleEditingMode(false);
+        }
+    }
+
     private void toggleEditingMode(boolean editing) {
         isEditing = editing;
         buttonModify.setText(editing ? "Guardar datos" : "Modificar");
+        
         labelName.setVisible(!editing); labelName.setManaged(!editing);
         textFieldName.setVisible(editing); textFieldName.setManaged(editing);
         labelPosition.setVisible(!editing); labelPosition.setManaged(!editing);
@@ -83,112 +193,39 @@ public class FXMLConsultProjectSupervisorController extends ValidationHandler{
         }
     }
 
-    @FXML
-    private void searchProjectSupervisor() {
-        clearFields();
-        String supervisorName = textFieldNameProjectSupervisor.getText().trim();
+    private void setupAutocomplete() {
+        textFieldNameProjectSupervisor.textProperty().addListener(
+            (observable, oldValue, newValue) -> handleAutocompleteChange(newValue));
+    }
 
-        Optional<String> validateError = validateText(supervisorName, "Nombre del responsable");
-
-        if (validateError.isPresent()) {
-            showError(validateError.get());
+    private void handleAutocompleteChange(String newValue) {
+        contextMenuSuggestions.getItems().clear();
+        if (newValue == null || newValue.trim().isEmpty()) {
+            contextMenuSuggestions.hide();
         } else {
             try {
-                Optional<ProjectSupervisor> supervisorOpt = projectSupervisorDAO
-                    .getProjectSupervisorByName(supervisorName);
-
-                if (supervisorOpt.isPresent()) {
-                    projectSupervisor = supervisorOpt.get();
-
-                    labelName.setText(projectSupervisor.getName());
-                    labelPosition.setText(projectSupervisor.getPosition());
-                    labelEmail.setText(projectSupervisor.getEmail());
-                    labelOrganization.setText(
-                        affiliatedOrganizationDAO
-                            .getOrganizationBySupervisorName(supervisorName)
-                            .orElse("Sin organización")
-                    );
-                    labelProject.setText(
-                        projectDAO
-                            .getProjectBySupervisorName(supervisorName)
-                            .orElse("Sin proyecto")
-                    );
-
-                    gridPaneProjectSupervisorInfo.setVisible(true);
-                    buttonModify.setDisable(false);
-                    labelMessage.setText("");
-
+                ArrayList<String> matches = projectSupervisorDAO.searchProjectSupervisorName(newValue.trim());
+                if (!matches.isEmpty()) {
+                    populateSuggestions(matches);
+                    contextMenuSuggestions.show(textFieldNameProjectSupervisor, Side.BOTTOM, 0, 0);
                 } else {
-                    showError("No se encontró ningún responsable con ese nombre.");
+                    contextMenuSuggestions.hide();
                 }
-
             } catch (OperationException e) {
-                showError(e.getMessage());
+                LOGGER.log(Level.WARNING, "Error al cargar sugerencias", e);
+                contextMenuSuggestions.hide();
             }
         }
     }
 
-    private void setupAutocomplete() {
-        textFieldNameProjectSupervisor.textProperty().addListener(
-            (observable, oldValue, newValue) -> {
-                contextMenuSuggestions.getItems().clear();
-
-                if (newValue == null || newValue.trim().isEmpty()) {
-                    contextMenuSuggestions.hide();
-                } else {
-                    try {
-                        ArrayList<String> matches = projectSupervisorDAO
-                            .searchProjectSupervisorName(newValue.trim());
-
-                        if (matches.isEmpty()) {
-                            contextMenuSuggestions.hide();
-                        } else {
-                            for (String number : matches) {
-                                MenuItem item = new MenuItem(number);
-                                item.setOnAction(e -> {
-                                    textFieldNameProjectSupervisor.setText(number);
-                                    contextMenuSuggestions.hide();
-                                });
-                                contextMenuSuggestions.getItems().add(item);
-                            }
-                            contextMenuSuggestions.show(
-                                textFieldNameProjectSupervisor, Side.BOTTOM, 0, 0);
-                        }
-
-                    } catch (OperationException e) {
-                        showError(e.getMessage());
-                        contextMenuSuggestions.hide();
-                    }
-                }
-            }
-        );
-    }
-
-
-    @FXML
-    private void handleModifyToggle() {
-        if(!isEditing) {
-            toggleEditingMode(true);
-        } else {
-            if(validateEmail(textFieldEmail.getText().trim(), "Email").isPresent()) {
-                showError("Email inválido");
-            } else {
-                try {
-                    projectSupervisor.setName(textFieldName.getText().trim());
-                    projectSupervisor.setPosition(textFieldPosition.getText().trim());
-                    projectSupervisor.setEmail(textFieldEmail.getText().trim());
-                            
-                    if (projectSupervisorDAO.modifyProjectSupervisor(projectSupervisor)) {
-                        showSuccess("Modificación exitosa");
-                        labelName.setText(projectSupervisor.getName());
-                        labelPosition.setText(projectSupervisor.getPosition());
-                        labelEmail.setText(projectSupervisor.getEmail());
-                        toggleEditingMode(false);
-                    } else showError("Falló la modificación");
-                } catch (OperationException e) { 
-                    showError(e.getMessage()); 
-                }
-            }
+    private void populateSuggestions(ArrayList<String> matches) {
+        for (String name : matches) {
+            MenuItem item = new MenuItem(name);
+            item.setOnAction(e -> {
+                textFieldNameProjectSupervisor.setText(name);
+                contextMenuSuggestions.hide();
+            });
+            contextMenuSuggestions.getItems().add(item);
         }
     }
 
@@ -199,3 +236,4 @@ public class FXMLConsultProjectSupervisorController extends ValidationHandler{
         toggleEditingMode(false);
     }
 }
+

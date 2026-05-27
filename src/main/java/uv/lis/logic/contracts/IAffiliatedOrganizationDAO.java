@@ -13,7 +13,7 @@ public interface IAffiliatedOrganizationDAO {
 
     boolean modifyOrganization(AffiliatedOrganization affiliatedOrganization) throws OperationException;
 
-    boolean inactivateOrganization(AffiliatedOrganization affiliatedOrganization) throws OperationException;
+    boolean inactivateOrganization(String organizationName) throws OperationException;
 
     ArrayList<String> getAllOrganizationNames() throws OperationException;
 
@@ -21,7 +21,13 @@ public interface IAffiliatedOrganizationDAO {
 
     Optional<String> getOrganizationBySupervisorName(String nombreSupervisor) throws OperationException;
 
-    boolean isOrganizationInactive(int organizationId) throws OperationException;
+    boolean isOrganizationInactive(String organizationName) throws OperationException;
 
     ArrayList<String> searchOrganizationByName(String prefix) throws OperationException;
+
+    Optional<AffiliatedOrganization> getOrganizationByName(String organizationName) throws OperationException;
+
+    ArrayList<String> getProjectsByOrganization(String organizationName) throws OperationException;
+
+    boolean hasProjectsActives(String organizationName) throws OperationException;
 }

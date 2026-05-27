@@ -84,7 +84,7 @@ class AffiliatedOrganizationDAOTest {
 
         AffiliatedOrganization expectedOrganization = buildExpectedOrganization();
 
-        assertEquals(expectedOrganization, affiliatedOrganizationDAO.getOrganizationById(1));
+        assertEquals(expectedOrganization, affiliatedOrganizationDAO.getOrganizationById(expectedOrganization.getId()));
     }
 
     @Test
@@ -169,7 +169,7 @@ class AffiliatedOrganizationDAOTest {
 
         AffiliatedOrganization organizationToInactivate = buildExpectedOrganization();
 
-        assertTrue(affiliatedOrganizationDAO.inactivateOrganization(organizationToInactivate));
+        assertTrue(affiliatedOrganizationDAO.inactivateOrganization(organizationToInactivate.getName()));
     }
 
     @Test
@@ -180,11 +180,12 @@ class AffiliatedOrganizationDAOTest {
         AffiliatedOrganization organizationToInactivate = buildExpectedOrganization();
 
         assertThrows(OperationException.class, 
-            () -> affiliatedOrganizationDAO.inactivateOrganization(organizationToInactivate));
+            () -> affiliatedOrganizationDAO.inactivateOrganization(organizationToInactivate.getName()));
     }
 
     @Test
     void inactivateOrganization_sqlError_returnsOperationException() throws Exception {
 
     }
+
 }

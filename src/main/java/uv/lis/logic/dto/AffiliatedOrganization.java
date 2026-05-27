@@ -9,7 +9,7 @@ public class AffiliatedOrganization {
     private String state;
     private String street;
     private String streetNumber;
-    private int postalCode;
+    private String postalCode;
     private String sector;
     private String email;
     private String phoneNumber;
@@ -135,11 +135,11 @@ public class AffiliatedOrganization {
         this.streetNumber = streetNumber;
     }
 
-    public int getPostalCode() {
+    public String getPostalCode() {
         return postalCode;
     }
 
-    public void setPostalCode(int postalCode) {
+    public void setPostalCode(String postalCode) {
         this.postalCode = postalCode;
     }
 
@@ -162,5 +162,11 @@ public class AffiliatedOrganization {
             && Objects.equals(phoneNumber, other.phoneNumber)
             && numberOfDirectUsers == other.numberOfDirectUsers
             && numberOfIndirectUsers == other.numberOfIndirectUsers;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, name, city, state, sector, email, phoneNumber, 
+                            numberOfDirectUsers, numberOfIndirectUsers);
     }
 }
