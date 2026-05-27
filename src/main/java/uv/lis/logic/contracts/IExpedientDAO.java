@@ -18,4 +18,8 @@ public interface IExpedientDAO {
     void uploadDocument(String idStudent, String typeDocument, File file) throws OperationException;
 
     ArrayList<String> getAllDocumentsTypes() throws OperationException;
+
+    List<Expedient> getDocumentsByStudentId(String idStudent) throws OperationException;
+
+    boolean updateValidationStatus(int idExpedient, boolean isValidated) throws OperationException;
 }

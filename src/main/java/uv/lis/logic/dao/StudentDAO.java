@@ -35,8 +35,8 @@ public class StudentDAO extends UserDAO implements IStudentDAO {
         Optional<Student> validateStudent = Optional.empty();
 
         String studentQuery = "SELECT e.matricula, u.nombre, u.apellidos, e.fechaNacimiento, e.genero "
-            + "FROM Alumno e INNER JOIN Usuario u ON e.idUsuario = u.idUsuario "
-            + "WHERE e.idUsuario = ?"; 
+                            + "FROM Alumno e INNER JOIN Usuario u ON e.idUsuario = u.idUsuario "
+                            + "WHERE e.idUsuario = ?"; 
 
         try (Connection databaseConnection = connectionManager.getConnection();
             PreparedStatement preparedStatement = databaseConnection.prepareStatement(studentQuery)) {
@@ -98,11 +98,11 @@ public class StudentDAO extends UserDAO implements IStudentDAO {
     public ArrayList<Student> getActiveStudentsNotInSubject() throws OperationException {
         ArrayList<Student> students = new ArrayList<>();
         String studentQuery = "SELECT a.matricula, u.nombre, u.apellidos "
-            + "FROM Alumno a "
-            + "JOIN Usuario u ON a.idUsuario = u.idUsuario "
-            + "WHERE u.estado = 1 "
-            + "AND a.matricula NOT IN ("
-            + "SELECT matricula FROM Alumno_Esta_EE)";
+                            + "FROM Alumno a "
+                            + "JOIN Usuario u ON a.idUsuario = u.idUsuario "
+                            + "WHERE u.estado = 1 "
+                            + "AND a.matricula NOT IN ("
+                            + "SELECT matricula FROM Alumno_Esta_EE)";
 
         try (Connection databaseConnection = connectionManager.getConnection();
                 PreparedStatement preparedStatement = databaseConnection.prepareStatement(studentQuery)) {
@@ -146,7 +146,8 @@ public class StudentDAO extends UserDAO implements IStudentDAO {
                 isRegistered = true;
                 LOGGER.log(Level.INFO, "Registro de alumno con matricula {0} exitoso.", student.getIdStudent());
             } else {
-                throw new OperationException("No se pudo registrar al alumno. Intentelo mas tarde", null);
+                throw new OperationException("No se pudo registrar al alumno. Intentelo mas tarde", 
+                    null);
             }
 
         } catch (SQLException e) {
@@ -179,7 +180,8 @@ public class StudentDAO extends UserDAO implements IStudentDAO {
                 isModified = true;
                 LOGGER.log(Level.INFO, "Modificacion de alumno con matricula {0} exitosa.", student.getIdStudent());
             } else {
-                throw new OperationException("No se pudo modificar al alumno. Intentelo mas tarde", null);
+                throw new OperationException("No se pudo modificar al alumno. Intentelo mas tarde", 
+                    null);
             }
 
         } catch (SQLException e) {
@@ -264,10 +266,11 @@ public class StudentDAO extends UserDAO implements IStudentDAO {
         return studentIds;
     }
 
+    @Override
     public boolean hasProjectAssigned(String studentId) throws OperationException {
         boolean hasProject = false;
         String studentQuery = "SELECT COUNT(*) FROM Solicita_Proyecto WHERE matricula = ? AND estatus = " 
-            + STATUS_ASSIGNED + ";";
+                            + STATUS_ASSIGNED + ";";
 
         try (Connection databaseConnection = connectionManager.getConnection();
             PreparedStatement preparedStatement = databaseConnection.prepareStatement(studentQuery)) {
