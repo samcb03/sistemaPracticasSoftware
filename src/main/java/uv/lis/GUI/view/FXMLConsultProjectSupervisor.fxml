@@ -2,6 +2,7 @@
 
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ListView?>
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.ColumnConstraints?>
@@ -10,112 +11,67 @@
 <?import javafx.scene.layout.Pane?>
 <?import javafx.scene.layout.RowConstraints?>
 <?import javafx.scene.text.Font?>
-<?import javafx.scene.layout.StackPane?>
 
-<AnchorPane prefHeight="480.0" prefWidth="600.0"
-    xmlns="http://javafx.com/javafx/25"
-    xmlns:fx="http://javafx.com/fxml/1"
-    fx:controller="uv.lis.GUI.controller.FXMLConsultProjectSupervisorController">
-
+<AnchorPane prefHeight="480.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/26" xmlns:fx="http://javafx.com/fxml/1" fx:controller="uv.lis.GUI.controller.FXMLConsultProjectSupervisorController">
     <children>
-
-        <Label layoutY="-1.0" prefHeight="20.0" prefWidth="600.0"
-               style="-fx-background-color: orange; -fx-border-color: BLACK;"
-               text="Consultar Responsable de Proyecto" />
-
-        <Label layoutX="155.0" layoutY="29.0"
-               text="Consultar Responsable de Proyecto">
-            <font>
-                <Font name="System Bold" size="20.0" />
-            </font>
+        <Label layoutY="-1.0" prefHeight="20.0" prefWidth="600.0" style="-fx-background-color: orange; -fx-border-color: BLACK;" text="Consultar Responsable de Proyecto" />
+        <Label layoutX="155.0" layoutY="29.0" text="Consultar Responsable de Proyecto">
+            <font> <Font name="System Bold" size="20.0" /> </font>
         </Label>
 
-        <Pane layoutX="75.0" layoutY="60.0"
-              prefHeight="390.0" prefWidth="450.0"
-              style="-fx-background-color: #ffaf9c; -fx-background-radius: 20;">
-
+        <Pane layoutX="16.0" layoutY="59.0" prefHeight="390.0" prefWidth="557.0" style="-fx-background-color: #ffaf9c; -fx-background-radius: 20;">
             <children>
+                <TextField fx:id="textFieldNameProjectSupervisor" layoutX="57.0" layoutY="24.0" prefHeight="25.0" prefWidth="279.0" promptText="Escribe el nombre del responsable" />
+                <Button fx:id="buttonSearch" layoutX="336.0" layoutY="24.0" mnemonicParsing="false" onAction="#searchProjectSupervisor" text="Buscar" />
 
-                <TextField fx:id="textFieldNameProjectSupervisor"
-                           layoutX="57.0" layoutY="24.0"
-                           prefHeight="25.0" prefWidth="279.0"
-                           promptText="Escribe el nombre del responsable" />
-
-                <Button fx:id="buttonSearch"
-                        layoutX="336.0" layoutY="24.0"
-                        mnemonicParsing="false"
-                        onAction="#searchProjectSupervisor"
-                        text="Buscar" />
-
-                <GridPane fx:id="gridPaneProjectSupervisorInfo"
-                        layoutX="57.0" layoutY="62.0"
-                        prefHeight="250.0" prefWidth="334.0"
-                        visible="false">
+                <GridPane fx:id="gridPaneProjectSupervisorInfo" layoutX="57.0" layoutY="62.0" prefHeight="240.0" prefWidth="250.0" visible="false">
                     <columnConstraints>
-                        <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="130.0" />
-                        <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="204.0" />
+                        <ColumnConstraints hgrow="SOMETIMES" prefWidth="100.0" />
+                        <ColumnConstraints hgrow="SOMETIMES" prefWidth="150.0" />
                     </columnConstraints>
                     <rowConstraints>
-                        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                        <RowConstraints minHeight="10.0" prefHeight="40.0" vgrow="SOMETIMES" />
-                        <RowConstraints minHeight="10.0" prefHeight="40.0" vgrow="SOMETIMES" />
+                        <RowConstraints minHeight="35.0" vgrow="SOMETIMES" />
+                        <RowConstraints minHeight="35.0" vgrow="SOMETIMES" />
+                        <RowConstraints minHeight="35.0" vgrow="SOMETIMES" />
+                        <RowConstraints minHeight="35.0" vgrow="SOMETIMES" />
+                        <RowConstraints minHeight="35.0" vgrow="SOMETIMES" />
+                        <RowConstraints minHeight="35.0" vgrow="SOMETIMES" />
                     </rowConstraints>
                     <children>
-                        <Label text="Nombre:" />
+                        <Label text="Nombre:" GridPane.rowIndex="0" />
+                        <Label fx:id="labelName" GridPane.columnIndex="1" GridPane.rowIndex="0" />
+                        <TextField fx:id="textFieldName" managed="false" visible="false" GridPane.columnIndex="1" GridPane.rowIndex="0" />
+
                         <Label text="Cargo:" GridPane.rowIndex="1" />
+                        <Label fx:id="labelPosition" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+                        <TextField fx:id="textFieldPosition" managed="false" visible="false" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+
                         <Label text="Correo:" GridPane.rowIndex="2" />
+                        <Label fx:id="labelEmail" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+                        <TextField fx:id="textFieldEmail" managed="false" visible="false" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+
                         <Label text="Organización:" GridPane.rowIndex="3" />
-                        <Label text="Proyecto:" GridPane.rowIndex="4" />
+                        <Label fx:id="labelOrganization" GridPane.columnIndex="1" GridPane.rowIndex="3" />
 
-                    <StackPane fx:id="stackPaneName" alignment="CENTER_LEFT" GridPane.columnIndex="1" GridPane.rowIndex="0">
-                        <Label fx:id="labelName" prefWidth="204.0" maxWidth="204.0" />
-                        <TextField fx:id="textFieldName" prefWidth="204.0" maxWidth="204.0" visible="false" managed="false" />
-                    </StackPane>
-
-                    <StackPane fx:id="stackPanePosition" alignment="CENTER_LEFT" GridPane.columnIndex="1" GridPane.rowIndex="1">
-                        <Label fx:id="labelPosition" prefWidth="204.0" maxWidth="204.0" />
-                        <TextField fx:id="textFieldPosition" prefWidth="204.0" maxWidth="204.0" visible="false" managed="false" />
-                    </StackPane>
-
-                    <StackPane fx:id="stackPaneEmail" alignment="CENTER_LEFT" GridPane.columnIndex="1" GridPane.rowIndex="2">
-                        <Label fx:id="labelEmail" prefWidth="204.0" maxWidth="204.0" />
-                        <TextField fx:id="textFieldEmail" prefWidth="204.0" maxWidth="204.0" visible="false" managed="false" />
-                    </StackPane>
-
-                        <Label fx:id="labelOrganization" prefHeight="18.0" prefWidth="204.0" wrapText="true"
-                            GridPane.columnIndex="1" GridPane.rowIndex="3" />
-                        <Label fx:id="labelProject" prefHeight="18.0" prefWidth="204.0" wrapText="true"
-                            GridPane.columnIndex="1" GridPane.rowIndex="4" />
+                        <Label text="Estado:" GridPane.rowIndex="4" />
+                        <Label fx:id="labelStatus" GridPane.columnIndex="1" GridPane.rowIndex="4" />
                     </children>
                 </GridPane>
 
-                <Label fx:id="labelMessage"
-                       layoutX="53.0" layoutY="330.0"
-                       prefHeight="17.0" prefWidth="343.0"
-                       textAlignment="CENTER" />
+                <Label layoutX="344.0" layoutY="62.0" text="Proyectos Asociados:" />
+                <ListView fx:id="listViewProjects" layoutX="344.0" layoutY="85.0" prefHeight="220.0" prefWidth="200.0" />
 
-                <HBox alignment="CENTER"
-                      layoutX="53.0" layoutY="347.0"
-                      prefHeight="38.0" prefWidth="343.0"
-                      spacing="20.0">
+                <Label fx:id="labelMessage" layoutX="53.0" layoutY="310.0" prefHeight="17.0" prefWidth="450.0" />
+
+                <HBox alignment="CENTER" layoutX="53.0" layoutY="340.0" prefHeight="38.0" prefWidth="450.0" spacing="15.0">
                     <children>
-                        <Button fx:id="buttonModify"
-                                disable="true"
-                                mnemonicParsing="false"
-                                onAction="#handleModifyToggle"
-                                text="Modificar" />
-                        <Button fx:id="buttonBack"
-                                disable="true"
-                                mnemonicParsing="false"
-                                onAction="#goBack"
-                                text="Cancelar" />
+                        <Button fx:id="buttonUpdate" disable="true" mnemonicParsing="false" onAction="#enableEditMode" text="Actualizar" />
+                        <Button fx:id="buttonSave" disable="true" managed="false" mnemonicParsing="false" onAction="#saveSupervisor" text="Guardar" visible="false" />
+                        <Button fx:id="buttonInactive" disable="true" mnemonicParsing="false" onAction="#inactiveSupervisor" text="Inactivar" />
+                        <Button fx:id="buttonBack" mnemonicParsing="false" onAction="#goBack" text="Cancelar" />
                     </children>
                 </HBox>
-
             </children>
         </Pane>
-
     </children>
 </AnchorPane>

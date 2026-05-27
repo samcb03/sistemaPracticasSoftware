@@ -75,38 +75,34 @@ public class ProjectSupervisorDAO implements IProjectSupervisorDAO {
 
         return validateSupervisor;
     }
+
     @Override
-    public Optional<ProjectSupervisor> getProjectSupervisorByName(String supervisorName) throws OperationException {
-
-        Optional<ProjectSupervisor> validateSupervisor = Optional.empty();
-
-        String supervisorQuery = "SELECT * FROM ResponsableProyecto WHERE nombre = ?";
+    public ArrayList<String> getProjectsBySupervisorName(String supervisorName) throws OperationException {
+        ArrayList<String> projectList = new ArrayList<>();
+        String projectQuery = "SELECT p.idProyecto, p.nombre, p.descripcion "
+                            + "FROM Proyecto p "
+                            + "JOIN ResponsableProyecto rp ON p.idResponsableProyecto = rp.idResponsableProyecto "
+                            + "WHERE rp.nombre = ? "
+                            + "ORDER BY p.nombre ASC";
 
         try (Connection databaseConnection = connectionManager.getConnection();
-             PreparedStatement preparedStatement = databaseConnection.prepareStatement(supervisorQuery)) {
+            PreparedStatement preparedStatement = databaseConnection.prepareStatement(projectQuery)) {
 
             preparedStatement.setString(1, supervisorName);
-            
+
             try (ResultSet resultSet = preparedStatement.executeQuery()) {
-                if (resultSet.next()) {
-                    ProjectSupervisor supervisor = new ProjectSupervisor();
-                    supervisor.setId(resultSet.getInt("idResponsableProyecto"));
-                    supervisor.setName(resultSet.getString("nombre"));
-                    supervisor.setPosition(resultSet.getString("cargo"));
-                    supervisor.setEmail(resultSet.getString("correo"));
-                    
-                    validateSupervisor = Optional.of(supervisor);
-                } else {
-                    LOGGER.log(Level.INFO, "No se encontró un supervisor con el nombre: {0}", supervisorName);
+                while (resultSet.next()) {
+                    String entry = "ID: " + resultSet.getInt("idProyecto")
+                                + " — " + resultSet.getString("nombre")
+                                + " (" + resultSet.getString("descripcion") + ")";
+                    projectList.add(entry);
                 }
             }
-
         } catch (SQLException e) {
-            LOGGER.log(Level.SEVERE, "Error buscando al supervisor", e);
-            throw new OperationException("Error al buscar al supervisor en la base de datos", e);
+            LOGGER.log(Level.SEVERE, "Error al obtener proyectos del supervisor", e);
+            throw new OperationException("No se pudo obtener la lista de proyectos.", e);
         }
-
-        return validateSupervisor;
+        return projectList;
     }
 
     @Override
@@ -322,4 +318,65 @@ public class ProjectSupervisorDAO implements IProjectSupervisorDAO {
 
         return isInactive;
     }
+
+    @Override
+    public boolean hasProjectsActives(String supervisorName) throws OperationException {
+        boolean hasProjectActives = false;
+        String projectQuery = "SELECT 1 FROM Proyecto p "
+                            + "JOIN ResponsableProyecto rp ON p.idResponsableProyecto = rp.idResponsableProyecto "
+                            + "WHERE rp.nombre = ? "
+                            + "AND p.estado = 1 "
+                            + "LIMIT 1;";
+       try (Connection databaseConnection = connectionManager.getConnection();
+             PreparedStatement preparedStatement = databaseConnection.prepareStatement(projectQuery)) {
+
+            preparedStatement.setString(1, supervisorName);
+
+            try (ResultSet resultSet = preparedStatement.executeQuery()) {
+                hasProjectActives = resultSet.next();
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+            LOGGER.log(Level.SEVERE, "Error al verificar Proyectos asignados", e);
+            throw new OperationException("No se pudo verificar los proyectos activos .Intente más tarde", e);
+        }
+
+        return hasProjectActives;
+    }
+
+    @Override
+    public Optional<ProjectSupervisor> getProjectSupervisorByName(String supervisorName) throws OperationException {
+    Optional<ProjectSupervisor> validateSupervisor = Optional.empty();
+    String supervisorQuery = "SELECT rp.idResponsableProyecto, rp.nombre, rp.cargo, rp.correo, ov.nombreOV "
+                           + "FROM ResponsableProyecto rp "
+                           + "LEFT JOIN OrganizacionVinculada ov ON rp.idOrganizacionVinculada = ov.idOrganizacionVinculada "
+                           + "WHERE rp.nombre = ?";
+
+    try (Connection databaseConnection = connectionManager.getConnection();
+         PreparedStatement preparedStatement = databaseConnection.prepareStatement(supervisorQuery)) {
+
+        preparedStatement.setString(1, supervisorName);
+
+        try (ResultSet resultSet = preparedStatement.executeQuery()) {
+            if (resultSet.next()) {
+                ProjectSupervisor supervisor = new ProjectSupervisor();
+                supervisor.setId(resultSet.getInt("idResponsableProyecto"));
+                supervisor.setName(resultSet.getString("nombre"));
+                supervisor.setPosition(resultSet.getString("cargo"));
+                supervisor.setEmail(resultSet.getString("correo"));
+                supervisor.setAffiliatedOrganizationName(resultSet.getString("nombreOV"));
+                
+                validateSupervisor = Optional.of(supervisor);
+            } else {
+                LOGGER.log(Level.INFO, "No se encontró un supervisor con el nombre: {0}", supervisorName);
+            }
+        }
+    } catch (SQLException e) {
+        LOGGER.log(Level.SEVERE, "Error al buscar al supervisor en la base de datos", e);
+        throw new OperationException("Error al buscar al supervisor", e);
+    }
+
+    return validateSupervisor;
+}
 }
