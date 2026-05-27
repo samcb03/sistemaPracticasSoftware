@@ -3,14 +3,18 @@ package uv.lis.GUI.controller;
 import java.net.URL;
 import java.util.Optional;
 import java.util.ResourceBundle;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
+
 import net.sf.jasperreports.engine.JRException;
 import net.sf.jasperreports.engine.JasperPrint;
 import net.sf.jasperreports.view.JasperViewer;
+
 import uv.lis.GUI.ValidationHandler;
 import uv.lis.logic.common.MonthlyReportCommon;
 import uv.lis.logic.dao.ReportContextDAO;
@@ -20,23 +24,36 @@ import uv.lis.logic.exceptions.OperationException;
 import uv.lis.logic.utils.InputValidator;
 import uv.lis.logic.utils.SessionManager;
 
-
-//FIXME : No 
-
 public class FXMLGenerateMonthlyReportController extends ValidationHandler {
 
-    @FXML private Label     labelStudentName;
-    @FXML private Label     labelCoordinatorName;
-    @FXML private Label     professorName;
-    @FXML private Label     labelMessage;
-    @FXML private Label     labelMonth;
-    @FXML private Label     labelReportedHours;
-    @FXML private Label     labelAccumulatedHours;
-    @FXML private Label     labelSection;
-    @FXML private Label     labelSubject;
-    @FXML private Label     labelNumberReport;
-    @FXML private Button    buttonGenerate;
-    @FXML private Button    buttonBack;
+    private static final Logger LOGGER
+        = Logger.getLogger(FXMLGenerateMonthlyReportController.class.getName());
+
+    private static final String NO_STUDENT_IN_SESSION_MESSAGE = "No hay alumno en sesión";
+    private static final String REPORT_GENERATED_MESSAGE = "Reporte generado correctamente.";
+    private static final String REPORT_GENERATION_ERROR = "Error al generar el reporte.";
+    private static final String ACTIVITY_FIELD_LABEL = "Actividad ";
+    private static final String OBSERVATION_FIELD_LABEL = "Observación ";
+    private static final String REPORT_VIEWER_TITLE = "Reporte Mensual";
+    private static final String EMPTY_TEXT = "";
+
+    private static final int MAX_ACTIVITY_INPUTS = 7;
+    private static final int HOURS_PER_ACTIVITY_ENTRY = 1;
+    private static final int INITIAL_REPORTED_HOURS = 0;
+    private static final int ROW_NUMBER_OFFSET = 1;
+
+    @FXML private Label labelStudentName;
+    @FXML private Label labelCoordinatorName;
+    @FXML private Label labelProfessorName;
+    @FXML private Label labelMessage;
+    @FXML private Label labelMonth;
+    @FXML private Label labelReportedHours;
+    @FXML private Label labelAccumulatedHours;
+    @FXML private Label labelSection;
+    @FXML private Label labelSubject;
+    @FXML private Label labelNumberReport;
+    @FXML private Button buttonGenerate;
+    @FXML private Button buttonBack;
 
     @FXML private TextField textFieldActivity1;
     @FXML private TextField textFieldActivity2;
@@ -54,8 +71,8 @@ public class FXMLGenerateMonthlyReportController extends ValidationHandler {
     @FXML private TextField textFieldObservation6;
     @FXML private TextField textFieldObservation7;
 
-    private TextField[] activities;
-    private TextField[] observations;
+    private TextField[] activityFields;
+    private TextField[] observationFields;
 
     private MonthlyReportCommon monthlyReportCommon;
     private Student currentStudent;
@@ -65,45 +82,58 @@ public class FXMLGenerateMonthlyReportController extends ValidationHandler {
     public void initialize(URL location, ResourceBundle resources) {
         setupControls(labelMessage, buttonBack);
         monthlyReportCommon = new MonthlyReportCommon();
-        currentStudent      = SessionManager.getInstance().getCurrentStudent();
+        currentStudent = SessionManager.getInstance().getCurrentStudent();
         reportContextDAO = new ReportContextDAO();
 
-        activities = new TextField[]{
+        initializeFieldArrays();
+        loadStudentData();
+    }
+
+    private void initializeFieldArrays() {
+        activityFields = new TextField[] {
             textFieldActivity1, textFieldActivity2, textFieldActivity3,
             textFieldActivity4, textFieldActivity5, textFieldActivity6,
             textFieldActivity7
         };
-        observations = new TextField[]{
+        observationFields = new TextField[] {
             textFieldObservation1, textFieldObservation2, textFieldObservation3,
             textFieldObservation4, textFieldObservation5, textFieldObservation6,
             textFieldObservation7
         };
-
-        loadStudentData();
     }
 
     private void loadStudentData() {
-        if(currentStudent == null) {
-            showError("No hay alumno en sesión");
+        if (currentStudent == null) {
+            showError(NO_STUDENT_IN_SESSION_MESSAGE);
         } else {
-            try {
-                MonthlyReport context = reportContextDAO.getMonthlyReportData(
-                    currentStudent.getIdStudent());
-                labelStudentName.setText(context.getStudentName());
-                labelCoordinatorName.setText(context.getCoordinadorName());
-                professorName.setText(context.getProfessorName());
-                labelMonth.setText(context.getMonth());
-                labelSection.setText(context.getSection());
-                labelSubject.setText(context.getNrcSubject());
-                labelNumberReport.setText(String.valueOf(context.getReportNumber()));
-
-                String accumulatedHours = reportContextDAO.getTotalReportedHoursByStudentId(currentStudent.getIdStudent());
-                labelAccumulatedHours.setText(accumulatedHours);
-
-            } catch(OperationException e) {
-                showError(e.getMessage());
-            }
+            fetchAndDisplayContext();
         }
+    }
+
+    private void fetchAndDisplayContext() {
+        try {
+            MonthlyReport context = reportContextDAO.getMonthlyReportData(
+                currentStudent.getIdStudent());
+            populateContextLabels(context);
+
+            String accumulatedHours = reportContextDAO.getTotalReportedHoursByStudentId(
+                currentStudent.getIdStudent());
+            labelAccumulatedHours.setText(accumulatedHours);
+        } catch (OperationException operationException) {
+            LOGGER.log(Level.SEVERE,
+                "Error al cargar contexto del reporte mensual", operationException);
+            showError(operationException.getMessage());
+        }
+    }
+
+    private void populateContextLabels(MonthlyReport context) {
+        labelStudentName.setText(context.getStudentName());
+        labelCoordinatorName.setText(context.getCoordinatorName());
+        labelProfessorName.setText(context.getProfessorName());
+        labelMonth.setText(context.getMonth());
+        labelSection.setText(context.getSection());
+        labelSubject.setText(context.getNrcSubject());
+        labelNumberReport.setText(String.valueOf(context.getReportNumber()));
     }
 
     @FXML
@@ -114,42 +144,47 @@ public class FXMLGenerateMonthlyReportController extends ValidationHandler {
 
     private Optional<String> validateFields() {
         Optional<String> validationResult = Optional.empty();
-        for (int i = 0; i < activities.length && validationResult.isEmpty(); i++) {
-            String activityText    = activities[i].getText().trim();
-            String observationText = observations[i].getText().trim();
 
-            Optional<String> validateActivity = InputValidator.validateText(
-                activityText, "Actividad " + (i + 1));
-            if (validateActivity.isPresent()) {
-                validationResult = validateActivity;
-            } else {
-                Optional<String> validateObservation = InputValidator.validateText(
-                    observationText, "Observación " + (i + 1));
-                if (validateObservation.isPresent()) {
-                    validationResult = validateObservation;
-                }
-            }
+        for (int index = 0; index < MAX_ACTIVITY_INPUTS && validationResult.isEmpty(); index++) {
+            validationResult = validateActivityRow(index);
         }
         return validationResult;
+    }
+
+    private Optional<String> validateActivityRow(int index) {
+        int rowNumber = index + ROW_NUMBER_OFFSET;
+        String activityText = activityFields[index].getText().trim();
+        String observationText = observationFields[index].getText().trim();
+
+        Optional<String> activityValidation = InputValidator.validateText(
+            activityText, ACTIVITY_FIELD_LABEL + rowNumber);
+        Optional<String> observationValidation = InputValidator.validateText(
+            observationText, OBSERVATION_FIELD_LABEL + rowNumber);
+
+        return activityValidation.or(() -> observationValidation);
     }
 
     private void generateMonthlyReport() {
         try {
             MonthlyReport report = buildReport();
             JasperPrint jasperPrint = monthlyReportCommon.generateMonthlyReport(report);
-            showSuccess("Reporte generado correctamente.");
+            showSuccess(REPORT_GENERATED_MESSAGE);
             displayReport(jasperPrint);
             clearFields();
-        } catch (OperationException e) {
-            showError(e.getMessage());
-        } catch (JRException e) {
-            showError("Error al generar el reporte.");
+        } catch (OperationException operationException) {
+            LOGGER.log(Level.SEVERE,
+                "Error de operación al generar el reporte mensual", operationException);
+            showError(operationException.getMessage());
+        } catch (JRException jasperException) {
+            LOGGER.log(Level.SEVERE,
+                "Error de JasperReports al generar el reporte mensual", jasperException);
+            showError(REPORT_GENERATION_ERROR);
         }
     }
 
     private void displayReport(JasperPrint jasperPrint) {
         JasperViewer viewer = new JasperViewer(jasperPrint, false);
-        viewer.setTitle("Reporte Mensual");
+        viewer.setTitle(REPORT_VIEWER_TITLE);
         viewer.setVisible(true);
     }
 
@@ -158,24 +193,31 @@ public class FXMLGenerateMonthlyReportController extends ValidationHandler {
 
         report.setStudentName(
             currentStudent.getFirstName() + " " + currentStudent.getLastName());
+        report.setStudentId(currentStudent.getIdStudent());
 
-        int totalHours = 0;
-        for (int i = 0; i < activities.length; i++) {
-            String activity    = activities[i].getText().trim();
-            String observation = observations[i].getText().trim();
-            String period      = report.getPeriod();
-            report.addActivity(period, activity, observation);
-            if (!activity.isEmpty()) totalHours++; 
+        int totalReportedHours = INITIAL_REPORTED_HOURS;
+        for (int index = 0; index < MAX_ACTIVITY_INPUTS; index++) {
+            String activityText = activityFields[index].getText().trim();
+            String observationText = observationFields[index].getText().trim();
+            report.addActivityEntry(report.getPeriod(), activityText, observationText);
+
+            if (!activityText.isEmpty()) {
+                totalReportedHours += HOURS_PER_ACTIVITY_ENTRY;
+            }
         }
 
-        report.setReportedHours(totalHours); 
+        report.setReportedHours(totalReportedHours);
         return report;
     }
 
     @Override
     protected void clearFields() {
-        for (TextField tf : activities)    tf.clear();
-        for (TextField tf : observations)  tf.clear();
-        labelMessage.setText("");
+        for (TextField field : activityFields) {
+            field.clear();
+        }
+        for (TextField field : observationFields) {
+            field.clear();
+        }
+        labelMessage.setText(EMPTY_TEXT);
     }
 }

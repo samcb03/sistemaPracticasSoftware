@@ -3,13 +3,16 @@ package uv.lis.logic.contracts;
 import java.util.List;
 
 import uv.lis.logic.dto.Activity;
+import uv.lis.logic.dto.FinalReport;
 import uv.lis.logic.dto.MonthlyReport;
-import uv.lis.logic.dto.Report;
+import uv.lis.logic.dto.PartialReport;
 import uv.lis.logic.exceptions.OperationException;
 
 public interface IReportContextDAO {
 
-    Report getReportContextByStudentId(String studentId) throws OperationException;
+    FinalReport getFinalReportContextByStudentId(String studentId) throws OperationException;
+
+    PartialReport getPartialReportContextByStudentId(String studentId) throws OperationException;
 
     String getTotalReportedHoursByStudentId(String studentId) throws OperationException;
 
@@ -17,5 +20,5 @@ public interface IReportContextDAO {
 
     List<Activity> getRecordedActivities(String studentId) throws OperationException;
 
-    boolean registerMonthlyReport(MonthlyReport monthlyReport) throws OperationException;
+    Activity getActivityByName(String studentId, String activityName) throws OperationException;
 }

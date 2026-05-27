@@ -2,35 +2,35 @@ package uv.lis.logic.dto;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 public class MonthlyReport extends Report {
 
     private int idReport;
     private String month;
-    private String studentName;
-    private String professorName;
-    private String coordinadorName;
-    private int loggedHours;
-    private int accumulateHour;
-    private int reportNumber;
+    private String coordinatorName;
+    private int accumulatedHours;
     private int reportedHours;
+    private int reportNumber;
     private String period;
     private String section;
     private String block;
-    private List<String> periods = new ArrayList<>();
-    private List<String> activities = new ArrayList<>();
-    private List<String> observations = new ArrayList<>();
-    private Activity activity;
+    private List<String> periods;
+    private List<String> activities;
+    private List<String> observations;
 
     public MonthlyReport() {
-
+        this.periods = new ArrayList<>();
+        this.activities = new ArrayList<>();
+        this.observations = new ArrayList<>();
     }
 
-    public MonthlyReport(String month, int reportedHours, String description, String observations, 
-            String studentId, String activity, int id, String dueDate) {
-        super(id, description, observations, activity, studentId);
-        this.month = month;
-        this.reportedHours = reportedHours;
+    public int getIdReport() {
+        return idReport;
+    }
+
+    public void setIdReport(int idReport) {
+        this.idReport = idReport;
     }
 
     public String getMonth() {
@@ -41,6 +41,22 @@ public class MonthlyReport extends Report {
         this.month = month;
     }
 
+    public String getCoordinatorName() {
+        return coordinatorName;
+    }
+
+    public void setCoordinatorName(String coordinatorName) {
+        this.coordinatorName = coordinatorName;
+    }
+
+    public int getAccumulatedHours() {
+        return accumulatedHours;
+    }
+
+    public void setAccumulatedHours(int accumulatedHours) {
+        this.accumulatedHours = accumulatedHours;
+    }
+
     public int getReportedHours() {
         return reportedHours;
     }
@@ -49,36 +65,20 @@ public class MonthlyReport extends Report {
         this.reportedHours = reportedHours;
     }
 
-    public String getStudentName() {
-        return studentName;
+    public int getReportNumber() {
+        return reportNumber;
     }
 
-    public void setStudentName(String studentName) {
-        this.studentName = studentName;
+    public void setReportNumber(int reportNumber) {
+        this.reportNumber = reportNumber;
     }
 
-    public String getProfessorName() {
-        return professorName;
+    public String getPeriod() {
+        return period;
     }
 
-    public void setProfessorName(String professorName) {
-        this.professorName = professorName;
-    }
-
-    public String getCoordinadorName() {
-        return coordinadorName;
-    }
-
-    public void setCoordinadorName(String coordinadorName) {
-        this.coordinadorName = coordinadorName;
-    }
-
-    public int getLoggedHours() {
-        return loggedHours;
-    }
-
-    public void setLoggedHours(int loggedHours) {
-        this.loggedHours = loggedHours;
+    public void setPeriod(String period) {
+        this.period = period;
     }
 
     public String getSection() {
@@ -97,24 +97,8 @@ public class MonthlyReport extends Report {
         this.block = block;
     }
 
-    public int getReportNumber() {
-        return reportNumber;
-    }
-
-    public void setReportNumber(int reportNumber) {
-        this.reportNumber = reportNumber;
-    }
-    
-    public String getPeriod() {
-        return period;
-    }
-
-    public void setPeriod(String period) {
-        this.period = period;
-    }
-
-    public void addActivity(String period, String activity, String observation) {
-        periods.add(period);
+    public void addActivityEntry(String entryPeriod, String activity, String observation) {
+        periods.add(entryPeriod);
         activities.add(activity);
         observations.add(observation);
     }
@@ -123,49 +107,46 @@ public class MonthlyReport extends Report {
         return activities.size();
     }
 
-    public int getAccumulateHour() {
-        return accumulateHour;
+    public String getPeriodAt(int index) {
+        String periodValue = "";
+
+        if (index >= 1 && index <= periods.size()) {
+            periodValue = periods.get(index - 1);
+        }
+        return periodValue;
     }
 
-    public void setAccumulateHour(int accumulateHour) {
-        this.accumulateHour = accumulateHour;
+    public String getActivityAt(int index) {
+        String activityValue = "";
+
+        if (index >= 1 && index <= activities.size()) {
+            activityValue = activities.get(index - 1);
+        }
+        return activityValue;
     }
 
+    public String getObservationAt(int index) {
+        String observationValue = "";
 
-    public int getIdReport() {
-        return idReport;
-    }
-
-    public void setIdReport(int idReport) {
-        this.idReport = idReport;
-    }
-
-    public String getPeriod(int i) { 
-        return (i >= 1 && i <= periods.size()) ? periods.get(i - 1) : ""; 
-    }
-    public String getActivity(int i) { 
-        return (i >= 1 && i <= activities.size()) ? activities.get(i - 1) : ""; 
-    }
-    public String getObservation(int i) { 
-        return (i >= 1 && i <= observations.size()) ? observations.get(i - 1) : ""; 
+        if (index >= 1 && index <= observations.size()) {
+            observationValue = observations.get(index - 1);
+        }
+        return observationValue;
     }
 
     @Override
     public boolean equals(Object object) {
+        boolean isEqual = false;
+
         if (this == object) {
-            return true;
+            isEqual = true;
+        } else if (object != null && getClass() == object.getClass() && super.equals(object)) {
+            MonthlyReport other = (MonthlyReport) object;
+            isEqual = idReport == other.idReport
+                && reportedHours == other.reportedHours
+                && reportNumber == other.reportNumber
+                && Objects.equals(month, other.month);
         }
-
-        if (object == null || getClass() != object.getClass()) {
-            return false;
-        }
-
-        if (!super.equals(object)) 
-            return false;
-
-        MonthlyReport other = (MonthlyReport) object;
-        return month == other.month 
-        && reportedHours == other.reportedHours;
+        return isEqual;
     }
-    
 }
