@@ -57,6 +57,8 @@ public class FXMLGenerateAutoevaluation extends ValidationHandler {
         loadAutomaticData(); 
     }
 
+    //FIXME: Arreglar nombre variables
+
     private void setupToggleGroups() {
         groups = new ToggleGroup[10]; 
         groups[0] = createGroup(rb1_1,  rb1_2,  rb1_3,  rb1_4,  rb1_5);
