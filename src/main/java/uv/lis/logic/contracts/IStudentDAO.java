@@ -22,4 +22,7 @@ public interface IStudentDAO {
     ArrayList<String> searchStudentIds(String prefix) throws OperationException;
 
     boolean isStudentInactive(String studentId) throws OperationException;
+
+    boolean hasProjectAssigned(String studentId) throws OperationException;
+
 }

@@ -24,6 +24,8 @@ public class FXMLConsultSubjectController extends WindowHandler {
 
     private static final Logger LOGGER = Logger.getLogger(FXMLConsultSubjectController.class.getName());
     private static final String CONSULT_STUDENT_VIEW = "/uv/lis/GUI/view/FXMLConsultStudent.fxml";
+    private static final String STUDENT_ARCHIVES_VIEW = "/uv/lis/GUI/view/FXMLConsultStudentExpedient.fxml";
+    private static final String SELECT_STUDENT_MESSAGE = "Debe seleccionar un alumno de la lista";
 
     @FXML private Label labelSubject;
     @FXML private Label labelNrc;
@@ -64,13 +66,12 @@ public class FXMLConsultSubjectController extends WindowHandler {
             listViewStudent.setItems(FXCollections.observableArrayList(enrolledStudents));
 
             if (enrolledStudents.isEmpty()) {
-                LOGGER.log(Level.INFO,
-                    "La experiencia educativa con NRC {0} no tiene alumnos inscritos",
+                LOGGER.log(Level.INFO, "La experiencia educativa con NRC {0} no tiene alumnos inscritos",
                     currentSubject.getNrc());
             }
-        } catch (OperationException operationException) {
-            LOGGER.log(Level.SEVERE, "Error al cargar los alumnos inscritos", operationException);
-            showError(operationException.getMessage());
+        } catch (OperationException e) {
+            LOGGER.log(Level.SEVERE, "Error al cargar los alumnos inscritos", e);
+            showError(e.getMessage());
         }
     }
 
@@ -79,7 +80,7 @@ public class FXMLConsultSubjectController extends WindowHandler {
         Student selectedStudent = listViewStudent.getSelectionModel().getSelectedItem();
 
         if (selectedStudent == null) {
-            showError("Debe seleccionar un alumno de la lista");
+            showError(SELECT_STUDENT_MESSAGE);
         } else {
             openConsultStudentView(selectedStudent);
         }
@@ -96,6 +97,21 @@ public class FXMLConsultSubjectController extends WindowHandler {
 
     @FXML
     private void handleConsultExpedient() {
+        Student selectedStudent = listViewStudent.getSelectionModel().getSelectedItem();
 
+        if (selectedStudent == null) {
+            showError(SELECT_STUDENT_MESSAGE);
+        } else {
+            openStudentArchivesView(selectedStudent);
+        }
+    }
+
+    private void openStudentArchivesView(Student student) {
+        FXMLLoader loader = navigateToWithLoader(STUDENT_ARCHIVES_VIEW);
+    
+        if (loader != null) {
+            FXMLConsultStudentExpedientController controller = loader.getController();
+            controller.loadStudentArchives(student.getIdStudent());
+        }
     }
 }
