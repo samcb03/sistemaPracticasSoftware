@@ -158,6 +158,68 @@ public class ExpedientDAO implements IExpedientDAO {
         return documentTypes;
     }
 
+    @Override
+    public List<Expedient> getDocumentsByStudentId(String idStudent) throws OperationException {
+        List<Expedient> studentDocuments = new ArrayList<>();
+        String expedientQuery = "SELECT idExpediente, nombre, tipoDocumento, url, "
+                            + "matricula, idTipoDocumento, estaValidado "
+                            + "FROM expediente "
+                            + "WHERE matricula = ?";
+    
+        try (Connection databaseConnection = connectionManager.getConnection();
+            PreparedStatement preparedStatement = databaseConnection.prepareStatement(expedientQuery)) {
+    
+            preparedStatement.setString(1, idStudent);
+    
+            try (ResultSet resultSet = preparedStatement.executeQuery()) {
+                while (resultSet.next()) {
+                    Expedient expedient = buildExpedientFromResultSet(resultSet);
+                    studentDocuments.add(expedient);
+                }
+            }
+        } catch (SQLException e) {
+            LOGGER.log(Level.SEVERE, "Error al obtener los documentos del alumno", e);
+            throw new OperationException(
+                "No se pudieron obtener los documentos del alumno. Intente más tarde", e);
+        }
+        return studentDocuments;
+    }
+
+    @Override
+    public boolean updateValidationStatus(int idExpedient, boolean isValidated)
+            throws OperationException {
+        boolean isUpdated = false;
+        String expedientQuery = "UPDATE expediente SET estaValidado = ? WHERE idExpediente = ?";
+    
+        try (Connection databaseConnection = connectionManager.getConnection();
+            PreparedStatement preparedStatement = databaseConnection.prepareStatement(expedientQuery)) {
+    
+            preparedStatement.setBoolean(1, isValidated);
+            preparedStatement.setInt(2, idExpedient);
+    
+            int affectedRows = preparedStatement.executeUpdate();
+            isUpdated = affectedRows > NO_ROWS_AFFECTED;
+        } catch (SQLException e) {
+            LOGGER.log(Level.SEVERE, "Error al actualizar el estado de validación del documento", e);
+            throw new OperationException(
+                "No se pudo actualizar el estado del documento. Intente más tarde", e);
+        }
+        return isUpdated;
+    }
+
+    private Expedient buildExpedientFromResultSet(ResultSet resultSet) throws SQLException {
+        Expedient expedient = new Expedient(
+            resultSet.getString("nombre"),
+            resultSet.getString("tipoDocumento"),
+            resultSet.getString("url"),
+            resultSet.getString("matricula"),
+            resultSet.getInt("idTipoDocumento")
+        );
+        expedient.setId(resultSet.getInt("idExpediente"));
+        expedient.setIsValidated(resultSet.getBoolean("estaValidado"));
+        return expedient;
+    }
+
     private void deletePreviousDocumentIfExists(String idStudent, int idDocumentType) throws OperationException {
     List<Integer> uniqueIds = new ArrayList<>();
         uniqueIds.add(1);

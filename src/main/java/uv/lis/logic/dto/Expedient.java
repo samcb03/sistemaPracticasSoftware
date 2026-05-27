@@ -3,19 +3,34 @@ package uv.lis.logic.dto;
 import java.util.Objects;
 
 public class Expedient {
+
+    private int id;
     private String name;
     private String typeDocument;
     private String url;
     private String idStudent;
     private int idTypeDocument;
+    private boolean isValidated;
 
-    public Expedient(String name, String typeDocument, 
-        String url, String idStudent, int idTypeDocument) {
+    public Expedient() {
+    }
+
+    public Expedient(String name, String typeDocument,
+            String url, String idStudent, int idTypeDocument) {
         this.name = name;
         this.typeDocument = typeDocument;
         this.url = url;
         this.idStudent = idStudent;
         this.idTypeDocument = idTypeDocument;
+        this.isValidated = false;
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
     }
 
     public String getName() {
@@ -50,7 +65,6 @@ public class Expedient {
         this.idStudent = idStudent;
     }
 
-    
     public int getIdTypeDocument() {
         return idTypeDocument;
     }
@@ -59,19 +73,29 @@ public class Expedient {
         this.idTypeDocument = idTypeDocument;
     }
 
+    public boolean getIsValidated() {
+        return isValidated;
+    }
+
+    public void setIsValidated(boolean isValidated) {
+        this.isValidated = isValidated;
+    }
+
     @Override
     public boolean equals(Object object) {
+        boolean isEqual;
+
         if (this == object) {
-            return true;
+            isEqual = true;
+        } else if (object == null || getClass() != object.getClass()) {
+            isEqual = false;
+        } else {
+            Expedient other = (Expedient) object;
+            isEqual = Objects.equals(name, other.name)
+                && Objects.equals(typeDocument, other.typeDocument)
+                && Objects.equals(url, other.url)
+                && Objects.equals(idStudent, other.idStudent);
         }
-        if (object == null || getClass() != object.getClass()) {
-            return false;
-        }
-        
-        Expedient other = (Expedient) object;
-        return name == other.name
-        && Objects.equals(typeDocument, other.typeDocument)
-        && Objects.equals(url, other.url)
-        && Objects.equals(idStudent, other.idStudent);
+        return isEqual;
     }
 }
