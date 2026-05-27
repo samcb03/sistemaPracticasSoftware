@@ -19,6 +19,8 @@ public interface IProjectSupervisorDAO {
 
     Optional<ProjectSupervisor> getProjectSupervisorByName(String supervisorName) throws OperationException;
 
+    ArrayList<String> getProjectsBySupervisorName(String supervisorName) throws OperationException;
+
     int getSupervisorIdByName(String supervisorName) throws OperationException;
 
     ArrayList<String> getSupervisorsByOrganizationId(int organizationId) throws OperationException;
@@ -26,4 +28,6 @@ public interface IProjectSupervisorDAO {
     boolean isSupervisorInactive(String name) throws OperationException;
 
     boolean inactivateProjectSupervisor(String projectSupervisorName) throws OperationException;
+
+    boolean hasProjectsActives(String supervisorName) throws OperationException;
 }
