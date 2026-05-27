@@ -1,52 +1,146 @@
 package uv.lis.logic.dto;
 
+import java.util.Objects;
+
 public class PartialReport extends Report {
 
-    private int plannedTime;
-    private int realTime;
+    private int plannedAdvanceWeek;
+    private int realAdvanceWeek;
+    private String activityName;
+    private String reportPeriod;
+    private int reportNumber;
+    private String projectSupervisor;
+    private String result;
+    private String projectName;
+    private String projectMethodology;
+    private String projectObjective;
+    private String affiliatedOrganization;
+    private String totalHours;
+    private String dateReport;
 
     public PartialReport() {
 
     }
 
-    public PartialReport(int plannedTime, int realTime, String description, String observations, String studentId, 
-        String dueDate, int id, String activity) {
-        super(id, description, observations, activity, studentId);
-        this.plannedTime = plannedTime;
-        this.realTime = realTime;
+    public int getPlannedAdvanceWeek() {
+        return plannedAdvanceWeek;
     }
 
-    public int getPlannedTime() {
-        return plannedTime;
+    public void setPlannedAdvanceWeek(int plannedAdvanceWeek) {
+        this.plannedAdvanceWeek = plannedAdvanceWeek;
     }
 
-    public void setPlannedTime(int plannedTime) {
-        this.plannedTime = plannedTime;
+    public int getRealAdvanceWeek() {
+        return realAdvanceWeek;
     }
 
-    public int getRealTime() {
-        return realTime;
+    public void setRealAdvanceWeek(int realAdvanceWeek) {
+        this.realAdvanceWeek = realAdvanceWeek;
     }
 
-    public void setRealTime(int realTime) {
-        this.realTime = realTime;
+    public String getActivityName() {
+        return activityName;
+    }
+
+    public void setActivityName(String activityName) {
+        this.activityName = activityName;
+    }
+
+    public String getReportPeriod() {
+        return reportPeriod;
+    }
+
+    public void setReportPeriod(String reportPeriod) {
+        this.reportPeriod = reportPeriod;
+    }
+
+    public int getReportNumber() {
+        return reportNumber;
+    }
+
+    public void setReportNumber(int reportNumber) {
+        this.reportNumber = reportNumber;
+    }
+
+    public String getProjectSupervisor() {
+        return projectSupervisor;
+    }
+
+    public void setProjectSupervisor(String projectSupervisor) {
+        this.projectSupervisor = projectSupervisor;
+    }
+
+    public String getResult() {
+        return result;
+    }
+
+    public void setResult(String result) {
+        this.result = result;
+    }
+
+    public String getProjectName() {
+        return projectName;
+    }
+
+    public void setProjectName(String projectName) {
+        this.projectName = projectName;
+    }
+
+    public String getProjectMethodology() {
+        return projectMethodology;
+    }
+
+    public void setProjectMethodology(String projectMethodology) {
+        this.projectMethodology = projectMethodology;
+    }
+
+    public String getProjectObjective() {
+        return projectObjective;
+    }
+
+    public void setProjectObjective(String projectObjective) {
+        this.projectObjective = projectObjective;
+    }
+
+    public String getAffiliatedOrganization() {
+        return affiliatedOrganization;
+    }
+
+    public void setAffiliatedOrganization(String affiliatedOrganization) {
+        this.affiliatedOrganization = affiliatedOrganization;
+    }
+
+    public String getTotalHours() {
+        return totalHours;
+    }
+
+    public void setTotalHours(String totalHours) {
+        this.totalHours = totalHours;
+    }
+
+    public String getDateReport() {
+        return dateReport;
+    }
+
+    public void setDateReport(String dateReport) {
+        this.dateReport = dateReport;
     }
 
     @Override
     public boolean equals(Object object) {
+        boolean isEqual = false;
+
         if (this == object) {
-            return true;
+            isEqual = true;
+        } else if (object != null && getClass() == object.getClass() && super.equals(object)) {
+            PartialReport other = (PartialReport) object;
+            isEqual = plannedAdvanceWeek == other.plannedAdvanceWeek
+                && realAdvanceWeek == other.realAdvanceWeek
+                && reportNumber == other.reportNumber
+                && Objects.equals(activityName, other.activityName)
+                && Objects.equals(reportPeriod, other.reportPeriod)
+                && Objects.equals(result, other.result);
         }
-
-        if (object == null || getClass() != object.getClass()) {
-            return false;
-        }
-
-        if (!super.equals(object)) 
-            return false;
-
-        PartialReport other = (PartialReport) object;
-        return plannedTime == other.plannedTime 
-        && realTime == other.realTime;
+        return isEqual;
     }
 }

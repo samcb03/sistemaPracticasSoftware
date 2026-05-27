@@ -83,7 +83,7 @@
                         <TextField fx:id="textFieldResult2" layoutX="92.0" layoutY="184.0" prefHeight="26.0" prefWidth="150.0" GridPane.columnIndex="1" GridPane.rowIndex="3" />
                         <VBox alignment="CENTER" layoutX="255.0" layoutY="159.0" prefHeight="200.0" prefWidth="100.0" spacing="5.0" GridPane.columnIndex="2" GridPane.rowIndex="3">
                            <children>
-                              <TextField fx:id="textFieldAdvanceResult2" promptText="Porcentaje de Avance" />
+                              <TextField fx:id="textFieldResultAdvance2" promptText="Porcentaje de Avance" />
                               <TextArea fx:id="textAreaObservationResult2" prefHeight="56.0" prefWidth="302.0" promptText="Observaciones" />
                            </children>
                         </VBox>

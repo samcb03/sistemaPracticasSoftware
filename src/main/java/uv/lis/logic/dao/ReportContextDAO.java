@@ -3,10 +3,10 @@ package uv.lis.logic.dao;
 import static uv.lis.logic.utils.InputValidator.STATUS_ASSIGNED;
 
 import java.sql.Connection;
+import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
@@ -15,13 +15,27 @@ import java.util.logging.Logger;
 import uv.lis.dataaccess.MySQLConnectionManager;
 import uv.lis.logic.contracts.IReportContextDAO;
 import uv.lis.logic.dto.Activity;
+import uv.lis.logic.dto.FinalReport;
 import uv.lis.logic.dto.MonthlyReport;
-import uv.lis.logic.dto.Report;
-import uv.lis.logic.exceptions.OperationException;;
+import uv.lis.logic.dto.PartialReport;
+import uv.lis.logic.exceptions.OperationException;
 
 public class ReportContextDAO implements IReportContextDAO {
+
     private static final Logger LOGGER = Logger.getLogger(ReportContextDAO.class.getName());
-    private MySQLConnectionManager connectionManager;
+
+    private static final String REPORT_CONTEXT_NOT_FOUND = "No se encontraron datos asociados al alumno";
+    private static final String DATABASE_CONNECTION_ERROR = "Error de conexión con la base de datos";
+    private static final String FINAL_CONTEXT_ERROR = "Error al obtener los datos contextuales del reporte";
+    private static final String PARTIAL_CONTEXT_ERROR = "Error al obtener los datos contextuales del reporte parcial";
+    private static final String MONTHLY_CONTEXT_ERROR = "Error al consultar la vista de contexto";
+    private static final String TOTAL_HOURS_ERROR = "Error al calcular las horas totales reportadas";
+    private static final String ACTIVITIES_QUERY_ERROR = "Error al obtener actividades";
+    private static final String ACTIVITY_BY_NAME_ERROR = "Error al obtener la actividad por nombre";
+
+    private static final String INITIAL_TOTAL_HOURS = "0";
+
+    private final MySQLConnectionManager connectionManager;
 
     public ReportContextDAO() {
         this.connectionManager = new MySQLConnectionManager();
@@ -32,74 +46,66 @@ public class ReportContextDAO implements IReportContextDAO {
     }
 
     @Override
-    public Report getReportContextByStudentId(String studentId) throws OperationException {
-        Report report = new Report();
-
-        String contextQuery = "SELECT u.nombre AS nombreAlumno, u.apellidos AS apellidosAlumno, "
-                            + "ee.NRC AS nrc, "
-                            + "pe.nombre AS periodo, "
-                            + "uProf.nombre AS nombreProfesor, uProf.apellidos AS apellidosProfesor, "
-                            + "p.nombre AS nombreProyecto, p.objetivo AS objetivoProyecto, "
-                            + "p.metodologiaProyecto AS metodologiaProyecto, "
-                            + "ov.nombreOV AS organizacion "
-                            + "FROM Alumno a "
-                            + "INNER JOIN Usuario u ON a.idUsuario = u.idUsuario "
-                            + "INNER JOIN Alumno_Esta_EE aee ON a.matricula = aee.matricula "
-                            + "INNER JOIN ExperienciaEducativa ee ON aee.NRC = ee.NRC "
-                            + "INNER JOIN PeriodoEscolar pe ON ee.idPeriodoEscolar = pe.idPeriodoEscolar "
-                            + "INNER JOIN Profesor_Imparte_Experiencia pie ON ee.NRC = pie.NRC "
-                            + "INNER JOIN Profesor prof ON pie.numeroPersonal = prof.numeroPersonal "
-                            + "INNER JOIN Usuario uProf ON prof.idUsuario = uProf.idUsuario "
-                            + "INNER JOIN Solicita_Proyecto sp ON a.matricula = sp.matricula "
-                            + "INNER JOIN Proyecto p ON sp.idProyecto = p.idProyecto "
-                            + "INNER JOIN OrganizacionVinculada ov ON p.idOrganizacionVinculada = ov.idOrganizacionVinculada "
-                            + "WHERE a.matricula = ? AND sp.estatus = " + STATUS_ASSIGNED + ";";
+    public FinalReport getFinalReportContextByStudentId(String studentId) throws OperationException {
+        FinalReport finalReport = new FinalReport();
+        String reportContextQuery = buildContextQuery();
 
         try (Connection databaseConnection = connectionManager.getConnection();
-            PreparedStatement preparedStatement = databaseConnection.prepareStatement(contextQuery)) {
+                PreparedStatement preparedStatement = databaseConnection.prepareStatement(reportContextQuery)) {
 
             preparedStatement.setString(1, studentId);
 
             try (ResultSet resultSet = preparedStatement.executeQuery()) {
                 if (resultSet.next()) {
-                    String studentFullName = resultSet.getString("nombreAlumno") + " "
-                        + resultSet.getString("apellidosAlumno");
-                    String professorFullName = resultSet.getString("nombreProfesor") + " "
-                        + resultSet.getString("apellidosProfesor");
-
-                    report.setStudentName(studentFullName);
-                    report.setProfessorName(professorFullName);
-                    report.setNrcSubject(resultSet.getString("nrc"));
-                    report.setSchoolPeriod(resultSet.getString("periodo"));
-                    report.setProjectName(resultSet.getString("nombreProyecto"));
-                    report.setProjectObjective(resultSet.getString("objetivoProyecto"));
-                    report.setProjectMethodology(resultSet.getString("metodologiaProyecto"));
-                    report.setAffiliatedOrganization(resultSet.getString("organizacion"));
+                    fillFinalReportContext(finalReport, resultSet);
                 } else {
-                    LOGGER.log(Level.INFO, "No se encontró contexto de reporte.",
-                        studentId);
-                    throw new OperationException("No se encontraron datos asociados al alumno", null);
+                    LOGGER.log(Level.INFO, "No se encontró contexto de reporte para {0}", studentId);
+                    throw new OperationException(REPORT_CONTEXT_NOT_FOUND, null);
                 }
             }
-
         } catch (SQLException e) {
-            LOGGER.log(Level.SEVERE, "Error de conexión con la base de datos", e);
-            throw new OperationException("Error al obtener los datos contextuales del reporte", e);
+            LOGGER.log(Level.SEVERE, DATABASE_CONNECTION_ERROR, e);
+            throw new OperationException(FINAL_CONTEXT_ERROR, e);
         }
-
-        return report;
+        return finalReport;
     }
 
     @Override
-    public String getTotalReportedHoursByStudentId(String studentId) throws OperationException {
-        String totalHours = "0";
-        String hoursQuery = "SELECT COALESCE(SUM(rm.horasReportadas), 0) AS total "
-            + "FROM Reporte r "
-            + "INNER JOIN ReporteMensual rm ON r.idReporte = rm.idReporte "
-            + "WHERE r.matricula = ?";
+    public PartialReport getPartialReportContextByStudentId(String studentId) throws OperationException {
+        PartialReport partialReport = new PartialReport();
+        String reportContextQuery = buildContextQuery();
 
         try (Connection databaseConnection = connectionManager.getConnection();
-            PreparedStatement preparedStatement = databaseConnection.prepareStatement(hoursQuery)) {
+                PreparedStatement preparedStatement = databaseConnection.prepareStatement(reportContextQuery)) {
+
+            preparedStatement.setString(1, studentId);
+
+            try (ResultSet resultSet = preparedStatement.executeQuery()) {
+                if (resultSet.next()) {
+                    fillPartialReportContext(partialReport, resultSet);
+                } else {
+                    LOGGER.log(Level.INFO, "No se encontró contexto de reporte parcial para {0}", studentId);
+                    throw new OperationException(REPORT_CONTEXT_NOT_FOUND, null);
+                }
+            }
+        } catch (SQLException e) {
+            LOGGER.log(Level.SEVERE, DATABASE_CONNECTION_ERROR, e);
+            throw new OperationException(PARTIAL_CONTEXT_ERROR, e);
+        }
+        return partialReport;
+    }
+
+    @Override
+    public String getTotalReportedHoursByStudentId(String studentId)
+            throws OperationException {
+        String totalHours = INITIAL_TOTAL_HOURS;
+        String reportContextQuery = "SELECT COALESCE(SUM(rm.horasReportadas), 0) AS total "
+                                  + "FROM Reporte r "
+                                  + "INNER JOIN ReporteMensual rm ON r.idReporte = rm.idReporte "
+                                  + "WHERE r.matricula = ?";
+
+        try (Connection databaseConnection = connectionManager.getConnection();
+                PreparedStatement preparedStatement = databaseConnection.prepareStatement(reportContextQuery)) {
 
             preparedStatement.setString(1, studentId);
 
@@ -108,113 +114,182 @@ public class ReportContextDAO implements IReportContextDAO {
                     totalHours = String.valueOf(resultSet.getInt("total"));
                 }
             }
-
         } catch (SQLException e) {
-            LOGGER.log(Level.SEVERE, "Error al calcular las horas totales reportadas", e);
-            throw new OperationException("Error al calcular las horas totales reportadas", e);
+            LOGGER.log(Level.SEVERE, TOTAL_HOURS_ERROR, e);
+            throw new OperationException(TOTAL_HOURS_ERROR, e);
         }
-
         return totalHours;
     }
 
-    @Override 
+    @Override
     public MonthlyReport getMonthlyReportData(String studentId) throws OperationException {
         MonthlyReport monthlyReport = new MonthlyReport();
-        String mothlyReportQuery = "SELECT * FROM v_contexto_academico WHERE matricula = ?";
+        String reportContextQuery = "SELECT * FROM v_contexto_academico WHERE matricula = ?";
 
         try (Connection databaseConnection = connectionManager.getConnection();
-            PreparedStatement preparedStatement = databaseConnection.prepareStatement(mothlyReportQuery)) {
+                PreparedStatement preparedStatement = databaseConnection.prepareStatement(reportContextQuery)) {
+
             preparedStatement.setString(1, studentId);
 
             try (ResultSet resultSet = preparedStatement.executeQuery()) {
                 if (resultSet.next()) {
-                    monthlyReport.setStudentName(resultSet.getString("nombreAlumno") + " " 
-                        + resultSet.getString("apellidosAlumno"));
-                    monthlyReport.setPeriod(resultSet.getString("periodoPrincipal"));
-                    monthlyReport.setProfessorName(resultSet.getString("nombreAcademico"));
-                    monthlyReport.setCoordinadorName(resultSet.getString("nombreCoordinador"));
-                    monthlyReport.setNrcSubject(resultSet.getString("nrc"));
-                    monthlyReport.setMonth(resultSet.getString("mes"));
-                    monthlyReport.setReportNumber(resultSet.getInt("numeroReporte"));
-                    
+                    fillMonthlyReportContext(monthlyReport, resultSet);
                 } else {
-                    throw new OperationException("No se encontró contexto para: " + studentId, null);
+                    throw new OperationException(
+                        "No se encontró contexto para: " + studentId, null);
                 }
             }
         } catch (SQLException e) {
-            throw new OperationException("Error al consultar la vista de contexto.", e);
+            LOGGER.log(Level.SEVERE, DATABASE_CONNECTION_ERROR, e);
+            throw new OperationException(MONTHLY_CONTEXT_ERROR, e);
         }
         return monthlyReport;
     }
 
     @Override
     public List<Activity> getRecordedActivities(String studentId) throws OperationException {
-        List<Activity> list = new ArrayList<>();
-        
-        String mothlyReportQuery = "SELECT a.nombreActividad, a.descripcionActividad "
-                    + "FROM Actividad a "
-                    + "JOIN Proyecto p ON a.idActividad = p.idActividad "
-                    + "JOIN Solicita_Proyecto sp ON p.idProyecto = sp.idProyecto "
-                    + "WHERE sp.matricula = ?";
+        List<Activity> recordedActivities = new ArrayList<>();
+        String reportContextQuery = "SELECT a.idActividad, a.nombreActividad, "
+                                  + "a.descripcionActividad, a.FechaInicio, a.FechaFin "
+                                  + "FROM Actividad a "
+                                  + "INNER JOIN Proyecto p ON a.idActividad = p.idActividad "
+                                  + "INNER JOIN Solicita_Proyecto sp ON p.idProyecto = sp.idProyecto "
+                                  + "WHERE sp.matricula = ?";
 
         try (Connection databaseConnection = connectionManager.getConnection();
-            PreparedStatement preparedStatement = databaseConnection.prepareStatement(mothlyReportQuery)) {
-            
+                PreparedStatement preparedStatement = databaseConnection.prepareStatement(reportContextQuery)) {
+
             preparedStatement.setString(1, studentId);
-            
+
             try (ResultSet resultSet = preparedStatement.executeQuery()) {
                 while (resultSet.next()) {
-                    Activity activity = new Activity();
-                    activity.setName(resultSet.getString("nombreActividad"));
-                    activity.setDescription(resultSet.getString("descripcionActividad"));
-                    list.add(activity);
+                    recordedActivities.add(mapActivity(resultSet));
                 }
             }
         } catch (SQLException e) {
-            throw new OperationException("Error al obtener actividades.", e);
+            LOGGER.log(Level.SEVERE, ACTIVITIES_QUERY_ERROR, e);
+            throw new OperationException(ACTIVITIES_QUERY_ERROR, e);
         }
-        return list;
+        return recordedActivities;
     }
 
     @Override
-    public boolean registerMonthlyReport(MonthlyReport monthlyReport) throws OperationException {
-        boolean isRegistered = false; 
+    public Activity getActivityByName(String studentId, String activityName)
+            throws OperationException {
+        Activity activity = null;
+        String reportContextQuery = "SELECT a.idActividad, a.nombreActividad, "
+                                  + "a.descripcionActividad, a.FechaInicio, a.FechaFin "
+                                  + "FROM Actividad a "
+                                  + "INNER JOIN Proyecto p ON a.idActividad = p.idActividad "
+                                  + "INNER JOIN Solicita_Proyecto sp ON p.idProyecto = sp.idProyecto "
+                                  + "WHERE sp.matricula = ? AND a.nombreActividad = ?";
 
-        String queryReporte = "INSERT INTO Reporte (matricula, actividad) VALUES (?, ?);";
-        String queryMensual = "INSERT INTO ReporteMensual (idReporte, mes, horasReportadas) VALUES (?, ?, ?);";
+        try (Connection databaseConnection = connectionManager.getConnection();
+                PreparedStatement preparedStatement = databaseConnection.prepareStatement(reportContextQuery)) {
 
-        try (Connection conn = connectionManager.getConnection()) {
-            conn.setAutoCommit(false); 
+            preparedStatement.setString(1, studentId);
+            preparedStatement.setString(2, activityName);
 
-            try (PreparedStatement ps1 = conn.prepareStatement(queryReporte, Statement.RETURN_GENERATED_KEYS)) {
-                ps1.setString(1, monthlyReport.getStudentId());
-                ps1.setString(2, "Reporte Mensual");
-                int rows1 = ps1.executeUpdate();
-
-                try (ResultSet generatedKeys = ps1.getGeneratedKeys()) {
-                    if (generatedKeys.next()) {
-                        int idGenerado = generatedKeys.getInt(1);
-
-                        try (PreparedStatement ps2 = conn.prepareStatement(queryMensual)) {
-                            ps2.setInt(1, idGenerado);
-                            ps2.setString(2, monthlyReport.getMonth());
-                            ps2.setInt(3, monthlyReport.getReportedHours());
-                            int rows2 = ps2.executeUpdate();
-
-                            if (rows1 > 0 && rows2 > 0) {
-                                isRegistered = true;
-                                conn.commit(); 
-                            } else {
-                                conn.rollback(); 
-                            }
-                        }
-                    }
+            try (ResultSet resultSet = preparedStatement.executeQuery()) {
+                if (resultSet.next()) {
+                    activity = mapActivity(resultSet);
                 }
             }
         } catch (SQLException e) {
-            throw new OperationException("Error al registrar el reporte mensual", e);
+            LOGGER.log(Level.SEVERE, ACTIVITY_BY_NAME_ERROR, e);
+            throw new OperationException(ACTIVITY_BY_NAME_ERROR, e);
         }
-        return isRegistered; 
+        return activity;
     }
 
+    private String buildContextQuery() {
+        String reportContextQuery = "SELECT u.nombre AS nombreAlumno, u.apellidos AS apellidosAlumno, "
+                                 + "ee.NRC AS nrc, "
+                                 + "pe.nombre AS periodo, "
+                                 + "uProf.nombre AS nombreProfesor, uProf.apellidos AS apellidosProfesor, "
+                                 + "p.nombre AS nombreProyecto, p.objetivo AS objetivoProyecto, "
+                                 + "p.metodologiaProyecto AS metodologiaProyecto, "
+                                 + "ov.nombreOV AS organizacion, "
+                                 + "rp.nombre AS nombreResponsable "
+                                 + "FROM Alumno a "
+                                 + "INNER JOIN Usuario u ON a.idUsuario = u.idUsuario "
+                                 + "INNER JOIN Alumno_Esta_EE aee ON a.matricula = aee.matricula "
+                                 + "INNER JOIN ExperienciaEducativa ee ON aee.NRC = ee.NRC "
+                                 + "INNER JOIN PeriodoEscolar pe ON ee.idPeriodoEscolar = pe.idPeriodoEscolar "
+                                 + "INNER JOIN Profesor_Imparte_Experiencia pie ON ee.NRC = pie.NRC "
+                                 + "INNER JOIN Profesor prof ON pie.numeroPersonal = prof.numeroPersonal "
+                                 + "INNER JOIN Usuario uProf ON prof.idUsuario = uProf.idUsuario "
+                                 + "INNER JOIN Solicita_Proyecto sp ON a.matricula = sp.matricula "
+                                 + "INNER JOIN Proyecto p ON sp.idProyecto = p.idProyecto "
+                                 + "INNER JOIN OrganizacionVinculada ov "
+                                 + "ON p.idOrganizacionVinculada = ov.idOrganizacionVinculada "
+                                 + "LEFT JOIN ResponsableProyecto rp "
+                                 + "ON p.idResponsableProyecto = rp.idResponsableProyecto "
+                                 + "WHERE a.matricula = ? AND sp.estatus = " + STATUS_ASSIGNED + ";";
+        return reportContextQuery;
+    }
+
+    private void fillFinalReportContext(FinalReport finalReport, ResultSet resultSet)
+            throws SQLException {
+        String studentFullName = resultSet.getString("nombreAlumno") + " " + resultSet.getString("apellidosAlumno");
+        String professorFullName = resultSet.getString("nombreProfesor") + " " 
+            + resultSet.getString("apellidosProfesor");
+
+        finalReport.setStudentName(studentFullName);
+        finalReport.setProfessorName(professorFullName);
+        finalReport.setNrcSubject(resultSet.getString("nrc"));
+        finalReport.setSchoolPeriod(resultSet.getString("periodo"));
+        finalReport.setProjectName(resultSet.getString("nombreProyecto"));
+        finalReport.setProjectObjective(resultSet.getString("objetivoProyecto"));
+        finalReport.setProjectMethodology(resultSet.getString("metodologiaProyecto"));
+        finalReport.setAffiliatedOrganization(resultSet.getString("organizacion"));
+    }
+
+    private void fillPartialReportContext(PartialReport partialReport, ResultSet resultSet)
+            throws SQLException {
+        String studentFullName = resultSet.getString("nombreAlumno") + " " + resultSet.getString("apellidosAlumno");
+        String professorFullName = resultSet.getString("nombreProfesor") + " "  
+            + resultSet.getString("apellidosProfesor");
+
+        partialReport.setStudentName(studentFullName);
+        partialReport.setProfessorName(professorFullName);
+        partialReport.setNrcSubject(resultSet.getString("nrc"));
+        partialReport.setSchoolPeriod(resultSet.getString("periodo"));
+        partialReport.setProjectName(resultSet.getString("nombreProyecto"));
+        partialReport.setProjectObjective(resultSet.getString("objetivoProyecto"));
+        partialReport.setProjectMethodology(resultSet.getString("metodologiaProyecto"));
+        partialReport.setAffiliatedOrganization(resultSet.getString("organizacion"));
+        partialReport.setProjectSupervisor(resultSet.getString("nombreResponsable"));
+    }
+
+    private void fillMonthlyReportContext(MonthlyReport monthlyReport, ResultSet resultSet)
+            throws SQLException {
+        String studentFullName = resultSet.getString("nombreAlumno") + " "
+            + resultSet.getString("apellidosAlumno");
+        monthlyReport.setStudentName(studentFullName);
+        monthlyReport.setPeriod(resultSet.getString("periodoPrincipal"));
+        monthlyReport.setProfessorName(resultSet.getString("nombreAcademico"));
+        monthlyReport.setCoordinatorName(resultSet.getString("nombreCoordinador"));
+        monthlyReport.setNrcSubject(resultSet.getString("nrc"));
+        monthlyReport.setMonth(resultSet.getString("mes"));
+        monthlyReport.setReportNumber(resultSet.getInt("numeroReporte"));
+    }
+
+    private Activity mapActivity(ResultSet resultSet) throws SQLException {
+        Activity activity = new Activity();
+        activity.setId(resultSet.getInt("idActividad"));
+        activity.setName(resultSet.getString("nombreActividad"));
+        activity.setDescription(resultSet.getString("descripcionActividad"));
+
+        Date startDate = resultSet.getDate("FechaInicio");
+        Date endDate = resultSet.getDate("FechaFin");
+
+        if (startDate != null) {
+            activity.setStartDate(startDate.toLocalDate());
+        }
+        if (endDate != null) {
+            activity.setEndDate(endDate.toLocalDate());
+        }
+        return activity;
+    }
 }

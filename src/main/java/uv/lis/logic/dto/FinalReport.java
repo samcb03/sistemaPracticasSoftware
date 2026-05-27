@@ -3,55 +3,129 @@ package uv.lis.logic.dto;
 import java.util.Objects;
 
 public class FinalReport extends Report {
-    private int advancePercentage;
-    private String result;
+
+    private String projectName;
+    private String projectMethodology;
+    private String projectObjective;
+    private String affiliatedOrganization;
+    private String totalHours;
+    private String dateReport;
+    private ActivityProgress firstActivity;
+    private ActivityProgress secondActivity;
+    private DeliverableResult firstDeliverable;
+    private DeliverableResult secondDeliverable;
+    private String generalObservations;
 
     public FinalReport() {
+        this.firstActivity = new ActivityProgress();
+        this.secondActivity = new ActivityProgress();
+        this.firstDeliverable = new DeliverableResult();
+        this.secondDeliverable = new DeliverableResult();
     }
 
-    public FinalReport(int advancePercentage, String result) {
-        this.advancePercentage = advancePercentage;
-        this.result = result;
+    public String getProjectName() {
+        return projectName;
     }
 
-    public FinalReport(String observations, String dueDate, int id, String studentId, int advancePercentage, 
-        String result, String description, String activity) {
-        super(id, description, observations, activity, studentId); 
-        this.advancePercentage = advancePercentage;
-        this.result = result;
+    public void setProjectName(String projectName) {
+        this.projectName = projectName;
     }
 
-    public int getAdvancePercentage() {
-        return advancePercentage;
+    public String getProjectMethodology() {
+        return projectMethodology;
     }
 
-    public void setAdvancePercentage(int advancePercentage) {
-        this.advancePercentage = advancePercentage;
+    public void setProjectMethodology(String projectMethodology) {
+        this.projectMethodology = projectMethodology;
     }
 
-    public String getResult() {
-        return result;
+    public String getProjectObjective() {
+        return projectObjective;
     }
 
-    public void setResult(String result) {
-        this.result = result;
+    public void setProjectObjective(String projectObjective) {
+        this.projectObjective = projectObjective;
+    }
+
+    public String getAffiliatedOrganization() {
+        return affiliatedOrganization;
+    }
+
+    public void setAffiliatedOrganization(String affiliatedOrganization) {
+        this.affiliatedOrganization = affiliatedOrganization;
+    }
+
+    public String getTotalHours() {
+        return totalHours;
+    }
+
+    public void setTotalHours(String totalHours) {
+        this.totalHours = totalHours;
+    }
+
+    public String getDateReport() {
+        return dateReport;
+    }
+
+    public void setDateReport(String dateReport) {
+        this.dateReport = dateReport;
+    }
+
+    public ActivityProgress getFirstActivity() {
+        return firstActivity;
+    }
+
+    public void setFirstActivity(ActivityProgress firstActivity) {
+        this.firstActivity = firstActivity;
+    }
+
+    public ActivityProgress getSecondActivity() {
+        return secondActivity;
+    }
+
+    public void setSecondActivity(ActivityProgress secondActivity) {
+        this.secondActivity = secondActivity;
+    }
+
+    public DeliverableResult getFirstDeliverable() {
+        return firstDeliverable;
+    }
+
+    public void setFirstDeliverable(DeliverableResult firstDeliverable) {
+        this.firstDeliverable = firstDeliverable;
+    }
+
+    public DeliverableResult getSecondDeliverable() {
+        return secondDeliverable;
+    }
+
+    public void setSecondDeliverable(DeliverableResult secondDeliverable) {
+        this.secondDeliverable = secondDeliverable;
+    }
+
+    public String getGeneralObservations() {
+        return generalObservations;
+    }
+
+    public void setGeneralObservations(String generalObservations) {
+        this.generalObservations = generalObservations;
     }
 
     @Override
     public boolean equals(Object object) {
+        boolean isEqual = false;
+
         if (this == object) {
-            return true;
+            isEqual = true;
+        } else if (object != null && getClass() == object.getClass() && super.equals(object)) {
+            FinalReport other = (FinalReport) object;
+            isEqual = Objects.equals(projectName, other.projectName)
+                && Objects.equals(firstActivity, other.firstActivity)
+                && Objects.equals(secondActivity, other.secondActivity)
+                && Objects.equals(firstDeliverable, other.firstDeliverable)
+                && Objects.equals(secondDeliverable, other.secondDeliverable)
+                && Objects.equals(generalObservations, other.generalObservations);
         }
-
-        if (object == null || getClass() != object.getClass()) {
-            return false;
-        }
-
-        if (!super.equals(object)) 
-            return false;
-
-        FinalReport other = (FinalReport) object;
-        return advancePercentage == other.advancePercentage 
-        && Objects.equals(result, other.result);
+        return isEqual;
     }
 }
