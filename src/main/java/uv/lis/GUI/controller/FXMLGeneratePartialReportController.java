@@ -34,8 +34,7 @@ import uv.lis.logic.utils.SessionManager;
 
 public class FXMLGeneratePartialReportController extends ValidationHandler {
 
-    private static final Logger LOGGER
-        = Logger.getLogger(FXMLGeneratePartialReportController.class.getName());
+    private static final Logger LOGGER = Logger.getLogger(FXMLGeneratePartialReportController.class.getName());
 
     private static final String REPORT_GENERATED_MESSAGE = "Reporte generado correctamente.";
     private static final String REPORT_GENERATION_ERROR = "Error al generar el reporte";
@@ -143,8 +142,7 @@ public class FXMLGeneratePartialReportController extends ValidationHandler {
 
     private Optional<String> validateFirstActivityRow() {
         Stream<Optional<String>> validationStream = Stream.of(
-            InputValidator.validateComboBox(
-                comboBoxActivity1.getValue(), "una actividad"),
+            InputValidator.validateComboBox(comboBoxActivity1.getValue(), "una actividad"),
             InputValidator.validatePositiveInteger(
                 textFieldAdvance1.getText(), "Porcentaje de Avance de Actividad 1")
         );
@@ -166,12 +164,10 @@ public class FXMLGeneratePartialReportController extends ValidationHandler {
             displayReport(jasperPrint);
             clearFields();
         } catch (OperationException operationException) {
-            LOGGER.log(Level.SEVERE,
-                "Error de operación al generar el reporte", operationException);
+            LOGGER.log(Level.SEVERE, "Error de operación al generar el reporte", operationException);
             showError(operationException.getMessage());
         } catch (JRException jasperException) {
-            LOGGER.log(Level.SEVERE,
-                "Error de JasperReports al generar el reporte", jasperException);
+            LOGGER.log(Level.SEVERE, "Error de JasperReports al generar el reporte", jasperException);
             showError(REPORT_GENERATION_ERROR);
         }
     }
@@ -182,9 +178,6 @@ public class FXMLGeneratePartialReportController extends ValidationHandler {
         viewer.setVisible(true);
     }
 
-    /* The context fields (student, professor, NRC, project, supervisor, planned
-       advance) are completed by PartialReportCommon through ReportContextDAO and
-       the active session, just like the final report flow. */
     private PartialReport buildPartialReport() {
         PartialReport partialReport = new PartialReport();
 
@@ -203,8 +196,7 @@ public class FXMLGeneratePartialReportController extends ValidationHandler {
 
         for (int activityIndex = 0; activityIndex < comboBoxActivities.length; activityIndex++) {
             activityNames[activityIndex] = readActivityName(activityIndex);
-            realAdvances[FIRST_WEEK_SLOT][activityIndex]
-                = parseAdvance(textFieldAdvances[activityIndex].getText());
+            realAdvances[FIRST_WEEK_SLOT][activityIndex] = parseAdvance(textFieldAdvances[activityIndex].getText());
         }
 
         partialReport.setRealAdvanceWeek(realAdvances[FIRST_WEEK_SLOT][0]);

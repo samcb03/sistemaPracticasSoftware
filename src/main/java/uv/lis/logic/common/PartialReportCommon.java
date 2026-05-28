@@ -153,8 +153,7 @@ public class PartialReportCommon {
         }
     }
 
-    private void addAdvanceMatrixParameters(Map<String, Object> parameters,
-            PartialReport report) {
+    private void addAdvanceMatrixParameters(Map<String, Object> parameters, PartialReport report) {
         int[][] plannedAdvances = report.getPlannedAdvances();
         int[][] realAdvances = report.getRealAdvances();
 
@@ -164,9 +163,8 @@ public class PartialReportCommon {
             putRealRow(parameters, weekNumber, realAdvances[weekIndex]);
         }
     }
-
-    private void putPlannedRow(Map<String, Object> parameters,
-            int weekNumber, int[] plannedRow) {
+    //FIXME verificar numeros magicos
+    private void putPlannedRow(Map<String, Object> parameters, int weekNumber, int[] plannedRow) {
         for (int activityIndex = 0; activityIndex < PartialReport.MAX_ACTIVITIES; activityIndex++) {
             int activityNumber = activityIndex + FIRST_ACTIVITY_INDEX;
             String parameterKey = buildCellKey(
@@ -175,8 +173,7 @@ public class PartialReportCommon {
         }
     }
 
-    private void putRealRow(Map<String, Object> parameters,
-            int weekNumber, int[] realRow) {
+    private void putRealRow(Map<String, Object> parameters, int weekNumber, int[] realRow) {
         for (int activityIndex = 0; activityIndex < PartialReport.MAX_ACTIVITIES; activityIndex++) {
             int activityNumber = activityIndex + FIRST_ACTIVITY_INDEX;
             String parameterKey = buildCellKey(

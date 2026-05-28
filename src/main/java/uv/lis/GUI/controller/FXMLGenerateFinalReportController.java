@@ -29,9 +29,6 @@ public class FXMLGenerateFinalReportController extends ValidationHandler {
 
     private static final Logger LOGGER = Logger.getLogger(FXMLGenerateFinalReportController.class.getName());
 
-    private static final String PARTIAL_REPORT = "Reporte Parcial";
-    private static final String FINAL_REPORT = "Reporte Final";
-
     private static final String REPORT_GENERATED_MESSAGE = "Reporte generado correctamente.";
     private static final String REPORT_GENERATION_ERROR = "Error al generar el reporte";
 

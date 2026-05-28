@@ -19,6 +19,7 @@ import uv.lis.logic.exceptions.OperationException;
 public class ProjectSupervisorDAO implements IProjectSupervisorDAO {
     private static final Logger LOGGER = Logger.getLogger(ProjectSupervisorDAO.class.getName());
     private MySQLConnectionManager connectionManager;
+    private static final int INACTIVE_STATUS = 0;
 
     public ProjectSupervisorDAO() {
         this.connectionManager = new MySQLConnectionManager();
@@ -93,8 +94,8 @@ public class ProjectSupervisorDAO implements IProjectSupervisorDAO {
             try (ResultSet resultSet = preparedStatement.executeQuery()) {
                 while (resultSet.next()) {
                     String entry = "ID: " + resultSet.getInt("idProyecto")
-                                + " — " + resultSet.getString("nombre")
-                                + " (" + resultSet.getString("descripcion") + ")";
+                                 + " — " + resultSet.getString("nombre")
+                                 + " (" + resultSet.getString("descripcion") + ")";
                     projectList.add(entry);
                 }
             }
@@ -246,7 +247,8 @@ public class ProjectSupervisorDAO implements IProjectSupervisorDAO {
     @Override
     public ArrayList<String> getSupervisorsByOrganizationId(int organizationId) throws OperationException {
         ArrayList<String> supervisorNames = new ArrayList<>();
-        String supervisorQuery = "SELECT nombre FROM ResponsableProyecto WHERE idOrganizacionVinculada = ? AND estado = 1;";
+        String supervisorQuery = "SELECT nombre FROM ResponsableProyecto WHERE idOrganizacionVinculada = ? " 
+            + "AND estado = 1;";
 
         try (Connection databaseConnection = connectionManager.getConnection();
              PreparedStatement preparedStatement = databaseConnection.prepareStatement(supervisorQuery)) {
@@ -268,7 +270,8 @@ public class ProjectSupervisorDAO implements IProjectSupervisorDAO {
 
     public boolean assignSupervisorToOrganization(int supervisorId, int organizationId) throws OperationException {
         boolean isAssigned = false;
-        String query = "INSERT INTO Organizacion_Tiene_Responsable (idOrganizacionVinculada, idResponsableProyecto) VALUES (?, ?)";
+        String query = "INSERT INTO Organizacion_Tiene_Responsable (idOrganizacionVinculada, idResponsableProyecto)" 
+            + "VALUES (?, ?)";
 
         try (Connection databaseConnection = connectionManager.getConnection();
              PreparedStatement preparedStatement = databaseConnection.prepareStatement(query)) {
@@ -281,7 +284,8 @@ public class ProjectSupervisorDAO implements IProjectSupervisorDAO {
                 LOGGER.log(Level.INFO, "Responsable vinculado a la organización exitosamente");
             } else {
                 LOGGER.log(Level.WARNING, "No se pudo vincular el responsable a la organización");
-                throw new OperationException("No se pudo vincular el responsable a la organización", null);
+                throw new OperationException("No se pudo vincular el responsable a la organización", 
+                    null);
             }
 
         } catch (SQLException e) {
@@ -304,7 +308,7 @@ public class ProjectSupervisorDAO implements IProjectSupervisorDAO {
 
             try (ResultSet resultSet = preparedStatement.executeQuery()) {
                 if (resultSet.next()) {
-                    isInactive = resultSet.getInt("estado") == 0;
+                    isInactive = resultSet.getInt("estado") == INACTIVE_STATUS;
                 } else {
                     throw new OperationException("No se encontró al profesor con número: "
                         + supervisorName, null);
@@ -349,7 +353,8 @@ public class ProjectSupervisorDAO implements IProjectSupervisorDAO {
     Optional<ProjectSupervisor> validateSupervisor = Optional.empty();
     String supervisorQuery = "SELECT rp.idResponsableProyecto, rp.nombre, rp.cargo, rp.correo, ov.nombreOV "
                            + "FROM ResponsableProyecto rp "
-                           + "LEFT JOIN OrganizacionVinculada ov ON rp.idOrganizacionVinculada = ov.idOrganizacionVinculada "
+                           + "LEFT JOIN OrganizacionVinculada ov ON rp.idOrganizacionVinculada = " 
+                           + "ov.idOrganizacionVinculada "
                            + "WHERE rp.nombre = ?";
 
     try (Connection databaseConnection = connectionManager.getConnection();
