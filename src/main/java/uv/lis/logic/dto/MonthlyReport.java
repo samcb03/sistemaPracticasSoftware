@@ -7,7 +7,9 @@ import java.util.Objects;
 public class MonthlyReport extends Report {
 
     private int idReport;
+    private int idProject;
     private String month;
+    private int year;
     private String coordinatorName;
     private int accumulatedHours;
     private int reportedHours;
@@ -39,6 +41,14 @@ public class MonthlyReport extends Report {
 
     public void setMonth(String month) {
         this.month = month;
+    }
+
+    public int getYear() {
+        return year;
+    }
+
+    public void setYear(int year) {
+        this.year = year;
     }
 
     public String getCoordinatorName() {
@@ -95,6 +105,15 @@ public class MonthlyReport extends Report {
 
     public void setBlock(String block) {
         this.block = block;
+    }
+
+
+    public int getIdProject() {
+        return idProject;
+    }
+
+    public void setIdProject(int idProject) {
+        this.idProject = idProject;
     }
 
     public void addActivityEntry(String entryPeriod, String activity, String observation) {
