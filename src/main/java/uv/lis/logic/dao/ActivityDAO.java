@@ -202,9 +202,12 @@ public class ActivityDAO implements IActivityDAO {
         String activityDescription = resultSet.getString("descripcionActividad");
         LocalDate startDate = resultSet.getObject("FechaInicio", LocalDate.class);
         LocalDate endDate = resultSet.getObject("FechaFin", LocalDate.class);
+        int hours = resultSet.getInt("horasReportadas");
         int idProject = resultSet.getInt("idProyecto");
- 
-        return new Activity(idActivity, activityName, activityDescription,
-            startDate, endDate, idProject);
+        Activity activity = new Activity(idActivity, activityName, activityDescription,
+                    startDate, endDate, idProject);
+        activity.setHoursReported(hours);
+            
+        return activity;
     }
 }

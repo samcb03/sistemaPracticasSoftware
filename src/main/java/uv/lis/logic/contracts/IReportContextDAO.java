@@ -18,7 +18,13 @@ public interface IReportContextDAO {
 
     MonthlyReport getMonthlyReportData(String studentId) throws OperationException;
 
+    Activity getActivityByName(String studentId, String activityName) throws OperationException;
+
     List<Activity> getRecordedActivities(String studentId) throws OperationException;
 
-    Activity getActivityByName(String studentId, String activityName) throws OperationException;
+    List<Activity> getRecordedActivitiesByMonth(int idProyecto, int mes, int anio) throws OperationException;
+
+    int getSumOfReportedHours(int reportId) throws OperationException;
+
+    boolean hasReportAlreadyBeenGenerated(String studentId, String month) throws OperationException;
 }

@@ -48,6 +48,19 @@ public class FXMLGenerateMonthlyReportController extends ValidationHandler {
     private static final int HOURS_PER_ACTIVITY_ENTRY = 1;
     private static final int INITIAL_REPORTED_HOURS = 0;
     private static final int ROW_NUMBER_OFFSET = 1;
+    private static final int MONTH_JANUARY = 1;
+    private static final int MONTH_FEBRUARY = 2;
+    private static final int MONTH_MARCH = 3;
+    private static final int MONTH_APRIL = 4;
+    private static final int MONTH_MAY = 5;
+    private static final int MONTH_JUNE = 6;
+    private static final int MONTH_JULY = 7;
+    private static final int MONTH_AUGUST = 8;
+    private static final int MONTH_SEPTEMBER = 9;
+    private static final int MONTH_OCTOBER = 10;
+    private static final int MONTH_NOVEMBER = 11;
+    private static final int MONTH_DECEMBER = 12;
+    private static final int MONTH_UNKNOWN = 0;
 
     @FXML private Label labelStudentName;
     @FXML private Label labelCoordinatorName;
@@ -86,6 +99,7 @@ public class FXMLGenerateMonthlyReportController extends ValidationHandler {
     private Student currentStudent;
     private ReportContextDAO reportContextDAO;
     private AdvanceDAO advanceDAO;
+    private String schoolPeriod;
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
@@ -98,6 +112,26 @@ public class FXMLGenerateMonthlyReportController extends ValidationHandler {
         initializeFieldArrays();
         loadStudentData();
         loadRegisteredActivities();
+    }
+
+    @FXML
+    public void validateMonthlyReport() {
+        String studentId = currentStudent.getIdStudent();
+        String currentMonth = labelMonth.getText();
+
+        boolean duplicated = false;
+            try {
+                duplicated = reportContextDAO.hasReportAlreadyBeenGenerated(studentId, currentMonth);
+            } catch (OperationException e) {
+                showError("Error al verificar reporte mensual: " + e.getMessage());
+            }
+
+            if (duplicated) {
+                showError("Ya se ha generado un reporte para el mes de " + currentMonth);
+            } else {
+                Optional<String> validationError = validateFields();
+                handleValidation(validationError, this::generateMonthlyReport);
+        }
     }
 
     private void initializeFieldArrays() {
@@ -113,7 +147,29 @@ public class FXMLGenerateMonthlyReportController extends ValidationHandler {
         };
     }
 
-    private void loadStudentData() {
+    private Optional<String> validateFields() {
+        Optional<String> validationResult = Optional.empty();
+
+        for (int i = 0; i < MAX_ACTIVITY_INPUTS && validationResult.isEmpty(); i++) {
+            validationResult = validateActivityRow(i);
+        }
+        return validationResult;
+    }
+
+    private Optional<String> validateActivityRow(int index) {
+        int rowNumber = index + ROW_NUMBER_OFFSET;
+        String activityText = activityFields[index].getText().trim();
+        String observationText = observationFields[index].getText().trim();
+
+        Optional<String> activityValidation = InputValidator.validateText(
+            activityText, ACTIVITY_FIELD_LABEL + rowNumber);
+        Optional<String> observationValidation = InputValidator.validateText(
+            observationText, OBSERVATION_FIELD_LABEL + rowNumber);
+
+        return activityValidation.or(() -> observationValidation);
+    }
+
+        private void loadStudentData() {
         if (currentStudent == null) {
             showError(NO_STUDENT_IN_SESSION_MESSAGE);
         } else {
@@ -137,24 +193,6 @@ public class FXMLGenerateMonthlyReportController extends ValidationHandler {
         }
     }
 
-        private int convertMonthNameToNumber(String monthName) {
-        switch (monthName.toLowerCase()) {
-            case "enero": return 1;
-            case "febrero": return 2;
-            case "marzo": return 3;
-            case "abril": return 4;
-            case "mayo": return 5;
-            case "junio": return 6;
-            case "julio": return 7;
-            case "agosto": return 8;
-            case "septiembre": return 9;
-            case "octubre": return 10;
-            case "noviembre": return 11;
-            case "diciembre": return 12;
-            default: return 0;
-        }
-    }
-
     private void loadRegisteredActivities() {
         try {
             MonthlyReport context = reportContextDAO.getMonthlyReportData(currentStudent.getIdStudent());
@@ -171,9 +209,12 @@ public class FXMLGenerateMonthlyReportController extends ValidationHandler {
             for (int i = 0; i < registered.size() && i < activityFields.length; i++) {
                 activityFields[i].setText(registered.get(i).getName());
                 observationFields[i].setText(registered.get(i).getDescription());
-                totalHours += registered.get(i).getHoursReported();
+
+                int hours = registered.get(i).getHoursReported();
+                totalHours += (hours > 0) ? hours : HOURS_PER_ACTIVITY_ENTRY;
             }
             labelReportedHours.setText(String.valueOf(totalHours));
+            buttonRegisterActivity.setDisable(registered.size() >= MAX_ACTIVITY_INPUTS);
 
         } catch (OperationException e) {
             LOGGER.log(Level.SEVERE, "Error al cargar actividades", e);
@@ -189,48 +230,7 @@ public class FXMLGenerateMonthlyReportController extends ValidationHandler {
         labelSection.setText(context.getSection());
         labelSubject.setText(context.getNrcSubject());
         labelNumberReport.setText(String.valueOf(context.getReportNumber()));
-    }
-
-    @FXML
-    public void validateMonthlyReport() {
-        String studentId = currentStudent.getIdStudent();
-        String currentMonth = labelMonth.getText();
-
-        boolean duplicated = false;
-            try {
-                duplicated = reportContextDAO.hasReportAlreadyBeenGenerated(studentId, currentMonth);
-            } catch (OperationException e) {
-                showError("Error al verificar reporte mensual: " + e.getMessage());
-            }
-
-            if (duplicated) {
-                showError("Ya se ha generado un reporte para el mes de " + currentMonth);
-            } else {
-                Optional<String> validationError = validateFields();
-                handleValidation(validationError, this::generateMonthlyReport);
-        }
-    }
-
-    private Optional<String> validateFields() {
-        Optional<String> validationResult = Optional.empty();
-
-        for (int i = 0; i < MAX_ACTIVITY_INPUTS && validationResult.isEmpty(); i++) {
-            validationResult = validateActivityRow(i);
-        }
-        return validationResult;
-    }
-
-    private Optional<String> validateActivityRow(int index) {
-        int rowNumber = index + ROW_NUMBER_OFFSET;
-        String activityText = activityFields[index].getText().trim();
-        String observationText = observationFields[index].getText().trim();
-
-        Optional<String> activityValidation = InputValidator.validateText(
-            activityText, ACTIVITY_FIELD_LABEL + rowNumber);
-        Optional<String> observationValidation = InputValidator.validateText(
-            observationText, OBSERVATION_FIELD_LABEL + rowNumber);
-
-        return activityValidation.or(() -> observationValidation);
+        schoolPeriod = context.getPeriod();
     }
 
     private void generateMonthlyReport() {
@@ -266,13 +266,47 @@ public class FXMLGenerateMonthlyReportController extends ValidationHandler {
         for (int index = 0; index < MAX_ACTIVITY_INPUTS; index++) {
             String activityText = activityFields[index].getText().trim();
             String observationText = observationFields[index].getText().trim();
-            String weekPeriod = "Semana " + (index + ROW_NUMBER_OFFSET);
-            report.addActivityEntry(weekPeriod, activityText, observationText);
-
+            report.addActivityEntry(schoolPeriod, activityText, observationText);
         }
 
-        report.setReportedHours(Integer.parseInt(labelReportedHours.getText()));
+        String horasText = labelReportedHours.getText();
+        if (!horasText.isEmpty()) {
+            totalReportedHours = Integer.parseInt(horasText);
+        }
+        report.setReportedHours(totalReportedHours);
         return report;
+    }
+
+    
+    private int convertMonthNameToNumber(String monthName) {
+        switch (monthName.toLowerCase()) {
+            case "enero": 
+            return MONTH_JANUARY;
+            case "febrero": 
+            return MONTH_FEBRUARY;
+            case "marzo": 
+            return MONTH_MARCH;
+            case "abril": 
+            return MONTH_APRIL;
+            case "mayo": 
+            return MONTH_MAY;
+            case "junio": 
+            return MONTH_JUNE;
+            case "julio": 
+            return MONTH_JULY;
+            case "agosto": 
+            return MONTH_AUGUST;
+            case "septiembre": 
+            return MONTH_SEPTEMBER;
+            case "octubre": 
+            return MONTH_OCTOBER;
+            case "noviembre": 
+            return MONTH_NOVEMBER;
+            case "diciembre": 
+            return MONTH_DECEMBER;
+            default: 
+            return MONTH_UNKNOWN;
+        }
     }
 
     @FXML
