@@ -33,10 +33,10 @@ public class SubjectDAO implements ISubjectDAO {
         boolean isRegistered = false;
 
         String subjectQuery = "INSERT INTO ExperienciaEducativa (NRC, nombreExperiencia, carrera, idPeriodoEscolar) "
-                              + "VALUES (?, ?, ?, ?);";
+                            + "VALUES (?, ?, ?, ?);";
 
         String professorSubjectQuery = "INSERT INTO Profesor_Imparte_Experiencia (NRC, numeroPersonal) "
-                                       + "VALUES (?, ?);";
+                                    + "VALUES (?, ?);";
 
         try (Connection databaseConnection = connectionManager.getConnection()) {
 
@@ -127,8 +127,8 @@ public class SubjectDAO implements ISubjectDAO {
     public String getSubjectNRCByStudentID(String studentID) throws OperationException {
         String subjectNRC = "No tiene asignada una experiencia";
         String subjectQuery = "SELECT ee.NRC FROM ExperienciaEducativa ee "
-            + "JOIN alumno_esta_ee aee ON ee.NRC = aee.NRC "
-            + "WHERE aee.matricula = ?;";
+                            + "JOIN alumno_esta_ee aee ON ee.NRC = aee.NRC "
+                            + "WHERE aee.matricula = ?;";
 
         try (Connection databaseConnection = connectionManager.getConnection();
             PreparedStatement preparedStatement = databaseConnection.prepareStatement(subjectQuery)) {
@@ -149,7 +149,7 @@ public class SubjectDAO implements ISubjectDAO {
     @Override
     public void unassignProfessorFromSubject(String personnelNumber) throws OperationException {
         String subjectQuery = "DELETE FROM Profesor_Imparte_Experiencia"
-            + " WHERE numeroPersonal = ?";
+                            + " WHERE numeroPersonal = ?";
 
 
         try (Connection databaseConnection = connectionManager.getConnection();
