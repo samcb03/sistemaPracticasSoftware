@@ -1,4 +1,4 @@
-package src.test.java;
+package daotest.test.java.testdao;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -7,16 +7,21 @@ import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.when;
+import static org.junit.jupiter.params.provider.Arguments.arguments;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Optional;
+import java.util.stream.Stream;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.Mock;
 import org.mockito.MockedStatic;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -36,6 +41,9 @@ class UserDAOTest {
     private static final String VALID_EMAIL = "gom03@gmail.com";
     private static final String VALID_PASSWORD = "Gom_Ram002";
     private static final String HASHED_PASSWORD = "hashedPassword";
+    private static final int PROFESSOR_ROLE_ID = 2;
+    private static final int COORDINATOR_ROLE_ID = 3;
+    private static final int ADMIN_ROLE_ID = 4;
 
     @Mock private MySQLConnectionManager connectionManager;
     @Mock private Connection databaseConnection;
@@ -114,15 +122,23 @@ class UserDAOTest {
         }
     }
 
-    //FIXME usar conjunto de datos cargados para probar autenticaciones de todo los tipos de usuario
-    @Test
-    void authenticate_validCredentials_returnsUser() throws Exception {
+    private static Stream<Arguments> provideUsersByRole() {
+        return Stream.of(
+            arguments(1, DEFAULT_ROLE_ID),
+            arguments(2, PROFESSOR_ROLE_ID),
+            arguments(3, COORDINATOR_ROLE_ID),
+            arguments(4, ADMIN_ROLE_ID));
+    }
+
+    @ParameterizedTest
+    @MethodSource("provideUsersByRole")
+    void authenticate_validCredentialsByRole_returnsUser(int userId, int roleId) throws Exception {
         when(databaseConnection.prepareStatement(anyString())).thenReturn(preparedStatement);
         when(preparedStatement.executeQuery()).thenReturn(resultSet);
         when(resultSet.next()).thenReturn(true);
         when(resultSet.getString("contraseña")).thenReturn(HASHED_PASSWORD);
-        when(resultSet.getInt("idUsuario")).thenReturn(1);
-        when(resultSet.getInt("idRol")).thenReturn(DEFAULT_ROLE_ID);
+        when(resultSet.getInt("idUsuario")).thenReturn(userId);
+        when(resultSet.getInt("idRol")).thenReturn(roleId);
 
         try (MockedStatic<PasswordHasher> mockedHasher = mockStatic(PasswordHasher.class)) {
             mockedHasher.when(() -> PasswordHasher.verifyPassword(VALID_PASSWORD, HASHED_PASSWORD))

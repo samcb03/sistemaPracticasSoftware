@@ -140,7 +140,7 @@ public class PartialReportCommon {
         parameters.put("result", report.getResult());
         parameters.put("observations", report.getObservations());
     }
-    //FIXME verificar operacion tenearias
+
     private void addActivityNameParameters(Map<String, Object> parameters,
             String[] activityNames) {
         for (int activityIndex = 0; activityIndex < PartialReport.MAX_ACTIVITIES; activityIndex++) {
@@ -163,7 +163,7 @@ public class PartialReportCommon {
             putRealRow(parameters, weekNumber, realAdvances[weekIndex]);
         }
     }
-    //FIXME verificar numeros magicos
+
     private void putPlannedRow(Map<String, Object> parameters, int weekNumber, int[] plannedRow) {
         for (int activityIndex = 0; activityIndex < PartialReport.MAX_ACTIVITIES; activityIndex++) {
             int activityNumber = activityIndex + FIRST_ACTIVITY_INDEX;

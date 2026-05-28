@@ -1,4 +1,4 @@
-package src.test.java;
+package daotest.test.java.testdao;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
