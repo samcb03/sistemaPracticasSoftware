@@ -214,8 +214,8 @@ public class FXMLGenerateMonthlyReportController extends ValidationHandler {
     private Optional<String> validateFields() {
         Optional<String> validationResult = Optional.empty();
 
-        for (int i = 0; i < MAX_ACTIVITY_INPUTS && validationResult.isEmpty(); i++) {
-            validationResult = validateActivityRow(i);
+        for (int index = 0; index < MAX_ACTIVITY_INPUTS && validationResult.isEmpty(); index++) {
+            validationResult = validateActivityRow(index);
         }
         return validationResult;
     }
