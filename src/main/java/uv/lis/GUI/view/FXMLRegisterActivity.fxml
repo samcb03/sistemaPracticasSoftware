@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.scene.control.Button?>
+<?import javafx.scene.control.DatePicker?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.AnchorPane?>
@@ -32,43 +33,50 @@
             </Label>
             <Label fx:id="labelProject" layoutX="160.0" layoutY="40.0" prefHeight="25.0" prefWidth="250.0" style="-fx-background-color: #e6e6e6; -fx-background-radius: 3; -fx-border-color: #cccccc; -fx-border-radius: 3; -fx-padding: 0 0 0 5;" />
 
-            <Label fx:id="labelActivityName" layoutX="29.0" layoutY="94.0" text="Nombre:">
+            <Label fx:id="labelActivityName" layoutX="29.0" layoutY="84.0" text="Nombre:">
                <font>
                   <Font size="13.0" />
                </font>
             </Label>
-            <TextField fx:id="textFieldActivity" layoutX="160.0" layoutY="90.0" prefHeight="25.0" prefWidth="250.0" />
+            <TextField fx:id="textFieldActivity" layoutX="160.0" layoutY="80.0" prefHeight="25.0" prefWidth="250.0" />
 
-            <Label fx:id="labelDescription" layoutX="29.0" layoutY="144.0" text="Descripción:">
+            <Label fx:id="labelDescription" layoutX="29.0" layoutY="124.0" text="Descripción:">
                <font>
                   <Font size="13.0" />
                </font>
             </Label>
-            <TextField fx:id="textFieldDescription" layoutX="160.0" layoutY="140.0" prefHeight="25.0" prefWidth="250.0" />
+            <TextField fx:id="textFieldDescription" layoutX="160.0" layoutY="120.0" prefHeight="25.0" prefWidth="250.0" />
 
-            <Label fx:id="labelStartDate" layoutX="29.0" layoutY="194.0" text="Fecha Inicio:">
+            <Label fx:id="labelStartDate" layoutX="29.0" layoutY="164.0" text="Fecha Inicio:">
                <font>
                   <Font size="13.0" />
                </font>
             </Label>
-            <TextField fx:id="textFieldStarDate" layoutX="160.0" layoutY="190.0" prefHeight="25.0" prefWidth="250.0" promptText="dd/mm/yyyy" />
+            <DatePicker fx:id="datePickerStartDate" layoutX="160.0" layoutY="160.0" prefHeight="25.0" prefWidth="250.0" promptText="Seleccione fecha" />
 
-            <Label fx:id="labelFinalDate" layoutX="29.0" layoutY="244.0" text="Fecha Final:">
+            <Label fx:id="labelFinalDate" layoutX="29.0" layoutY="204.0" text="Fecha Final:">
                <font>
                   <Font size="13.0" />
                </font>
             </Label>
-            <TextField fx:id="textFieldFinalDate" layoutX="160.0" layoutY="240.0" prefHeight="25.0" prefWidth="250.0" promptText="dd/mm/yyyy" />
+            <DatePicker fx:id="datePickerFinalDate" layoutX="160.0" layoutY="200.0" prefHeight="25.0" prefWidth="250.0" promptText="Seleccione fecha" />
 
-            <Label fx:id="labelError" layoutX="30.0" layoutY="310.0" prefWidth="390.0" style="-fx-text-fill: red;">
+            <Label fx:id="labelHours" layoutX="29.0" layoutY="244.0" text="Horas:">
+               <font>
+                  <Font size="13.0" />
+               </font>
+            </Label>
+            <TextField fx:id="textFieldHours" layoutX="160.0" layoutY="240.0" prefHeight="25.0" prefWidth="250.0" promptText="Ej. 4" />
+
+            <Label fx:id="labelError" layoutX="30.0" layoutY="280.0" prefWidth="390.0" style="-fx-text-fill: red;">
                <font>
                   <Font size="11.0" />
                </font>
             </Label>
 
-            <Button fx:id="buttonRegister" layoutX="80.0" layoutY="340.0" mnemonicParsing="false" onAction="#validateFields" prefHeight="28.0" prefWidth="146.0" style="-fx-background-color: white;" text="Registrar Actividad" />
+            <Button fx:id="buttonRegister" layoutX="80.0" layoutY="330.0" mnemonicParsing="false" onAction="#validateFields" prefHeight="28.0" prefWidth="146.0" style="-fx-background-color: white;" text="Registrar Actividad" />
             
-            <Button fx:id="buttonBack" layoutX="276.0" layoutY="340.0" mnemonicParsing="false" onAction="#goBack" prefHeight="28.0" prefWidth="80.0" style="-fx-background-color: white;" text="Cancelar" />
+            <Button fx:id="buttonBack" layoutX="276.0" layoutY="330.0" mnemonicParsing="false" onAction="#goBack" prefHeight="28.0" prefWidth="80.0" style="-fx-background-color: white;" text="Cancelar" />
          </children>
       </Pane>
    </children>

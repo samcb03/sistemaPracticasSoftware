@@ -13,7 +13,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane prefHeight="750.0" prefWidth="950.0" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="uv.lis.GUI.controller.FXMLGenerateMonthlyReportController">
+<AnchorPane prefHeight="750.0" prefWidth="950.0" xmlns="http://javafx.com/javafx/26" xmlns:fx="http://javafx.com/fxml/1" fx:controller="uv.lis.GUI.controller.FXMLGenerateMonthlyReportController">
    <children>
       <VBox alignment="TOP_CENTER" spacing="15.0" AnchorPane.bottomAnchor="20.0" AnchorPane.leftAnchor="20.0" AnchorPane.rightAnchor="20.0" AnchorPane.topAnchor="20.0">
          <children>
@@ -57,7 +57,7 @@
                   <Label text="Profesor:" textFill="GREY" GridPane.rowIndex="2">
                      <font><Font name="System Bold" size="14.0" /></font>
                   </Label>
-                  <Label fx:id="professorName" text="[Nombre Profesor]" GridPane.columnIndex="1" GridPane.rowIndex="2">
+                  <Label fx:id="labelProfessorName" text="[Nombre Profesor]" GridPane.columnIndex="1" GridPane.rowIndex="2">
                      <font><Font size="14.0" /></font>
                   </Label>
 
@@ -185,6 +185,7 @@
                   <Button fx:id="buttonBack" mnemonicParsing="false" onAction="#goBack" prefHeight="35.0" prefWidth="120.0" style="-fx-background-color: #E0E0E0;" text="Cancelar">
                      <font><Font size="14.0" /></font>
                   </Button>
+                  <Button fx:id="buttonRegisterActivity" mnemonicParsing="false" onAction="#goToRegisterActivity" prefHeight="38.0" prefWidth="130.0" text="Registrar Actividad" textAlignment="CENTER" />
                   <Button fx:id="buttonGenerate" mnemonicParsing="false" onAction="#validateMonthlyReport" prefHeight="35.0" prefWidth="150.0" style="-fx-background-color: #4CAF50; -fx-text-fill: white;" text="Generar Reporte">
                      <font><Font name="System Bold" size="14.0" /></font>
                   </Button>
