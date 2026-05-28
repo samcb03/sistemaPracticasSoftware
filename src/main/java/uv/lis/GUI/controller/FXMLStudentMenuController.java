@@ -21,7 +21,6 @@ public class FXMLStudentMenuController extends ValidationHandler {
     @FXML private Button buttonRequestProject;
     @FXML private Button buttonReports;
     @FXML private Button buttonAutoevaluation;
-    @FXML private Button buttonMonthlyReport;
     @FXML private Button buttonUploadDocuments;
     @FXML private Button buttonLogOut;
     @FXML private Button buttonRegisterActivity;
@@ -77,11 +76,6 @@ public class FXMLStudentMenuController extends ValidationHandler {
     @FXML   
     public void goToAutoevaluation() {
         navigateTo("/uv/lis/GUI/view/FXMLGenerateAutoevaluation.fxml");
-    }
-
-    @FXML
-    public void goToMonthlyReport() {
-        navigateTo("/uv/lis/GUI/view/FXMLGenerateMonthlyReport.fxml");
     }
  
     @FXML 

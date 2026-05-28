@@ -174,6 +174,35 @@ public class ReportContextDAO implements IReportContextDAO {
     }
 
     @Override
+    public List<Activity> getRecordedActivitiesByMonth(int idProyecto, int mes, int anio) throws OperationException {
+        List<Activity> activities = new ArrayList<>();
+        String reportContextQuery = "SELECT DISTINCT nombreActividad, descripcionActividad, horas "
+                    + "FROM Actividad "
+                    + "WHERE idProyecto = ? AND MONTH(FechaInicio) = ? AND YEAR(FechaInicio) = ?";
+
+        try (Connection databaseConnection = connectionManager.getConnection();
+            PreparedStatement preparedStatement = databaseConnection.prepareStatement(reportContextQuery)) {
+            
+            preparedStatement.setInt(1, idProyecto);
+            preparedStatement.setInt(2, mes);
+            preparedStatement.setInt(3, anio);
+            
+            try (ResultSet resultSet = preparedStatement.executeQuery()) {
+                while (resultSet.next()) {
+                    Activity act = new Activity();
+                    act.setName(resultSet.getString("nombreActividad"));
+                    act.setDescription(resultSet.getString("descripcionActividad"));
+                    act.setHoursReported(resultSet.getInt("horas"));
+                    activities.add(act);
+                }
+            }
+        } catch (SQLException e) {
+            throw new OperationException("Error al cargar actividades del mes", e);
+        }
+        return activities;
+    }
+
+    @Override
     public Activity getActivityByName(String studentId, String activityName)
             throws OperationException {
         Activity activity = null;
@@ -200,6 +229,44 @@ public class ReportContextDAO implements IReportContextDAO {
             throw new OperationException(ACTIVITY_BY_NAME_ERROR, e);
         }
         return activity;
+    }
+
+    @Override
+    public int getSumOfReportedHours(int reportId) throws OperationException {
+        int total = 0;
+        String query = "SELECT SUM(horas) FROM Actividad WHERE idReporte = ?";
+        
+        try (Connection conn = connectionManager.getConnection();
+            PreparedStatement pstmt = conn.prepareStatement(query)) {
+            pstmt.setInt(1, reportId);
+            try (ResultSet resultSet = pstmt.executeQuery()) {
+                if (resultSet.next()) {
+                    total = resultSet.getInt(1); 
+                }
+            }
+        } catch (SQLException e) {
+            throw new OperationException("Error al calcular total de horas", e);
+        }
+        return total;
+    }
+
+    @Override
+    public boolean hasReportAlreadyBeenGenerated(String studentId, String month) throws OperationException {
+        String reportContextQuery = "SELECT COUNT(*) FROM Reporte r "
+                    + "INNER JOIN ReporteMensual rm ON r.idReporte = rm.idReporte "
+                    + "WHERE r.matricula = ? AND rm.mes = ?";
+        
+        try (Connection databaseConnection = connectionManager.getConnection();
+            PreparedStatement preparedStatement = databaseConnection.prepareStatement(reportContextQuery)) {
+            preparedStatement.setString(1, studentId);
+            preparedStatement.setString(2, month);
+            
+            try (ResultSet resultSet = preparedStatement.executeQuery()) {
+                return resultSet.next() && resultSet.getInt(1) > 0;
+            }
+        } catch (SQLException e) {
+            throw new OperationException("Error al verificar duplicidad de reporte", e);
+        }
     }
 
     private String buildContextQuery() {
@@ -231,7 +298,8 @@ public class ReportContextDAO implements IReportContextDAO {
 
     private void fillFinalReportContext(FinalReport finalReport, ResultSet resultSet)
             throws SQLException {
-        String studentFullName = resultSet.getString("nombreAlumno") + " " + resultSet.getString("apellidosAlumno");
+        String studentFullName = resultSet.getString("nombreAlumno") + " " 
+        + resultSet.getString("apellidosAlumno");
         String professorFullName = resultSet.getString("nombreProfesor") + " " 
             + resultSet.getString("apellidosProfesor");
 
@@ -247,9 +315,10 @@ public class ReportContextDAO implements IReportContextDAO {
 
     private void fillPartialReportContext(PartialReport partialReport, ResultSet resultSet)
             throws SQLException {
-        String studentFullName = resultSet.getString("nombreAlumno") + " " + resultSet.getString("apellidosAlumno");
-        String professorFullName = resultSet.getString("nombreProfesor") + " "  
-            + resultSet.getString("apellidosProfesor");
+        String studentFullName = resultSet.getString("nombreAlumno") 
+        + " " + resultSet.getString("apellidosAlumno");
+        String professorFullName = resultSet.getString("nombreProfesor") 
+        + " " + resultSet.getString("apellidosProfesor");
 
         partialReport.setStudentName(studentFullName);
         partialReport.setProfessorName(professorFullName);
@@ -272,6 +341,8 @@ public class ReportContextDAO implements IReportContextDAO {
         monthlyReport.setNrcSubject(resultSet.getString("nrc"));
         monthlyReport.setMonth(resultSet.getString("mes"));
         monthlyReport.setReportNumber(resultSet.getInt("numeroReporte"));
+        monthlyReport.setIdProject(resultSet.getInt("idProyecto"));
+        monthlyReport.setIdReport(resultSet.getInt("idReporte"));
     }
 
     private Activity mapActivity(ResultSet resultSet) throws SQLException {
@@ -291,4 +362,5 @@ public class ReportContextDAO implements IReportContextDAO {
         }
         return activity;
     }
+
 }

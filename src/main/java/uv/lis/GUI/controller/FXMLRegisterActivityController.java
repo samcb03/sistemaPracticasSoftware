@@ -1,7 +1,6 @@
 package uv.lis.GUI.controller;
 
 import java.net.URL;
-import java.time.LocalDate;
 import java.util.Optional;
 import java.util.ResourceBundle;
 
@@ -14,7 +13,6 @@ import uv.lis.GUI.FormValidator;
 import uv.lis.GUI.ValidationHandler;
 import uv.lis.logic.dao.ActivityDAO;
 import uv.lis.logic.dao.ProjectDAO;
-import uv.lis.logic.dao.ReportContextDAO;
 import uv.lis.logic.dto.Activity;
 import uv.lis.logic.dto.Project;
 import uv.lis.logic.dto.Student;
@@ -41,15 +39,12 @@ public class FXMLRegisterActivityController extends ValidationHandler {
 
     private ActivityDAO activityDAO;
     private ProjectDAO projectDAO;
-    private ReportContextDAO reportContextDAO;
     private int currentProjectId;
-    private int reportId;
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         activityDAO = new ActivityDAO();
         projectDAO = new ProjectDAO();
-        reportContextDAO = new ReportContextDAO();
         setupControls(labelError, buttonBack);
         loadStudentProject();
     }

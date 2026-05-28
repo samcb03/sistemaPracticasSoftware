@@ -16,7 +16,7 @@ import uv.lis.logic.dto.Advance;
 import uv.lis.logic.exceptions.OperationException;
 
 public class AdvanceDAO implements IAdvanceDAO{
-    private static final Logger LOGGER = Logger.getLogger(AutoevaluationDAO.class.getName());
+private static final Logger LOGGER = Logger.getLogger(AdvanceDAO.class.getName());
     private MySQLConnectionManager connectionManager;
 
     public AdvanceDAO() {
@@ -35,8 +35,8 @@ public class AdvanceDAO implements IAdvanceDAO{
             
             return preparedStatement.executeUpdate() > NO_ROWS_AFFECTED;
         } catch (SQLException e) {
-            LOGGER.log(Level.SEVERE, "Error al registrar autoevaluación", e);
-            throw new OperationException("Error al registrar la autoevaluación", e);
+            LOGGER.log(Level.SEVERE, "Error al registrar avance", e);
+            throw new OperationException("Error al registrar el avance", e);
         }
     }
 
