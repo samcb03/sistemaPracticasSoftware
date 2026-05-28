@@ -32,7 +32,7 @@ public class ActivityDAO implements IActivityDAO {
         String activityQuery = "SELECT * FROM Actividad;";
 
         try (Connection databaseConnection = connectionManager.getConnection();
-             PreparedStatement preparedStatement = databaseConnection.prepareStatement(activityQuery)) {
+            PreparedStatement preparedStatement = databaseConnection.prepareStatement(activityQuery)) {
              
             ResultSet resultSet = preparedStatement.executeQuery();
             
@@ -44,7 +44,8 @@ public class ActivityDAO implements IActivityDAO {
                 LocalDate endDate = resultSet.getObject("FechaFin", LocalDate.class);
                 int idProject = resultSet.getInt("idProyecto"); 
                 
-                activities.add(new Activity(idActivity, activityName, activityDescription, startDate, endDate, idProject));
+                activities.add(new Activity(idActivity, activityName, activityDescription, startDate, endDate, 
+                    idProject));
             }
         } catch (SQLException e) {
             LOGGER.log(Level.SEVERE, "Error de conexion con la base de datos", e);
@@ -75,7 +76,8 @@ public class ActivityDAO implements IActivityDAO {
                 
                 int idProject = resultSet.getInt("idProyecto");
                 
-                activityOptional = Optional.of(new Activity(id, activityName, activityDescription, startDate, endDate, idProject));
+                activityOptional = Optional.of(new Activity(id, activityName, activityDescription, startDate, endDate, 
+                    idProject));
             }
         } catch (SQLException e) {
             LOGGER.log(Level.SEVERE, "Error de conexion con la base de datos", e);
@@ -97,7 +99,7 @@ public class ActivityDAO implements IActivityDAO {
         }
 
         try (Connection databaseConnection = connectionManager.getConnection();
-             PreparedStatement preparedStatement = databaseConnection.prepareStatement(activityQuery,
+            PreparedStatement preparedStatement = databaseConnection.prepareStatement(activityQuery,
                 PreparedStatement.RETURN_GENERATED_KEYS)) {
 
             preparedStatement.setInt(1,activity.getId());
@@ -142,7 +144,7 @@ public class ActivityDAO implements IActivityDAO {
         }
         
         try (Connection databaseConnection = connectionManager.getConnection();
-             PreparedStatement preparedStatement = databaseConnection.prepareStatement(activityQuery)) {
+            PreparedStatement preparedStatement = databaseConnection.prepareStatement(activityQuery)) {
             
             preparedStatement.setString(1, activity.getName());
             preparedStatement.setString(2, activity.getDescription());

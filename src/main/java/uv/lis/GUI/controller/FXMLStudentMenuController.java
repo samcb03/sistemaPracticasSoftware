@@ -56,8 +56,7 @@ public class FXMLStudentMenuController extends ValidationHandler {
 
     private boolean canGenerateReport() throws OperationException {
         Student currentStudent = student != null
-            ? student
-            : SessionManager.getInstance().getCurrentStudent();
+            ? student : SessionManager.getInstance().getCurrentStudent();
         String studentId = currentStudent.getIdStudent();
         boolean canGenerate = true;
 
