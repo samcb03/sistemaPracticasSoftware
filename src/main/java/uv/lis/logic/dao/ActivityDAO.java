@@ -1,6 +1,7 @@
 package uv.lis.logic.dao;
 
 import static uv.lis.logic.utils.InputValidator.NO_ROWS_AFFECTED;
+import static uv.lis.logic.utils.InputValidator.STATUS_ASSIGNED;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -87,7 +88,8 @@ public class ActivityDAO implements IActivityDAO {
     public boolean registerActivity(Activity activity) throws OperationException {
         boolean isRegistered = false;
     
-        String activityQuery = "INSERT INTO Actividad(idActividad,nombreActividad, descripcionActividad, FechaInicio, FechaFin, idProyecto) " 
+        String activityQuery = "INSERT INTO Actividad(idActividad,nombreActividad, descripcionActividad, FechaInicio," 
+                             + "FechaFin, idProyecto) " 
                              + "VALUES(?,?, ?, ?, ?, ?);";
 
         if (activity == null) {
@@ -153,12 +155,54 @@ public class ActivityDAO implements IActivityDAO {
                 isModified = true;
             } else {
                 LOGGER.log(Level.WARNING, "No se pudo modificar la actividad con ID {0}.", activity.getId());
-                throw new OperationException("No se pudo modificar la actividad con ID: " + activity.getId(), null);    
+                throw new OperationException("No se pudo modificar la actividad con ID: " + activity.getId(), 
+                    null);    
             }
         } catch (SQLException e) {
             LOGGER.log(Level.SEVERE, "Error de conexion con la base de datos", e);
             throw new OperationException("Error al modificar la actividad", e);
         }
         return isModified;
+    }
+
+    @Override
+    public List<Activity> getActivitiesByStudentId(String studentId) throws OperationException {
+        List<Activity> activities = new ArrayList<>();
+        String activityContextQuery = "SELECT a.idActividad, a.nombreActividad, "
+                                    + "a.descripcionActividad, a.FechaInicio, a.FechaFin, "
+                                    + "p.idProyecto "
+                                    + "FROM Actividad a "
+                                    + "INNER JOIN Proyecto p ON a.idProyecto = p.idProyecto "
+                                    + "INNER JOIN Solicita_Proyecto sp ON p.idProyecto = sp.idProyecto "
+                                    + "WHERE sp.matricula = ? AND sp.estatus = ?";
+ 
+        try (Connection databaseConnection = connectionManager.getConnection();
+                PreparedStatement preparedStatement = databaseConnection.prepareStatement(activityContextQuery)) {
+ 
+            preparedStatement.setString(1, studentId);
+            preparedStatement.setInt(2, STATUS_ASSIGNED);
+ 
+            try (ResultSet resultSet = preparedStatement.executeQuery()) {
+                while (resultSet.next()) {
+                    activities.add(mapActivity(resultSet));
+                }
+            }
+        } catch (SQLException e) {
+            LOGGER.log(Level.SEVERE, "Error al acceder a la base de datos", e);
+            throw new OperationException("Error al obtener las actividades", e);
+        }
+        return activities;
+    }
+ 
+    private Activity mapActivity(ResultSet resultSet) throws SQLException {
+        int idActivity = resultSet.getInt("idActividad");
+        String activityName = resultSet.getString("nombreActividad");
+        String activityDescription = resultSet.getString("descripcionActividad");
+        LocalDate startDate = resultSet.getObject("FechaInicio", LocalDate.class);
+        LocalDate endDate = resultSet.getObject("FechaFin", LocalDate.class);
+        int idProject = resultSet.getInt("idProyecto");
+ 
+        return new Activity(idActivity, activityName, activityDescription,
+            startDate, endDate, idProject);
     }
 }

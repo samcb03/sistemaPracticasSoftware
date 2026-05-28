@@ -1,8 +1,12 @@
 package uv.lis.logic.dto;
 
+import java.util.Arrays;
 import java.util.Objects;
 
 public class PartialReport extends Report {
+
+    public static final int MAX_ACTIVITIES = 6;
+    public static final int MAX_WEEKS = 8;
 
     private int plannedAdvanceWeek;
     private int realAdvanceWeek;
@@ -18,8 +22,15 @@ public class PartialReport extends Report {
     private String totalHours;
     private String dateReport;
 
-    public PartialReport() {
+    private String[] activityNames;
+    private int[][] plannedAdvances;
+    private int[][] realAdvances;
 
+    public PartialReport() {
+        this.activityNames = new String[MAX_ACTIVITIES];
+        this.plannedAdvances = new int[MAX_WEEKS][MAX_ACTIVITIES];
+        this.realAdvances = new int[MAX_WEEKS][MAX_ACTIVITIES];
+        Arrays.fill(this.activityNames, "");
     }
 
     public int getPlannedAdvanceWeek() {
@@ -124,6 +135,30 @@ public class PartialReport extends Report {
 
     public void setDateReport(String dateReport) {
         this.dateReport = dateReport;
+    }
+
+    public String[] getActivityNames() {
+        return activityNames;
+    }
+
+    public void setActivityNames(String[] activityNames) {
+        this.activityNames = activityNames;
+    }
+
+    public int[][] getPlannedAdvances() {
+        return plannedAdvances;
+    }
+
+    public void setPlannedAdvances(int[][] plannedAdvances) {
+        this.plannedAdvances = plannedAdvances;
+    }
+
+    public int[][] getRealAdvances() {
+        return realAdvances;
+    }
+
+    public void setRealAdvances(int[][] realAdvances) {
+        this.realAdvances = realAdvances;
     }
 
     @Override
