@@ -14,4 +14,6 @@ public interface IActivityDAO {
     boolean registerActivity(Activity activity) throws OperationException;
 
     boolean modifyActivity(Activity activity) throws OperationException;
+
+    List<Activity> getActivitiesByStudentId(String studentId) throws OperationException;
 }

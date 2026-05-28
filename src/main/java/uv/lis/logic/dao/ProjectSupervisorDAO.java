@@ -337,7 +337,6 @@ public class ProjectSupervisorDAO implements IProjectSupervisorDAO {
             }
 
         } catch (SQLException e) {
-            e.printStackTrace();
             LOGGER.log(Level.SEVERE, "Error al verificar Proyectos asignados", e);
             throw new OperationException("No se pudo verificar los proyectos activos .Intente más tarde", e);
         }

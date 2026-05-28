@@ -5,11 +5,10 @@ import java.util.Optional;
 import java.util.ResourceBundle;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.stream.Stream;
 
-import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
-import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
@@ -26,10 +25,9 @@ import uv.lis.logic.dto.FinalReport;
 import uv.lis.logic.exceptions.OperationException;
 import uv.lis.logic.utils.InputValidator;
 
-public class FXMLGenerateReportController extends ValidationHandler {
+public class FXMLGenerateFinalReportController extends ValidationHandler {
 
-    private static final Logger LOGGER
-        = Logger.getLogger(FXMLGenerateReportController.class.getName());
+    private static final Logger LOGGER = Logger.getLogger(FXMLGenerateFinalReportController.class.getName());
 
     private static final String PARTIAL_REPORT = "Reporte Parcial";
     private static final String FINAL_REPORT = "Reporte Final";
@@ -42,7 +40,6 @@ public class FXMLGenerateReportController extends ValidationHandler {
     @FXML private Label labelMessage;
     @FXML private Button buttonGenerate;
     @FXML private Button buttonBack;
-    @FXML private ComboBox<String> comboBoxReportType;
     @FXML private TextField textFieldActivity1;
     @FXML private TextField textFieldAdvance1;
     @FXML private TextArea textAreaObservation1;
@@ -60,14 +57,6 @@ public class FXMLGenerateReportController extends ValidationHandler {
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         setupControls(labelMessage, buttonBack);
-        loadReportTypes();
-    }
-
-    private void loadReportTypes() {
-        comboBoxReportType.setItems(FXCollections.observableArrayList(
-            PARTIAL_REPORT,
-            FINAL_REPORT
-        ));
     }
 
     @FXML
@@ -76,79 +65,93 @@ public class FXMLGenerateReportController extends ValidationHandler {
     }
 
     private void validateFields() {
-        Optional<String> reportTypeValidation = validateReportType();
-        Optional<String> firstActivityValidation = validateFirstActivityBlock();
-        Optional<String> secondActivityValidation = validateSecondActivityBlock();
-        Optional<String> firstDeliverableValidation = validateFirstDeliverableBlock();
-        Optional<String> secondDeliverableValidation = validateSecondDeliverableBlock();
-        Optional<String> generalObservationsValidation = InputValidator.validateText(
-            textAreaGeneralObservations.getText(), "Observaciones Generales");
+        Stream<Optional<String>> validationStream = Stream.of(
+            validateFirstActivityBlock(),
+            validateSecondActivityBlock(),
+            validateFirstDeliverableBlock(),
+            validateSecondDeliverableBlock(),
+            InputValidator.validateText(
+                textAreaGeneralObservations.getText(), "Observaciones Generales")
+        );
 
-        Optional<String> validationError = reportTypeValidation
-            .or(() -> firstActivityValidation)
-            .or(() -> secondActivityValidation)
-            .or(() -> firstDeliverableValidation)
-            .or(() -> secondDeliverableValidation)
-            .or(() -> generalObservationsValidation);
+        Optional<String> validationError = validationStream
+            .filter(Optional::isPresent)
+            .map(Optional::get)
+            .findFirst();
 
         handleValidation(validationError, this::generateReport);
     }
 
-    private Optional<String> validateReportType() {
-        String reportType = comboBoxReportType.getSelectionModel().getSelectedItem();
-        return InputValidator.validateComboBox(reportType, "un tipo de reporte");
-    }
-    //FIXME cambiar estos metodos con lambas 
     private Optional<String> validateFirstActivityBlock() {
-        Optional<String> activityValidation = InputValidator.validateText(
-            textFieldActivity1.getText(), "Actividad 1");
-        Optional<String> advanceValidation = InputValidator.validatePositiveInteger(
-            textFieldAdvance1.getText(), "Porcentaje de Avance de Actividad 1");
-        Optional<String> observationValidation = InputValidator.validateText(
-            textAreaObservation1.getText(), "Observación de Actividad 1");
+        Stream<Optional<String>> validationStream = Stream.of(
+            InputValidator.validateText(
+                textFieldActivity1.getText(), "Actividad 1"),
+            InputValidator.validatePositiveInteger(
+                textFieldAdvance1.getText(), "Porcentaje de Avance de Actividad 1"),
+            InputValidator.validateText(
+                textAreaObservation1.getText(), "Observación de Actividad 1")
+        );
 
-        return activityValidation
-            .or(() -> advanceValidation)
-            .or(() -> observationValidation);
+        Optional<String> firstError = validationStream
+            .filter(Optional::isPresent)
+            .map(Optional::get)
+            .findFirst();
+
+        return firstError;
     }
 
     private Optional<String> validateSecondActivityBlock() {
-        Optional<String> activityValidation = InputValidator.validateText(
-            textFieldActivity2.getText(), "Actividad 2");
-        Optional<String> advanceValidation = InputValidator.validatePositiveInteger(
-            textFieldAdvance2.getText(), "Porcentaje de Avance de Actividad 2");
-        Optional<String> observationValidation = InputValidator.validateText(
-            textAreaObservation2.getText(), "Observación de Actividad 2");
+        Stream<Optional<String>> validationStream = Stream.of(
+            InputValidator.validateText(
+                textFieldActivity2.getText(), "Actividad 2"),
+            InputValidator.validatePositiveInteger(
+                textFieldAdvance2.getText(), "Porcentaje de Avance de Actividad 2"),
+            InputValidator.validateText(
+                textAreaObservation2.getText(), "Observación de Actividad 2")
+        );
 
-        return activityValidation
-            .or(() -> advanceValidation)
-            .or(() -> observationValidation);
+        Optional<String> firstError = validationStream
+            .filter(Optional::isPresent)
+            .map(Optional::get)
+            .findFirst();
+
+        return firstError;
     }
 
     private Optional<String> validateFirstDeliverableBlock() {
-        Optional<String> resultValidation = InputValidator.validateText(
-            textFieldResult1.getText(), "Entregable 1");
-        Optional<String> advanceValidation = InputValidator.validatePositiveInteger(
-            textFieldResultAdvance1.getText(), "Porcentaje de Avance de Entregable 1");
-        Optional<String> observationValidation = InputValidator.validateText(
-            textAreaObservationResult1.getText(), "Observación de Entregable 1");
+        Stream<Optional<String>> validationStream = Stream.of(
+            InputValidator.validateText(
+                textFieldResult1.getText(), "Entregable 1"),
+            InputValidator.validatePositiveInteger(
+                textFieldResultAdvance1.getText(), "Porcentaje de Avance de Entregable 1"),
+            InputValidator.validateText(
+                textAreaObservationResult1.getText(), "Observación de Entregable 1")
+        );
 
-        return resultValidation
-            .or(() -> advanceValidation)
-            .or(() -> observationValidation);
+        Optional<String> firstError = validationStream
+            .filter(Optional::isPresent)
+            .map(Optional::get)
+            .findFirst();
+
+        return firstError;
     }
 
     private Optional<String> validateSecondDeliverableBlock() {
-        Optional<String> resultValidation = InputValidator.validateText(
-            textFieldResult2.getText(), "Entregable 2");
-        Optional<String> advanceValidation = InputValidator.validatePositiveInteger(
-            textFieldResultAdvance2.getText(), "Porcentaje de Avance de Entregable 2");
-        Optional<String> observationValidation = InputValidator.validateText(
-            textAreaObservationResult2.getText(), "Observación de Entregable 2");
+        Stream<Optional<String>> validationStream = Stream.of(
+            InputValidator.validateText(
+                textFieldResult2.getText(), "Entregable 2"),
+            InputValidator.validatePositiveInteger(
+                textFieldResultAdvance2.getText(), "Porcentaje de Avance de Entregable 2"),
+            InputValidator.validateText(
+                textAreaObservationResult2.getText(), "Observación de Entregable 2")
+        );
 
-        return resultValidation
-            .or(() -> advanceValidation)
-            .or(() -> observationValidation);
+        Optional<String> firstError = validationStream
+            .filter(Optional::isPresent)
+            .map(Optional::get)
+            .findFirst();
+
+        return firstError;
     }
 
     private void generateReport() {
@@ -219,7 +222,6 @@ public class FXMLGenerateReportController extends ValidationHandler {
 
     @Override
     protected void clearFields() {
-        comboBoxReportType.getSelectionModel().clearSelection();
 
         textFieldActivity1.clear();
         textFieldAdvance1.clear();

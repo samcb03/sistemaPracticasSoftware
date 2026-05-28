@@ -262,8 +262,7 @@ public class ReportContextDAO implements IReportContextDAO {
         partialReport.setProjectSupervisor(resultSet.getString("nombreResponsable"));
     }
 
-    private void fillMonthlyReportContext(MonthlyReport monthlyReport, ResultSet resultSet)
-            throws SQLException {
+    private void fillMonthlyReportContext(MonthlyReport monthlyReport, ResultSet resultSet) throws SQLException {
         String studentFullName = resultSet.getString("nombreAlumno") + " "
             + resultSet.getString("apellidosAlumno");
         monthlyReport.setStudentName(studentFullName);
