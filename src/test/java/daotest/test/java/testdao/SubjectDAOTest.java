@@ -1,4 +1,4 @@
-package src.test.java;
+package daotest.test.java.testdao;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -6,6 +6,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.sql.Connection;
@@ -39,6 +40,7 @@ class SubjectDAOTest {
     private static final String SUBJECT_NAME = "Practicas Profesionales";
     private static final String CONNECTION_ERROR = "Fallo de conexión";
     private static final String NO_SUBJECT_MESSAGE = "No tiene asignada una experiencia";
+    private static final int FIRST_INSERT_SUCCESS = 1;
 
     @Mock private MySQLConnectionManager connectionManager;
     @Mock private Connection databaseConnection;
@@ -83,6 +85,29 @@ class SubjectDAOTest {
         when(preparedStatement.executeUpdate()).thenReturn(1, 0);
 
         assertFalse(subjectDAO.registerSubject(builderSubject()));
+    }
+
+    @Test
+    void registerSubject_secondInsertThrows_rollsBack() throws Exception {
+        when(databaseConnection.prepareStatement(anyString())).thenReturn(preparedStatement);
+        when(preparedStatement.executeUpdate())
+            .thenReturn(FIRST_INSERT_SUCCESS)
+            .thenThrow(new SQLException("Error en segundo insert"));
+
+        assertThrows(OperationException.class,
+            () -> subjectDAO.registerSubject(builderSubject()));
+    }
+
+    @Test
+    void registerSubject_executeUpdateThrows_invokesRollback() throws Exception {
+        when(databaseConnection.prepareStatement(anyString())).thenReturn(preparedStatement);
+        when(preparedStatement.executeUpdate()).thenThrow(new SQLException("Error en insert"));
+
+        try {
+            subjectDAO.registerSubject(builderSubject());
+        } catch (OperationException operationException) {
+            verify(databaseConnection).rollback();
+        }
     }
 
     @Test

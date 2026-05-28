@@ -32,7 +32,7 @@ public final class InputValidator {
     public static final String PHONE_REGEX = "^[0-9]{7,15}$";
     public static final String PASSWORD_REGEX 
         =  "^(?=.*[A-Z])(?=.*\\d)(?=.*[!@#$%^&*()_+=\\[\\]{};':\"|,.<>/?-]).{8,}$";
-    public static final String REPEAT_LETTERS_REGEX = "^.*([\\p{L}])\\1{2,}.*$";
+    public static final String REPEAT_LETTERS_REGEX = "(?i)^.*([\\p{L}])\\1{2,}.*$";
     public static final String STUDENT_ENROLLMENT = "^[Ss]\\d{8}$";
 
     public static Optional<String> validateNotEmpty(String fieldValue, String fieldName) {
@@ -120,16 +120,17 @@ public final class InputValidator {
     }
 
     public static Optional<String> validateText(String name, String fieldName) {
-    return Stream.of(
-            InputValidator.validateLettersOnly(name, fieldName),
-            InputValidator.validateNoLeadingSpace(name, fieldName),
-            InputValidator.validateNoTrailingSpace(name, fieldName),
-            InputValidator.validateNoConsecutiveSpaces(name, fieldName),
-            InputValidator.validateNoConsecutiveRepeatedLetters(name, fieldName))
-        .filter(Optional::isPresent)
-        .findFirst()
-        .orElse(Optional.empty());
-}
+        Optional<String> validText = Stream.of(
+                InputValidator.validateLettersOnly(name, fieldName),
+                InputValidator.validateNoLeadingSpace(name, fieldName),
+                InputValidator.validateNoTrailingSpace(name, fieldName),
+                InputValidator.validateNoConsecutiveSpaces(name, fieldName),
+                InputValidator.validateNoConsecutiveRepeatedLetters(name, fieldName))
+            .filter(Optional::isPresent)
+            .findFirst()
+            .orElse(Optional.empty());
+        return validText;
+    }
 
     public static Optional<String> validateEmail(String emailValue, String fieldName) {
         Optional<String> validationResult;
