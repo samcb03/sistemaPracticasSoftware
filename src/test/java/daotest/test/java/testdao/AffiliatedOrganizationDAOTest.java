@@ -78,13 +78,14 @@ class AffiliatedOrganizationDAOTest {
     }
 
     @Test
-    void getOrganizationById_succesful_returnsOrganization() throws Exception {
+    void getOrganizationById_found_returnsOrganization() throws Exception {
         mockQueryExecution();
         mockResultSetOrganization();
 
         AffiliatedOrganization expectedOrganization = buildExpectedOrganization();
 
-        assertEquals(expectedOrganization, affiliatedOrganizationDAO.getOrganizationById(expectedOrganization.getId()));
+        assertEquals(expectedOrganization,
+            affiliatedOrganizationDAO.getOrganizationById(expectedOrganization.getId()).get());
     }
 
     @Test
@@ -152,7 +153,7 @@ class AffiliatedOrganizationDAOTest {
         when(preparedStatement.executeUpdate()).thenReturn(0);
 
         AffiliatedOrganization organizationToModify = buildExpectedOrganization();
-
+                              
         assertThrows(OperationException.class, 
             () -> affiliatedOrganizationDAO.modifyOrganization(organizationToModify));
     }

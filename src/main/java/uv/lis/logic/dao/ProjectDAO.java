@@ -51,7 +51,6 @@ public class ProjectDAO implements IProjectDAO{
                 
                 projects.add(project);
             }
-            databaseConnection.close();
         } catch (SQLException e) {
             LOGGER.log(Level.SEVERE, "Error de conexion con la base de datos", e);
             throw new OperationException("Error al obtener los proyectos", e);

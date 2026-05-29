@@ -125,7 +125,7 @@ public class AffiliatedOrganizationDAO implements IAffiliatedOrganizationDAO{
     public boolean modifyOrganization(AffiliatedOrganization affiliatedOrganization) throws OperationException {
         boolean isModified = false;
         String affiliatedOrganizationQuery = "UPDATE organizacionVinculada " 
-                                           + "SET nombreOv = ?, ciudad = ?, "
+                                           + "SET nombreOV = ?, ciudad = ?, "
                                            + "estado = ?, calle = ?, numeroDomicilio = ?, codigoPostal = ?, sector = ?," 
                                            + "correo = ?, telefono = ?, numUsuariosIndirectos = ?, numUsuariosDirectos = ? " 
                                            + "WHERE idOrganizacionVinculada = ?;";
