@@ -14,7 +14,7 @@ import uv.lis.logic.dto.Practice;
 import uv.lis.logic.exceptions.OperationException;
 
 public class PracticeDAO implements IPracticeDAO {
-    private static final Logger LOGGER = Logger.getLogger(ProjectDAO.class.getName());
+    private static final Logger LOGGER = Logger.getLogger(PracticeDAO.class.getName());
     private MySQLConnectionManager connectionManager;
 
     public PracticeDAO() {
@@ -29,7 +29,7 @@ public class PracticeDAO implements IPracticeDAO {
     public boolean registerPractice(Practice practice) throws OperationException {
         boolean isRegistered = false;
         String practiceQuery = "INSERT INTO Actividad (idActividad, nombreActividad, FechaInicio, FechaFin, idReporte) "
-                             + "VALUES (?, ?, ?, ?, ?, ?)";
+                             + "VALUES (?, ?, ?, ?, ?)";
 
         try (Connection connection = connectionManager.getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement(practiceQuery)) {
@@ -45,9 +45,9 @@ public class PracticeDAO implements IPracticeDAO {
                         if (resultSet.next()) {
                             int generatedId = resultSet.getInt(1);
                             practice.setIdPractice(generatedId);
+                            isRegistered = true;
                     }
                 }
-                isRegistered = true;
                 LOGGER.log(Level.INFO, "Practica con ID {0} registrado con éxito.", practice.getIdPractice());
             } else {
                 LOGGER.log(Level.WARNING, "No se pudo registrar la actividad.");
