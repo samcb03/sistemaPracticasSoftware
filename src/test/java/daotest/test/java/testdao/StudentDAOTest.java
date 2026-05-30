@@ -43,7 +43,7 @@ class StudentDAOTest {
     private static final String CONNECTION_ERROR = "Fallo";
 
     @Mock private MySQLConnectionManager connectionManager;
-    @Mock private Connection connection;
+    @Mock private Connection databaseConnection;
     @Mock private PreparedStatement preparedStatement;
     @Mock private ResultSet resultSet;
 
@@ -51,7 +51,7 @@ class StudentDAOTest {
 
     @BeforeEach
     void setUp() throws Exception {
-        when(connectionManager.getConnection()).thenReturn(connection);
+        when(connectionManager.getConnection()).thenReturn(databaseConnection);
         studentDAO = new StudentDAO(connectionManager);
     }
 
@@ -68,7 +68,7 @@ class StudentDAOTest {
 
     @Test
     void getStudentById_successful_returnsStudent() throws Exception {
-        when(connection.prepareStatement(anyString())).thenReturn(preparedStatement);
+        when(databaseConnection.prepareStatement(anyString())).thenReturn(preparedStatement);
         when(preparedStatement.executeQuery()).thenReturn(resultSet);
         when(resultSet.next()).thenReturn(true);
         when(resultSet.getString("matricula")).thenReturn(VALID_STUDENT_ID);
@@ -84,7 +84,7 @@ class StudentDAOTest {
 
     @Test
     void getStudentById_notFound_throwsOperationException() throws Exception {
-        when(connection.prepareStatement(anyString())).thenReturn(preparedStatement);
+        when(databaseConnection.prepareStatement(anyString())).thenReturn(preparedStatement);
         when(preparedStatement.executeQuery()).thenReturn(resultSet);
         when(resultSet.next()).thenReturn(false);
 
@@ -102,7 +102,7 @@ class StudentDAOTest {
 
     @Test
     void getIdUserByStudentId_successful_returnsIdUser() throws Exception {
-        when(connection.prepareStatement(anyString())).thenReturn(preparedStatement);
+        when(databaseConnection.prepareStatement(anyString())).thenReturn(preparedStatement);
         when(preparedStatement.executeQuery()).thenReturn(resultSet);
         when(resultSet.next()).thenReturn(true);
         when(resultSet.getInt("idUsuario")).thenReturn(EXPECTED_USER_ID);
@@ -112,7 +112,7 @@ class StudentDAOTest {
 
     @Test
     void getIdUserByStudentId_notFound_throwsOperationException() throws Exception {
-        when(connection.prepareStatement(anyString())).thenReturn(preparedStatement);
+        when(databaseConnection.prepareStatement(anyString())).thenReturn(preparedStatement);
         when(preparedStatement.executeQuery()).thenReturn(resultSet);
         when(resultSet.next()).thenReturn(false);
 
@@ -130,7 +130,7 @@ class StudentDAOTest {
 
     @Test
     void getActiveStudentsNotInSubject_withResults_returnsPopulatedList() throws Exception {
-        when(connection.prepareStatement(anyString())).thenReturn(preparedStatement);
+        when(databaseConnection.prepareStatement(anyString())).thenReturn(preparedStatement);
         when(preparedStatement.executeQuery()).thenReturn(resultSet);
         when(resultSet.next()).thenReturn(true, true, false);
         when(resultSet.getString("matricula")).thenReturn(VALID_STUDENT_ID, SECOND_STUDENT_ID);
@@ -144,7 +144,7 @@ class StudentDAOTest {
 
     @Test
     void getActiveStudentsNotInSubject_emptyResultSet_returnsEmptyList() throws Exception {
-        when(connection.prepareStatement(anyString())).thenReturn(preparedStatement);
+        when(databaseConnection.prepareStatement(anyString())).thenReturn(preparedStatement);
         when(preparedStatement.executeQuery()).thenReturn(resultSet);
         when(resultSet.next()).thenReturn(false);
 
@@ -161,7 +161,7 @@ class StudentDAOTest {
 
     @Test
     void registerStudent_successful_returnsTrue() throws Exception {
-        when(connection.prepareStatement(anyString())).thenReturn(preparedStatement);
+        when(databaseConnection.prepareStatement(anyString())).thenReturn(preparedStatement);
         when(preparedStatement.executeUpdate()).thenReturn(1);
 
         assertTrue(studentDAO.registerStudent(builderStudent()));
@@ -169,7 +169,7 @@ class StudentDAOTest {
 
     @Test
     void registerStudent_noRowsAffected_throwsOperationException() throws Exception {
-        when(connection.prepareStatement(anyString())).thenReturn(preparedStatement);
+        when(databaseConnection.prepareStatement(anyString())).thenReturn(preparedStatement);
         when(preparedStatement.executeUpdate()).thenReturn(0);
 
         assertThrows(OperationException.class,
@@ -186,7 +186,7 @@ class StudentDAOTest {
 
     @Test
     void modifyStudent_successful_returnsTrue() throws Exception {
-        when(connection.prepareStatement(anyString())).thenReturn(preparedStatement);
+        when(databaseConnection.prepareStatement(anyString())).thenReturn(preparedStatement);
         when(preparedStatement.executeUpdate()).thenReturn(1);
 
         assertTrue(studentDAO.modifyStudent(builderStudent()));
@@ -194,7 +194,7 @@ class StudentDAOTest {
 
     @Test
     void modifyStudent_noRowsAffected_throwsOperationException() throws Exception {
-        when(connection.prepareStatement(anyString())).thenReturn(preparedStatement);
+        when(databaseConnection.prepareStatement(anyString())).thenReturn(preparedStatement);
         when(preparedStatement.executeUpdate()).thenReturn(0);
 
         assertThrows(OperationException.class,
@@ -211,7 +211,7 @@ class StudentDAOTest {
 
     @Test
     void inactivateStudent_successful_returnsTrue() throws Exception {
-        when(connection.prepareStatement(anyString())).thenReturn(preparedStatement);
+        when(databaseConnection.prepareStatement(anyString())).thenReturn(preparedStatement);
         when(preparedStatement.executeUpdate()).thenReturn(1);
 
         assertTrue(studentDAO.inactivateStudent(VALID_STUDENT_ID));
@@ -219,7 +219,7 @@ class StudentDAOTest {
 
     @Test
     void inactivateStudent_noRowsAffected_throwsOperationException() throws Exception {
-        when(connection.prepareStatement(anyString())).thenReturn(preparedStatement);
+        when(databaseConnection.prepareStatement(anyString())).thenReturn(preparedStatement);
         when(preparedStatement.executeUpdate()).thenReturn(0);
 
         assertThrows(OperationException.class,
@@ -236,7 +236,7 @@ class StudentDAOTest {
 
     @Test
     void isStudentInactive_studentIsInactive_returnsTrue() throws Exception {
-        when(connection.prepareStatement(anyString())).thenReturn(preparedStatement);
+        when(databaseConnection.prepareStatement(anyString())).thenReturn(preparedStatement);
         when(preparedStatement.executeQuery()).thenReturn(resultSet);
         when(resultSet.next()).thenReturn(true);
         when(resultSet.getInt("estado")).thenReturn(INACTIVE_STATUS);
@@ -246,7 +246,7 @@ class StudentDAOTest {
 
     @Test
     void isStudentInactive_studentIsActive_returnsFalse() throws Exception {
-        when(connection.prepareStatement(anyString())).thenReturn(preparedStatement);
+        when(databaseConnection.prepareStatement(anyString())).thenReturn(preparedStatement);
         when(preparedStatement.executeQuery()).thenReturn(resultSet);
         when(resultSet.next()).thenReturn(true);
         when(resultSet.getInt("estado")).thenReturn(ACTIVE_STATUS);
@@ -256,7 +256,7 @@ class StudentDAOTest {
 
     @Test
     void isStudentInactive_notFound_throwsOperationException() throws Exception {
-        when(connection.prepareStatement(anyString())).thenReturn(preparedStatement);
+        when(databaseConnection.prepareStatement(anyString())).thenReturn(preparedStatement);
         when(preparedStatement.executeQuery()).thenReturn(resultSet);
         when(resultSet.next()).thenReturn(false);
 
@@ -274,7 +274,7 @@ class StudentDAOTest {
 
     @Test
     void searchStudentIds_successful_returnsStudentIds() throws Exception {
-        when(connection.prepareStatement(anyString())).thenReturn(preparedStatement);
+        when(databaseConnection.prepareStatement(anyString())).thenReturn(preparedStatement);
         when(preparedStatement.executeQuery()).thenReturn(resultSet);
         when(resultSet.next()).thenReturn(true, true, false);
         when(resultSet.getString("matricula")).thenReturn(VALID_STUDENT_ID, SECOND_STUDENT_ID);
@@ -284,7 +284,7 @@ class StudentDAOTest {
 
     @Test
     void searchStudentIds_noMatches_returnsEmptyList() throws Exception {
-        when(connection.prepareStatement(anyString())).thenReturn(preparedStatement);
+        when(databaseConnection.prepareStatement(anyString())).thenReturn(preparedStatement);
         when(preparedStatement.executeQuery()).thenReturn(resultSet);
         when(resultSet.next()).thenReturn(false);
 
@@ -301,7 +301,7 @@ class StudentDAOTest {
 
     @Test
     void hasProjectAssigned_hasAssignment_returnsTrue() throws Exception {
-        when(connection.prepareStatement(anyString())).thenReturn(preparedStatement);
+        when(databaseConnection.prepareStatement(anyString())).thenReturn(preparedStatement);
         when(preparedStatement.executeQuery()).thenReturn(resultSet);
         when(resultSet.next()).thenReturn(true);
         when(resultSet.getInt(1)).thenReturn(1);
@@ -311,7 +311,7 @@ class StudentDAOTest {
 
     @Test
     void hasProjectAssigned_noAssignment_returnsFalse() throws Exception {
-        when(connection.prepareStatement(anyString())).thenReturn(preparedStatement);
+        when(databaseConnection.prepareStatement(anyString())).thenReturn(preparedStatement);
         when(preparedStatement.executeQuery()).thenReturn(resultSet);
         when(resultSet.next()).thenReturn(true);
         when(resultSet.getInt(1)).thenReturn(0);
@@ -321,7 +321,7 @@ class StudentDAOTest {
 
     @Test
     void hasProjectAssigned_emptyResultSet_returnsFalse() throws Exception {
-        when(connection.prepareStatement(anyString())).thenReturn(preparedStatement);
+        when(databaseConnection.prepareStatement(anyString())).thenReturn(preparedStatement);
         when(preparedStatement.executeQuery()).thenReturn(resultSet);
         when(resultSet.next()).thenReturn(false);
 
