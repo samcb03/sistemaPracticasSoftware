@@ -279,18 +279,24 @@ public class ReportDAO implements IReportDAO {
     }
 
     private void insertReportRow(Connection databaseConnection, Report report) throws SQLException {
-        String reportQuery = "INSERT INTO Reporte "
-                           + "(idReporte, descripcion, observaciones, actividad, matricula) "
-                           + "VALUES (?, ?, ?, ?, ?)";
+        String reportQuery = "INSERT INTO Reporte (descripcion, observaciones, actividad, matricula) VALUES (?, ?, ?, ?)";
 
-        try (PreparedStatement preparedStatement = databaseConnection.prepareStatement(reportQuery)) {
+        try (PreparedStatement preparedStatement = databaseConnection.prepareStatement(reportQuery, 
+            PreparedStatement.RETURN_GENERATED_KEYS)) {
 
-            preparedStatement.setInt(1, report.getId());
-            preparedStatement.setString(2, report.getDescription());
-            preparedStatement.setString(3, report.getObservations());
-            preparedStatement.setString(4, report.getActivity());
-            preparedStatement.setString(5, report.getStudentId());
+            preparedStatement.setString(1, report.getDescription());
+            preparedStatement.setString(2, report.getObservations());
+            preparedStatement.setString(3, report.getActivity());
+            preparedStatement.setString(4, report.getStudentId());
             preparedStatement.executeUpdate();
+
+            try (ResultSet generatedKeys = preparedStatement.getGeneratedKeys()) {
+                if (generatedKeys.next()) {
+                    report.setId(generatedKeys.getInt(1)); 
+                } else {
+                    throw new SQLException("No se pudo obtener el ID del reporte generado.");
+                }
+            }
         }
     }
 

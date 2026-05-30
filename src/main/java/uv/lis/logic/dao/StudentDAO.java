@@ -279,13 +279,12 @@ public class StudentDAO extends UserDAO implements IStudentDAO {
 
             try (ResultSet resultSet = preparedStatement.executeQuery()) {
                 if (resultSet.next()) {
-                    hasProject = resultSet.getInt(1) > 0;
+                    hasProject = resultSet.getInt(1) > NO_ROWS_AFFECTED;
                 }
             }
         } catch (SQLException e) {
             LOGGER.log(Level.SEVERE, "Error al verificar asignacion de proyecto", e);
-            throw new OperationException("No se pudo verificar la asignación de proyecto. Intente más tarde", 
-                e);
+            throw new OperationException("No se pudo verificar la asignación de proyecto. Intente más tarde", e);
         }
         return hasProject;
     }
