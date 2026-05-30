@@ -1,5 +1,7 @@
 package uv.lis.GUI.controller;
 
+import static uv.lis.logic.utils.InputValidator.INVALID_ID;
+
 import java.net.URL;
 import java.util.List;
 import java.util.Optional;
@@ -42,7 +44,7 @@ public class FXMLAssignationProjectController extends ValidationHandler {
     private ProjectDAO projectDAO;
     private AffiliatedOrganizationDAO affiliatedOrganizationDAO;
     private Professor coordinator;
-    private final static int INDEX_ADJUSTMENT = 1;
+    private static final String APPLICANT_SEPARATOR = " - ";
 
 @Override
     public void initialize(URL location, ResourceBundle resources) {
@@ -118,7 +120,8 @@ public class FXMLAssignationProjectController extends ValidationHandler {
         try {
             List<Student> applicants = requestProjectDAO.getApplicantsByProjectId(idProject);
             List<String> applicantNames = applicants.stream().
-                map(student -> student.getFirstName() + " " + student.getLastName() + " - " + student.getIdStudent())
+                map(student -> student.getFirstName() + " " + student.getLastName()
+                    + APPLICANT_SEPARATOR + student.getIdStudent())
                 .collect(Collectors.toList());
             
             listViewApplicants.setItems(FXCollections.observableArrayList(applicantNames));
@@ -142,8 +145,7 @@ public class FXMLAssignationProjectController extends ValidationHandler {
             showError("Seleccione un proyecto y un alumno de la lista.");
         } else {
             try {
-                String matricula = selectedRow.substring(selectedRow.lastIndexOf("(") + INDEX_ADJUSTMENT, 
-                selectedRow.lastIndexOf(")"));
+                String matricula = extractStudentId(selectedRow);
 
                 Optional<Project> validateProject = projectDAO.getProjectByName(selectedProject);
 
@@ -166,6 +168,16 @@ public class FXMLAssignationProjectController extends ValidationHandler {
                 showError("No se pudo asignar: " + e.getMessage());
             }
         }
+    }
+
+    private String extractStudentId(String applicantRow) {
+        int separatorIndex = applicantRow.lastIndexOf(APPLICANT_SEPARATOR);
+        String studentId = "";
+
+        if (separatorIndex >= INVALID_ID) {
+            studentId = applicantRow.substring(separatorIndex + APPLICANT_SEPARATOR.length()).trim();
+        }
+        return studentId;
     }
 
     @Override

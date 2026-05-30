@@ -152,7 +152,7 @@ public class ReportContextDAO implements IReportContextDAO {
         String reportContextQuery = "SELECT a.idActividad, a.nombreActividad, "
                                   + "a.descripcionActividad, a.FechaInicio, a.FechaFin "
                                   + "FROM Actividad a "
-                                  + "INNER JOIN Proyecto p ON a.idActividad = p.idActividad "
+                                  + "INNER JOIN Proyecto p ON a.idProyecto = p.idProyecto "
                                   + "INNER JOIN Solicita_Proyecto sp ON p.idProyecto = sp.idProyecto "
                                   + "WHERE sp.matricula = ?";
 
@@ -176,7 +176,7 @@ public class ReportContextDAO implements IReportContextDAO {
     @Override
     public List<Activity> getRecordedActivitiesByMonth(int idProyecto, int mes, int anio) throws OperationException {
         List<Activity> activities = new ArrayList<>();
-        String reportContextQuery = "SELECT DISTINCT nombreActividad, descripcionActividad, horas "
+        String reportContextQuery = "SELECT DISTINCT nombreActividad, descripcionActividad, horasReportadas AS horas "
                     + "FROM Actividad "
                     + "WHERE idProyecto = ? AND MONTH(FechaInicio) = ? AND YEAR(FechaInicio) = ?";
 
@@ -209,7 +209,7 @@ public class ReportContextDAO implements IReportContextDAO {
         String reportContextQuery = "SELECT a.idActividad, a.nombreActividad, "
                                   + "a.descripcionActividad, a.FechaInicio, a.FechaFin "
                                   + "FROM Actividad a "
-                                  + "INNER JOIN Proyecto p ON a.idActividad = p.idActividad "
+                                  + "INNER JOIN Proyecto p ON a.idProyecto = p.idProyecto "
                                   + "INNER JOIN Solicita_Proyecto sp ON p.idProyecto = sp.idProyecto "
                                   + "WHERE sp.matricula = ? AND a.nombreActividad = ?";
 
@@ -234,7 +234,7 @@ public class ReportContextDAO implements IReportContextDAO {
     @Override
     public int getSumOfReportedHours(int reportId) throws OperationException {
         int total = 0;
-        String query = "SELECT SUM(horas) FROM Actividad WHERE idReporte = ?";
+        String query = "SELECT SUM(horasReportadas) FROM Actividad WHERE idReporte = ?";
         
         try (Connection conn = connectionManager.getConnection();
             PreparedStatement pstmt = conn.prepareStatement(query)) {

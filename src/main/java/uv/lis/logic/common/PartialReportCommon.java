@@ -169,7 +169,7 @@ public class PartialReportCommon {
             int activityNumber = activityIndex + FIRST_ACTIVITY_INDEX;
             String parameterKey = buildCellKey(
                 PLANNED_ADVANCE_PREFIX, weekNumber, activityNumber);
-            parameters.put(parameterKey, plannedRow[activityIndex]);
+            parameters.put(parameterKey, String.valueOf(plannedRow[activityIndex]));
         }
     }
 
@@ -178,7 +178,7 @@ public class PartialReportCommon {
             int activityNumber = activityIndex + FIRST_ACTIVITY_INDEX;
             String parameterKey = buildCellKey(
                 REAL_ADVANCE_PREFIX, weekNumber, activityNumber);
-            parameters.put(parameterKey, realRow[activityIndex]);
+            parameters.put(parameterKey, String.valueOf(realRow[activityIndex]));
         }
     }
 
