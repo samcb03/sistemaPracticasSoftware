@@ -3,6 +3,7 @@ package uv.lis.GUI.controller;
 import static uv.lis.logic.utils.InputValidator.validateComboBox;
 import static uv.lis.logic.utils.InputValidator.validateText;
 import static uv.lis.logic.utils.InputValidator.validatePositiveInteger;
+import static uv.lis.logic.utils.InputValidator.validateProjectCapacity;
 
 import java.net.URL;
 import java.util.ArrayList;
@@ -84,10 +85,18 @@ public class FXMLRegisterProjectController extends ValidationHandler {
     }
 
     private Optional<String> getFirstValidationError() {
+        String capacityProject = textFieldCapacity.getText().trim();
+        Optional<String> formatError = validatePositiveInteger(capacityProject, "El cupo");
+        Optional<String> capacityError = Optional.empty();
+            if (formatError.isEmpty()) {
+                capacityError = validateProjectCapacity(Integer.parseInt(capacityProject), "El cupo");
+            }
+
         Stream<Optional<String>> validationStream = Stream.of(
             validateText(textFieldName.getText(), "El nombre"),
             validateText(textFieldMethodology.getText(), "La metodología"),
-            validatePositiveInteger(textFieldCapacity.getText().trim(), "El cupo"),
+            formatError,
+            capacityError,
             validateText(textFieldObjective.getText(), "El objetivo"),
             validateText(textAreaDescription.getText(), "La descripción"),
             validateComboBox(comboBoxOrganizationName.getValue(), " organización"),

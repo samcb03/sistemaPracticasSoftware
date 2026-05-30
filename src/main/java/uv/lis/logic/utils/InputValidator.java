@@ -22,6 +22,7 @@ public final class InputValidator {
     public static final int MIN_POSITIVE_INTEGER = 1;
     public static final int INVALID_ID = -1;
     private static final int MINIMUM_AGE = 18;
+    private static final int MAX_PROJECT_CAPACITY = 2;
     public static final String LETTERS_ONLY_REGEX = "^[\\p{L}\\s]+$";
     public static final String LEADING_SPACE_REGEX = "^\\s.*";
     public static final String TRAILING_SPACE_REGEX = ".*\\s$";
@@ -272,5 +273,17 @@ public final class InputValidator {
             validationResult = Optional.empty();
         }
         return validationResult;
+    }
+
+    public static Optional<String> validateProjectCapacity(int capacity, String fieldName) {
+
+
+        Optional<String> validateResult;
+        if(capacity > MAX_PROJECT_CAPACITY) {
+            validateResult = Optional.of(fieldName + " no puede tener una capacidad mayor a " + MAX_PROJECT_CAPACITY + " alumnos");
+        } else {
+            validateResult = Optional.empty();
+        }
+        return validateResult;
     }
 }
