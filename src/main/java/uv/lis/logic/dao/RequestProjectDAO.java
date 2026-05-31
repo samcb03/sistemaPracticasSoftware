@@ -157,8 +157,7 @@ public class RequestProjectDAO implements IRequestProjectDAO {
                                    + "(idProyecto, matricula, estatus) VALUES (?, ?, ?);";
 
         try (Connection databaseConnection = connectionManager.getConnection();
-            PreparedStatement preparedStatement
-                = databaseConnection.prepareStatement(requestProjectQuery)) {
+            PreparedStatement preparedStatement = databaseConnection.prepareStatement(requestProjectQuery)) {
 
             preparedStatement.setInt(1, idProject);
             preparedStatement.setString(2, idStudent);
@@ -192,30 +191,28 @@ public class RequestProjectDAO implements IRequestProjectDAO {
     }
 
     @Override
-    public boolean assignStudentToProject(String idStudent, int idProject)
-            throws OperationException {
+    public boolean assignStudentToProject(String idStudent, int idProject) throws OperationException {
         boolean isAssigned = false;
 
-        try (Connection connection = connectionManager.getConnection()) {
-            connection.setAutoCommit(false);
+        try (Connection databaseConnection = connectionManager.getConnection()) {
+            databaseConnection.setAutoCommit(false);
             try {
-                executeAssignmentTransaction(connection, idStudent, idProject);
-                connection.commit();
+                executeAssignmentTransaction(databaseConnection, idStudent, idProject);
+                databaseConnection.commit();
                 isAssigned = true;
             } catch (SQLException sqlException) {
-                connection.rollback();
+                databaseConnection.rollback();
                 LOGGER.log(Level.SEVERE, "Transacción de asignación cancelada", sqlException);
-                throw new OperationException("Error al ejecutar la transacción de asignación",
-                    sqlException);
+                throw new OperationException("Error al ejecutar la transacción de asignación", sqlException);
             } catch (OperationException operationException) {
-                connection.rollback();
+                databaseConnection.rollback();
                 throw operationException;
             } finally {
-                connection.setAutoCommit(true);
+                databaseConnection.setAutoCommit(true);
             }
         } catch (SQLException e) {
             LOGGER.log(Level.SEVERE, "Error de conexión a la base de datos", e);
-            throw new OperationException("Error de conexión a la base de datos", e);
+            throw new OperationException("Intentelo mas tarde", e);
         }
 
         return isAssigned;
@@ -229,8 +226,7 @@ public class RequestProjectDAO implements IRequestProjectDAO {
                                    + "WHERE sp.matricula = ? AND sp.estatus = ?;";
 
         try (Connection databaseConnection = connectionManager.getConnection();
-            PreparedStatement preparedStatement
-                = databaseConnection.prepareStatement(requestProjectQuery)) {
+            PreparedStatement preparedStatement = databaseConnection.prepareStatement(requestProjectQuery)) {
 
             preparedStatement.setString(1, idStudent);
             preparedStatement.setInt(2, STATUS_ASSIGNED);
@@ -251,8 +247,7 @@ public class RequestProjectDAO implements IRequestProjectDAO {
                                    + "WHERE sp.idProyecto = ?";
 
         try (Connection databaseConnection = connectionManager.getConnection();
-            PreparedStatement preparedStatement
-                = databaseConnection.prepareStatement(requestProjectQuery)) {
+            PreparedStatement preparedStatement = databaseConnection.prepareStatement(requestProjectQuery)) {
 
             preparedStatement.setInt(1, idProject);
 
@@ -269,7 +264,6 @@ public class RequestProjectDAO implements IRequestProjectDAO {
         return applicants;
     }
 
-    @Override
     public String getProjectAssignedToStudent(String idStudent) throws OperationException {
         String projectName = DEFAULT_NO_PROJECT_MESSAGE;
         String requestProjectQuery = "SELECT p.nombre FROM Proyecto p "
@@ -277,8 +271,7 @@ public class RequestProjectDAO implements IRequestProjectDAO {
                                    + "WHERE sp.matricula = ? AND sp.estatus = ?;";
 
         try (Connection databaseConnection = connectionManager.getConnection();
-            PreparedStatement preparedStatement
-                = databaseConnection.prepareStatement(requestProjectQuery)) {
+            PreparedStatement preparedStatement = databaseConnection.prepareStatement(requestProjectQuery)) {
 
             preparedStatement.setString(1, idStudent);
             preparedStatement.setInt(2, STATUS_ASSIGNED);
@@ -307,8 +300,7 @@ public class RequestProjectDAO implements IRequestProjectDAO {
                                    + "WHERE sp.idProyecto = ? AND sp.estatus = ?";
 
         try (Connection databaseConnection = connectionManager.getConnection();
-            PreparedStatement preparedStatement
-                = databaseConnection.prepareStatement(requestProjectQuery)) {
+            PreparedStatement preparedStatement = databaseConnection.prepareStatement(requestProjectQuery)) {
 
             preparedStatement.setInt(1, idProject);
             preparedStatement.setInt(2, STATUS_ASSIGNED);
@@ -326,21 +318,21 @@ public class RequestProjectDAO implements IRequestProjectDAO {
         return assignedStudents;
     }
 
-    private void executeAssignmentTransaction(Connection connection, String idStudent,
+    private void executeAssignmentTransaction(Connection databaseConnection, String idStudent,
             int idProject) throws SQLException, OperationException {
-        ensureStudentNotAlreadyAssigned(connection, idStudent);
+        ensureStudentNotAlreadyAssigned(databaseConnection, idStudent);
         hasAvailableCapacity(idProject);
-        assignRequest(connection, idStudent, idProject);
-        cleanPendingRequests(connection, idStudent);
+        assignRequest(databaseConnection, idStudent, idProject);
+        cleanPendingRequests(databaseConnection, idStudent);
     }
 
-    private void ensureStudentNotAlreadyAssigned(Connection connection, String idStudent)
+    private void ensureStudentNotAlreadyAssigned(Connection databaseConnection, String idStudent)
         throws SQLException, OperationException {
         String requestProjectQuery = "SELECT COUNT(*) FROM Solicita_Proyecto "
                                    + "WHERE matricula = ? AND estatus = ?";
 
         try (PreparedStatement preparedStatement
-            = connection.prepareStatement(requestProjectQuery)) {
+            = databaseConnection.prepareStatement(requestProjectQuery)) {
             preparedStatement.setString(1, idStudent);
             preparedStatement.setInt(2, STATUS_ASSIGNED);
 
@@ -353,13 +345,13 @@ public class RequestProjectDAO implements IRequestProjectDAO {
         }
     }
 
-    private void assignRequest(Connection connection, String idStudent, int idProject)
+    private void assignRequest(Connection databaseConnection, String idStudent, int idProject)
             throws SQLException {
         String requestProjectQuery = "UPDATE Solicita_Proyecto SET estatus = ? "
                                    + "WHERE matricula = ? AND idProyecto = ?";
 
         try (PreparedStatement preparedStatement
-            = connection.prepareStatement(requestProjectQuery)) {
+            = databaseConnection.prepareStatement(requestProjectQuery)) {
             preparedStatement.setInt(1, STATUS_ASSIGNED);
             preparedStatement.setString(2, idStudent);
             preparedStatement.setInt(3, idProject);
@@ -367,12 +359,12 @@ public class RequestProjectDAO implements IRequestProjectDAO {
         }
     }
 
-    private void cleanPendingRequests(Connection connection, String idStudent) throws SQLException {
+    private void cleanPendingRequests(Connection databaseConnection, String idStudent) throws SQLException {
         String requestProjectQuery = "DELETE FROM Solicita_Proyecto "
                                    + "WHERE matricula = ? AND estatus = ?";
 
         try (PreparedStatement preparedStatement
-            = connection.prepareStatement(requestProjectQuery)) {
+            = databaseConnection.prepareStatement(requestProjectQuery)) {
             preparedStatement.setString(1, idStudent);
             preparedStatement.setInt(2, STATUS_REQUESTED);
             preparedStatement.executeUpdate();
