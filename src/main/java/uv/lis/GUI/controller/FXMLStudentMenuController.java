@@ -30,10 +30,15 @@ public class FXMLStudentMenuController extends ValidationHandler {
     private final StudentDAO studentDAO = new StudentDAO();
     private final SubjectDAO subjectDAO = new SubjectDAO();
 
-
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         this.student = SessionManager.getInstance().getCurrentStudent();
+        try {
+            disableActionsWithoutAssignedSubject();
+            disableActionsWithoutAssignedProject();
+        } catch (OperationException e) {
+            showError(e.getMessage());
+        }
         setupControls(labelMessage, buttonLogOut);
     }
 
@@ -42,35 +47,27 @@ public class FXMLStudentMenuController extends ValidationHandler {
         navigateTo("/uv/lis/GUI/view/FXMLRequestProject.fxml");
     }
 
-    @FXML
-    public void goToReports() {
-        try {
-            if (canGenerateReport()) {
-                navigateTo("/uv/lis/GUI/view/FXMLReportsMenu.fxml");
-            }
-        } catch (OperationException e) {
-            showError(e.getMessage());
+    private void disableActionsWithoutAssignedSubject() throws OperationException {
+        String subjectNRC = subjectDAO.getSubjectNRCByStudentID(student.getIdStudent());
+        if (NO_SUBJECT_MESSAGE.equals(subjectNRC)) {
+            buttonRequestProject.setDisable(true);
+            buttonReports.setDisable(true);
         }
     }
 
-    private boolean canGenerateReport() throws OperationException {
-        Student currentStudent = student != null
-            ? student : SessionManager.getInstance().getCurrentStudent();
-        String studentId = currentStudent.getIdStudent();
-        boolean canGenerate = true;
+    @FXML
+    public void goToReports() {
+        navigateTo("/uv/lis/GUI/view/FXMLReportsMenu.fxml");
+    }
 
-        String subjectNRC = subjectDAO.getSubjectNRCByStudentID(studentId);
-        if (NO_SUBJECT_MESSAGE.equals(subjectNRC)) {
-            showError("No puede generar un reporte porque no tiene una experiencia educativa asignada.");
-            canGenerate = false;
-        }
+    private void disableActionsWithoutAssignedProject() throws OperationException {
+        String studentId = student.getIdStudent();
 
         if (!studentDAO.hasProjectAssigned(studentId)) {
-            showError("No puede generar un reporte porque no tiene un proyecto asignado.");
-            canGenerate = false;
+            buttonReports.setDisable(true);
+            buttonRegisterActivity.setDisable(true);
+            buttonUploadDocuments.setDisable(true);
         }
-
-        return canGenerate;
     }
 
     @FXML   

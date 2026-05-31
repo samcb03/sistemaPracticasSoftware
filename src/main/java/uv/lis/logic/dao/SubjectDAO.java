@@ -36,7 +36,7 @@ public class SubjectDAO implements ISubjectDAO {
                             + "VALUES (?, ?, ?, ?);";
 
         String professorSubjectQuery = "INSERT INTO Profesor_Imparte_Experiencia (NRC, numeroPersonal) "
-                                    + "VALUES (?, ?);";
+                                     + "VALUES (?, ?);";
 
         try (Connection databaseConnection = connectionManager.getConnection()) {
 
@@ -85,14 +85,19 @@ public class SubjectDAO implements ISubjectDAO {
     @Override
     public ArrayList<String> getAllSubjectsNRCName() throws OperationException {
         ArrayList<String> subjects = new ArrayList<>();
-        String subjectQuery = "SELECT NRC, nombreExperiencia FROM ExperienciaEducativa";
+        String subjectQuery = "SELECT ee.NRC, ee.nombreExperiencia "
+                            + "FROM ExperienciaEducativa ee "
+                            + "INNER JOIN PeriodoEscolar pe "
+                            + "ON ee.idPeriodoEscolar = pe.idPeriodoEscolar "
+                            + "WHERE pe.FechaFin IS NULL OR pe.FechaFin >= CURDATE()";
 
         try (Connection databaseConnection = connectionManager.getConnection();
                 PreparedStatement preparedStatement = databaseConnection.prepareStatement(subjectQuery);
                 ResultSet resultSet = preparedStatement.executeQuery()) {
 
             while (resultSet.next()) {
-                String formatted = resultSet.getInt("NRC") + " - " + resultSet.getString("nombreExperiencia");
+                String formatted = resultSet.getInt("NRC") + " - "
+                                 + resultSet.getString("nombreExperiencia");
                 subjects.add(formatted);
             }
 
@@ -228,4 +233,3 @@ public class SubjectDAO implements ISubjectDAO {
         return enrolledStudents;
     }
 }
-
