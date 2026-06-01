@@ -8,7 +8,6 @@
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.Pane?>
 
-
 <Pane prefHeight="466.0" prefWidth="661.0" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="uv.lis.GUI.controller.FXMLProfessorMenuController">
    <children>
       <AnchorPane layoutX="34.0" layoutY="33.0" minHeight="0.0" minWidth="0.0" prefHeight="407.0" prefWidth="594.0" style="-fx-background-color: #87CEEB; -fx-background-radius: 20;">
@@ -22,7 +21,7 @@
             </TableView>
             <ComboBox fx:id="comboBoxSchoolPeriod" layoutX="379.0" layoutY="43.0" prefHeight="26.0" prefWidth="177.0" />
             <Label layoutX="333.0" layoutY="47.0" text="Periodo:" />
-            <Button fx:id="buttonLogOut" layoutX="266.0" layoutY="367.0" mnemonicParsing="false" onAction="#navigateToLogOut" text="Cancelar" />
+            <Button fx:id="buttonLogOut" layoutX="266.0" layoutY="367.0" mnemonicParsing="false" onAction="#handleCloseProfessorMenu" text="Cancelar" />
          </children>
       </AnchorPane>
       <Label prefHeight="18.0" prefWidth="661.0" text="Menu Profesor" />

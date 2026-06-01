@@ -4,15 +4,20 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import net.sf.jasperreports.engine.DefaultJasperReportsContext;
 import net.sf.jasperreports.engine.JREmptyDataSource;
 import net.sf.jasperreports.engine.JRException;
 import net.sf.jasperreports.engine.JasperFillManager;
 import net.sf.jasperreports.engine.JasperPrint;
+import net.sf.jasperreports.engine.SimpleJasperReportsContext;
+import net.sf.jasperreports.repo.RepositoryService;
 
 import uv.lis.logic.dao.ReportContextDAO;
 import uv.lis.logic.dto.Activity;
@@ -21,7 +26,7 @@ import uv.lis.logic.dto.Student;
 import uv.lis.logic.exceptions.OperationException;
 import uv.lis.logic.utils.SessionManager;
 import uv.lis.logic.utils.WorkProgressCalculator;
-
+//TODO estudiar esta clase
 public class PartialReportCommon {
 
     private static final Logger LOGGER = Logger.getLogger(PartialReportCommon.class.getName());
@@ -39,16 +44,27 @@ public class PartialReportCommon {
     private static final String PLANNED_ADVANCE_PREFIX = "plannedAdvanceWeek";
     private static final String REAL_ADVANCE_PREFIX = "realAdvanceWeek";
     private static final String ACTIVITY_KEY_FRAGMENT = "Activity";
-    private static final int FIRST_ACTIVITY_INDEX = 1;
+    private static final int FIRST_INDEX = 0;
+    private static final int INDEX_OFFSET = 1;
 
     private final ReportContextDAO reportContextDAO;
+    private final SimpleJasperReportsContext jasperReportsContext;
 
     public PartialReportCommon() {
         this.reportContextDAO = new ReportContextDAO();
+        this.jasperReportsContext = buildReportsContext();
     }
 
-    public JasperPrint generatePartialReport(PartialReport partialReport)
-            throws JRException, OperationException {
+    private SimpleJasperReportsContext buildReportsContext() {
+        SimpleJasperReportsContext reportsContext
+            = new SimpleJasperReportsContext(DefaultJasperReportsContext.getInstance());
+        List<RepositoryService> repositoryServices = new ArrayList<>();
+        repositoryServices.add(new ClasspathImageRepositoryCommon());
+        reportsContext.setExtensions(RepositoryService.class, repositoryServices);
+        return reportsContext;
+    }
+
+    public JasperPrint generatePartialReport(PartialReport partialReport) throws JRException, OperationException {
         Student currentStudent = SessionManager.getInstance().getCurrentStudent();
 
         if (currentStudent == null) {
@@ -56,12 +72,11 @@ public class PartialReportCommon {
         }
 
         mergeContextIntoReport(partialReport, currentStudent.getIdStudent());
-        applyPlannedWeeklyAdvance(partialReport, currentStudent.getIdStudent());
+        fillAdvanceMatrices(partialReport, currentStudent.getIdStudent());
         return fillReportTemplate(partialReport);
     }
 
-    private JasperPrint fillReportTemplate(PartialReport partialReport)
-            throws JRException, OperationException {
+    private JasperPrint fillReportTemplate(PartialReport partialReport) throws JRException, OperationException {
         JasperPrint jasperPrint;
 
         try (InputStream templateStream = getClass().getResourceAsStream(REPORT_TEMPLATE_PATH)) {
@@ -72,8 +87,8 @@ public class PartialReportCommon {
             }
 
             Map<String, Object> parameters = buildReportParameters(partialReport);
-            jasperPrint = JasperFillManager.fillReport(
-                templateStream, parameters, new JREmptyDataSource());
+            jasperPrint = JasperFillManager.getInstance(jasperReportsContext)
+                .fill(templateStream, parameters, new JREmptyDataSource());
         } catch (IOException ioException) {
             LOGGER.log(Level.SEVERE,
                 "Error al leer la plantilla del reporte parcial", ioException);
@@ -82,8 +97,7 @@ public class PartialReportCommon {
         return jasperPrint;
     }
 
-    private void mergeContextIntoReport(PartialReport partialReport, String studentId)
-            throws OperationException {
+    private void mergeContextIntoReport(PartialReport partialReport, String studentId) throws OperationException {
         PartialReport context = reportContextDAO.getPartialReportContextByStudentId(studentId);
 
         partialReport.setStudentName(context.getStudentName());
@@ -96,22 +110,87 @@ public class PartialReportCommon {
         partialReport.setAffiliatedOrganization(context.getAffiliatedOrganization());
         partialReport.setProjectSupervisor(context.getProjectSupervisor());
 
-        partialReport.setTotalHours(
-            reportContextDAO.getTotalReportedHoursByStudentId(studentId));
+        partialReport.setTotalHours(reportContextDAO.getTotalReportedHoursByStudentId(studentId));
         partialReport.setDateReport(LocalDate.now().format(DATE_FORMATTER));
     }
 
-    private void applyPlannedWeeklyAdvance(PartialReport partialReport, String studentId)
-            throws OperationException {
-        Activity activity = reportContextDAO.getActivityByName(
-            studentId, partialReport.getActivityName());
+    private void fillAdvanceMatrices(PartialReport partialReport, String studentId) throws OperationException {
+        List<Activity> selectedActivities = new ArrayList<>();
+        String[] activityNames = partialReport.getActivityNames();
+
+        for (int activityIndex = 0; activityIndex < PartialReport.MAX_ACTIVITIES; activityIndex++) {
+            String activityName = activityNames[activityIndex];
+
+            if (activityName != null && !activityName.isBlank()) {
+                Activity activity = resolveActivity(studentId, activityName);
+                fillActivityColumn(partialReport, activity, activityIndex);
+                selectedActivities.add(activity);
+            }
+        }
+
+        partialReport.setReportPeriod(buildReportPeriod(selectedActivities));
+    }
+
+    private Activity resolveActivity(String studentId, String activityName) throws OperationException {
+        Activity activity = reportContextDAO.getActivityByName(studentId, activityName);
 
         if (activity == null) {
             throw new OperationException(ACTIVITY_NOT_FOUND_MESSAGE, null);
         }
+        return activity;
+    }
 
-        int plannedAdvance = WorkProgressCalculator.calculateWeeklyPlannedAdvance(activity);
-        partialReport.setPlannedAdvanceWeek(plannedAdvance);
+    private void fillActivityColumn(PartialReport partialReport, Activity activity, int activityIndex) {
+        int activityWeeks = WorkProgressCalculator.calculateActivityWeeks(activity);
+        int totalWeeks = Math.min(activityWeeks, PartialReport.MAX_WEEKS);
+        int plannedWeeklyAdvance = WorkProgressCalculator.calculateWeeklyPlannedAdvance(activity);
+        int writtenRealAdvance = partialReport.getRealWeeklyAdvances()[activityIndex];
+        int realWeeklyAdvance = writtenRealAdvance / activityWeeks;
+
+        int[][] plannedAdvances = partialReport.getPlannedAdvances();
+        int[][] realAdvances = partialReport.getRealAdvances();
+
+        for (int weekIndex = 0; weekIndex < totalWeeks; weekIndex++) {
+            plannedAdvances[weekIndex][activityIndex] = plannedWeeklyAdvance;
+            realAdvances[weekIndex][activityIndex] = realWeeklyAdvance;
+        }
+    }
+
+    private String buildReportPeriod(List<Activity> activities) {
+        String reportPeriod = "";
+        LocalDate earliestStart = findEarliestStart(activities);
+        LocalDate latestEnd = findLatestEnd(activities);
+
+        if (earliestStart != null && latestEnd != null) {
+            reportPeriod = earliestStart.format(DATE_FORMATTER) + " - " + latestEnd.format(DATE_FORMATTER);
+        }
+        return reportPeriod;
+    }
+
+    private LocalDate findEarliestStart(List<Activity> activities) {
+        LocalDate earliestStart = null;
+
+        for (Activity activity : activities) {
+            LocalDate startDate = activity.getStartDate();
+
+            if (startDate != null && (earliestStart == null || startDate.isBefore(earliestStart))) {
+                earliestStart = startDate;
+            }
+        }
+        return earliestStart;
+    }
+
+    private LocalDate findLatestEnd(List<Activity> activities) {
+        LocalDate latestEnd = null;
+
+        for (Activity activity : activities) {
+            LocalDate endDate = activity.getEndDate();
+
+            if (endDate != null && (latestEnd == null || endDate.isAfter(latestEnd))) {
+                latestEnd = endDate;
+            }
+        }
+        return latestEnd;
     }
 
     private Map<String, Object> buildReportParameters(PartialReport report) {
@@ -141,14 +220,11 @@ public class PartialReportCommon {
         parameters.put("observations", report.getObservations());
     }
 
-    private void addActivityNameParameters(Map<String, Object> parameters,
-            String[] activityNames) {
+    private void addActivityNameParameters(Map<String, Object> parameters, String[] activityNames) {
         for (int activityIndex = 0; activityIndex < PartialReport.MAX_ACTIVITIES; activityIndex++) {
-            String activityName = activityNames[activityIndex] == null
-                ? "" : activityNames[activityIndex];
-            String parameterKey = activityIndex == 0
-                ? ACTIVITY_NAME_PREFIX
-                : ACTIVITY_NAME_PREFIX + (activityIndex + 1);
+            String activityName = activityNames[activityIndex] == null ? "" : activityNames[activityIndex];
+            String parameterKey = activityIndex == FIRST_INDEX ? ACTIVITY_NAME_PREFIX 
+                : ACTIVITY_NAME_PREFIX + (activityIndex + INDEX_OFFSET);
             parameters.put(parameterKey, activityName);
         }
     }
@@ -158,7 +234,7 @@ public class PartialReportCommon {
         int[][] realAdvances = report.getRealAdvances();
 
         for (int weekIndex = 0; weekIndex < PartialReport.MAX_WEEKS; weekIndex++) {
-            int weekNumber = weekIndex + FIRST_ACTIVITY_INDEX;
+            int weekNumber = weekIndex + INDEX_OFFSET;
             putPlannedRow(parameters, weekNumber, plannedAdvances[weekIndex]);
             putRealRow(parameters, weekNumber, realAdvances[weekIndex]);
         }
@@ -166,7 +242,7 @@ public class PartialReportCommon {
 
     private void putPlannedRow(Map<String, Object> parameters, int weekNumber, int[] plannedRow) {
         for (int activityIndex = 0; activityIndex < PartialReport.MAX_ACTIVITIES; activityIndex++) {
-            int activityNumber = activityIndex + FIRST_ACTIVITY_INDEX;
+            int activityNumber = activityIndex + INDEX_OFFSET;
             String parameterKey = buildCellKey(
                 PLANNED_ADVANCE_PREFIX, weekNumber, activityNumber);
             parameters.put(parameterKey, String.valueOf(plannedRow[activityIndex]));
@@ -175,7 +251,7 @@ public class PartialReportCommon {
 
     private void putRealRow(Map<String, Object> parameters, int weekNumber, int[] realRow) {
         for (int activityIndex = 0; activityIndex < PartialReport.MAX_ACTIVITIES; activityIndex++) {
-            int activityNumber = activityIndex + FIRST_ACTIVITY_INDEX;
+            int activityNumber = activityIndex + INDEX_OFFSET;
             String parameterKey = buildCellKey(
                 REAL_ADVANCE_PREFIX, weekNumber, activityNumber);
             parameters.put(parameterKey, String.valueOf(realRow[activityIndex]));

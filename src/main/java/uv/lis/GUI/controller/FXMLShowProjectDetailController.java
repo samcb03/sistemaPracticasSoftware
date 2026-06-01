@@ -273,10 +273,6 @@ public class FXMLShowProjectDetailController extends ValidationHandler {
         }
     }
 
-    /* This view does not require field clearing because it does not have 
-     * a search mechanism. The project information is loaded once via 
-     * initializeData() and replaced entirely by displayProjectInformation() 
-     * after a successful update. */
     @Override
     protected void clearFields() {
     }

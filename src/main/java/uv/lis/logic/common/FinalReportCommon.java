@@ -4,15 +4,20 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import net.sf.jasperreports.engine.DefaultJasperReportsContext;
 import net.sf.jasperreports.engine.JREmptyDataSource;
 import net.sf.jasperreports.engine.JRException;
 import net.sf.jasperreports.engine.JasperFillManager;
 import net.sf.jasperreports.engine.JasperPrint;
+import net.sf.jasperreports.engine.SimpleJasperReportsContext;
+import net.sf.jasperreports.repo.RepositoryService;
 
 import uv.lis.logic.dao.ReportContextDAO;
 import uv.lis.logic.dto.ActivityProgress;
@@ -33,9 +38,20 @@ public class FinalReportCommon {
     private static final String TEMPLATE_READ_ERROR_MESSAGE = "Error al cargar la plantilla del reporte.";
 
     private final ReportContextDAO reportContextDAO;
+    private final SimpleJasperReportsContext jasperReportsContext;
 
     public FinalReportCommon() {
         this.reportContextDAO = new ReportContextDAO();
+        this.jasperReportsContext = buildReportsContext();
+    }
+
+    private SimpleJasperReportsContext buildReportsContext() {
+        SimpleJasperReportsContext reportsContext
+            = new SimpleJasperReportsContext(DefaultJasperReportsContext.getInstance());
+        List<RepositoryService> repositoryServices = new ArrayList<>();
+        repositoryServices.add(new ClasspathImageRepositoryCommon());
+        reportsContext.setExtensions(RepositoryService.class, repositoryServices);
+        return reportsContext;
     }
 
     public JasperPrint generateFinalReport(FinalReport finalReport) throws JRException, OperationException {
@@ -60,7 +76,8 @@ public class FinalReportCommon {
             }
 
             Map<String, Object> parameters = buildReportParameters(finalReport);
-            jasperPrint = JasperFillManager.fillReport(templateStream, parameters, new JREmptyDataSource());
+            jasperPrint = JasperFillManager.getInstance(jasperReportsContext)
+                .fill(templateStream, parameters, new JREmptyDataSource());
         } catch (IOException ioException) {
             LOGGER.log(Level.SEVERE, "Error al leer la plantilla del reporte", ioException);
             throw new OperationException(TEMPLATE_READ_ERROR_MESSAGE, ioException);
