@@ -10,4 +10,6 @@ public interface IUserDAO {
     int registerUser(User user) throws OperationException;
 
     Optional<User> authenticate(String email, String password) throws AuthenticateException;
+
+    boolean existActiveCoordinator() throws OperationException;
 }

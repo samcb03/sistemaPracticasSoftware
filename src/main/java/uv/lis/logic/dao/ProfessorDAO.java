@@ -154,6 +154,12 @@ public class ProfessorDAO extends UserDAO implements IProfessorDAO {
 
     @Override
     public boolean modifyProfessor(Professor professor) throws OperationException {
+        if (professor.getIsCoordinator()) {
+            if (isAnotherCoordinatorActive(professor.getPersonnelNumber())) {
+                throw new OperationException("No es posible asignar el cargo: ya existe un coordinador activo en el sistema.", null);
+            }
+        }
+
         boolean isModified = false;
         String professorQuery = "UPDATE Profesor p INNER JOIN Usuario u ON p.idUsuario = u.idUsuario "
                               + "SET u.idRol = ?, u.nombre = ?, u.apellidos = ? "
@@ -346,5 +352,28 @@ public class ProfessorDAO extends UserDAO implements IProfessorDAO {
         }
 
         return history;
+    }
+
+    public boolean isAnotherCoordinatorActive(String personnelNumber) throws OperationException {
+        boolean exits = false;
+        String query = "SELECT COUNT(*) " +
+                       "FROM Usuario u " +
+                       "INNER JOIN Profesor p ON u.idUsuario = p.idUsuario " +
+                       "WHERE u.idRol = 3 AND u.estado = 1 AND p.numeroPersonal <> ?;";
+        
+        try (Connection databaseConnection = connectionManager.getConnection();
+            PreparedStatement preparedStatement = databaseConnection.prepareStatement(query)) {
+            
+            preparedStatement.setString(1, personnelNumber);
+
+            try (ResultSet resultSet = preparedStatement.executeQuery()) {
+                if (resultSet.next()) {
+                    exits = resultSet.getInt(1) > NO_ROWS_AFFECTED;
+                }
+            }
+        } catch (SQLException e) {
+            throw new OperationException("Error al validar el coordinador ", e);
+        }
+        return exits;
     }
 }

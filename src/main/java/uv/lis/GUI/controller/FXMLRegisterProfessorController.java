@@ -2,7 +2,6 @@ package uv.lis.GUI.controller;
 
 import static uv.lis.logic.utils.InputValidator.INVALID_ID;
 import static uv.lis.logic.utils.InputValidator.PROFESSOR_ID_LENGTH;
-import static uv.lis.logic.utils.InputValidator.validateComboBox;
 import static uv.lis.logic.utils.InputValidator.validateEmail;
 import static uv.lis.logic.utils.InputValidator.validateExactLength;
 import static uv.lis.logic.utils.InputValidator.validateText;
@@ -13,10 +12,8 @@ import java.util.Optional;
 import java.util.ResourceBundle;
 import java.util.stream.Stream;
 
-import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
-import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
@@ -29,9 +26,7 @@ import uv.lis.logic.exceptions.OperationException;
 
 public class FXMLRegisterProfessorController extends ValidationHandler {
 
-    private static final String COORDINATOR_OPTION = "Si";
-    private static final int COORDINATOR_USER_TYPE = 3;
-    private static final int PROFESSOR_USER_TYPE = 2;
+    private static final int PROFESSOR_ROLE_ID = 2;
 
     @FXML private Button buttonBack;
     @FXML private Label labelMessage;
@@ -40,7 +35,6 @@ public class FXMLRegisterProfessorController extends ValidationHandler {
     @FXML private TextField textFieldEmail;
     @FXML private PasswordField passwordFieldPassword;
     @FXML private TextField textFieldPersonnelNumber;
-    @FXML private ComboBox<String> comboBoxCoordinator;
 
     private UserDAO userDAO;
     private ProfessorDAO professorDAO;
@@ -49,7 +43,6 @@ public class FXMLRegisterProfessorController extends ValidationHandler {
     public void initialize(URL url, ResourceBundle resourceBundle) {
         userDAO = new UserDAO();
         professorDAO = new ProfessorDAO();
-        comboBoxCoordinator.setItems(FXCollections.observableArrayList("Si", "No"));
         setupControls(labelMessage, buttonBack);
     }
 
@@ -66,8 +59,7 @@ public class FXMLRegisterProfessorController extends ValidationHandler {
             validateEmail(textFieldEmail.getText().trim(), "El correo electrónico"),
             validatePassword(passwordFieldPassword.getText().trim(), "La contraseña"),
             validateExactLength(textFieldPersonnelNumber.getText().trim(), PROFESSOR_ID_LENGTH, 
-                "El número de personal"),
-            validateComboBox(comboBoxCoordinator.getValue(), "una opción de coordinador")
+                "El número de personal")
         );
         Optional<String> firstError = validationStream
             .filter(Optional::isPresent)
@@ -98,16 +90,14 @@ public class FXMLRegisterProfessorController extends ValidationHandler {
     }
 
     private Professor buildProfessor() {
-        boolean isCoordinator = COORDINATOR_OPTION.equals(comboBoxCoordinator.getValue());
         Professor professor = new Professor();
         professor.setFirstName(textFieldFirstName.getText().trim());
         professor.setLastName(textFieldLastName.getText().trim());
         professor.setEmail(textFieldEmail.getText().trim());
         professor.setPassword(passwordFieldPassword.getText().trim());
         professor.setPersonnelNumber(textFieldPersonnelNumber.getText().trim());
-        professor.setIsCoordinator(isCoordinator);
-        professor.setRoleId(isCoordinator ? COORDINATOR_USER_TYPE : PROFESSOR_USER_TYPE);
         professor.setActive(true);
+        professor.setRoleId(PROFESSOR_ROLE_ID);
         return professor;
     }
 
@@ -118,6 +108,5 @@ public class FXMLRegisterProfessorController extends ValidationHandler {
         textFieldEmail.clear();
         passwordFieldPassword.clear();
         textFieldPersonnelNumber.clear();
-        comboBoxCoordinator.setValue(null);
     }
 }
