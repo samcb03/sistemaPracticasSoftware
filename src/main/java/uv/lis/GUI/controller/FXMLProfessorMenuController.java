@@ -10,12 +10,12 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
-import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.input.MouseEvent;
+import javafx.stage.Stage;
 
 import uv.lis.GUI.WindowHandler;
 import uv.lis.logic.dao.SchoolPeriodDAO;
@@ -36,7 +36,6 @@ public class FXMLProfessorMenuController extends WindowHandler {
     @FXML private TableColumn<Subject, String> tableColumnSubjectName;
     @FXML private TableColumn<Subject, Integer> tableColumnPeriod;
     @FXML private ComboBox<String> comboBoxSchoolPeriod;
-    @FXML private Button buttonLogOut;
 
     private final SubjectDAO subjectDAO = new SubjectDAO();
     private final SchoolPeriodDAO schoolPeriodDAO = new SchoolPeriodDAO();
@@ -83,6 +82,22 @@ public class FXMLProfessorMenuController extends WindowHandler {
             FXMLConsultSubjectController controller = loader.getController();
             controller.initializeData(subject);
         }
+    }
+
+    @FXML
+    private void handleCloseProfessorMenu() {
+        boolean isCoordinator = SessionManager.getInstance().getCurrentCoordinator().isPresent();
+
+        if (isCoordinator) {
+            closeCurrentWindow();
+        } else {
+            navigateToLogOut();
+        }
+    }
+
+    private void closeCurrentWindow() {
+        Stage currentStage = (Stage) buttonLogOut.getScene().getWindow();
+        currentStage.close();
     }
 
     private void loadSchoolPeriods() {

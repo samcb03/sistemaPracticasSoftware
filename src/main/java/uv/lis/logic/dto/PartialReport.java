@@ -23,11 +23,13 @@ public class PartialReport extends Report {
     private String dateReport;
 
     private String[] activityNames;
+    private int[] realWeeklyAdvances;
     private int[][] plannedAdvances;
     private int[][] realAdvances;
 
     public PartialReport() {
         this.activityNames = new String[MAX_ACTIVITIES];
+        this.realWeeklyAdvances = new int[MAX_ACTIVITIES];
         this.plannedAdvances = new int[MAX_WEEKS][MAX_ACTIVITIES];
         this.realAdvances = new int[MAX_WEEKS][MAX_ACTIVITIES];
         Arrays.fill(this.activityNames, "");
@@ -143,6 +145,14 @@ public class PartialReport extends Report {
 
     public void setActivityNames(String[] activityNames) {
         this.activityNames = activityNames;
+    }
+
+    public int[] getRealWeeklyAdvances() {
+        return realWeeklyAdvances;
+    }
+
+    public void setRealWeeklyAdvances(int[] realWeeklyAdvances) {
+        this.realWeeklyAdvances = realWeeklyAdvances;
     }
 
     public int[][] getPlannedAdvances() {

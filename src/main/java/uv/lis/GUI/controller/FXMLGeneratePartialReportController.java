@@ -1,9 +1,11 @@
 package uv.lis.GUI.controller;
 
 import java.net.URL;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.ResourceBundle;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
@@ -41,9 +43,10 @@ public class FXMLGeneratePartialReportController extends ValidationHandler {
     private static final String NO_STUDENT_MESSAGE = "No hay un estudiante en sesión";
     private static final String LOAD_ACTIVITIES_ERROR = "No se pudieron cargar las actividades";
     private static final String PARTIAL_REPORT_TITLE = "Reporte Parcial";
+    private static final String DUPLICATE_ACTIVITY_MESSAGE
+        = "La actividad ya fue seleccionada. Cada actividad solo puede elegirse una vez.";
 
     private static final int DEFAULT_REPORT_NUMBER = 1;
-    private static final int FIRST_WEEK_SLOT = 0;
     private static final int INVALID_ADVANCE = 0;
 
     private final PartialReportCommon partialReportCommon = new PartialReportCommon();
@@ -126,6 +129,7 @@ public class FXMLGeneratePartialReportController extends ValidationHandler {
     private void validateFields() {
         Stream<Optional<String>> validationStream = Stream.of(
             validateFirstActivityRow(),
+            validateNoDuplicateActivities(),
             InputValidator.validateText(
                 textAreaGeneralObservations.getText(), "Observaciones Generales"),
             InputValidator.validateText(
@@ -138,6 +142,21 @@ public class FXMLGeneratePartialReportController extends ValidationHandler {
             .findFirst();
 
         handleValidation(validationError, this::generateReport);
+    }
+
+    private Optional<String> validateNoDuplicateActivities() {
+        Optional<String> duplicateError = Optional.empty();
+        Set<String> selectedActivities = new HashSet<>();
+
+        for (ComboBox<String> comboBoxActivity : comboBoxActivities) {
+            String selectedActivity = comboBoxActivity.getValue();
+
+            if (selectedActivity != null && !selectedActivities.add(selectedActivity)) {
+                duplicateError = Optional.of(DUPLICATE_ACTIVITY_MESSAGE);
+                break;
+            }
+        }
+        return duplicateError;
     }
 
     private Optional<String> validateFirstActivityRow() {
@@ -186,20 +205,19 @@ public class FXMLGeneratePartialReportController extends ValidationHandler {
         partialReport.setResult(textAreaResults.getText().trim());
         partialReport.setObservations(textAreaGeneralObservations.getText().trim());
 
-        fillActivityMatrices(partialReport);
+        fillActivityInputs(partialReport);
         return partialReport;
     }
 
-    private void fillActivityMatrices(PartialReport partialReport) {
+    private void fillActivityInputs(PartialReport partialReport) {
         String[] activityNames = partialReport.getActivityNames();
-        int[][] realAdvances = partialReport.getRealAdvances();
+        int[] realWeeklyAdvances = partialReport.getRealWeeklyAdvances();
 
         for (int activityIndex = 0; activityIndex < comboBoxActivities.length; activityIndex++) {
             activityNames[activityIndex] = readActivityName(activityIndex);
-            realAdvances[FIRST_WEEK_SLOT][activityIndex] = parseAdvance(textFieldAdvances[activityIndex].getText());
+            realWeeklyAdvances[activityIndex]
+                = parseAdvance(textFieldAdvances[activityIndex].getText());
         }
-
-        partialReport.setRealAdvanceWeek(realAdvances[FIRST_WEEK_SLOT][0]);
     }
 
     private String readActivityName(int activityIndex) {
