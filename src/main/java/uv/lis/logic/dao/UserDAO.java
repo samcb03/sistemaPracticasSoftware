@@ -18,6 +18,7 @@ import uv.lis.logic.exceptions.OperationException;
 import uv.lis.logic.utils.PasswordHasher;
 
 public class UserDAO implements IUserDAO {
+    private static final int ROL_COORDINATOR = 3;
     private static final Logger LOGGER = Logger.getLogger(UserDAO.class.getName());
     private MySQLConnectionManager connectionManager;
 
@@ -43,6 +44,10 @@ public class UserDAO implements IUserDAO {
         try (Connection databaseConnection = connectionManager.getConnection();
             PreparedStatement preparedStatement = databaseConnection.prepareStatement(userQuery,
                 PreparedStatement.RETURN_GENERATED_KEYS)) {
+
+            if (user.getRoleId() == ROL_COORDINATOR && existActiveCoordinator()) {
+                throw new OperationException("Ya existe un coordinador activo en el sistema", null);
+            }
  
             preparedStatement.setString(1, user.getFirstName());
             preparedStatement.setString(2, user.getLastName());
@@ -110,5 +115,25 @@ public class UserDAO implements IUserDAO {
             throw new AuthenticateException("Error al autenticar: " + e.getMessage(), e);
         }
         return validateUser;
+    }
+
+    @Override
+    public boolean existActiveCoordinator() throws OperationException {
+        boolean exists = false;
+        String userQuery = "SELECT COUNT(*) FROM Usuario WHERE idRol = 2 AND estado = 1";
+
+        try (Connection databaseConnection = connectionManager.getConnection();
+            PreparedStatement preparedStatement
+                = databaseConnection.prepareStatement(userQuery);
+            ResultSet resultSet = preparedStatement.executeQuery()) {
+
+            if (resultSet.next()) {
+                exists = resultSet.getInt(1) > NO_ROWS_AFFECTED; 
+            }
+        } catch (SQLException e) {
+            LOGGER.log(Level.SEVERE, "Error al verificar coordinador activo", e);
+            throw new OperationException("Error al verificar coordinador activo", e);
+        }
+        return exists;
     }
 }

@@ -169,14 +169,15 @@ public class FXMLConsultProfessorController extends ValidationHandler {
             executeProfessorUpdate();
         }
     }
-
+    
     private void executeProfessorUpdate() {
         try {
             Professor updatedProfessor = buildUpdatedProfessor();
             boolean isUpdated = professorDAO.modifyProfessor(updatedProfessor);
             handleUpdateResult(isUpdated, updatedProfessor);
         } catch (OperationException operationException) {
-            LOGGER.log(Level.SEVERE, "Error al actualizar al profesor", operationException);
+            LOGGER.log(Level.WARNING, "Error al actualizar al profesor: {0}",
+                operationException.getMessage());
             showError(operationException.getMessage());
         }
     }

@@ -1,6 +1,7 @@
 package daotest.test.java.testdao;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.anyInt;
@@ -181,5 +182,47 @@ class UserDAOTest {
 
         assertThrows(AuthenticateException.class, () -> userDAO.authenticate("S123", 
             "pass"));
+    }
+
+    @Test
+    void existActiveCoordinator_coordinatorExists_returnsTrue() throws Exception {
+        when(databaseConnection.prepareStatement(anyString())).thenReturn(preparedStatement);
+        when(preparedStatement.executeQuery()).thenReturn(resultSet);
+        when(resultSet.next()).thenReturn(true);
+        when(resultSet.getInt(1)).thenReturn(1);
+
+        boolean result = userDAO.existActiveCoordinator();
+
+        assertTrue(result);
+    }
+
+    @Test
+    void existActiveCoordinator_noCoordinatorExists_returnsFalse() throws Exception {
+        when(databaseConnection.prepareStatement(anyString())).thenReturn(preparedStatement);
+        when(preparedStatement.executeQuery()).thenReturn(resultSet);
+        when(resultSet.next()).thenReturn(true);
+        when(resultSet.getInt(1)).thenReturn(0);
+
+        boolean result = userDAO.existActiveCoordinator();
+
+        assertFalse(result);
+    }
+
+    @Test
+    void existActiveCoordinator_resultSetEmpty_returnsFalse() throws Exception {
+        when(databaseConnection.prepareStatement(anyString())).thenReturn(preparedStatement);
+        when(preparedStatement.executeQuery()).thenReturn(resultSet);
+        when(resultSet.next()).thenReturn(false);
+
+        boolean result = userDAO.existActiveCoordinator();
+
+        assertFalse(result);
+    }
+
+    @Test
+    void existActiveCoordinator_databaseError_throwsOperationException() throws Exception {
+        when(databaseConnection.prepareStatement(anyString())).thenThrow(new SQLException());
+
+        assertThrows(OperationException.class, () -> userDAO.existActiveCoordinator());
     }
 }
