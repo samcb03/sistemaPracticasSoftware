@@ -4,6 +4,7 @@ import static uv.lis.logic.utils.InputValidator.MAX_REQUESTS;
 import static uv.lis.logic.utils.InputValidator.NO_ROWS_AFFECTED;
 import static uv.lis.logic.utils.InputValidator.STATUS_ASSIGNED;
 import static uv.lis.logic.utils.InputValidator.STATUS_REQUESTED;
+import static uv.lis.logic.utils.InputValidator.STATUS_REJECTED;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -331,8 +332,7 @@ public class RequestProjectDAO implements IRequestProjectDAO {
         String requestProjectQuery = "SELECT COUNT(*) FROM Solicita_Proyecto "
                                    + "WHERE matricula = ? AND estatus = ?";
 
-        try (PreparedStatement preparedStatement
-            = databaseConnection.prepareStatement(requestProjectQuery)) {
+        try (PreparedStatement preparedStatement = databaseConnection.prepareStatement(requestProjectQuery)) {
             preparedStatement.setString(1, idStudent);
             preparedStatement.setInt(2, STATUS_ASSIGNED);
 
@@ -350,8 +350,7 @@ public class RequestProjectDAO implements IRequestProjectDAO {
         String requestProjectQuery = "UPDATE Solicita_Proyecto SET estatus = ? "
                                    + "WHERE matricula = ? AND idProyecto = ?";
 
-        try (PreparedStatement preparedStatement
-            = databaseConnection.prepareStatement(requestProjectQuery)) {
+        try (PreparedStatement preparedStatement = databaseConnection.prepareStatement(requestProjectQuery)) {
             preparedStatement.setInt(1, STATUS_ASSIGNED);
             preparedStatement.setString(2, idStudent);
             preparedStatement.setInt(3, idProject);
@@ -360,13 +359,13 @@ public class RequestProjectDAO implements IRequestProjectDAO {
     }
 
     private void cleanPendingRequests(Connection databaseConnection, String idStudent) throws SQLException {
-        String requestProjectQuery = "DELETE FROM Solicita_Proyecto "
+        String requestProjectQuery = "UPDATE Solicita_Proyecto SET estatus = ? "
                                    + "WHERE matricula = ? AND estatus = ?";
 
-        try (PreparedStatement preparedStatement
-            = databaseConnection.prepareStatement(requestProjectQuery)) {
-            preparedStatement.setString(1, idStudent);
-            preparedStatement.setInt(2, STATUS_REQUESTED);
+        try (PreparedStatement preparedStatement = databaseConnection.prepareStatement(requestProjectQuery)) {
+            preparedStatement.setInt(1, STATUS_REJECTED);
+            preparedStatement.setString(2, idStudent);
+            preparedStatement.setInt(3, STATUS_REQUESTED);
             preparedStatement.executeUpdate();
         }
     }

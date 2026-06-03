@@ -36,7 +36,8 @@ public class SubjectDAO implements ISubjectDAO {
                             + "VALUES (?, ?, ?, ?);";
 
         String professorSubjectQuery = "INSERT INTO Profesor_Imparte_Experiencia (NRC, numeroPersonal) "
-                                     + "VALUES (?, ?);";
+                                     + "VALUES (?, ?) "
+                                     + "ON DUPLICATE KEY UPDATE estaActiva = TRUE;";
 
         try (Connection databaseConnection = connectionManager.getConnection()) {
 
@@ -155,7 +156,6 @@ public class SubjectDAO implements ISubjectDAO {
     public void unassignProfessorFromSubject(String personnelNumber) throws OperationException {
         String subjectQuery = "DELETE FROM Profesor_Imparte_Experiencia"
                             + " WHERE numeroPersonal = ?";
-
 
         try (Connection databaseConnection = connectionManager.getConnection();
             PreparedStatement preparedStatement = databaseConnection.prepareStatement(subjectQuery)) {
