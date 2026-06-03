@@ -9,11 +9,10 @@ import java.util.logging.Logger;
 
 import net.sf.jasperreports.engine.JREmptyDataSource;
 import net.sf.jasperreports.engine.JRException;
-import net.sf.jasperreports.engine.JRParameter;
-import net.sf.jasperreports.engine.JasperCompileManager;
 import net.sf.jasperreports.engine.JasperFillManager;
 import net.sf.jasperreports.engine.JasperPrint;
 import net.sf.jasperreports.engine.JasperReport;
+import net.sf.jasperreports.engine.SimpleJasperReportsContext;
 import net.sf.jasperreports.engine.util.JRLoader;
 import uv.lis.logic.dao.ReportContextDAO;
 import uv.lis.logic.dao.ReportDAO;
@@ -26,18 +25,18 @@ public class MonthlyReportCommon {
 
     private static final Logger LOGGER = Logger.getLogger(MonthlyReportCommon.class.getName());
     private static final String TEMPLATE_PATH = "/uv/lis/GUI/view/templates/MonthlyReport.jasper";
-    private static final String IMAGE_PATH = "/uv/lis/GUI/view/images/ReporteMensual.jpg";
     private static final String TEMPLATE_NOT_FOUND_MESSAGE = "No se encontró la plantilla del reporte mensual.";
-    private static final String IMAGE_NOT_FOUND_MESSAGE = "No se encontró la imagen de fondo del reporte mensual.";
     private static final String TEMPLATE_READ_ERROR_MESSAGE = "Error al cargar la plantilla del reporte mensual.";
     private static final String NO_STUDENT_IN_SESSION_MESSAGE = "No hay un estudiante en sesión";
     private static final int MAX_ACTIVITIES = 7;
 
     private final ReportContextDAO reportContextDAO;
+    private final SimpleJasperReportsContext jasperReportsContext;
     private final ReportDAO reportDAO;
 
     public MonthlyReportCommon() {
         this.reportContextDAO = new ReportContextDAO();
+        this.jasperReportsContext = new SimpleJasperReportsContext();
         this.reportDAO = new ReportDAO();
     }
 
@@ -56,23 +55,24 @@ public class MonthlyReportCommon {
     private JasperPrint fillReportTemplate(MonthlyReport monthlyReport) throws JRException, OperationException {
         JasperPrint jasperPrint;
 
-        try (InputStream reportStream = getClass().getResourceAsStream(TEMPLATE_PATH)) {
-            if (reportStream == null) {
+        try (InputStream templateStream = getClass().getResourceAsStream(TEMPLATE_PATH)) {
+
+            if (templateStream == null) {
+                LOGGER.log(Level.SEVERE, "No se encontró la plantilla: {0}", TEMPLATE_PATH);
                 throw new OperationException(TEMPLATE_NOT_FOUND_MESSAGE, null);
             }
 
-            JasperReport jasperReport = (JasperReport) JRLoader.loadObject(reportStream);
-
             Map<String, Object> parameters = buildReportParameters(monthlyReport);
-            parameters.put("REPORT_REPOSITORY", new ClasspathImageRepositoryCommon());
-
-            jasperPrint = JasperFillManager.fillReport(jasperReport, parameters, new JREmptyDataSource());
+            jasperPrint = JasperFillManager.getInstance(jasperReportsContext)
+                    .fill(templateStream, parameters, new JREmptyDataSource());
 
         } catch (IOException e) {
+            LOGGER.log(Level.SEVERE, "Error al leer la plantilla del reporte mensual", e);
             throw new OperationException(TEMPLATE_READ_ERROR_MESSAGE, e);
         }
         return jasperPrint;
     }
+
     private void mergeContextIntoMonthlyReport(MonthlyReport report, String studentId) throws OperationException {
         MonthlyReport context = reportContextDAO.getMonthlyReportData(studentId);
         report.setStudentName(context.getStudentName());
