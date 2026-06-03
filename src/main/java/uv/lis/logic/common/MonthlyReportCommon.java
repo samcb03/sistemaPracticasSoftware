@@ -9,6 +9,7 @@ import java.util.logging.Logger;
 
 import net.sf.jasperreports.engine.JREmptyDataSource;
 import net.sf.jasperreports.engine.JRException;
+import net.sf.jasperreports.engine.JRParameter;
 import net.sf.jasperreports.engine.JasperCompileManager;
 import net.sf.jasperreports.engine.JasperFillManager;
 import net.sf.jasperreports.engine.JasperPrint;
@@ -24,7 +25,7 @@ import uv.lis.logic.utils.SessionManager;
 public class MonthlyReportCommon {
 
     private static final Logger LOGGER = Logger.getLogger(MonthlyReportCommon.class.getName());
-    private static final String TEMPLATE_PATH = "/uv/lis/GUI/view/templates/MonthlyReport.jrxml";
+    private static final String TEMPLATE_PATH = "/uv/lis/GUI/view/templates/MonthlyReport.jasper";
     private static final String IMAGE_PATH = "/uv/lis/GUI/view/images/ReporteMensual.jpg";
     private static final String TEMPLATE_NOT_FOUND_MESSAGE = "No se encontró la plantilla del reporte mensual.";
     private static final String IMAGE_NOT_FOUND_MESSAGE = "No se encontró la imagen de fondo del reporte mensual.";
@@ -54,25 +55,20 @@ public class MonthlyReportCommon {
 
     private JasperPrint fillReportTemplate(MonthlyReport monthlyReport) throws JRException, OperationException {
         JasperPrint jasperPrint;
-
-        try (InputStream reportStream = getClass().getResourceAsStream(TEMPLATE_PATH);
-                InputStream imageStream = getClass().getResourceAsStream(IMAGE_PATH)) {
-
+        
+        try (InputStream reportStream = getClass().getResourceAsStream(TEMPLATE_PATH)) {
             if (reportStream == null) {
-                LOGGER.log(Level.SEVERE, "No se encontró la plantilla: {0}", TEMPLATE_PATH);
                 throw new OperationException(TEMPLATE_NOT_FOUND_MESSAGE, null);
-            }
-
-            if (imageStream == null) {
-                LOGGER.log(Level.SEVERE, "No se encontró la imagen: {0}", IMAGE_PATH);
-                throw new OperationException(IMAGE_NOT_FOUND_MESSAGE, null);
             }
 
             JasperReport jasperReport = JasperCompileManager.compileReport(reportStream);
             Map<String, Object> parameters = buildReportParameters(monthlyReport);
+            
+            parameters.put("REPORT_REPOSITORY", new ClasspathImageRepositoryCommon());
+
             jasperPrint = JasperFillManager.fillReport(jasperReport, parameters, new JREmptyDataSource());
+            
         } catch (IOException ioException) {
-            LOGGER.log(Level.SEVERE, "Error al leer la plantilla del reporte mensual", ioException);
             throw new OperationException(TEMPLATE_READ_ERROR_MESSAGE, ioException);
         }
         return jasperPrint;
