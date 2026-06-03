@@ -14,7 +14,7 @@ import net.sf.jasperreports.engine.JasperCompileManager;
 import net.sf.jasperreports.engine.JasperFillManager;
 import net.sf.jasperreports.engine.JasperPrint;
 import net.sf.jasperreports.engine.JasperReport;
-
+import net.sf.jasperreports.engine.util.JRLoader;
 import uv.lis.logic.dao.ReportContextDAO;
 import uv.lis.logic.dao.ReportDAO;
 import uv.lis.logic.dto.MonthlyReport;
@@ -55,25 +55,24 @@ public class MonthlyReportCommon {
 
     private JasperPrint fillReportTemplate(MonthlyReport monthlyReport) throws JRException, OperationException {
         JasperPrint jasperPrint;
-        
+
         try (InputStream reportStream = getClass().getResourceAsStream(TEMPLATE_PATH)) {
             if (reportStream == null) {
                 throw new OperationException(TEMPLATE_NOT_FOUND_MESSAGE, null);
             }
 
-            JasperReport jasperReport = JasperCompileManager.compileReport(reportStream);
+            JasperReport jasperReport = (JasperReport) JRLoader.loadObject(reportStream);
+
             Map<String, Object> parameters = buildReportParameters(monthlyReport);
-            
             parameters.put("REPORT_REPOSITORY", new ClasspathImageRepositoryCommon());
 
             jasperPrint = JasperFillManager.fillReport(jasperReport, parameters, new JREmptyDataSource());
-            
-        } catch (IOException ioException) {
-            throw new OperationException(TEMPLATE_READ_ERROR_MESSAGE, ioException);
+
+        } catch (IOException e) {
+            throw new OperationException(TEMPLATE_READ_ERROR_MESSAGE, e);
         }
         return jasperPrint;
     }
-
     private void mergeContextIntoMonthlyReport(MonthlyReport report, String studentId) throws OperationException {
         MonthlyReport context = reportContextDAO.getMonthlyReportData(studentId);
         report.setStudentName(context.getStudentName());
