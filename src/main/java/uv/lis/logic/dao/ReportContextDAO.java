@@ -51,9 +51,10 @@ public class ReportContextDAO implements IReportContextDAO {
         String reportContextQuery = buildContextQuery();
 
         try (Connection databaseConnection = connectionManager.getConnection();
-                PreparedStatement preparedStatement = databaseConnection.prepareStatement(reportContextQuery)) {
+            PreparedStatement preparedStatement = databaseConnection.prepareStatement(reportContextQuery)) {
 
             preparedStatement.setString(1, studentId);
+            preparedStatement.setInt(2, STATUS_ASSIGNED);
 
             try (ResultSet resultSet = preparedStatement.executeQuery()) {
                 if (resultSet.next()) {
@@ -76,9 +77,10 @@ public class ReportContextDAO implements IReportContextDAO {
         String reportContextQuery = buildContextQuery();
 
         try (Connection databaseConnection = connectionManager.getConnection();
-                PreparedStatement preparedStatement = databaseConnection.prepareStatement(reportContextQuery)) {
+            PreparedStatement preparedStatement = databaseConnection.prepareStatement(reportContextQuery)) {
 
             preparedStatement.setString(1, studentId);
+            preparedStatement.setInt(2, STATUS_ASSIGNED);
 
             try (ResultSet resultSet = preparedStatement.executeQuery()) {
                 if (resultSet.next()) {
@@ -96,8 +98,7 @@ public class ReportContextDAO implements IReportContextDAO {
     }
 
     @Override
-    public String getTotalReportedHoursByStudentId(String studentId)
-            throws OperationException {
+    public String getTotalReportedHoursByStudentId(String studentId) throws OperationException {
         String totalHours = INITIAL_TOTAL_HOURS;
         String reportContextQuery = "SELECT COALESCE(SUM(rm.horasReportadas), 0) AS total "
                                   + "FROM Reporte r "
@@ -105,7 +106,7 @@ public class ReportContextDAO implements IReportContextDAO {
                                   + "WHERE r.matricula = ?";
 
         try (Connection databaseConnection = connectionManager.getConnection();
-                PreparedStatement preparedStatement = databaseConnection.prepareStatement(reportContextQuery)) {
+            PreparedStatement preparedStatement = databaseConnection.prepareStatement(reportContextQuery)) {
 
             preparedStatement.setString(1, studentId);
 
@@ -127,7 +128,7 @@ public class ReportContextDAO implements IReportContextDAO {
         String reportContextQuery = "SELECT * FROM v_contexto_academico WHERE matricula = ?";
 
         try (Connection databaseConnection = connectionManager.getConnection();
-                PreparedStatement preparedStatement = databaseConnection.prepareStatement(reportContextQuery)) {
+            PreparedStatement preparedStatement = databaseConnection.prepareStatement(reportContextQuery)) {
 
             preparedStatement.setString(1, studentId);
 
@@ -135,8 +136,7 @@ public class ReportContextDAO implements IReportContextDAO {
                 if (resultSet.next()) {
                     fillMonthlyReportContext(monthlyReport, resultSet);
                 } else {
-                    throw new OperationException(
-                        "No se encontró contexto para: " + studentId, null);
+                    throw new OperationException("No se encontró contexto para: " + studentId, null);
                 }
             }
         } catch (SQLException e) {
@@ -157,7 +157,7 @@ public class ReportContextDAO implements IReportContextDAO {
                                   + "WHERE sp.matricula = ?";
 
         try (Connection databaseConnection = connectionManager.getConnection();
-                PreparedStatement preparedStatement = databaseConnection.prepareStatement(reportContextQuery)) {
+            PreparedStatement preparedStatement = databaseConnection.prepareStatement(reportContextQuery)) {
 
             preparedStatement.setString(1, studentId);
 
@@ -177,8 +177,8 @@ public class ReportContextDAO implements IReportContextDAO {
     public List<Activity> getRecordedActivitiesByMonth(int idProyecto, int mes, int anio) throws OperationException {
         List<Activity> activities = new ArrayList<>();
         String reportContextQuery = "SELECT DISTINCT nombreActividad, descripcionActividad, horasReportadas AS horas "
-                    + "FROM Actividad "
-                    + "WHERE idProyecto = ? AND MONTH(FechaInicio) = ? AND YEAR(FechaInicio) = ?";
+                                  + "FROM Actividad "
+                                  + "WHERE idProyecto = ? AND MONTH(FechaInicio) = ? AND YEAR(FechaInicio) = ?";
 
         try (Connection databaseConnection = connectionManager.getConnection();
             PreparedStatement preparedStatement = databaseConnection.prepareStatement(reportContextQuery)) {
@@ -203,8 +203,7 @@ public class ReportContextDAO implements IReportContextDAO {
     }
 
     @Override
-    public Activity getActivityByName(String studentId, String activityName)
-            throws OperationException {
+    public Activity getActivityByName(String studentId, String activityName) throws OperationException {
         Activity activity = null;
         String reportContextQuery = "SELECT a.idActividad, a.nombreActividad, "
                                   + "a.descripcionActividad, a.FechaInicio, a.FechaFin "
@@ -236,10 +235,10 @@ public class ReportContextDAO implements IReportContextDAO {
         int total = 0;
         String query = "SELECT SUM(horasReportadas) FROM Actividad WHERE idReporte = ?";
         
-        try (Connection conn = connectionManager.getConnection();
-            PreparedStatement pstmt = conn.prepareStatement(query)) {
-            pstmt.setInt(1, reportId);
-            try (ResultSet resultSet = pstmt.executeQuery()) {
+        try (Connection databaseConnection = connectionManager.getConnection();
+            PreparedStatement preparedStatement = databaseConnection.prepareStatement(query)) {
+            preparedStatement.setInt(1, reportId);
+            try (ResultSet resultSet = preparedStatement.executeQuery()) {
                 if (resultSet.next()) {
                     total = resultSet.getInt(1); 
                 }
@@ -253,8 +252,8 @@ public class ReportContextDAO implements IReportContextDAO {
     @Override
     public boolean hasReportAlreadyBeenGenerated(String studentId, String month) throws OperationException {
         String reportContextQuery = "SELECT COUNT(*) FROM Reporte r "
-                    + "INNER JOIN ReporteMensual rm ON r.idReporte = rm.idReporte "
-                    + "WHERE r.matricula = ? AND rm.mes = ?";
+                                  + "INNER JOIN ReporteMensual rm ON r.idReporte = rm.idReporte "
+                                  + "WHERE r.matricula = ? AND rm.mes = ?";
         
         try (Connection databaseConnection = connectionManager.getConnection();
             PreparedStatement preparedStatement = databaseConnection.prepareStatement(reportContextQuery)) {
@@ -271,35 +270,33 @@ public class ReportContextDAO implements IReportContextDAO {
 
     private String buildContextQuery() {
         String reportContextQuery = "SELECT u.nombre AS nombreAlumno, u.apellidos AS apellidosAlumno, "
-                                 + "ee.NRC AS nrc, "
-                                 + "pe.nombre AS periodo, "
-                                 + "uProf.nombre AS nombreProfesor, uProf.apellidos AS apellidosProfesor, "
-                                 + "p.nombre AS nombreProyecto, p.objetivo AS objetivoProyecto, "
-                                 + "p.metodologiaProyecto AS metodologiaProyecto, "
-                                 + "ov.nombreOV AS organizacion, "
-                                 + "rp.nombre AS nombreResponsable "
-                                 + "FROM Alumno a "
-                                 + "INNER JOIN Usuario u ON a.idUsuario = u.idUsuario "
-                                 + "INNER JOIN Alumno_Esta_EE aee ON a.matricula = aee.matricula "
-                                 + "INNER JOIN ExperienciaEducativa ee ON aee.NRC = ee.NRC "
-                                 + "INNER JOIN PeriodoEscolar pe ON ee.idPeriodoEscolar = pe.idPeriodoEscolar "
-                                 + "INNER JOIN Profesor_Imparte_Experiencia pie ON ee.NRC = pie.NRC "
-                                 + "INNER JOIN Profesor prof ON pie.numeroPersonal = prof.numeroPersonal "
-                                 + "INNER JOIN Usuario uProf ON prof.idUsuario = uProf.idUsuario "
-                                 + "INNER JOIN Solicita_Proyecto sp ON a.matricula = sp.matricula "
-                                 + "INNER JOIN Proyecto p ON sp.idProyecto = p.idProyecto "
-                                 + "INNER JOIN OrganizacionVinculada ov "
-                                 + "ON p.idOrganizacionVinculada = ov.idOrganizacionVinculada "
-                                 + "LEFT JOIN ResponsableProyecto rp "
-                                 + "ON p.idResponsableProyecto = rp.idResponsableProyecto "
-                                 + "WHERE a.matricula = ? AND sp.estatus = " + STATUS_ASSIGNED + ";";
+                                  + "ee.NRC AS nrc, "
+                                  + "pe.nombre AS periodo, "
+                                  + "uProf.nombre AS nombreProfesor, uProf.apellidos AS apellidosProfesor, "
+                                  + "p.nombre AS nombreProyecto, p.objetivo AS objetivoProyecto, "
+                                  + "p.metodologiaProyecto AS metodologiaProyecto, "
+                                  + "ov.nombreOV AS organizacion, "
+                                  + "rp.nombre AS nombreResponsable "
+                                  + "FROM Alumno a "
+                                  + "INNER JOIN Usuario u ON a.idUsuario = u.idUsuario "
+                                  + "INNER JOIN Alumno_Esta_EE aee ON a.matricula = aee.matricula "
+                                  + "INNER JOIN ExperienciaEducativa ee ON aee.NRC = ee.NRC "
+                                  + "INNER JOIN PeriodoEscolar pe ON ee.idPeriodoEscolar = pe.idPeriodoEscolar "
+                                  + "INNER JOIN Profesor_Imparte_Experiencia pie ON ee.NRC = pie.NRC "
+                                  + "INNER JOIN Profesor prof ON pie.numeroPersonal = prof.numeroPersonal "
+                                  + "INNER JOIN Usuario uProf ON prof.idUsuario = uProf.idUsuario "
+                                  + "INNER JOIN Solicita_Proyecto sp ON a.matricula = sp.matricula "
+                                  + "INNER JOIN Proyecto p ON sp.idProyecto = p.idProyecto "
+                                  + "INNER JOIN OrganizacionVinculada ov "
+                                  + "ON p.idOrganizacionVinculada = ov.idOrganizacionVinculada "
+                                  + "LEFT JOIN ResponsableProyecto rp "
+                                  + "ON p.idResponsableProyecto = rp.idResponsableProyecto "
+                                  + "WHERE a.matricula = ? AND sp.estatus = ? ";
         return reportContextQuery;
     }
 
-    private void fillFinalReportContext(FinalReport finalReport, ResultSet resultSet)
-            throws SQLException {
-        String studentFullName = resultSet.getString("nombreAlumno") + " " 
-        + resultSet.getString("apellidosAlumno");
+    private void fillFinalReportContext(FinalReport finalReport, ResultSet resultSet) throws SQLException {
+        String studentFullName = resultSet.getString("nombreAlumno") + " "  + resultSet.getString("apellidosAlumno");
         String professorFullName = resultSet.getString("nombreProfesor") + " " 
             + resultSet.getString("apellidosProfesor");
 
@@ -313,12 +310,10 @@ public class ReportContextDAO implements IReportContextDAO {
         finalReport.setAffiliatedOrganization(resultSet.getString("organizacion"));
     }
 
-    private void fillPartialReportContext(PartialReport partialReport, ResultSet resultSet)
-            throws SQLException {
-        String studentFullName = resultSet.getString("nombreAlumno") 
-        + " " + resultSet.getString("apellidosAlumno");
+    private void fillPartialReportContext(PartialReport partialReport, ResultSet resultSet) throws SQLException {
+        String studentFullName = resultSet.getString("nombreAlumno") + " " + resultSet.getString("apellidosAlumno");
         String professorFullName = resultSet.getString("nombreProfesor") 
-        + " " + resultSet.getString("apellidosProfesor");
+            + " " + resultSet.getString("apellidosProfesor");
 
         partialReport.setStudentName(studentFullName);
         partialReport.setProfessorName(professorFullName);
@@ -332,8 +327,7 @@ public class ReportContextDAO implements IReportContextDAO {
     }
 
     private void fillMonthlyReportContext(MonthlyReport monthlyReport, ResultSet resultSet) throws SQLException {
-        String studentFullName = resultSet.getString("nombreAlumno") + " "
-            + resultSet.getString("apellidosAlumno");
+        String studentFullName = resultSet.getString("nombreAlumno") + " " + resultSet.getString("apellidosAlumno");
         monthlyReport.setStudentName(studentFullName);
         monthlyReport.setPeriod(resultSet.getString("periodoPrincipal"));
         monthlyReport.setProfessorName(resultSet.getString("nombreAcademico"));

@@ -302,7 +302,7 @@ public class ProfessorDAO extends UserDAO implements IProfessorDAO {
     public boolean hasSubjectAssigned(String personnelNumber) throws OperationException {
         boolean hasSubject = false;
         String professorQuery = "SELECT 1 FROM Profesor_Imparte_Experiencia"
-                              + " WHERE numeroPersonal = ?";
+                              + " WHERE numeroPersonal = ? AND estaActiva = TRUE";
 
         try (Connection databaseConnection = connectionManager.getConnection();
              PreparedStatement preparedStatement = databaseConnection.prepareStatement(professorQuery)) {

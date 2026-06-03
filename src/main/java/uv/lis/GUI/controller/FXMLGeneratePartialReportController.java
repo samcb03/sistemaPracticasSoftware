@@ -215,8 +215,7 @@ public class FXMLGeneratePartialReportController extends ValidationHandler {
 
         for (int activityIndex = 0; activityIndex < comboBoxActivities.length; activityIndex++) {
             activityNames[activityIndex] = readActivityName(activityIndex);
-            realWeeklyAdvances[activityIndex]
-                = parseAdvance(textFieldAdvances[activityIndex].getText());
+            realWeeklyAdvances[activityIndex] = parseAdvance(textFieldAdvances[activityIndex].getText());
         }
     }
 
