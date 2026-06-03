@@ -123,6 +123,7 @@ public final class InputValidator {
 
     public static Optional<String> validateText(String name, String fieldName) {
         Optional<String> validText = Stream.of(
+                InputValidator.validateNotEmpty(name, fieldName),
                 InputValidator.validateLettersOnly(name, fieldName),
                 InputValidator.validateNoLeadingSpace(name, fieldName),
                 InputValidator.validateNoTrailingSpace(name, fieldName),
