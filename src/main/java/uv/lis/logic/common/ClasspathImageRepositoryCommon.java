@@ -13,10 +13,9 @@ public final class ClasspathImageRepositoryCommon implements RepositoryService {
     private static final Logger LOGGER = Logger.getLogger(ClasspathImageRepositoryCommon.class.getName());
 
     private static final String IMAGES_CLASSPATH = "/uv/lis/GUI/view/images/";
-    private static final char UNIX_SEPARATOR = '/';
     private static final char WINDOWS_SEPARATOR = '\\';
+    private static final int FILE_NAME_START_OFFSET = 1;
 
-    //TODO estudiar clase
     @Override
     public <K extends Resource> K getResource(String uri, Class<K> resourceType) {
         K resource = null;
@@ -50,9 +49,8 @@ public final class ClasspathImageRepositoryCommon implements RepositoryService {
     }
 
     private String extractFileName(String uri) {
-        int lastUnixSeparator = uri.lastIndexOf(UNIX_SEPARATOR);
         int lastWindowsSeparator = uri.lastIndexOf(WINDOWS_SEPARATOR);
-        int lastSeparator = Math.max(lastUnixSeparator, lastWindowsSeparator);
-        return uri.substring(lastSeparator + 1);
+        String fileName = uri.substring(lastWindowsSeparator + FILE_NAME_START_OFFSET);
+        return fileName;
     }
 }
