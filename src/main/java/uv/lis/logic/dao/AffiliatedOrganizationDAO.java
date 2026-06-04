@@ -14,6 +14,7 @@ import java.util.logging.Logger;
 import uv.lis.dataaccess.MySQLConnectionManager;
 import uv.lis.logic.contracts.IAffiliatedOrganizationDAO;
 import uv.lis.logic.dto.AffiliatedOrganization;
+import uv.lis.logic.dto.Project;
 import uv.lis.logic.exceptions.OperationException;
 
 public class AffiliatedOrganizationDAO implements IAffiliatedOrganizationDAO{
@@ -403,6 +404,43 @@ public class AffiliatedOrganizationDAO implements IAffiliatedOrganizationDAO{
 
         return hasProjectsActives;
     }
+        
+        public ArrayList<Project> getCompleteProjectsByOrganization(String organizationName) throws OperationException {
+        ArrayList<Project> projectList = new ArrayList<>();
+        String projectQuery = "SELECT p.idProyecto, p.nombre, p.descripcion, p.objetivo, "
+                            + "p.cupo, p.metodologiaProyecto, p.estado, ov.nombreOV "
+                            + "FROM Proyecto p "
+                            + "JOIN OrganizacionVinculada ov ON p.idOrganizacionVinculada = ov.idOrganizacionVinculada "
+                            + "WHERE ov.nombreOV = ? "
+                            + "ORDER BY p.nombre ASC";
+
+        try (Connection databaseConnection = connectionManager.getConnection();
+            PreparedStatement preparedStatement = databaseConnection.prepareStatement(projectQuery)) {
+
+            preparedStatement.setString(1, organizationName);
+
+            try (ResultSet resultSet = preparedStatement.executeQuery()) {
+                while (resultSet.next()) {
+                    Project project = new Project();
+                    project.setId(resultSet.getInt("idProyecto"));
+                    project.setName(resultSet.getString("nombre"));
+                    project.setDescription(resultSet.getString("descripcion"));
+                    project.setObjective(resultSet.getString("objetivo"));
+                    project.setCapacity(resultSet.getInt("cupo"));
+                    project.setMethodology(resultSet.getString("metodologiaProyecto"));
+                    project.setActive(resultSet.getBoolean("estado"));
+                    project.setAffiliatedOrganizationName(resultSet.getString("nombreOV"));
+                    projectList.add(project);
+                }
+            }
+        } catch (SQLException e) {
+            LOGGER.log(Level.SEVERE, "Error al obtener proyectos de la organización: " + organizationName, e);
+            throw new OperationException("No se pudo obtener la lista de proyectos de la organización.", e);
+        }
+        return projectList;
+    }
+
+
         
 }
 
