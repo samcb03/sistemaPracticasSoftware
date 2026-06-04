@@ -16,6 +16,7 @@ import java.util.stream.Stream;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.geometry.Side;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
@@ -24,11 +25,13 @@ import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.TextField;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.GridPane;
 
 import uv.lis.GUI.ValidationHandler;
 import uv.lis.logic.dao.AffiliatedOrganizationDAO;
 import uv.lis.logic.dto.AffiliatedOrganization;
+import uv.lis.logic.dto.Project;
 import uv.lis.logic.exceptions.OperationException;
 
 public class FXMLConsultAffiliatedOrganizationController extends ValidationHandler {
@@ -39,6 +42,10 @@ public class FXMLConsultAffiliatedOrganizationController extends ValidationHandl
     private static final String LABEL_INACTIVE = "Inactivo";
     private static final String LABEL_ACTIVE   = "Activo";
     private static final int POSTAL_CODE = 5;
+    private static final int DOUBLE_CLICK_COUNT = 2;
+    private static final int NO_SELECTION = -1;
+    private static final String CONSULT_PROJECT_VIEW = "/uv/lis/GUI/view/FXMLShowProjectDetail.fxml";
+
 
     @FXML private Button buttonBack;
     @FXML private Button buttonSearch;
@@ -71,12 +78,12 @@ public class FXMLConsultAffiliatedOrganizationController extends ValidationHandl
     @FXML private TextField textFieldPhoneNumber;
     @FXML private TextField textFieldNumberOfDirectUsers;
     @FXML private TextField textFieldNumberOfIndirectUsers;
-
     @FXML private GridPane  gridPaneOrganizationInfo;
 
     private ContextMenu contextMenuSuggestions;
     private AffiliatedOrganizationDAO affiliatedOrganizationDAO;
     private AffiliatedOrganization currentOrganization;
+    private ArrayList<Project> currentProjects;
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
@@ -88,8 +95,8 @@ public class FXMLConsultAffiliatedOrganizationController extends ValidationHandl
         buttonInactive.setDisable(true);
         buttonUpdate.setDisable(true);
         setNodeVisibility(buttonSave, false);
-
         setupAutocomplete();
+        configureProjectDoubleClick();
     }
 
     @FXML
@@ -154,6 +161,9 @@ public class FXMLConsultAffiliatedOrganizationController extends ValidationHandl
             .getProjectsByOrganization(currentOrganization.getName());
         ObservableList<String> items = FXCollections.observableArrayList(projects);
         listViewProjects.setItems(items);
+
+        currentProjects = affiliatedOrganizationDAO
+        .getCompleteProjectsByOrganization(currentOrganization.getName());
     }
 
     private void resetOrganizationView() {
@@ -335,6 +345,27 @@ public class FXMLConsultAffiliatedOrganizationController extends ValidationHandl
                 contextMenuSuggestions.hide();
             });
             contextMenuSuggestions.getItems().add(item);
+        }
+    }
+
+    private void configureProjectDoubleClick() {
+        listViewProjects.setOnMouseClicked(this::handleProjectRowClicked);
+    }
+
+    private void handleProjectRowClicked(MouseEvent mouseEvent) {
+        boolean isDoubleClick = mouseEvent.getClickCount() == DOUBLE_CLICK_COUNT;
+        int selectedIndex = listViewProjects.getSelectionModel().getSelectedIndex();
+
+        if (isDoubleClick && selectedIndex >= NO_SELECTION) {
+            navigateToProjectDetail(currentProjects.get(selectedIndex));
+        }
+    }
+
+    private void navigateToProjectDetail(Project project) {
+        FXMLLoader loader = navigateToWithLoader(CONSULT_PROJECT_VIEW);
+        if (loader != null) {
+            FXMLShowProjectDetailController controller = loader.getController();
+            controller.initializeData(project);
         }
     }
 
