@@ -19,11 +19,14 @@ import net.sf.jasperreports.view.JasperViewer;
 
 import uv.lis.GUI.ValidationHandler;
 import uv.lis.logic.common.FinalReportCommon;
+import uv.lis.logic.dao.ReportDAO;
 import uv.lis.logic.dto.ActivityProgress;
 import uv.lis.logic.dto.DeliverableResult;
 import uv.lis.logic.dto.FinalReport;
+import uv.lis.logic.dto.Student;
 import uv.lis.logic.exceptions.OperationException;
 import uv.lis.logic.utils.InputValidator;
+import uv.lis.logic.utils.SessionManager;
 
 public class FXMLGenerateFinalReportController extends ValidationHandler {
 
@@ -33,6 +36,7 @@ public class FXMLGenerateFinalReportController extends ValidationHandler {
     private static final String REPORT_GENERATION_ERROR = "Error al generar el reporte";
 
     private final FinalReportCommon finalReportCommon = new FinalReportCommon();
+    private final ReportDAO reportDAO = new ReportDAO();
 
     @FXML private Label labelMessage;
     @FXML private Button buttonGenerate;
@@ -155,6 +159,8 @@ public class FXMLGenerateFinalReportController extends ValidationHandler {
         try {
             FinalReport finalReport = buildFinalReport();
             JasperPrint jasperPrint = finalReportCommon.generateFinalReport(finalReport);
+            persistReport(finalReport);
+ 
             showSuccess(REPORT_GENERATED_MESSAGE);
             displayReport(jasperPrint);
             clearFields();
@@ -167,6 +173,14 @@ public class FXMLGenerateFinalReportController extends ValidationHandler {
         }
     }
 
+    private void persistReport(FinalReport finalReport) throws OperationException {
+        boolean isRegistered = reportDAO.registerFinalReport(finalReport);
+ 
+        if (!isRegistered) {
+            LOGGER.log(Level.WARNING, "El reporte final no se guardó en la base de datos");
+        }
+    }
+
     private void displayReport(JasperPrint jasperPrint) {
         JasperViewer viewer = new JasperViewer(jasperPrint, false);
         viewer.setTitle("Reporte Final");
@@ -175,13 +189,18 @@ public class FXMLGenerateFinalReportController extends ValidationHandler {
 
     private FinalReport buildFinalReport() {
         FinalReport finalReport = new FinalReport();
-
+ 
         finalReport.setFirstActivity(buildFirstActivity());
         finalReport.setSecondActivity(buildSecondActivity());
         finalReport.setFirstDeliverable(buildFirstDeliverable());
         finalReport.setSecondDeliverable(buildSecondDeliverable());
         finalReport.setGeneralObservations(textAreaGeneralObservations.getText().trim());
-
+ 
+        Student currentStudent = SessionManager.getInstance().getCurrentStudent();
+        if (currentStudent != null) {
+            finalReport.setStudentId(currentStudent.getIdStudent());
+        }
+ 
         return finalReport;
     }
 
