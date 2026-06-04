@@ -296,4 +296,35 @@ public class ProjectDAO implements IProjectDAO{
         return projectOptional;
     }
 
+    public ArrayList<Project> getAllProjectsWithCapacity() throws OperationException {
+        ArrayList<Project> projectsAvailable = new ArrayList<>();
+        String projectQuery = "SELECT p.idProyecto, p.nombre, p.cupo, "
+                            + "o.nombreOV AS nombreOrganizacion "
+                            + "FROM Proyecto p "
+                            + "INNER JOIN OrganizacionVinculada o "
+                            + "ON p.idOrganizacionVinculada = o.idOrganizacionVinculada "
+                            + "WHERE p.estado = 1 "
+                            + "AND p.cupo > (SELECT COUNT(*) FROM Solicita_Proyecto sp "
+                            + "             WHERE sp.idProyecto = p.idProyecto AND sp.estatus = 2)";
+
+        try (Connection databaseConnection = connectionManager.getConnection();
+            PreparedStatement preparedStatement = databaseConnection.prepareStatement(projectQuery)) {
+
+            try (ResultSet resultSet = preparedStatement.executeQuery()) {
+                while (resultSet.next()) {
+                    Project project = new Project();
+                    project.setId(resultSet.getInt("idProyecto"));
+                    project.setName(resultSet.getString("nombre"));
+                    project.setCapacity(resultSet.getInt("cupo"));
+                    project.setAffiliatedOrganizationName(resultSet.getString("nombreOrganizacion"));
+                    projectsAvailable.add(project);
+                }
+            }
+        } catch (SQLException e) {
+            LOGGER.log(Level.SEVERE, "Error al obtener proyectos disponibles", e);
+            throw new OperationException("Error al obtener los proyectos disponibles", e);
+        }
+        return projectsAvailable;
+    }
+
 }

@@ -25,6 +25,7 @@ import uv.lis.logic.exceptions.OperationException;
 public class RequestProjectDAO implements IRequestProjectDAO {
 
     private static final String COLUMN_AVAILABLE = "disponibles";
+    private static final int ASSIGNED_STATUS = 2;
     private static final String DEFAULT_NO_PROJECT_MESSAGE = "Sin proyecto asignado";
     private static final Logger LOGGER = Logger.getLogger(RequestProjectDAO.class.getName());
     private MySQLConnectionManager connectionManager;
@@ -387,5 +388,77 @@ public class RequestProjectDAO implements IRequestProjectDAO {
         student.setFirstName(resultSet.getString("nombre"));
         student.setLastName(resultSet.getString("apellidos"));
         return student;
+    }
+    
+    @Override
+    public ArrayList<Student> getStudentsWithoutAssignedProject() throws OperationException {
+        ArrayList<Student> students = new ArrayList<>();
+        String requestProjectQuery = "SELECT a.matricula, u.nombre, u.apellidos "
+                                + "FROM Alumno a "
+                                + "INNER JOIN Usuario u ON a.idUsuario = u.idUsuario "
+                                + "WHERE NOT EXISTS ( "
+                                + "    SELECT 1 FROM Solicita_Proyecto sp "
+                                + "    WHERE sp.matricula = a.matricula AND sp.estatus = ?)";
+
+        try (Connection databaseConnection = connectionManager.getConnection();
+            PreparedStatement preparedStatement = databaseConnection.prepareStatement(requestProjectQuery)) {
+
+            preparedStatement.setInt(1, ASSIGNED_STATUS);
+
+            try (ResultSet resultSet = preparedStatement.executeQuery()) {
+                while (resultSet.next()) {
+                    Student student = new Student();
+                    student.setIdStudent(resultSet.getString("matricula"));
+                    student.setFirstName(resultSet.getString("nombre"));
+                    student.setLastName(resultSet.getString("apellidos"));
+                    students.add(student);
+                }
+            }
+        } catch (SQLException e) {
+            LOGGER.log(Level.SEVERE, "Error al obtener alumnos sin proyecto asignado", e);
+            throw new OperationException("Error al obtener alumnos sin proyecto asignado", e);
+        }
+        return students;
+    }
+
+    @Override
+    public boolean assignStudentToProjectAlternative(String idStudent, int idProject) throws OperationException {
+        boolean isAssigned = false;
+
+        try (Connection databaseConnection = connectionManager.getConnection()) {
+            databaseConnection.setAutoCommit(false);
+            try {
+                ensureStudentNotAlreadyAssigned(databaseConnection, idStudent);
+                insertAssignment(databaseConnection, idStudent, idProject);
+                databaseConnection.commit();
+                isAssigned = true;
+            } catch (SQLException sqlException) {
+                databaseConnection.rollback();
+                LOGGER.log(Level.SEVERE, "Transacción de asignación alternativa cancelada", sqlException);
+                throw new OperationException("Error al ejecutar la asignación alternativa", sqlException);
+            } catch (OperationException operationException) {
+                databaseConnection.rollback();
+                throw operationException;
+            } finally {
+                databaseConnection.setAutoCommit(true);
+            }
+        } catch (SQLException e) {
+            LOGGER.log(Level.SEVERE, "Error de conexión a la base de datos", e);
+            throw new OperationException("Intentelo mas tarde", e);
+        }
+
+        return isAssigned;
+    }
+
+    private void insertAssignment(Connection databaseConnection, String idStudent, int idProject)
+            throws SQLException {
+        String query = "INSERT INTO Solicita_Proyecto (idProyecto, matricula, estatus) VALUES (?, ?, ?)";
+
+        try (PreparedStatement preparedStatement = databaseConnection.prepareStatement(query)) {
+            preparedStatement.setInt(1, idProject);
+            preparedStatement.setString(2, idStudent);
+            preparedStatement.setInt(3, STATUS_ASSIGNED);
+            preparedStatement.executeUpdate();
+        }
     }
 }

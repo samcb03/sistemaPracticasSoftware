@@ -30,5 +30,9 @@ public interface IRequestProjectDAO {
     void unassignStudentFromProject(String idStudent) throws OperationException;
 
     ArrayList<Student> getAssignedStudentsByProjectId(int idProject) throws OperationException;
+
+    ArrayList<Student> getStudentsWithoutAssignedProject() throws OperationException;
+
+    boolean assignStudentToProjectAlternative(String idStudent, int idProject) throws OperationException;
 }
 

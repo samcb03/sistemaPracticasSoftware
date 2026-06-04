@@ -11,6 +11,7 @@ import java.util.stream.Collectors;
 
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
+import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
@@ -36,13 +37,17 @@ public class FXMLAssignationProjectController extends ValidationHandler {
     @FXML private ComboBox<String> comboBoxProjects;
     @FXML private Button buttonAssignProject;
     @FXML private Button buttonBack;
+    @FXML private Button buttonAlternativeMode;
     @FXML private Label labelOrganizationName;
     @FXML private Label labelMethodology;
     @FXML private Label labelCapacity;
     @FXML private Label labelObjective;
     @FXML private Label labelDescription;
     @FXML private Label labelError;
+    @FXML private Label labelApplicants;
     @FXML private ListView<String> listViewApplicants;
+    @FXML private ListView<String> listViewStudentsWithoutProject;
+    @FXML private Label labelStudentsWithoutProject;
     @FXML private TextArea textAreaReason;
 
     private RequestProjectDAO requestProjectDAO;
@@ -55,6 +60,11 @@ public class FXMLAssignationProjectController extends ValidationHandler {
     private static final String ASSIGNMENT_NOTIFICATION_TITLE = "Proyecto asignado";
     private static final String ASSIGNMENT_MESSAGE_PREFIX = "Se te asignó el proyecto: ";
     private static final String ASSIGNMENT_MESSAGE_REASON = ". Motivo: ";
+    private static final String ALTERNATIVE_MODE_LABEL = "Asignación alternativa";
+    private static final String NORMAL_MODE_LABEL = "Modo normal";
+    private static final String STUDENTS_WITHOUT_PROJECT_LABEL = "Alumnos sin proyecto:";
+    private static final String APPLICANTS_LABEL = "Alumnos solicitantes:";
+    private boolean isAlternativeMode = false;
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
@@ -74,6 +84,8 @@ public class FXMLAssignationProjectController extends ValidationHandler {
         } else {
             loadProjectNames();
             setupComboBoxListener();
+            setNodeVisibility(listViewStudentsWithoutProject, false);
+            setNodeVisibility(labelStudentsWithoutProject, false);
         }
     }
 
@@ -110,7 +122,11 @@ public class FXMLAssignationProjectController extends ValidationHandler {
                 labelObjective.setText(project.getObjective());
                 labelDescription.setText(project.getDescription());
                 loadOrganizationName(project.getIdAffiliatedOrganization());
-                loadApplicantsForProject(project.getId());
+
+                    if (!isAlternativeMode) {
+                        loadApplicantsForProject(project.getId());
+                    }
+
             } else {
                 showError("Proyecto no encontrado");
             }
@@ -153,7 +169,9 @@ public class FXMLAssignationProjectController extends ValidationHandler {
     @FXML
     public void assignStudent() {
         String selectedProject = comboBoxProjects.getValue();
-        String selectedRow = listViewApplicants.getSelectionModel().getSelectedItem();
+        String selectedRow = isAlternativeMode
+        ? listViewStudentsWithoutProject.getSelectionModel().getSelectedItem()
+        : listViewApplicants.getSelectionModel().getSelectedItem();
         String reason = textAreaReason.getText();
 
         Optional<String> validationError = validateAssignmentInput(selectedProject, selectedRow, reason);
@@ -195,11 +213,19 @@ public class FXMLAssignationProjectController extends ValidationHandler {
     }
 
     private boolean executeAssignment(Project project, String idStudent, String reason) throws OperationException {
-        boolean isAssigned = requestProjectDAO.assignStudentToProject(idStudent, project.getId());
+        boolean isAssigned = requestProjectDAO.hasAvailableCapacity(project.getId());
 
-        if (isAssigned) {
-            showSuccess("Asignación exitosa para " + idStudent);
-            notifyAssignedStudent(idStudent, project.getName(), reason);
+        if (!isAssigned) {
+            showError("El proyecto ya no tiene cupo disponible.");
+        } else {
+            isAssigned = isAlternativeMode  
+                ? requestProjectDAO.assignStudentToProjectAlternative(idStudent, project.getId())
+                : requestProjectDAO.assignStudentToProject(idStudent, project.getId());
+
+            if (isAssigned) {
+                showSuccess("Asignación exitosa para " + idStudent);
+                notifyAssignedStudent(idStudent, project.getName(), reason);
+            }
         }
 
         return isAssigned;
@@ -229,11 +255,19 @@ public class FXMLAssignationProjectController extends ValidationHandler {
     }
 
     private void refreshApplicantsList(String selectedRow) {
-        listViewApplicants.getItems().remove(selectedRow);
-
-        if (listViewApplicants.getItems().isEmpty()) {
-            loadProjectNames();
-            clearFields();
+        if (isAlternativeMode) {
+            listViewStudentsWithoutProject.getItems().remove(selectedRow);
+            loadAvailableProjects();
+            loadStudentsWithoutProject();
+            if (listViewStudentsWithoutProject.getItems().isEmpty()) {
+                clearFields();
+            }
+        } else {
+            listViewApplicants.getItems().remove(selectedRow);
+            if (listViewApplicants.getItems().isEmpty()) {
+                loadProjectNames();
+                clearFields();
+            }
         }
     }
 
@@ -249,9 +283,64 @@ public class FXMLAssignationProjectController extends ValidationHandler {
         return studentId;
     }
 
+    @FXML
+    private void toggleAlternativeMode() {
+        isAlternativeMode = !isAlternativeMode;
+        clearFields();
+
+        if (isAlternativeMode) {
+            buttonAlternativeMode.setText(NORMAL_MODE_LABEL);
+            loadAvailableProjects();
+            loadStudentsWithoutProject();
+        } else {
+            buttonAlternativeMode.setText(ALTERNATIVE_MODE_LABEL);
+            loadProjectNames();
+        }
+
+        setNodeVisibility(listViewApplicants, !isAlternativeMode);
+        setNodeVisibility(labelApplicants, !isAlternativeMode);
+        setNodeVisibility(listViewStudentsWithoutProject, isAlternativeMode);
+        setNodeVisibility(labelStudentsWithoutProject, isAlternativeMode);
+    }
+
+    private void loadAvailableProjects() {
+        try {
+            List<Project> projects = projectDAO.getAllProjectsWithCapacity();
+            List<String> projectNames = projects.stream()
+                .map(Project::getName)
+                .collect(Collectors.toList());
+            comboBoxProjects.setItems(FXCollections.observableArrayList(projectNames));
+        } catch (OperationException e) {
+            showError(e.getMessage());
+        }
+    }
+
+    private void loadStudentsWithoutProject() {
+        try {
+            List<Student> students = requestProjectDAO.getStudentsWithoutAssignedProject();
+            List<String> studentNames = students.stream()
+                .map(student -> student.getFirstName() + " " + student.getLastName()
+                    + APPLICANT_SEPARATOR + student.getIdStudent())
+                .collect(Collectors.toList());
+            listViewStudentsWithoutProject.setItems(FXCollections.observableArrayList(studentNames));
+
+            if (students.isEmpty()) {
+                showError("No hay alumnos sin proyecto asignado.");
+            }
+        } catch (OperationException e) {
+            showError(e.getMessage());
+        }
+    }
+
+    private void setNodeVisibility(Node node, boolean isVisible) {
+        node.setVisible(isVisible);
+        node.setManaged(isVisible);
+    }
+
     @Override
     protected void clearFields() {
         listViewApplicants.getItems().clear();
+        listViewStudentsWithoutProject.getItems().clear();
         labelOrganizationName.setText("");
         labelMethodology.setText("");
         labelCapacity.setText("");
