@@ -109,73 +109,73 @@
                         <Label text="5" GridPane.columnIndex="5" GridPane.rowIndex="0"><font><Font name="System Bold" size="14.0" /></font></Label>
 
                         <Label text="1. Mi participación fue productiva." GridPane.rowIndex="1" />
-                        <RadioButton fx:id="rb1_1" GridPane.columnIndex="1" GridPane.rowIndex="1" />
-                        <RadioButton fx:id="rb1_2" GridPane.columnIndex="2" GridPane.rowIndex="1" />
-                        <RadioButton fx:id="rb1_3" GridPane.columnIndex="3" GridPane.rowIndex="1" />
-                        <RadioButton fx:id="rb1_4" GridPane.columnIndex="4" GridPane.rowIndex="1" />
-                        <RadioButton fx:id="rb1_5" GridPane.columnIndex="5" GridPane.rowIndex="1" />
+                        <RadioButton fx:id="radioButton1_1" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+                        <RadioButton fx:id="radioButton1_2" GridPane.columnIndex="2" GridPane.rowIndex="1" />
+                        <RadioButton fx:id="radioButton1_3" GridPane.columnIndex="3" GridPane.rowIndex="1" />
+                        <RadioButton fx:id="radioButton1_4" GridPane.columnIndex="4" GridPane.rowIndex="1" />
+                        <RadioButton fx:id="radioButton1_5" GridPane.columnIndex="5" GridPane.rowIndex="1" />
 
                         <Label text="2. Logré aplicar mis conocimientos." GridPane.rowIndex="2" />
-                        <RadioButton fx:id="rb2_1" GridPane.columnIndex="1" GridPane.rowIndex="2" />
-                        <RadioButton fx:id="rb2_2" GridPane.columnIndex="2" GridPane.rowIndex="2" />
-                        <RadioButton fx:id="rb2_3" GridPane.columnIndex="3" GridPane.rowIndex="2" />
-                        <RadioButton fx:id="rb2_4" GridPane.columnIndex="4" GridPane.rowIndex="2" />
-                        <RadioButton fx:id="rb2_5" GridPane.columnIndex="5" GridPane.rowIndex="2" />
+                        <RadioButton fx:id="radioButton2_1" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+                        <RadioButton fx:id="radioButton2_2" GridPane.columnIndex="2" GridPane.rowIndex="2" />
+                        <RadioButton fx:id="radioButton2_3" GridPane.columnIndex="3" GridPane.rowIndex="2" />
+                        <RadioButton fx:id="radioButton2_4" GridPane.columnIndex="4" GridPane.rowIndex="2" />
+                        <RadioButton fx:id="radioButton2_5" GridPane.columnIndex="5" GridPane.rowIndex="2" />
 
                         <Label text="3. Seguridad en mis actividades." GridPane.rowIndex="3" />
-                        <RadioButton fx:id="rb3_1" GridPane.columnIndex="1" GridPane.rowIndex="3" />
-                        <RadioButton fx:id="rb3_2" GridPane.columnIndex="2" GridPane.rowIndex="3" />
-                        <RadioButton fx:id="rb3_3" GridPane.columnIndex="3" GridPane.rowIndex="3" />
-                        <RadioButton fx:id="rb3_4" GridPane.columnIndex="4" GridPane.rowIndex="3" />
-                        <RadioButton fx:id="rb3_5" GridPane.columnIndex="5" GridPane.rowIndex="3" />
+                        <RadioButton fx:id="radioButton3_1" GridPane.columnIndex="1" GridPane.rowIndex="3" />
+                        <RadioButton fx:id="radioButton3_2" GridPane.columnIndex="2" GridPane.rowIndex="3" />
+                        <RadioButton fx:id="radioButton3_3" GridPane.columnIndex="3" GridPane.rowIndex="3" />
+                        <RadioButton fx:id="radioButton3_4" GridPane.columnIndex="4" GridPane.rowIndex="3" />
+                        <RadioButton fx:id="radioButton3_5" GridPane.columnIndex="5" GridPane.rowIndex="3" />
 
                         <Label text="4. Interés en las tareas asignadas." GridPane.rowIndex="4" />
-                        <RadioButton fx:id="rb4_1" GridPane.columnIndex="1" GridPane.rowIndex="4" />
-                        <RadioButton fx:id="rb4_2" GridPane.columnIndex="2" GridPane.rowIndex="4" />
-                        <RadioButton fx:id="rb4_3" GridPane.columnIndex="3" GridPane.rowIndex="4" />
-                        <RadioButton fx:id="rb4_4" GridPane.columnIndex="4" GridPane.rowIndex="4" />
-                        <RadioButton fx:id="rb4_5" GridPane.columnIndex="5" GridPane.rowIndex="4" />
+                        <RadioButton fx:id="radioButton4_1" GridPane.columnIndex="1" GridPane.rowIndex="4" />
+                        <RadioButton fx:id="radioButton4_2" GridPane.columnIndex="2" GridPane.rowIndex="4" />
+                        <RadioButton fx:id="radioButton4_3" GridPane.columnIndex="3" GridPane.rowIndex="4" />
+                        <RadioButton fx:id="radioButton4_4" GridPane.columnIndex="4" GridPane.rowIndex="4" />
+                        <RadioButton fx:id="radioButton4_5" GridPane.columnIndex="5" GridPane.rowIndex="4" />
 
                         <Label text="5. Información adecuada de la Org." GridPane.rowIndex="5" />
-                        <RadioButton fx:id="rb5_1" GridPane.columnIndex="1" GridPane.rowIndex="5" />
-                        <RadioButton fx:id="rb5_2" GridPane.columnIndex="2" GridPane.rowIndex="5" />
-                        <RadioButton fx:id="rb5_3" GridPane.columnIndex="3" GridPane.rowIndex="5" />
-                        <RadioButton fx:id="rb5_4" GridPane.columnIndex="4" GridPane.rowIndex="5" />
-                        <RadioButton fx:id="rb5_5" GridPane.columnIndex="5" GridPane.rowIndex="5" />
+                        <RadioButton fx:id="radioButton5_1" GridPane.columnIndex="1" GridPane.rowIndex="5" />
+                        <RadioButton fx:id="radioButton5_2" GridPane.columnIndex="2" GridPane.rowIndex="5" />
+                        <RadioButton fx:id="radioButton5_3" GridPane.columnIndex="3" GridPane.rowIndex="5" />
+                        <RadioButton fx:id="radioButton5_4" GridPane.columnIndex="4" GridPane.rowIndex="5" />
+                        <RadioButton fx:id="radioButton5_5" GridPane.columnIndex="5" GridPane.rowIndex="5" />
 
                         <Label text="6. Conocimiento de reglas internas." GridPane.rowIndex="6" />
-                        <RadioButton fx:id="rb6_1" GridPane.columnIndex="1" GridPane.rowIndex="6" />
-                        <RadioButton fx:id="rb6_2" GridPane.columnIndex="2" GridPane.rowIndex="6" />
-                        <RadioButton fx:id="rb6_3" GridPane.columnIndex="3" GridPane.rowIndex="6" />
-                        <RadioButton fx:id="rb6_4" GridPane.columnIndex="4" GridPane.rowIndex="6" />
-                        <RadioButton fx:id="rb6_5" GridPane.columnIndex="5" GridPane.rowIndex="6" />
+                        <RadioButton fx:id="radioButton6_1" GridPane.columnIndex="1" GridPane.rowIndex="6" />
+                        <RadioButton fx:id="radioButton6_2" GridPane.columnIndex="2" GridPane.rowIndex="6" />
+                        <RadioButton fx:id="radioButton6_3" GridPane.columnIndex="3" GridPane.rowIndex="6" />
+                        <RadioButton fx:id="radioButton6_4" GridPane.columnIndex="4" GridPane.rowIndex="6" />
+                        <RadioButton fx:id="radioButton6_5" GridPane.columnIndex="5" GridPane.rowIndex="6" />
 
                         <Label text="7. Orientación del responsable." GridPane.rowIndex="7" />
-                        <RadioButton fx:id="rb7_1" GridPane.columnIndex="1" GridPane.rowIndex="7" />
-                        <RadioButton fx:id="rb7_2" GridPane.columnIndex="2" GridPane.rowIndex="7" />
-                        <RadioButton fx:id="rb7_3" GridPane.columnIndex="3" GridPane.rowIndex="7" />
-                        <RadioButton fx:id="rb7_4" GridPane.columnIndex="4" GridPane.rowIndex="7" />
-                        <RadioButton fx:id="rb7_5" GridPane.columnIndex="5" GridPane.rowIndex="7" />
+                        <RadioButton fx:id="radioButton7_1" GridPane.columnIndex="1" GridPane.rowIndex="7" />
+                        <RadioButton fx:id="radioButton7_2" GridPane.columnIndex="2" GridPane.rowIndex="7" />
+                        <RadioButton fx:id="radioButton7_3" GridPane.columnIndex="3" GridPane.rowIndex="7" />
+                        <RadioButton fx:id="radioButton7_4" GridPane.columnIndex="4" GridPane.rowIndex="7" />
+                        <RadioButton fx:id="radioButton7_5" GridPane.columnIndex="5" GridPane.rowIndex="7" />
                         <Label text="8. Seguimiento efectivo de tareas." GridPane.rowIndex="8" />
-                        <RadioButton fx:id="rb8_1" GridPane.columnIndex="1" GridPane.rowIndex="8" />
-                        <RadioButton fx:id="rb8_2" GridPane.columnIndex="2" GridPane.rowIndex="8" />
-                        <RadioButton fx:id="rb8_3" GridPane.columnIndex="3" GridPane.rowIndex="8" />
-                        <RadioButton fx:id="rb8_4" GridPane.columnIndex="4" GridPane.rowIndex="8" />
-                        <RadioButton fx:id="rb8_5" GridPane.columnIndex="5" GridPane.rowIndex="8" />
+                        <RadioButton fx:id="radioButton8_1" GridPane.columnIndex="1" GridPane.rowIndex="8" />
+                        <RadioButton fx:id="radioButton8_2" GridPane.columnIndex="2" GridPane.rowIndex="8" />
+                        <RadioButton fx:id="radioButton8_3" GridPane.columnIndex="3" GridPane.rowIndex="8" />
+                        <RadioButton fx:id="radioButton8_4" GridPane.columnIndex="4" GridPane.rowIndex="8" />
+                        <RadioButton fx:id="radioButton8_5" GridPane.columnIndex="5" GridPane.rowIndex="8" />
 
                         <Label text="9. Congruencia con mi carrera." GridPane.rowIndex="9" />
-                        <RadioButton fx:id="rb9_1" GridPane.columnIndex="1" GridPane.rowIndex="9" />
-                        <RadioButton fx:id="rb9_2" GridPane.columnIndex="2" GridPane.rowIndex="9" />
-                        <RadioButton fx:id="rb9_3" GridPane.columnIndex="3" GridPane.rowIndex="9" />
-                        <RadioButton fx:id="rb9_4" GridPane.columnIndex="4" GridPane.rowIndex="9" />
-                        <RadioButton fx:id="rb9_5" GridPane.columnIndex="5" GridPane.rowIndex="9" />
+                        <RadioButton fx:id="radioButton9_1" GridPane.columnIndex="1" GridPane.rowIndex="9" />
+                        <RadioButton fx:id="radioButton9_2" GridPane.columnIndex="2" GridPane.rowIndex="9" />
+                        <RadioButton fx:id="radioButton9_3" GridPane.columnIndex="3" GridPane.rowIndex="9" />
+                        <RadioButton fx:id="radioButton9_4" GridPane.columnIndex="4" GridPane.rowIndex="9" />
+                        <RadioButton fx:id="radioButton9_5" GridPane.columnIndex="5" GridPane.rowIndex="9" />
 
                         <Label text="10. Importancia de las prácticas." GridPane.rowIndex="10" />
-                        <RadioButton fx:id="rb10_1" GridPane.columnIndex="1" GridPane.rowIndex="10" />
-                        <RadioButton fx:id="rb10_2" GridPane.columnIndex="2" GridPane.rowIndex="10" />
-                        <RadioButton fx:id="rb10_3" GridPane.columnIndex="3" GridPane.rowIndex="10" />
-                        <RadioButton fx:id="rb10_4" GridPane.columnIndex="4" GridPane.rowIndex="10" />
-                        <RadioButton fx:id="rb10_5" GridPane.columnIndex="5" GridPane.rowIndex="10" />
+                        <RadioButton fx:id="radioButton10_1" GridPane.columnIndex="1" GridPane.rowIndex="10" />
+                        <RadioButton fx:id="radioButton10_2" GridPane.columnIndex="2" GridPane.rowIndex="10" />
+                        <RadioButton fx:id="radioButton10_3" GridPane.columnIndex="3" GridPane.rowIndex="10" />
+                        <RadioButton fx:id="radioButton10_4" GridPane.columnIndex="4" GridPane.rowIndex="10" />
+                        <RadioButton fx:id="radioButton10_5" GridPane.columnIndex="5" GridPane.rowIndex="10" />
                      </children>
                   </GridPane>
                   

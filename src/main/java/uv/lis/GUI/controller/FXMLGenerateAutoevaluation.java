@@ -1,6 +1,7 @@
 package uv.lis.GUI.controller;
 
 import java.net.URL;
+import java.util.Optional;
 import java.util.ResourceBundle;
 
 import javafx.fxml.FXML;
@@ -31,16 +32,56 @@ public class FXMLGenerateAutoevaluation extends ValidationHandler {
     @FXML private Label labelMessage;
     @FXML private Button buttonGenerate;
     @FXML private Button buttonBack;
-    @FXML private RadioButton rb1_1, rb1_2, rb1_3, rb1_4, rb1_5;
-    @FXML private RadioButton rb2_1, rb2_2, rb2_3, rb2_4, rb2_5;
-    @FXML private RadioButton rb3_1, rb3_2, rb3_3, rb3_4, rb3_5;
-    @FXML private RadioButton rb4_1, rb4_2, rb4_3, rb4_4, rb4_5;
-    @FXML private RadioButton rb5_1, rb5_2, rb5_3, rb5_4, rb5_5;
-    @FXML private RadioButton rb6_1, rb6_2, rb6_3, rb6_4, rb6_5;
-    @FXML private RadioButton rb7_1, rb7_2, rb7_3, rb7_4, rb7_5;
-    @FXML private RadioButton rb8_1, rb8_2, rb8_3, rb8_4, rb8_5;
-    @FXML private RadioButton rb9_1, rb9_2, rb9_3, rb9_4, rb9_5;
-    @FXML private RadioButton rb10_1, rb10_2, rb10_3, rb10_4, rb10_5;
+    @FXML private RadioButton radioButton1_1;
+    @FXML private RadioButton radioButton1_2;
+    @FXML private RadioButton radioButton1_3;
+    @FXML private RadioButton radioButton1_4;
+    @FXML private RadioButton radioButton1_5;
+    @FXML private RadioButton radioButton2_1;
+    @FXML private RadioButton radioButton2_2;
+    @FXML private RadioButton radioButton2_3;
+    @FXML private RadioButton radioButton2_4;
+    @FXML private RadioButton radioButton2_5;
+    @FXML private RadioButton radioButton3_1;
+    @FXML private RadioButton radioButton3_2;
+    @FXML private RadioButton radioButton3_3;
+    @FXML private RadioButton radioButton3_4;
+    @FXML private RadioButton radioButton3_5;
+    @FXML private RadioButton radioButton4_1;
+    @FXML private RadioButton radioButton4_2;
+    @FXML private RadioButton radioButton4_3;
+    @FXML private RadioButton radioButton4_4;
+    @FXML private RadioButton radioButton4_5;
+    @FXML private RadioButton radioButton5_1;
+    @FXML private RadioButton radioButton5_2;
+    @FXML private RadioButton radioButton5_3;
+    @FXML private RadioButton radioButton5_4;
+    @FXML private RadioButton radioButton5_5;
+    @FXML private RadioButton radioButton6_1;
+    @FXML private RadioButton radioButton6_2;
+    @FXML private RadioButton radioButton6_3;
+    @FXML private RadioButton radioButton6_4;
+    @FXML private RadioButton radioButton6_5;
+    @FXML private RadioButton radioButton7_1;
+    @FXML private RadioButton radioButton7_2;
+    @FXML private RadioButton radioButton7_3;
+    @FXML private RadioButton radioButton7_4;
+    @FXML private RadioButton radioButton7_5;
+    @FXML private RadioButton radioButton8_1;
+    @FXML private RadioButton radioButton8_2;
+    @FXML private RadioButton radioButton8_3;
+    @FXML private RadioButton radioButton8_4;
+    @FXML private RadioButton radioButton8_5;
+    @FXML private RadioButton radioButton9_1;
+    @FXML private RadioButton radioButton9_2;
+    @FXML private RadioButton radioButton9_3;
+    @FXML private RadioButton radioButton9_4;
+    @FXML private RadioButton radioButton9_5;
+    @FXML private RadioButton radioButton10_1;
+    @FXML private RadioButton radioButton10_2;
+    @FXML private RadioButton radioButton10_3;
+    @FXML private RadioButton radioButton10_4;
+    @FXML private RadioButton radioButton10_5;
 
     private ToggleGroup[] groups;
     private AutoevaluationCommon autoevaluationCommon;
@@ -57,20 +98,18 @@ public class FXMLGenerateAutoevaluation extends ValidationHandler {
         loadAutomaticData(); 
     }
 
-    //FIXME: Arreglar nombre variables
-
     private void setupToggleGroups() {
         groups = new ToggleGroup[10]; 
-        groups[0] = createGroup(rb1_1,  rb1_2,  rb1_3,  rb1_4,  rb1_5);
-        groups[1] = createGroup(rb2_1,  rb2_2,  rb2_3,  rb2_4,  rb2_5);
-        groups[2] = createGroup(rb3_1,  rb3_2,  rb3_3,  rb3_4,  rb3_5);
-        groups[3] = createGroup(rb4_1,  rb4_2,  rb4_3,  rb4_4,  rb4_5);
-        groups[4] = createGroup(rb5_1,  rb5_2,  rb5_3,  rb5_4,  rb5_5);
-        groups[5] = createGroup(rb6_1,  rb6_2,  rb6_3,  rb6_4,  rb6_5);
-        groups[6] = createGroup(rb7_1,  rb7_2,  rb7_3,  rb7_4,  rb7_5);
-        groups[7] = createGroup(rb8_1,  rb8_2,  rb8_3,  rb8_4,  rb8_5);
-        groups[8] = createGroup(rb9_1,  rb9_2,  rb9_3,  rb9_4,  rb9_5);
-        groups[9] = createGroup(rb10_1, rb10_2, rb10_3, rb10_4, rb10_5);  
+        groups[0] = createGroup(radioButton1_1,  radioButton1_2,  radioButton1_3,  radioButton1_4,  radioButton1_5);
+        groups[1] = createGroup(radioButton2_1,  radioButton2_2,  radioButton2_3,  radioButton2_4,  radioButton2_5);
+        groups[2] = createGroup(radioButton3_1,  radioButton3_2,  radioButton3_3,  radioButton3_4,  radioButton3_5);
+        groups[3] = createGroup(radioButton4_1,  radioButton4_2,  radioButton4_3,  radioButton4_4,  radioButton4_5);
+        groups[4] = createGroup(radioButton5_1,  radioButton5_2,  radioButton5_3,  radioButton5_4,  radioButton5_5);
+        groups[5] = createGroup(radioButton6_1,  radioButton6_2,  radioButton6_3,  radioButton6_4,  radioButton6_5);
+        groups[6] = createGroup(radioButton7_1,  radioButton7_2,  radioButton7_3,  radioButton7_4,  radioButton7_5);
+        groups[7] = createGroup(radioButton8_1,  radioButton8_2,  radioButton8_3,  radioButton8_4,  radioButton8_5);
+        groups[8] = createGroup(radioButton9_1,  radioButton9_2,  radioButton9_3,  radioButton9_4,  radioButton9_5);
+        groups[9] = createGroup(radioButton10_1, radioButton10_2, radioButton10_3, radioButton10_4, radioButton10_5);  
     }
 
     private ToggleGroup createGroup(RadioButton... parameters) {
@@ -104,26 +143,41 @@ public class FXMLGenerateAutoevaluation extends ValidationHandler {
 
     @FXML
     private void generateAutoevaluation() {
+        Optional<int[]> answers = collectAnswers();
+
+        if (answers.isEmpty()) {
+            showError("Por favor, responda todas las preguntas antes de generar.");
+        } else {
+            processAutoevaluation(answers.get());
+        }
+    }
+
+    private Optional<int[]> collectAnswers() {
+        Optional<int[]> result = Optional.empty();
         int[] answers = new int[10];
+        boolean allAnswered = true;
 
         for (int questionIndex = 0; questionIndex < groups.length; questionIndex++) {
             if (groups[questionIndex].getSelectedToggle() == null) {
-                showError("Por favor, responda todas las preguntas antes de generar.");
+                allAnswered = false;
             } else {
                 answers[questionIndex] = (int) groups[questionIndex].getSelectedToggle().getUserData();
             }
         }
+            if (allAnswered) {
+                result = Optional.of(answers);
+            }
 
+        return result;
+    }
+
+    private void processAutoevaluation(int[] answers) {
         try {
-            Autoevaluation evaluation = new Autoevaluation(
-                currentStudent.getIdStudent(), answers);
-
+            Autoevaluation evaluation = new Autoevaluation(currentStudent.getIdStudent(), answers);
             JasperPrint report = autoevaluationCommon.generateAutoevaluation(evaluation);
-
             JasperViewer.viewReport(report, false);
             labelMessage.setStyle("-fx-text-fill: green;");
             labelMessage.setText("Autoevaluación guardada y generada con éxito.");
-
         } catch (IllegalArgumentException e) {
             showError("Respuestas inválidas: " + e.getMessage());
         } catch (OperationException e) {

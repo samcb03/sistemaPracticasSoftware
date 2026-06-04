@@ -8,7 +8,7 @@
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="540.0" prefWidth="680.0" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="uv.lis.GUI.controller.FXMLAssignationProjectController">
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="540.0" prefWidth="680.0" xmlns="http://javafx.com/javafx/26" xmlns:fx="http://javafx.com/fxml/1" fx:controller="uv.lis.GUI.controller.FXMLAssignationProjectController">
    <children>
 
       <Label layoutX="0.0" layoutY="0.0" prefHeight="20.0" prefWidth="680.0" style="-fx-background-color: #a8c8e8; -fx-border-color: BLACK;" text=" Sistema de Expedientes - Panel de Profesor">
@@ -36,7 +36,7 @@
             <Label fx:id="labelObjective" layoutX="95.0" layoutY="229.0" prefHeight="18.0" prefWidth="229.0" />
             <Label fx:id="labelDescription" alignment="TOP_LEFT" layoutX="109.0" layoutY="279.0" prefHeight="90.0" prefWidth="230.0" wrapText="true" />
             
-            <Label layoutX="368.0" layoutY="60.0" text="Alumnos solicitantes:">
+            <Label fx:id="labelApplicants" layoutX="368.0" layoutY="60.0" text="Alumnos solicitantes:">
                <font>
                   <Font name="System Bold" size="12.0" />
                </font>
@@ -52,6 +52,14 @@
             <TextArea fx:id="textAreaReason" layoutX="368.0" layoutY="366.0" prefHeight="60.0" prefWidth="200.0" promptText="Explique por qué se asigna este proyecto..." wrapText="true" />
             <Button fx:id="buttonAssignProject" layoutX="167.0" layoutY="405.0" mnemonicParsing="false" onAction="#assignStudent" text="Asignar" />
             <Button fx:id="buttonBack" layoutX="238.0" layoutY="405.0" mnemonicParsing="false" onAction="#goBack" text="Cancelar" />
+
+            <Button fx:id="buttonAlternativeMode" layoutX="453.0" layoutY="25.0" mnemonicParsing="false" onAction="#toggleAlternativeMode" text="Asignación alternativa" />
+            <Label fx:id="labelStudentsWithoutProject" layoutX="368.0" layoutY="60.0" text="Alumnos sin proyecto:">
+               <font>
+                  <Font name="System Bold" size="12.0" />
+               </font>
+            </Label>
+            <ListView fx:id="listViewStudentsWithoutProject" layoutX="368.0" layoutY="81.0" prefHeight="258.0" prefWidth="200.0" />
          </children>
       </AnchorPane>
 
