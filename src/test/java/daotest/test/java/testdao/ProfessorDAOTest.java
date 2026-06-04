@@ -161,11 +161,35 @@ class ProfessorDAOTest {
         "false",
         "true"
     })
-    void modifyProfessor_validProfessor_returnsTrue(boolean isCoordinator) throws Exception {
+    
+    @Test
+    void modifyProfessor_notCoordinator_returnsTrue() throws Exception {
         when(databaseConnection.prepareStatement(anyString())).thenReturn(preparedStatement);
         when(preparedStatement.executeUpdate()).thenReturn(ROWS_AFFECTED);
 
-        assertTrue(professorDAO.modifyProfessor(builderProfessor(isCoordinator)));
+        assertTrue(professorDAO.modifyProfessor(builderProfessor(false)));
+    }
+
+    @Test
+    void modifyProfessor_coordinatorWithNoOtherActive_returnsTrue() throws Exception {
+        when(databaseConnection.prepareStatement(anyString())).thenReturn(preparedStatement);
+        when(preparedStatement.executeQuery()).thenReturn(resultSet);
+        when(resultSet.next()).thenReturn(true);
+        when(resultSet.getInt(1)).thenReturn(0);
+        when(preparedStatement.executeUpdate()).thenReturn(ROWS_AFFECTED);
+
+        assertTrue(professorDAO.modifyProfessor(builderProfessor(true)));
+    }
+
+    @Test
+    void modifyProfessor_coordinatorAlreadyExists_throwsOperationException() throws Exception {
+        when(databaseConnection.prepareStatement(anyString())).thenReturn(preparedStatement);
+        when(preparedStatement.executeQuery()).thenReturn(resultSet);
+        when(resultSet.next()).thenReturn(true);
+        when(resultSet.getInt(1)).thenReturn(1); 
+
+        assertThrows(OperationException.class,
+            () -> professorDAO.modifyProfessor(builderProfessor(true)));
     }
 
     @Test

@@ -4,6 +4,7 @@ package daotest.test.java.testdao;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 import org.junit.jupiter.api.BeforeEach;
@@ -58,10 +59,11 @@ class ActivityDAOTest {
 
     private void mockUpdateExecution(int rowsAffected) throws Exception {
         when(databaseConnection.prepareStatement(anyString())).thenReturn(preparedStatement);
+        when(databaseConnection.prepareStatement(anyString(), anyInt())).thenReturn(preparedStatement);
         when(preparedStatement.executeUpdate()).thenReturn(rowsAffected);
     }
 
-private void mockResultSetActivity() throws Exception {
+    private void mockResultSetActivity() throws Exception {
         when(resultSet.next()).thenReturn(true, true, false);
 
         when(resultSet.getInt("idActividad")).thenReturn(1, 2);
@@ -135,6 +137,9 @@ private void mockResultSetActivity() throws Exception {
     @Test
     void registerActivity_successful_returnsTrue() throws Exception {
         mockUpdateExecution(1);
+        when(preparedStatement.getGeneratedKeys()).thenReturn(resultSet);
+        when(resultSet.next()).thenReturn(true);
+        when(resultSet.getInt(1)).thenReturn(1); 
 
         assertTrue(activityDAO.registerActivity(buildExpectedActivity()));
     }
