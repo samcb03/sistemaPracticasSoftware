@@ -33,6 +33,8 @@ public class MonthlyReportCommon {
     private static final String TEMPLATE_READ_ERROR_MESSAGE = "Error al cargar la plantilla del reporte mensual.";
     private static final String NO_STUDENT_IN_SESSION_MESSAGE = "No hay un estudiante en sesión";
     private static final int MAX_ACTIVITIES = 7;
+    private static final int YEAR_DIGITS = 4;
+    private static final int FIRST_INDEX = 0;
 
     private final ReportContextDAO reportContextDAO;
     private final SimpleJasperReportsContext jasperReportsContext;
@@ -96,7 +98,8 @@ public class MonthlyReportCommon {
         report.setSection(context.getSection());
         report.setPeriod(context.getPeriod());
         report.setProfessorName(context.getProfessorName());
-
+        report.setYear(extractYearFromPeriod(context.getPeriod()));
+ 
         String totalHours = reportContextDAO.getTotalReportedHoursByStudentId(studentId);
         report.setAccumulatedHours(Integer.parseInt(totalHours));
     }
@@ -132,4 +135,16 @@ public class MonthlyReportCommon {
         }
     }
 
+    private int extractYearFromPeriod(String period) {
+        int reportYear = FIRST_INDEX;
+ 
+        if (period != null && period.length() >= YEAR_DIGITS) {
+            try {
+                reportYear = Integer.parseInt(period.substring(FIRST_INDEX, YEAR_DIGITS));
+            } catch (NumberFormatException numberFormatException) {
+                LOGGER.log(Level.WARNING, "Periodo escolar con año no numérico: {0}", period);
+            }
+        }
+        return reportYear;
+    }
 }

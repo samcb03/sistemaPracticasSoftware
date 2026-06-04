@@ -27,6 +27,7 @@ import net.sf.jasperreports.view.JasperViewer;
 import uv.lis.GUI.ValidationHandler;
 import uv.lis.logic.common.PartialReportCommon;
 import uv.lis.logic.dao.ActivityDAO;
+import uv.lis.logic.dao.ReportDAO;
 import uv.lis.logic.dto.Activity;
 import uv.lis.logic.dto.PartialReport;
 import uv.lis.logic.dto.Student;
@@ -51,6 +52,7 @@ public class FXMLGeneratePartialReportController extends ValidationHandler {
 
     private final PartialReportCommon partialReportCommon = new PartialReportCommon();
     private final ActivityDAO activityDAO = new ActivityDAO();
+    private final ReportDAO reportDAO = new ReportDAO();
 
     private ComboBox<String>[] comboBoxActivities;
     private TextField[] textFieldAdvances;
@@ -178,7 +180,8 @@ public class FXMLGeneratePartialReportController extends ValidationHandler {
         try {
             PartialReport partialReport = buildPartialReport();
             JasperPrint jasperPrint = partialReportCommon.generatePartialReport(partialReport);
-
+            persistReport(partialReport);
+ 
             showSuccess(REPORT_GENERATED_MESSAGE);
             displayReport(jasperPrint);
             clearFields();
@@ -191,6 +194,14 @@ public class FXMLGeneratePartialReportController extends ValidationHandler {
         }
     }
 
+    private void persistReport(PartialReport partialReport) throws OperationException {
+        boolean isRegistered = reportDAO.registerPartialReport(partialReport);
+ 
+        if (!isRegistered) {
+            LOGGER.log(Level.WARNING, "El reporte parcial no se guardó en la base de datos");
+        }
+    }
+
     private void displayReport(JasperPrint jasperPrint) {
         JasperViewer viewer = new JasperViewer(jasperPrint, false);
         viewer.setTitle(PARTIAL_REPORT_TITLE);
@@ -199,12 +210,17 @@ public class FXMLGeneratePartialReportController extends ValidationHandler {
 
     private PartialReport buildPartialReport() {
         PartialReport partialReport = new PartialReport();
-
+ 
         partialReport.setReportNumber(DEFAULT_REPORT_NUMBER);
         partialReport.setActivityName(comboBoxActivity1.getValue());
         partialReport.setResult(textAreaResults.getText().trim());
         partialReport.setObservations(textAreaGeneralObservations.getText().trim());
-
+ 
+        Student currentStudent = SessionManager.getInstance().getCurrentStudent();
+        if (currentStudent != null) {
+            partialReport.setStudentId(currentStudent.getIdStudent());
+        }
+ 
         fillActivityInputs(partialReport);
         return partialReport;
     }

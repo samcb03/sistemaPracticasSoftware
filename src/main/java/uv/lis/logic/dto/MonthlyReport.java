@@ -145,6 +145,14 @@ public class MonthlyReport extends Report {
         return observationValue;
     }
 
+    public int getYear() {
+        return year;
+    }
+ 
+    public void setYear(int year) {
+        this.year = year;
+    }
+
     @Override
     public boolean equals(Object object) {
         boolean isEqual = false;

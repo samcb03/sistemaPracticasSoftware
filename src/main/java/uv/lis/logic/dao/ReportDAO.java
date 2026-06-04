@@ -14,6 +14,8 @@ import java.util.logging.Logger;
 
 import uv.lis.dataaccess.MySQLConnectionManager;
 import uv.lis.logic.contracts.IReportDAO;
+import uv.lis.logic.dto.ActivityProgress;
+import uv.lis.logic.dto.DeliverableResult;
 import uv.lis.logic.dto.FinalReport;
 import uv.lis.logic.dto.MonthlyReport;
 import uv.lis.logic.dto.PartialReport;
@@ -33,7 +35,10 @@ public class ReportDAO implements IReportDAO {
     private static final String REGISTER_FINAL_ERROR = "Error al registrar el reporte final";
     private static final String MODIFY_FINAL_ERROR = "Error al modificar el reporte final";
     private static final String REGISTER_MONTHLY_ERROR = "Error al registrar reporte mensual";
-    private static final String MONTHLY_REPORT_ACTIVITY = "Reporte Mensual";
+    private static final String EMPTY_DELIVERABLE_NAME = "";
+    private static final int NO_ADVANCE = 0;
+    private static final int WEEK_OFFSET = 1;
+    private static final int FIRST_DETAIL = 1;
 
     private final MySQLConnectionManager connectionManager;
 
@@ -65,8 +70,7 @@ public class ReportDAO implements IReportDAO {
     }
 
     @Override
-    public Optional<PartialReport> getPartialReportById(int idPartialReport)
-            throws OperationException {
+    public Optional<PartialReport> getPartialReportById(int idPartialReport) throws OperationException {
         Optional<PartialReport> validReport = Optional.empty();
         String reportQuery = "SELECT r.idReporte, r.descripcion, r.observaciones, r.actividad, "
                            + "r.matricula, rp.tiempoPlaneado, rp.tiempoReal "
@@ -83,8 +87,7 @@ public class ReportDAO implements IReportDAO {
                 if (resultSet.next()) {
                     validReport = Optional.of(mapPartialReport(resultSet));
                 } else {
-                    LOGGER.log(Level.INFO,
-                        "No se encontró un reporte parcial con id {0}", idPartialReport);
+                    LOGGER.log(Level.INFO,"No se encontró un reporte parcial con id {0}", idPartialReport);
                 }
             }
         } catch (SQLException e) {
@@ -103,6 +106,7 @@ public class ReportDAO implements IReportDAO {
             try {
                 insertReportRow(databaseConnection, partialReport);
                 isRegistered = insertPartialDetail(databaseConnection, partialReport);
+                insertPartialActivityDetails(databaseConnection, partialReport);
                 commitOrRollback(databaseConnection, isRegistered);
             } catch (SQLException innerException) {
                 databaseConnection.rollback();
@@ -137,8 +141,7 @@ public class ReportDAO implements IReportDAO {
     }
 
     @Override
-    public Optional<FinalReport> getFinalReportById(int idFinalReport)
-            throws OperationException {
+    public Optional<FinalReport> getFinalReportById(int idFinalReport) throws OperationException {
         Optional<FinalReport> validReport = Optional.empty();
         String reportQuery = "SELECT r.idReporte, r.descripcion, r.observaciones, r.actividad, "
                            + "r.matricula, rf.porcentajeAvance, rf.ResultadoEntregable "
@@ -172,6 +175,8 @@ public class ReportDAO implements IReportDAO {
             try {
                 insertReportRow(databaseConnection, finalReport);
                 isRegistered = insertFinalDetail(databaseConnection, finalReport);
+                insertFinalActivityDetails(databaseConnection, finalReport);
+                insertFinalDeliverableDetails(databaseConnection, finalReport);
                 commitOrRollback(databaseConnection, isRegistered);
             } catch (SQLException innerException) {
                 databaseConnection.rollback();
@@ -206,8 +211,7 @@ public class ReportDAO implements IReportDAO {
     }
 
     @Override
-    public boolean registerMonthlyReport(MonthlyReport monthlyReport)
-            throws OperationException {
+    public boolean registerMonthlyReport(MonthlyReport monthlyReport) throws OperationException {
         boolean isRegistered = false;
 
         try (Connection databaseConnection = connectionManager.getConnection()) {
@@ -215,6 +219,7 @@ public class ReportDAO implements IReportDAO {
             try {
                 insertReportRow(databaseConnection, monthlyReport);
                 isRegistered = insertMonthlyDetail(databaseConnection, monthlyReport);
+                insertMonthlyActivityDetails(databaseConnection, monthlyReport);
                 commitOrRollback(databaseConnection, isRegistered);
             } catch (SQLException innerException) {
                 databaseConnection.rollback();
@@ -279,9 +284,10 @@ public class ReportDAO implements IReportDAO {
     }
 
     private void insertReportRow(Connection databaseConnection, Report report) throws SQLException {
-        String reportQuery = "INSERT INTO Reporte (descripcion, observaciones, actividad, matricula) VALUES (?, ?, ?, ?)";
+        String reportQuery = "INSERT INTO Reporte (descripcion, observaciones, actividad, matricula) "
+                           + "VALUES (?, ?, ?, ?)";
 
-        try (PreparedStatement preparedStatement = databaseConnection.prepareStatement(reportQuery, 
+        try (PreparedStatement preparedStatement = databaseConnection.prepareStatement(reportQuery,
             PreparedStatement.RETURN_GENERATED_KEYS)) {
 
             preparedStatement.setString(1, report.getDescription());
@@ -292,7 +298,7 @@ public class ReportDAO implements IReportDAO {
 
             try (ResultSet generatedKeys = preparedStatement.getGeneratedKeys()) {
                 if (generatedKeys.next()) {
-                    report.setId(generatedKeys.getInt(1)); 
+                    report.setId(generatedKeys.getInt(1));
                 } else {
                     throw new SQLException("No se pudo obtener el ID del reporte generado.");
                 }
@@ -300,8 +306,7 @@ public class ReportDAO implements IReportDAO {
         }
     }
 
-    private void updateReportRow(Connection databaseConnection, Report report)
-            throws SQLException {
+    private void updateReportRow(Connection databaseConnection, Report report) throws SQLException {
         String reportQuery = "UPDATE Reporte SET descripcion = ?, observaciones = ?, "
                            + "actividad = ?, matricula = ? WHERE idReporte = ?";
 
@@ -316,8 +321,8 @@ public class ReportDAO implements IReportDAO {
         }
     }
 
-    private boolean insertPartialDetail(Connection databaseConnection,
-            PartialReport partialReport) throws SQLException {
+    private boolean insertPartialDetail(Connection databaseConnection, PartialReport partialReport)
+        throws SQLException {
         boolean isInserted = false;
         String reportQuery = "INSERT INTO ReporteParcial (idReporte, tiempoPlaneado, tiempoReal) "
                            + "VALUES (?, ?, ?)";
@@ -335,8 +340,50 @@ public class ReportDAO implements IReportDAO {
         return isInserted;
     }
 
-    private boolean updatePartialDetail(Connection databaseConnection, 
+    private void insertPartialActivityDetails(Connection databaseConnection,
             PartialReport partialReport) throws SQLException {
+        String reportQuery = "INSERT INTO DetalleReporteParcial "
+                           + "(idReporte, nombreActividad, semana, tiempoPlaneado, tiempoReal) "
+                           + "VALUES (?, ?, ?, ?, ?)";
+
+        try (PreparedStatement preparedStatement = databaseConnection.prepareStatement(reportQuery)) {
+            String[] activityNames = partialReport.getActivityNames();
+
+            for (int activityIndex = 0; activityIndex < PartialReport.MAX_ACTIVITIES; activityIndex++) {
+                String activityName = activityNames[activityIndex];
+
+                if (activityName != null && !activityName.isBlank()) {
+                    addPartialWeeksForActivity(preparedStatement, partialReport, activityIndex);
+                }
+            }
+            preparedStatement.executeBatch();
+        }
+    }
+
+    private void addPartialWeeksForActivity(PreparedStatement preparedStatement,
+            PartialReport partialReport, int activityIndex) throws SQLException {
+        String activityName = partialReport.getActivityNames()[activityIndex];
+        int[][] plannedAdvances = partialReport.getPlannedAdvances();
+        int[][] realAdvances = partialReport.getRealAdvances();
+
+        for (int weekIndex = 0; weekIndex < PartialReport.MAX_WEEKS; weekIndex++) {
+            int plannedAdvance = plannedAdvances[weekIndex][activityIndex];
+            int realAdvance = realAdvances[weekIndex][activityIndex];
+            boolean hasAdvance = plannedAdvance > NO_ADVANCE || realAdvance > NO_ADVANCE;
+
+            if (hasAdvance) {
+                preparedStatement.setInt(1, partialReport.getId());
+                preparedStatement.setString(2, activityName);
+                preparedStatement.setInt(3, weekIndex + WEEK_OFFSET);
+                preparedStatement.setInt(4, plannedAdvance);
+                preparedStatement.setInt(5, realAdvance);
+                preparedStatement.addBatch();
+            }
+        }
+    }
+
+    private boolean updatePartialDetail(Connection databaseConnection, PartialReport partialReport)
+        throws SQLException {
         boolean isUpdated = false;
         String reportQuery = "UPDATE ReporteParcial SET tiempoPlaneado = ?, tiempoReal = ? "
                            + "WHERE idReporte = ?";
@@ -356,16 +403,18 @@ public class ReportDAO implements IReportDAO {
 
     private boolean insertFinalDetail(Connection databaseConnection, FinalReport finalReport) throws SQLException {
         boolean isInserted = false;
-        int advancePercentage = parseAdvancePercentage( finalReport.getFirstActivity().getAdvancePercentage());
+        int advancePercentage = parseAdvancePercentage(finalReport.getFirstActivity().getAdvancePercentage());
         String deliverableResult = finalReport.getFirstDeliverable().getResult();
-        String reportQuery = "INSERT INTO ReporteFinal (idReporte, porcentajeAvance, ResultadoEntregable) "
-                           + "VALUES (?, ?, ?)";
+        String reportQuery = "INSERT INTO ReporteFinal "
+                           + "(idReporte, porcentajeAvance, ResultadoEntregable, observacionesGenerales) "
+                           + "VALUES (?, ?, ?, ?)";
 
         try (PreparedStatement preparedStatement = databaseConnection.prepareStatement(reportQuery)) {
 
             preparedStatement.setInt(1, finalReport.getId());
             preparedStatement.setInt(2, advancePercentage);
             preparedStatement.setString(3, deliverableResult);
+            preparedStatement.setString(4, finalReport.getGeneralObservations());
 
             if (preparedStatement.executeUpdate() > NO_ROWS_AFFECTED) {
                 isInserted = true;
@@ -374,7 +423,59 @@ public class ReportDAO implements IReportDAO {
         return isInserted;
     }
 
-    private boolean updateFinalDetail(Connection databaseConnection, FinalReport finalReport) throws SQLException {
+    private void insertFinalActivityDetails(Connection databaseConnection, FinalReport finalReport) 
+        throws SQLException {
+        String reportQuery = "INSERT INTO ActividadReporteFinal "
+                           + "(idReporte, nombreActividad, porcentajeAvance, observaciones) "
+                           + "VALUES (?, ?, ?, ?)";
+        ActivityProgress[] activities = {
+            finalReport.getFirstActivity(), finalReport.getSecondActivity()
+        };
+
+        try (PreparedStatement preparedStatement = databaseConnection.prepareStatement(reportQuery)) {
+            for (ActivityProgress activity : activities) {
+                String activityName = activity.getName();
+
+                if (activityName != null && !activityName.isBlank()) {
+                    preparedStatement.setInt(1, finalReport.getId());
+                    preparedStatement.setString(2, activityName);
+                    preparedStatement.setInt(3, parseAdvancePercentage(activity.getAdvancePercentage()));
+                    preparedStatement.setString(4, activity.getObservations());
+                    preparedStatement.addBatch();
+                }
+            }
+            preparedStatement.executeBatch();
+        }
+    }
+
+    private void insertFinalDeliverableDetails(Connection databaseConnection, FinalReport finalReport)
+        throws SQLException {
+        String reportQuery = "INSERT INTO EntregableReporteFinal "
+                           + "(idReporte, nombreEntregable, resultado, porcentajeAvance, observaciones) "
+                           + "VALUES (?, ?, ?, ?, ?)";
+        DeliverableResult[] deliverables = {
+            finalReport.getFirstDeliverable(), finalReport.getSecondDeliverable()
+        };
+
+        try (PreparedStatement preparedStatement = databaseConnection.prepareStatement(reportQuery)) {
+            for (DeliverableResult deliverable : deliverables) {
+                String deliverableResult = deliverable.getResult();
+
+                if (deliverableResult != null && !deliverableResult.isBlank()) {
+                    preparedStatement.setInt(1, finalReport.getId());
+                    preparedStatement.setString(2, EMPTY_DELIVERABLE_NAME);
+                    preparedStatement.setString(3, deliverableResult);
+                    preparedStatement.setInt(4, parseAdvancePercentage(deliverable.getAdvancePercentage()));
+                    preparedStatement.setString(5, deliverable.getObservations());
+                    preparedStatement.addBatch();
+                }
+            }
+            preparedStatement.executeBatch();
+        }
+    }
+
+    private boolean updateFinalDetail(Connection databaseConnection, FinalReport finalReport)
+        throws SQLException {
         boolean isUpdated = false;
         int advancePercentage = parseAdvancePercentage(finalReport.getFirstActivity().getAdvancePercentage());
         String deliverableResult = finalReport.getFirstDeliverable().getResult();
@@ -394,23 +495,48 @@ public class ReportDAO implements IReportDAO {
         return isUpdated;
     }
 
-    private boolean insertMonthlyDetail(Connection databaseConnection, 
-            MonthlyReport monthlyReport) throws SQLException {
+    private boolean insertMonthlyDetail(Connection databaseConnection, MonthlyReport monthlyReport)
+        throws SQLException {
         boolean isInserted = false;
-        String reportQuery = "INSERT INTO ReporteMensual (idReporte, mes, horasReportadas) "
-                           + "VALUES (?, ?, ?)";
+        String reportQuery = "INSERT INTO ReporteMensual "
+                           + "(idReporte, mes, anio, horasReportadas, horasAcumuladas) "
+                           + "VALUES (?, ?, ?, ?, ?)";
 
         try (PreparedStatement preparedStatement = databaseConnection.prepareStatement(reportQuery)) {
 
             preparedStatement.setInt(1, monthlyReport.getId());
             preparedStatement.setString(2, monthlyReport.getMonth());
-            preparedStatement.setInt(3, monthlyReport.getReportedHours());
+            preparedStatement.setInt(3, monthlyReport.getYear());
+            preparedStatement.setInt(4, monthlyReport.getReportedHours());
+            preparedStatement.setInt(5, monthlyReport.getAccumulatedHours());
 
             if (preparedStatement.executeUpdate() > NO_ROWS_AFFECTED) {
                 isInserted = true;
             }
         }
         return isInserted;
+    }
+
+    private void insertMonthlyActivityDetails(Connection databaseConnection, MonthlyReport monthlyReport) 
+        throws SQLException {
+        String reportQuery = "INSERT INTO DetalleReporteMensual "
+                           + "(idReporte, periodo, actividad, observaciones) "
+                           + "VALUES (?, ?, ?, ?)";
+
+        try (PreparedStatement preparedStatement = databaseConnection.prepareStatement(reportQuery)) {
+            for (int position = FIRST_DETAIL; position <= monthlyReport.getActivityCount(); position++) {
+                String activity = monthlyReport.getActivityAt(position);
+
+                if (activity != null && !activity.isBlank()) {
+                    preparedStatement.setInt(1, monthlyReport.getId());
+                    preparedStatement.setString(2, monthlyReport.getPeriodAt(position));
+                    preparedStatement.setString(3, activity);
+                    preparedStatement.setString(4, monthlyReport.getObservationAt(position));
+                    preparedStatement.addBatch();
+                }
+            }
+            preparedStatement.executeBatch();
+        }
     }
 
     private int parseAdvancePercentage(String rawValue) {

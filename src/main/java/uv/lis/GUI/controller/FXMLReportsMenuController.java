@@ -15,6 +15,7 @@ public class FXMLReportsMenuController extends WindowHandler {
     private static final String PARTIAL_REPORT_VIEW = "/uv/lis/GUI/view/FXMLGeneratePartialReport.fxml";
     private static final String FINAL_REPORT_VIEW = "/uv/lis/GUI/view/FXMLGenerateFinalReport.fxml";
     private static final int MIN_HOURS_FOR_FINAL_REPORT = 420;
+    private static final int MIN_HOURS_FOR_PARTIAL_REPORT = 210;
 
     @FXML private Button buttonGenerateMonthlyReport;
     @FXML private Button buttonGeneratePartialReport;
@@ -25,7 +26,7 @@ public class FXMLReportsMenuController extends WindowHandler {
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         this.student = SessionManager.getInstance().getCurrentStudent();
-        disableReportOptions();
+        //disableReportOptions();
     }
     
     @FXML
@@ -44,7 +45,9 @@ public class FXMLReportsMenuController extends WindowHandler {
     }
 
     private void disableReportOptions() {
-        if(student.getCompletedHours() < MIN_HOURS_FOR_FINAL_REPORT) {
+        if(student.getCompletedHours() < MIN_HOURS_FOR_PARTIAL_REPORT) {
+            buttonGeneratePartialReport.setDisable(true);
+        } else if(student.getCompletedHours() < MIN_HOURS_FOR_FINAL_REPORT) {
             buttonGenerateFinalReport.setDisable(true);
         }
     }
