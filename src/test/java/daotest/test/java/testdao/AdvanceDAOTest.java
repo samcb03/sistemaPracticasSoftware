@@ -35,6 +35,7 @@ class AdvanceDAOTest {
     @Mock private ResultSet resultSet;
 
     private AdvanceDAO advanceDAO;
+    private static final int PROJECT_ID = 1;
 
     @BeforeEach
     void setUp() throws Exception {
@@ -94,7 +95,7 @@ class AdvanceDAOTest {
         when(preparedStatement.executeQuery()).thenReturn(resultSet);
         when(resultSet.next()).thenReturn(false);
 
-        ArrayList<Advance> result = advanceDAO.getAdvancesByProject(1);
+        ArrayList<Advance> result = advanceDAO.getAdvancesByProject(PROJECT_ID);
 
         assertTrue(result.isEmpty());
     }
@@ -106,7 +107,7 @@ class AdvanceDAOTest {
         when(resultSet.next()).thenReturn(true);
         when(resultSet.getInt("horasAcumuladas")).thenReturn(48);
 
-        int result = advanceDAO.getAccumulatedHoursByProject(1);
+        int result = advanceDAO.getAccumulatedHoursByProject(PROJECT_ID);
 
         assertEquals(48, result);
     }
@@ -117,7 +118,7 @@ class AdvanceDAOTest {
         when(preparedStatement.executeQuery()).thenReturn(resultSet);
         when(resultSet.next()).thenReturn(false);
 
-        int result = advanceDAO.getAccumulatedHoursByProject(1);
+        int result = advanceDAO.getAccumulatedHoursByProject(PROJECT_ID);
 
         assertEquals(0, result);
     }
@@ -127,7 +128,7 @@ class AdvanceDAOTest {
         when(databaseConnection.prepareStatement(anyString())).thenThrow(new SQLException());
 
         assertThrows(OperationException.class,
-            () -> advanceDAO.getAccumulatedHoursByProject(1));
+            () -> advanceDAO.getAccumulatedHoursByProject(PROJECT_ID));
     }
 
     private Advance buildAdvance() {
