@@ -245,13 +245,13 @@ public class RequestProjectDAO implements IRequestProjectDAO {
                                    + "FROM Usuario u "
                                    + "INNER JOIN Alumno a ON u.idUsuario = a.idUsuario "
                                    + "INNER JOIN Solicita_Proyecto sp ON a.matricula = sp.matricula "
-                                   + "WHERE sp.idProyecto = ?";
+                                   + "WHERE sp.idProyecto = ? AND sp.estatus = ?;";
 
         try (Connection databaseConnection = connectionManager.getConnection();
             PreparedStatement preparedStatement = databaseConnection.prepareStatement(requestProjectQuery)) {
 
             preparedStatement.setInt(1, idProject);
-
+            preparedStatement.setInt(2, STATUS_REQUESTED);
             try (ResultSet resultSet = preparedStatement.executeQuery()) {
                 while (resultSet.next()) {
                     applicants.add(buildStudentFromResultSet(resultSet));

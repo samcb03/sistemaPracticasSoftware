@@ -26,7 +26,7 @@ import uv.lis.logic.dto.Student;
 import uv.lis.logic.exceptions.OperationException;
 import uv.lis.logic.utils.SessionManager;
 import uv.lis.logic.utils.WorkProgressCalculator;
-//TODO estudiar esta clase
+
 public class PartialReportCommon {
 
     private static final Logger LOGGER = Logger.getLogger(PartialReportCommon.class.getName());
@@ -56,7 +56,7 @@ public class PartialReportCommon {
     }
 
     private SimpleJasperReportsContext buildReportsContext() {
-        SimpleJasperReportsContext reportsContext
+        SimpleJasperReportsContext reportsContext 
             = new SimpleJasperReportsContext(DefaultJasperReportsContext.getInstance());
         List<RepositoryService> repositoryServices = new ArrayList<>();
         repositoryServices.add(new ClasspathImageRepositoryCommon());
@@ -72,7 +72,7 @@ public class PartialReportCommon {
         }
 
         mergeContextIntoReport(partialReport, currentStudent.getIdStudent());
-        fillAdvanceMatrices(partialReport, currentStudent.getIdStudent());
+        fillAdvanceMatrix(partialReport, currentStudent.getIdStudent());
         return fillReportTemplate(partialReport);
     }
 
@@ -90,8 +90,7 @@ public class PartialReportCommon {
             jasperPrint = JasperFillManager.getInstance(jasperReportsContext)
                 .fill(templateStream, parameters, new JREmptyDataSource());
         } catch (IOException ioException) {
-            LOGGER.log(Level.SEVERE,
-                "Error al leer la plantilla del reporte parcial", ioException);
+            LOGGER.log(Level.SEVERE, "Error al leer la plantilla del reporte parcial", ioException);
             throw new OperationException(TEMPLATE_READ_ERROR_MESSAGE, ioException);
         }
         return jasperPrint;
@@ -114,7 +113,7 @@ public class PartialReportCommon {
         partialReport.setDateReport(LocalDate.now().format(DATE_FORMATTER));
     }
 
-    private void fillAdvanceMatrices(PartialReport partialReport, String studentId) throws OperationException {
+    private void fillAdvanceMatrix(PartialReport partialReport, String studentId) throws OperationException {
         List<Activity> selectedActivities = new ArrayList<>();
         String[] activityNames = partialReport.getActivityNames();
 

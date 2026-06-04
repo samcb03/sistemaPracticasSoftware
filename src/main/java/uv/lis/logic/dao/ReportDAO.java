@@ -46,7 +46,7 @@ public class ReportDAO implements IReportDAO {
     }
 
     @Override
-    public List<Report> getReports() throws OperationException {
+    public List<Report> getAllReports() throws OperationException {
         List<Report> reports = new ArrayList<>();
         String reportQuery = "SELECT idReporte, descripcion, observaciones, actividad, matricula FROM Reporte";
 

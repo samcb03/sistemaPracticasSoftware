@@ -24,5 +24,4 @@ public interface IStudentDAO {
     boolean isStudentInactive(String studentId) throws OperationException;
 
     boolean hasProjectAssigned(String studentId) throws OperationException;
-
 }

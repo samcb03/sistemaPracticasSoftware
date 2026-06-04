@@ -11,7 +11,7 @@ import uv.lis.logic.exceptions.OperationException;
 
 public interface IReportDAO {
 
-    List<Report> getReports() throws OperationException;
+    List<Report> getAllReports() throws OperationException;
 
     Optional<PartialReport> getPartialReportById(int idPartialReport) throws OperationException;
 
