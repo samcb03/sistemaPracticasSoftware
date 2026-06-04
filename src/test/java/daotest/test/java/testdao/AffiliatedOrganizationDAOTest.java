@@ -32,6 +32,7 @@ class AffiliatedOrganizationDAOTest {
     private ResultSet resultSet;
 
     private AffiliatedOrganizationDAO affiliatedOrganizationDAO;
+    private static final int ORGANIZATION_ID = 3;
 
     @BeforeEach
     void setUp() throws Exception {
@@ -94,7 +95,7 @@ class AffiliatedOrganizationDAOTest {
         when(resultSet.next()).thenReturn(false);
 
         assertThrows(OperationException.class, 
-            () -> affiliatedOrganizationDAO.getOrganizationById(99));
+            () -> affiliatedOrganizationDAO.getOrganizationById(ORGANIZATION_ID));
     }
 
     @Test
@@ -102,7 +103,7 @@ class AffiliatedOrganizationDAOTest {
         when(connection.prepareStatement(anyString())).thenThrow(new SQLException("DB error"));
 
         assertThrows(OperationException.class, 
-            () -> affiliatedOrganizationDAO.getOrganizationById(1));
+            () -> affiliatedOrganizationDAO.getOrganizationById(ORGANIZATION_ID));
     }
 
     @Test

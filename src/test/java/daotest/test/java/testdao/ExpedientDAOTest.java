@@ -39,6 +39,7 @@ class ExpedientDAOTest {
     @Mock private ResultSet generatedKeys;
 
     private ExpedientDAO expedientDAO;
+    private static final int EXPEDIENT_ID = 2;
 
     @BeforeEach
     void setUp() throws Exception {
@@ -191,7 +192,7 @@ class ExpedientDAOTest {
         when(databaseConnection.prepareStatement(anyString())).thenReturn(preparedStatement);
         when(preparedStatement.executeUpdate()).thenReturn(1);
 
-        boolean result = expedientDAO.updateValidationStatus(1, true);
+        boolean result = expedientDAO.updateValidationStatus(EXPEDIENT_ID, true);
 
         assertTrue(result);
     }
@@ -201,7 +202,7 @@ class ExpedientDAOTest {
         when(databaseConnection.prepareStatement(anyString())).thenReturn(preparedStatement);
         when(preparedStatement.executeUpdate()).thenReturn(0);
 
-        boolean result = expedientDAO.updateValidationStatus(99, true);
+        boolean result = expedientDAO.updateValidationStatus(EXPEDIENT_ID, true);
 
         assertFalse(result);
     }
@@ -211,7 +212,7 @@ class ExpedientDAOTest {
         when(databaseConnection.prepareStatement(anyString())).thenThrow(new SQLException());
 
         assertThrows(OperationException.class,
-            () -> expedientDAO.updateValidationStatus(1, true));
+            () -> expedientDAO.updateValidationStatus(EXPEDIENT_ID, true));
     }
 
     @Test

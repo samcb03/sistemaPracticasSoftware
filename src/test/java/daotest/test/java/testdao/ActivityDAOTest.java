@@ -7,6 +7,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
+import static uv.lis.logic.utils.InputValidator.NO_ROWS_AFFECTED;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
@@ -39,6 +41,8 @@ class ActivityDAOTest {
     private ResultSet resultSet;
 
     private ActivityDAO activityDAO;
+    private static final int ACTIVITY_ID = 3;
+    private static final int ROWS_AFFECTED = 1;
 
     @BeforeEach
     void setUp() throws Exception {
@@ -116,7 +120,7 @@ class ActivityDAOTest {
         mockQueryExecution();
         when(resultSet.next()).thenReturn(true, true, false);
 
-        assertTrue(activityDAO.getActivityById(1).isPresent());
+        assertTrue(activityDAO.getActivityById(ACTIVITY_ID).isPresent());
     }
 
     @Test
@@ -124,7 +128,7 @@ class ActivityDAOTest {
         mockQueryExecution();
         when(resultSet.next()).thenReturn(false);
 
-        assertTrue(activityDAO.getActivityById(999).isEmpty());
+        assertTrue(activityDAO.getActivityById(ACTIVITY_ID).isEmpty());
     }
 
     @Test
@@ -136,7 +140,7 @@ class ActivityDAOTest {
 
     @Test
     void registerActivity_successful_returnsTrue() throws Exception {
-        mockUpdateExecution(1);
+        mockUpdateExecution(ROWS_AFFECTED);
         when(preparedStatement.getGeneratedKeys()).thenReturn(resultSet);
         when(resultSet.next()).thenReturn(true);
         when(resultSet.getInt(1)).thenReturn(1); 
@@ -146,7 +150,7 @@ class ActivityDAOTest {
 
     @Test
     void registerActivity_noRowsAffected_throwsOperationException() throws Exception {
-        mockUpdateExecution(0);
+        mockUpdateExecution(NO_ROWS_AFFECTED);
 
         assertThrows(OperationException.class, () ->
             activityDAO.registerActivity(buildExpectedActivity())
@@ -164,14 +168,14 @@ class ActivityDAOTest {
 
     @Test
     void modifyActivity_successful_returnsTrue() throws Exception {
-        mockUpdateExecution(1);
+        mockUpdateExecution(ROWS_AFFECTED);
 
         assertTrue(activityDAO.modifyActivity(buildExpectedActivity()));
     }
 
     @Test
     void modifyActivity_noRowsAffected_throwsOperationException() throws Exception {
-        mockUpdateExecution(0);
+        mockUpdateExecution(NO_ROWS_AFFECTED);
 
         assertThrows(OperationException.class, () ->
             activityDAO.modifyActivity(buildExpectedActivity())
