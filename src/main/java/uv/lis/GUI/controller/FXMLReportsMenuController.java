@@ -26,7 +26,7 @@ public class FXMLReportsMenuController extends WindowHandler {
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         this.student = SessionManager.getInstance().getCurrentStudent();
-        //disableReportOptions();
+        disableReportOptions();
     }
     
     @FXML
@@ -47,7 +47,9 @@ public class FXMLReportsMenuController extends WindowHandler {
     private void disableReportOptions() {
         if(student.getCompletedHours() < MIN_HOURS_FOR_PARTIAL_REPORT) {
             buttonGeneratePartialReport.setDisable(true);
-        } else if(student.getCompletedHours() < MIN_HOURS_FOR_FINAL_REPORT) {
+            buttonGenerateFinalReport.setDisable(true);
+        } 
+        if(student.getCompletedHours() < MIN_HOURS_FOR_FINAL_REPORT) {
             buttonGenerateFinalReport.setDisable(true);
         }
     }

@@ -36,8 +36,8 @@ public class FXMLStudentMenuController extends ValidationHandler {
     public void initialize(URL location, ResourceBundle resources) {
         this.student = SessionManager.getInstance().getCurrentStudent();
         try {
-            //disableActionsWithoutAssignedSubject();
-            //disableActionsWithoutAssignedProject();
+            disableActionsWithoutAssignedSubject();
+            disableActionsWithoutAssignedProject();
             disableAutoevaluation();
         } catch (OperationException e) {
             showError(e.getMessage());
