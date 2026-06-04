@@ -25,10 +25,12 @@ public class FXMLStudentMenuController extends ValidationHandler {
     @FXML private Button buttonLogOut;
     @FXML private Button buttonRegisterActivity;
     @FXML private Label labelMessage;
+    @FXML private Button buttonNotifications;
 
     private Student student;
     private final StudentDAO studentDAO = new StudentDAO();
     private final SubjectDAO subjectDAO = new SubjectDAO();
+    private static final int MAX_HOURS = 420;
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
@@ -36,6 +38,7 @@ public class FXMLStudentMenuController extends ValidationHandler {
         try {
             disableActionsWithoutAssignedSubject();
             disableActionsWithoutAssignedProject();
+            disableAutoevaluation();
         } catch (OperationException e) {
             showError(e.getMessage());
         }
@@ -74,6 +77,12 @@ public class FXMLStudentMenuController extends ValidationHandler {
     public void goToAutoevaluation() {
         navigateTo("/uv/lis/GUI/view/FXMLGenerateAutoevaluation.fxml");
     }
+
+    private void disableAutoevaluation() throws OperationException {
+        if (student.getCompletedHours() < MAX_HOURS) {
+            buttonAutoevaluation.setDisable(true);
+        }
+    }
  
     @FXML 
     public void goToUploadDocuments() {
@@ -83,6 +92,11 @@ public class FXMLStudentMenuController extends ValidationHandler {
     @FXML 
     public void goToRegisterActivity() {
         navigateTo("/uv/lis/GUI/view/FXMLRegisterActivity.fxml");
+    }
+
+    @FXML
+    public void goToNotifications() {
+        navigateTo("/uv/lis/GUI/view/FXMLNotifications.fxml");
     }
 
     @Override

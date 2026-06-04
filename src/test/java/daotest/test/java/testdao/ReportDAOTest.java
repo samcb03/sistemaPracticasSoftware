@@ -51,7 +51,7 @@ class ReportDAOTest {
     }
 
     @Test
-    void getReports_reportsExist_returnsNonEmptyList() throws Exception {
+    void getAllReports_reportsExist_returnsNonEmptyList() throws Exception {
         when(databaseConnection.prepareStatement(anyString())).thenReturn(preparedStatement);
         when(preparedStatement.executeQuery()).thenReturn(resultSet);
         when(resultSet.next()).thenReturn(true, false);
@@ -61,27 +61,27 @@ class ReportDAOTest {
         when(resultSet.getString("actividad")).thenReturn("Actividad test");
         when(resultSet.getString("matricula")).thenReturn("S23013127");
 
-        List<Report> result = reportDAO.getReports();
+        List<Report> result = reportDAO.getAllReports();
 
         assertFalse(result.isEmpty());
     }
 
     @Test
-    void getReports_noReports_returnsEmptyList() throws Exception {
+    void getAllReports_noReports_returnsEmptyList() throws Exception {
         when(databaseConnection.prepareStatement(anyString())).thenReturn(preparedStatement);
         when(preparedStatement.executeQuery()).thenReturn(resultSet);
         when(resultSet.next()).thenReturn(false);
 
-        List<Report> result = reportDAO.getReports();
+        List<Report> result = reportDAO.getAllReports();
 
         assertTrue(result.isEmpty());
     }
 
     @Test
-    void getReports_databaseError_throwsOperationException() throws Exception {
+    void getAllReports_databaseError_throwsOperationException() throws Exception {
         when(databaseConnection.prepareStatement(anyString())).thenThrow(new SQLException());
 
-        assertThrows(OperationException.class, () -> reportDAO.getReports());
+        assertThrows(OperationException.class, () -> reportDAO.getAllReports());
     }
 
     @Test
