@@ -20,6 +20,8 @@ public class AdvanceDAO implements IAdvanceDAO {
     private static final Logger LOGGER = Logger.getLogger(AdvanceDAO.class.getName());
 
     private MySQLConnectionManager connectionManager;
+    private static final int COUNT_COLUMN = 1;
+    private static final int ZERO_COUNT = 0;
 
     public AdvanceDAO() {
         this.connectionManager = new MySQLConnectionManager();
@@ -67,6 +69,25 @@ public class AdvanceDAO implements IAdvanceDAO {
             throw new OperationException("Error al obtener los avances", e);
         }
         return advances;
+    }
+
+    public boolean existsAdvanceForReport(int reportId) throws OperationException {
+        boolean advanceExists = false;
+        String advanceQuery = "SELECT COUNT(*) FROM Avance WHERE idReporte = ?";
+
+        try (Connection databaseConnection = connectionManager.getConnection();
+            PreparedStatement preparedStatement = databaseConnection.prepareStatement(advanceQuery)) {
+
+            preparedStatement.setInt(1, reportId);
+
+            try (ResultSet resultSet = preparedStatement.executeQuery()) {
+                advanceExists = resultSet.next() && resultSet.getInt(COUNT_COLUMN) > ZERO_COUNT;
+            }
+        } catch (SQLException e) {
+            LOGGER.log(Level.SEVERE, "Error al verificar avance existente", e);
+            throw new OperationException("Error al verificar avance existente", e);
+        }
+        return advanceExists;
     }
 
     @Override
