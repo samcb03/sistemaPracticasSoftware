@@ -13,6 +13,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -38,9 +39,12 @@ class StudentDAOTest {
     private static final String INVALID_STUDENT_ID = "Z99";
     private static final String FIRST_NAME = "Denisse";
     private static final String LAST_NAME = "Reyes";
+    private static final String SECOND_FIRST_NAME = "Carlos";
+    private static final String SECOND_LAST_NAME = "Gomez";
     private static final String GENDER = "Mujer";
     private static final String SEARCH_PREFIX = "S1";
     private static final String CONNECTION_ERROR = "Fallo";
+    private static final Date BIRTH_DATE = Date.valueOf("2000-05-15");
 
     @Mock private MySQLConnectionManager connectionManager;
     @Mock private Connection databaseConnection;
@@ -61,9 +65,20 @@ class StudentDAOTest {
         student.setIdStudent(VALID_STUDENT_ID);
         student.setFirstName(FIRST_NAME);
         student.setLastName(LAST_NAME);
-        student.setBirthDate(new Date(System.currentTimeMillis()));
+        student.setBirthDate(BIRTH_DATE);
         student.setGender(GENDER);
         return student;
+    }
+
+    private Student buildExpectedStudent() {
+        Student expected = new Student();
+        expected.setId(EXPECTED_USER_ID);
+        expected.setIdStudent(VALID_STUDENT_ID);
+        expected.setFirstName(FIRST_NAME);
+        expected.setLastName(LAST_NAME);
+        expected.setBirthDate(BIRTH_DATE);
+        expected.setGender(GENDER);
+        return expected;
     }
 
     @Test
@@ -74,12 +89,10 @@ class StudentDAOTest {
         when(resultSet.getString("matricula")).thenReturn(VALID_STUDENT_ID);
         when(resultSet.getString("nombre")).thenReturn(FIRST_NAME);
         when(resultSet.getString("apellidos")).thenReturn(LAST_NAME);
-        when(resultSet.getDate("fechaNacimiento")).thenReturn(new Date(System.currentTimeMillis()));
+        when(resultSet.getDate("fechaNacimiento")).thenReturn(BIRTH_DATE);
         when(resultSet.getString("genero")).thenReturn(GENDER);
 
-        Optional<Student> result = studentDAO.getStudentById(EXPECTED_USER_ID);
-
-        assertTrue(result.isPresent());
+        assertEquals(Optional.of(buildExpectedStudent()), studentDAO.getStudentById(EXPECTED_USER_ID));
     }
 
     @Test
@@ -134,12 +147,20 @@ class StudentDAOTest {
         when(preparedStatement.executeQuery()).thenReturn(resultSet);
         when(resultSet.next()).thenReturn(true, true, false);
         when(resultSet.getString("matricula")).thenReturn(VALID_STUDENT_ID, SECOND_STUDENT_ID);
-        when(resultSet.getString("nombre")).thenReturn(FIRST_NAME, "Samuel");
-        when(resultSet.getString("apellidos")).thenReturn(LAST_NAME, "Carreto");
+        when(resultSet.getString("nombre")).thenReturn(FIRST_NAME, SECOND_FIRST_NAME);
+        when(resultSet.getString("apellidos")).thenReturn(LAST_NAME, SECOND_LAST_NAME);
 
-        ArrayList<Student> result = studentDAO.getActiveStudentsNotInSubject();
+        Student expectedFirst = new Student();
+        expectedFirst.setIdStudent(VALID_STUDENT_ID);
+        expectedFirst.setFirstName(FIRST_NAME);
+        expectedFirst.setLastName(LAST_NAME);
 
-        assertEquals(EXPECTED_LIST_SIZE, result.size());
+        Student expectedSecond = new Student();
+        expectedSecond.setIdStudent(SECOND_STUDENT_ID);
+        expectedSecond.setFirstName(SECOND_FIRST_NAME);
+        expectedSecond.setLastName(SECOND_LAST_NAME);
+
+        assertEquals(List.of(expectedFirst, expectedSecond), studentDAO.getActiveStudentsNotInSubject());
     }
 
     @Test
@@ -279,7 +300,7 @@ class StudentDAOTest {
         when(resultSet.next()).thenReturn(true, true, false);
         when(resultSet.getString("matricula")).thenReturn(VALID_STUDENT_ID, SECOND_STUDENT_ID);
 
-        assertEquals(EXPECTED_LIST_SIZE, studentDAO.searchStudentIds(SEARCH_PREFIX).size());
+        assertEquals(List.of(VALID_STUDENT_ID, SECOND_STUDENT_ID), studentDAO.searchStudentIds(SEARCH_PREFIX));
     }
 
     @Test
