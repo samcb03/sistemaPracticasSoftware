@@ -90,9 +90,9 @@ public class ActivityDAO implements IActivityDAO {
     public boolean registerActivity(Activity activity) throws OperationException {
         boolean isRegistered = false;
     
-        String activityQuery = "INSERT INTO Actividad(idActividad,nombreActividad, descripcionActividad, FechaInicio," 
-                             + "FechaFin, idProyecto) " 
-                             + "VALUES(?,?, ?, ?, ?, ?);";
+        String activityQuery = "INSERT INTO Actividad(nombreActividad, descripcionActividad, FechaInicio," 
+                             + "FechaFin, idProyecto,horasReportadas) " 
+                             + "VALUES(?, ?, ?, ?, ?, ?);";
 
         if (activity == null) {
             throw new OperationException("No se pudo registrar la actividad porque es nula", null);
@@ -102,14 +102,12 @@ public class ActivityDAO implements IActivityDAO {
             PreparedStatement preparedStatement = databaseConnection.prepareStatement(activityQuery,
                 PreparedStatement.RETURN_GENERATED_KEYS)) {
 
-            preparedStatement.setInt(1,activity.getId());
-            preparedStatement.setString(2, activity.getName());
-            preparedStatement.setString(3, activity.getDescription());
-            
-            preparedStatement.setObject(4, activity.getStartDate());
-            preparedStatement.setObject(5, activity.getEndDate());
-            
-            preparedStatement.setInt(6, activity.getProjectId());
+            preparedStatement.setString(1, activity.getName());
+            preparedStatement.setString(2, activity.getDescription());
+            preparedStatement.setObject(3, activity.getStartDate());
+            preparedStatement.setObject(4, activity.getEndDate());
+            preparedStatement.setInt(5, activity.getProjectId());
+            preparedStatement.setInt(6,activity.getHoursReported());
             
             if (preparedStatement.executeUpdate() > NO_ROWS_AFFECTED) {
                 try(ResultSet generatedKeys = preparedStatement.getGeneratedKeys()) {
@@ -137,7 +135,7 @@ public class ActivityDAO implements IActivityDAO {
         boolean isModified = false;
         
         String activityQuery = "UPDATE Actividad SET nombreActividad = ?, descripcionActividad = ?, FechaInicio = ?, " 
-                             + "FechaFin = ?, idProyecto = ? WHERE idActividad = ?;";
+                             + "FechaFin = ?, idProyecto = ?, horasReportadas = ? WHERE idActividad = ?;";
 
         if (activity == null) {
             throw new OperationException("No se pudo modificar la actividad porque es nula", null);
@@ -150,9 +148,9 @@ public class ActivityDAO implements IActivityDAO {
             preparedStatement.setString(2, activity.getDescription());
             preparedStatement.setObject(3, activity.getStartDate());
             preparedStatement.setObject(4, activity.getEndDate());
-            preparedStatement.setInt(5, activity.getId());
-            preparedStatement.setInt(6, activity.getId());
-            
+            preparedStatement.setInt(5, activity.getProjectId());
+            preparedStatement.setInt(6, activity.getHoursReported());
+
             if (preparedStatement.executeUpdate() > NO_ROWS_AFFECTED) {
                 isModified = true;
             } else {

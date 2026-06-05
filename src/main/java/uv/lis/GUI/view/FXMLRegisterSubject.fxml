@@ -8,7 +8,7 @@
 <?import javafx.scene.layout.Pane?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane prefHeight="480.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="uv.lis.GUI.controller.FXMLRegisterSubjectController">
+<AnchorPane prefHeight="480.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/26" xmlns:fx="http://javafx.com/fxml/1" fx:controller="uv.lis.GUI.controller.FXMLRegisterSubjectController">
 
     <children>
 
@@ -53,6 +53,8 @@
             <Label fx:id="labelSubject" layoutX="160.0" layoutY="98.0" prefHeight="21.0" prefWidth="250.0" />
             <Label fx:id="labelCareer" layoutX="160.0" layoutY="139.0" prefHeight="21.0" prefWidth="250.0" />
             <ComboBox fx:id="comboBoxPeriodName" layoutX="160.0" layoutY="174.0" prefHeight="25.0" prefWidth="250.0" />
+            <Label layoutX="29.0" layoutY="275.0" text="Sección" />
+            <ComboBox fx:id="comboBoxSection" layoutX="160.0" layoutY="262.0" prefHeight="25.0" prefWidth="250.0" />
 
             </children>
         </Pane>

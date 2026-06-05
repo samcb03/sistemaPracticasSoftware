@@ -24,7 +24,9 @@ private static final Logger LOGGER = Logger.getLogger(AdvanceDAO.class.getName()
     }
 
     public boolean registerAdvance(Advance advance) throws OperationException{
-        String advanceQuery = "INSERT INTO Avance (idProyecto, idReporte, semana, horasAcumuladas) VALUES (?, ?, ?, ?)";
+        String advanceQuery = "INSERT INTO Avance (idProyecto, idReporte, semana, horasAcumuladas) "
+                             + "VALUES (?, ?, ?, ?) ";
+                             
         try (Connection databaseConnection = connectionManager.getConnection();
              PreparedStatement preparedStatement = databaseConnection.prepareStatement(advanceQuery)) {
             
@@ -40,6 +42,23 @@ private static final Logger LOGGER = Logger.getLogger(AdvanceDAO.class.getName()
         }
     }
 
+    public boolean existsAdvanceForReport(int reportId) throws OperationException {
+        String query = "SELECT COUNT(*) FROM Avance WHERE idReporte = ?";
+
+        try (Connection databaseConnection = connectionManager.getConnection();
+             PreparedStatement preparedStatement = databaseConnection.prepareStatement(query)) {
+
+            preparedStatement.setInt(1, reportId);
+
+            try (ResultSet resultSet = preparedStatement.executeQuery()) {
+                return resultSet.next() && resultSet.getInt(1) > 0;
+            }
+        } catch (SQLException e) {
+            LOGGER.log(Level.SEVERE, "Error al verificar avance existente", e);
+            throw new OperationException("Error al verificar avance existente", e);
+        }
+    }
+
     public ArrayList<Advance> getAdvancesByProject(int projectId) throws OperationException{
         ArrayList<Advance> advances = new ArrayList<>();
         String advanceQuery = "SELECT * FROM Avance WHERE idProyecto = ?";
@@ -48,15 +67,15 @@ private static final Logger LOGGER = Logger.getLogger(AdvanceDAO.class.getName()
              PreparedStatement preparedStatement = databaseConnection.prepareStatement(advanceQuery)) {
             
             preparedStatement.setInt(1, projectId);
-            ResultSet resultSet = preparedStatement.executeQuery();
-            
-            while (resultSet.next()) {
-                Advance advance = new Advance();
-                advance.setProjectId(resultSet.getInt("idProyecto"));
-                advance.setReportId(resultSet.getInt("idReporte"));
-                advance.setWeekNumber(resultSet.getInt("semana"));
-                advance.setAccumulatedHours(resultSet.getInt("horasAcumuladas"));
-                advances.add(advance);
+                try(ResultSet resultSet = preparedStatement.executeQuery()) {
+                    while (resultSet.next()) {
+                        Advance advance = new Advance();
+                        advance.setProjectId(resultSet.getInt("idProyecto"));
+                        advance.setReportId(resultSet.getInt("idReporte"));
+                        advance.setWeekNumber(resultSet.getInt("semana"));
+                    advance.setAccumulatedHours(resultSet.getInt("horasAcumuladas"));
+                    advances.add(advance);
+                }
             }
         } catch (SQLException e) {
             LOGGER.log(Level.SEVERE,"Error al obtener avance", e);

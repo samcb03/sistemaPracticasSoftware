@@ -32,8 +32,8 @@ public class SubjectDAO implements ISubjectDAO {
     public boolean registerSubject(Subject subject) throws OperationException {
         boolean isRegistered = false;
 
-        String subjectQuery = "INSERT INTO ExperienciaEducativa (NRC, nombreExperiencia, carrera, idPeriodoEscolar) "
-                            + "VALUES (?, ?, ?, ?);";
+        String subjectQuery = "INSERT INTO ExperienciaEducativa (NRC, nombreExperiencia, carrera, idPeriodoEscolar, seccion) "
+                            + "VALUES (?, ?, ?, ?, ?);";
 
         String professorSubjectQuery = "INSERT INTO Profesor_Imparte_Experiencia (NRC, numeroPersonal) "
                                      + "VALUES (?, ?) "
@@ -51,6 +51,7 @@ public class SubjectDAO implements ISubjectDAO {
                 subjectStatement.setString(2, subject.getSUBJECT_NAME());
                 subjectStatement.setString(3, subject.getCAREER());
                 subjectStatement.setInt(4, subject.getSchoolPeriodId());
+                subjectStatement.setString(5, subject.getSection());
                 int subjectRows = subjectStatement.executeUpdate();
 
                 professorSubjectStatement.setInt(1, subject.getNrc());
