@@ -30,13 +30,16 @@ import uv.lis.logic.exceptions.OperationException;
 @ExtendWith(MockitoExtension.class)
 class AdvanceDAOTest {
 
-    private static final int PROJECT_ID = 1;
+    private static final int PROJECT_ID = 2;
     private static final int REPORT_ID = 10;
-    private static final int WEEK_NUMBER = 1;
+    private static final int WEEK_NUMBER = 3;
     private static final int ACCUMULATED_HOURS = 8;
     private static final int LATEST_ACCUMULATED_HOURS = 48;
     private static final int ZERO_ACCUMULATED_HOURS = 0;
     private static final int ROWS_AFFECTED = 1;
+    private static final int COUNT_COLUMN = 1;
+    private static final int ADVANCE_COUNT = 1;
+    private static final int NO_ADVANCE_COUNT = 0;
 
     @Mock private MySQLConnectionManager connectionManager;
     @Mock private Connection databaseConnection;
@@ -141,6 +144,32 @@ class AdvanceDAOTest {
 
         assertThrows(OperationException.class,
             () -> advanceDAO.getAdvancesByProject(PROJECT_ID));
+    }
+
+    @Test
+    void existsAdvanceForReport_advanceExists_returnsTrue() throws Exception {
+        mockQueryExecution();
+        when(resultSet.next()).thenReturn(true);
+        when(resultSet.getInt(COUNT_COLUMN)).thenReturn(ADVANCE_COUNT);
+
+        assertTrue(advanceDAO.existsAdvanceForReport(REPORT_ID));
+    }
+
+    @Test
+    void existsAdvanceForReport_noAdvance_returnsFalse() throws Exception {
+        mockQueryExecution();
+        when(resultSet.next()).thenReturn(true);
+        when(resultSet.getInt(COUNT_COLUMN)).thenReturn(NO_ADVANCE_COUNT);
+
+        assertFalse(advanceDAO.existsAdvanceForReport(REPORT_ID));
+    }
+
+    @Test
+    void existsAdvanceForReport_databaseError_throwsOperationException() throws Exception {
+        when(databaseConnection.prepareStatement(anyString())).thenThrow(new SQLException());
+
+        assertThrows(OperationException.class,
+            () -> advanceDAO.existsAdvanceForReport(REPORT_ID));
     }
 
     @Test
