@@ -9,4 +9,5 @@ public interface IAdvanceDAO {
     
     ArrayList<Advance> getAdvancesByProject(int projectId) throws OperationException;
 
+    int getAccumulatedHoursByProject(int projectId) throws OperationException;
 }

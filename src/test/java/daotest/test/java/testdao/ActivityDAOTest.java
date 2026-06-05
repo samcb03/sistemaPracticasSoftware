@@ -1,6 +1,5 @@
 package daotest.test.java.testdao;
 
-
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -9,40 +8,53 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 import static uv.lis.logic.utils.InputValidator.NO_ROWS_AFFECTED;
 
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
 import java.lang.reflect.Field;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.LocalDate;
+import java.util.List;
+import java.util.Optional;
+
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
 
 import uv.lis.dataaccess.MySQLConnectionManager;
 import uv.lis.logic.dao.ActivityDAO;
 import uv.lis.logic.dto.Activity;
 import uv.lis.logic.exceptions.OperationException;
 
-
 class ActivityDAOTest {
 
-    @Mock
-    private MySQLConnectionManager connectionManager;
+    private static final int FIRST_ACTIVITY_ID = 1;
+    private static final int SECOND_ACTIVITY_ID = 2;
+    private static final int SEARCHED_ACTIVITY_ID = 3;
+    private static final int FIRST_PROJECT_ID = 10;
+    private static final int SECOND_PROJECT_ID = 11;
+    private static final int ROWS_AFFECTED = 1;
+    private static final int GENERATED_KEY_COLUMN = 1;
+    private static final int GENERATED_ID = 1;
 
-    @Mock
-    private Connection databaseConnection;
+    private static final String FIRST_ACTIVITY_NAME = "Actividad 1";
+    private static final String SECOND_ACTIVITY_NAME = "Actividad 2";
+    private static final String FIRST_ACTIVITY_DESCRIPTION = "Descripción 1";
+    private static final String SECOND_ACTIVITY_DESCRIPTION = "Descripción 2";
+    private static final String DATABASE_ERROR_MESSAGE = "Fallo";
 
-    @Mock
-    private PreparedStatement preparedStatement;
+    private static final LocalDate FIRST_START_DATE = LocalDate.of(2024, 1, 1);
+    private static final LocalDate FIRST_END_DATE = LocalDate.of(2024, 12, 31);
+    private static final LocalDate SECOND_START_DATE = LocalDate.of(2024, 2, 1);
+    private static final LocalDate SECOND_END_DATE = LocalDate.of(2024, 11, 30);
 
-    @Mock
-    private ResultSet resultSet;
+    @Mock private MySQLConnectionManager connectionManager;
+    @Mock private Connection databaseConnection;
+    @Mock private PreparedStatement preparedStatement;
+    @Mock private ResultSet resultSet;
 
     private ActivityDAO activityDAO;
-    private static final int ACTIVITY_ID = 3;
-    private static final int ROWS_AFFECTED = 1;
 
     @BeforeEach
     void setUp() throws Exception {
@@ -63,45 +75,60 @@ class ActivityDAOTest {
 
     private void mockUpdateExecution(int rowsAffected) throws Exception {
         when(databaseConnection.prepareStatement(anyString())).thenReturn(preparedStatement);
-        when(databaseConnection.prepareStatement(anyString(), anyInt())).thenReturn(preparedStatement);
+        when(databaseConnection.prepareStatement(anyString(), anyInt()))
+            .thenReturn(preparedStatement);
         when(preparedStatement.executeUpdate()).thenReturn(rowsAffected);
     }
 
-    private void mockResultSetActivity() throws Exception {
-        when(resultSet.next()).thenReturn(true, true, false);
-
-        when(resultSet.getInt("idActividad")).thenReturn(1, 2);
-        when(resultSet.getString("nombreActividad")).thenReturn("Actividad 1", "Actividad 2");
-        when(resultSet.getString("descripcionActividad")).thenReturn("Descripción 1", "Descripción 2");
-        when(resultSet.getObject("FechaInicio", LocalDate.class))
-                .thenReturn(LocalDate.of(2024, 1, 1), LocalDate.of(2024, 2, 1));
-        when(resultSet.getObject("FechaFin", LocalDate.class))
-                .thenReturn(LocalDate.of(2024, 12, 31), LocalDate.of(2024, 11, 30));
-        when(resultSet.getInt("idProyecto")).thenReturn(10, 11);
+    private void mockResultSetSingleActivity() throws Exception {
+        when(resultSet.next()).thenReturn(true);
+        when(resultSet.getInt("idActividad")).thenReturn(FIRST_ACTIVITY_ID);
+        when(resultSet.getString("nombreActividad")).thenReturn(FIRST_ACTIVITY_NAME);
+        when(resultSet.getString("descripcionActividad")).thenReturn(FIRST_ACTIVITY_DESCRIPTION);
+        when(resultSet.getObject("FechaInicio", LocalDate.class)).thenReturn(FIRST_START_DATE);
+        when(resultSet.getObject("FechaFin", LocalDate.class)).thenReturn(FIRST_END_DATE);
+        when(resultSet.getInt("idProyecto")).thenReturn(FIRST_PROJECT_ID);
     }
 
-    private Activity buildExpectedActivity() {
-        Activity expected = new Activity();
-        expected.setId(1);
-        expected.setName("Actividad 1");
-        expected.setDescription("Descripción 1");
-        expected.setStartDate(LocalDate.of(2024, 1, 1));
-        expected.setEndDate(LocalDate.of(2024, 12, 31));
-        expected.setId(10);
-        return expected;
+    private void mockResultSetTwoActivities() throws Exception {
+        when(resultSet.next()).thenReturn(true, true, false);
+        when(resultSet.getInt("idActividad")).thenReturn(FIRST_ACTIVITY_ID, SECOND_ACTIVITY_ID);
+        when(resultSet.getString("nombreActividad"))
+            .thenReturn(FIRST_ACTIVITY_NAME, SECOND_ACTIVITY_NAME);
+        when(resultSet.getString("descripcionActividad"))
+            .thenReturn(FIRST_ACTIVITY_DESCRIPTION, SECOND_ACTIVITY_DESCRIPTION);
+        when(resultSet.getObject("FechaInicio", LocalDate.class))
+            .thenReturn(FIRST_START_DATE, SECOND_START_DATE);
+        when(resultSet.getObject("FechaFin", LocalDate.class))
+            .thenReturn(FIRST_END_DATE, SECOND_END_DATE);
+        when(resultSet.getInt("idProyecto")).thenReturn(FIRST_PROJECT_ID, SECOND_PROJECT_ID);
+    }
+
+    private Activity builderFirstActivity() {
+        return new Activity(FIRST_ACTIVITY_ID, FIRST_ACTIVITY_NAME, FIRST_ACTIVITY_DESCRIPTION,
+            FIRST_START_DATE, FIRST_END_DATE, FIRST_PROJECT_ID);
+    }
+
+    private Activity builderSecondActivity() {
+        return new Activity(SECOND_ACTIVITY_ID, SECOND_ACTIVITY_NAME, SECOND_ACTIVITY_DESCRIPTION,
+            SECOND_START_DATE, SECOND_END_DATE, SECOND_PROJECT_ID);
+    }
+
+    private List<Activity> builderExpectedActivities() {
+        return List.of(builderFirstActivity(), builderSecondActivity());
     }
 
     @Test
     void getAllActivities_successful_returnsActivityList() throws Exception {
         mockQueryExecution();
-        mockResultSetActivity();
-        when(resultSet.next()).thenReturn(true, true, false);
+        mockResultSetTwoActivities();
+        List<Activity> expectedActivities = builderExpectedActivities();
 
-        assertEquals(2, activityDAO.getAllActivities().size());
+        assertEquals(expectedActivities, activityDAO.getAllActivities());
     }
 
     @Test
-    void getAllActivities_emptyList_returnsEmptyList() throws Exception {
+    void getAllActivities_emptyResult_returnsEmptyList() throws Exception {
         mockQueryExecution();
         when(resultSet.next()).thenReturn(false);
 
@@ -110,7 +137,7 @@ class ActivityDAOTest {
 
     @Test
     void getAllActivities_sqlError_throwsOperationException() throws Exception {
-        when(connectionManager.getConnection()).thenThrow(new SQLException("Fallo"));
+        when(connectionManager.getConnection()).thenThrow(new SQLException(DATABASE_ERROR_MESSAGE));
 
         assertThrows(OperationException.class, () -> activityDAO.getAllActivities());
     }
@@ -118,24 +145,26 @@ class ActivityDAOTest {
     @Test
     void getActivityById_successful_returnsActivity() throws Exception {
         mockQueryExecution();
-        when(resultSet.next()).thenReturn(true, true, false);
+        mockResultSetSingleActivity();
+        Optional<Activity> expectedActivity = Optional.of(builderFirstActivity());
 
-        assertTrue(activityDAO.getActivityById(ACTIVITY_ID).isPresent());
+        assertEquals(expectedActivity, activityDAO.getActivityById(SEARCHED_ACTIVITY_ID));
     }
 
     @Test
-    void getActivityById_emptyList_returnsEmptyList() throws Exception {
+    void getActivityById_emptyResult_returnsEmptyOptional() throws Exception {
         mockQueryExecution();
         when(resultSet.next()).thenReturn(false);
 
-        assertTrue(activityDAO.getActivityById(ACTIVITY_ID).isEmpty());
+        assertTrue(activityDAO.getActivityById(SEARCHED_ACTIVITY_ID).isEmpty());
     }
 
     @Test
     void getActivityById_sqlError_throwsOperationException() throws Exception {
-        when(connectionManager.getConnection()).thenThrow(new SQLException("Fallo"));
+        when(connectionManager.getConnection()).thenThrow(new SQLException(DATABASE_ERROR_MESSAGE));
 
-        assertThrows(OperationException.class, () -> activityDAO.getActivityById(1));
+        assertThrows(OperationException.class,
+            () -> activityDAO.getActivityById(SEARCHED_ACTIVITY_ID));
     }
 
     @Test
@@ -143,51 +172,47 @@ class ActivityDAOTest {
         mockUpdateExecution(ROWS_AFFECTED);
         when(preparedStatement.getGeneratedKeys()).thenReturn(resultSet);
         when(resultSet.next()).thenReturn(true);
-        when(resultSet.getInt(1)).thenReturn(1); 
+        when(resultSet.getInt(GENERATED_KEY_COLUMN)).thenReturn(GENERATED_ID);
 
-        assertTrue(activityDAO.registerActivity(buildExpectedActivity()));
+        assertTrue(activityDAO.registerActivity(builderFirstActivity()));
     }
 
     @Test
     void registerActivity_noRowsAffected_throwsOperationException() throws Exception {
         mockUpdateExecution(NO_ROWS_AFFECTED);
 
-        assertThrows(OperationException.class, () ->
-            activityDAO.registerActivity(buildExpectedActivity())
-        );
+        assertThrows(OperationException.class,
+            () -> activityDAO.registerActivity(builderFirstActivity()));
     }
 
     @Test
     void registerActivity_sqlError_throwsOperationException() throws Exception {
-        when(connectionManager.getConnection()).thenThrow(new SQLException("Fallo"));
+        when(connectionManager.getConnection()).thenThrow(new SQLException(DATABASE_ERROR_MESSAGE));
 
-        assertThrows(OperationException.class, () ->
-            activityDAO.registerActivity(buildExpectedActivity())
-        );
+        assertThrows(OperationException.class,
+            () -> activityDAO.registerActivity(builderFirstActivity()));
     }
 
     @Test
     void modifyActivity_successful_returnsTrue() throws Exception {
         mockUpdateExecution(ROWS_AFFECTED);
 
-        assertTrue(activityDAO.modifyActivity(buildExpectedActivity()));
+        assertTrue(activityDAO.modifyActivity(builderFirstActivity()));
     }
 
     @Test
     void modifyActivity_noRowsAffected_throwsOperationException() throws Exception {
         mockUpdateExecution(NO_ROWS_AFFECTED);
 
-        assertThrows(OperationException.class, () ->
-            activityDAO.modifyActivity(buildExpectedActivity())
-        );
+        assertThrows(OperationException.class,
+            () -> activityDAO.modifyActivity(builderFirstActivity()));
     }
 
     @Test
     void modifyActivity_sqlError_throwsOperationException() throws Exception {
-        when(connectionManager.getConnection()).thenThrow(new SQLException("Fallo"));
+        when(connectionManager.getConnection()).thenThrow(new SQLException(DATABASE_ERROR_MESSAGE));
 
-        assertThrows(OperationException.class, () ->
-            activityDAO.modifyActivity(buildExpectedActivity())
-        );
+        assertThrows(OperationException.class,
+            () -> activityDAO.modifyActivity(builderFirstActivity()));
     }
 }

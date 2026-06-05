@@ -23,7 +23,7 @@ public interface IAffiliatedOrganizationDAO {
 
     boolean isOrganizationInactive(String organizationName) throws OperationException;
 
-    ArrayList<String> searchOrganizationByName(String prefix) throws OperationException;
+    ArrayList<String> searchActiveOrganizationsByNamePrefix(String prefix) throws OperationException;
 
     Optional<AffiliatedOrganization> getOrganizationByName(String organizationName) throws OperationException;
 
