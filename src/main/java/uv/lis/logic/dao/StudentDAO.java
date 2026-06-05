@@ -46,6 +46,7 @@ public class StudentDAO extends UserDAO implements IStudentDAO {
             try (ResultSet resultSet = preparedStatement.executeQuery()) {
                 if (resultSet.next()) {
                     Student student = new Student();
+                    student.setId(idStudent);
                     student.setIdStudent(resultSet.getString("matricula"));
                     student.setFirstName(resultSet.getString("nombre"));
                     student.setLastName(resultSet.getString("apellidos"));
