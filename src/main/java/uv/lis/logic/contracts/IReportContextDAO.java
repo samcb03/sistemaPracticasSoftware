@@ -24,7 +24,7 @@ public interface IReportContextDAO {
 
     List<Activity> getRecordedActivitiesByMonth(int idProyecto, int mes, int anio) throws OperationException;
 
-    int getSumOfReportedHours(int reportId) throws OperationException;
+    int getSumOfReportedHours(int projectId, int month, int year) throws OperationException;
 
     boolean hasReportAlreadyBeenGenerated(String studentId, String month) throws OperationException;
 }

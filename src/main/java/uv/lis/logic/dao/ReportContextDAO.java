@@ -174,18 +174,21 @@ public class ReportContextDAO implements IReportContextDAO {
     }
 
     @Override
-    public List<Activity> getRecordedActivitiesByMonth(int idProyecto, int mes, int anio) throws OperationException {
+    public List<Activity> getRecordedActivitiesByMonth(int idProyecto, int month, int year) throws OperationException {
         List<Activity> activities = new ArrayList<>();
-        String reportContextQuery = "SELECT DISTINCT nombreActividad, descripcionActividad, horasReportadas AS horas "
+        String reportContextQuery = "SELECT nombreActividad, descripcionActividad, " 
+                                  + "horasReportadas AS horas "
                                   + "FROM Actividad "
-                                  + "WHERE idProyecto = ? AND MONTH(FechaInicio) = ? AND YEAR(FechaInicio) = ?";
+                                  + "WHERE idProyecto = ? "
+                                  + "AND MONTH(FechaInicio) = ? "
+                                  + "AND YEAR(FechaInicio) = ? ";
 
         try (Connection databaseConnection = connectionManager.getConnection();
             PreparedStatement preparedStatement = databaseConnection.prepareStatement(reportContextQuery)) {
             
             preparedStatement.setInt(1, idProyecto);
-            preparedStatement.setInt(2, mes);
-            preparedStatement.setInt(3, anio);
+            preparedStatement.setInt(2, month);
+            preparedStatement.setInt(3, year);
             
             try (ResultSet resultSet = preparedStatement.executeQuery()) {
                 while (resultSet.next()) {
@@ -231,13 +234,19 @@ public class ReportContextDAO implements IReportContextDAO {
     }
 
     @Override
-    public int getSumOfReportedHours(int reportId) throws OperationException {
+    public int getSumOfReportedHours(int projectId, int month, int year) throws OperationException {
         int total = 0;
-        String query = "SELECT SUM(horasReportadas) FROM Actividad WHERE idReporte = ?";
+        String reportContextQuery =  "SELECT COALESCE(SUM(horasReportadas), 0) AS total "
+                                + "FROM Actividad "
+                                + "WHERE idProyecto = ? "
+                                + "AND MONTH(FechaInicio) = ? "
+                                + "AND YEAR(FechaInicio) = ?";
         
         try (Connection databaseConnection = connectionManager.getConnection();
-            PreparedStatement preparedStatement = databaseConnection.prepareStatement(query)) {
-            preparedStatement.setInt(1, reportId);
+            PreparedStatement preparedStatement = databaseConnection.prepareStatement(reportContextQuery)) {
+            preparedStatement.setInt(1, projectId);
+            preparedStatement.setInt(2, month);
+            preparedStatement.setInt(3, year);
             try (ResultSet resultSet = preparedStatement.executeQuery()) {
                 if (resultSet.next()) {
                     total = resultSet.getInt(1); 
@@ -337,6 +346,8 @@ public class ReportContextDAO implements IReportContextDAO {
         monthlyReport.setReportNumber(resultSet.getInt("numeroReporte"));
         monthlyReport.setIdProject(resultSet.getInt("idProyecto"));
         monthlyReport.setIdReport(resultSet.getInt("idReporte"));
+        String seccion = resultSet.getString("seccion");
+        monthlyReport.setSection(seccion != null ?  seccion : "Sin sección");
     }
 
     private Activity mapActivity(ResultSet resultSet) throws SQLException {

@@ -33,6 +33,7 @@ public class FXMLRegisterSubjectController extends ValidationHandler {
     @FXML private TextField textFieldNRC;
     @FXML private ComboBox<String> comboBoxProfessorName;
     @FXML private ComboBox<String> comboBoxPeriodName;
+    @FXML private ComboBox<String> comboBoxSection;
     @FXML private Label labelSubject;
     @FXML private Label labelCareer;
     @FXML private Label labelMessage;
@@ -54,6 +55,7 @@ public class FXMLRegisterSubjectController extends ValidationHandler {
         loadStaticLabels();
         loadProfessorsNames();
         loadPeriodsNames();
+        loadSections();
     }
 
     private void loadStaticLabels() {
@@ -79,6 +81,10 @@ public class FXMLRegisterSubjectController extends ValidationHandler {
         }
     }
 
+    private void loadSections() {
+        comboBoxSection.getItems().addAll("1", "2");
+    }
+
     @FXML
     public void validateFields() {
         Optional<String> firstValidationError = getFirstValidationError();
@@ -89,7 +95,8 @@ public class FXMLRegisterSubjectController extends ValidationHandler {
         Stream<Optional<String>> validationStream = Stream.of(
             validatePositiveInteger(textFieldNRC.getText().trim(), "El NRC"),
             validateComboBox(comboBoxPeriodName.getValue(), "un periodo escolar"),
-            validateComboBox(comboBoxProfessorName.getValue(), "un profesor")
+            validateComboBox(comboBoxProfessorName.getValue(), "un profesor"),
+            validateComboBox(comboBoxSection.getValue(), "una sección")
         );
         return validationStream
             .filter(Optional::isPresent)
@@ -120,6 +127,7 @@ public class FXMLRegisterSubjectController extends ValidationHandler {
             try {
                 Subject subject = new Subject();
                 subject.setNrc(Integer.parseInt(textFieldNRC.getText().trim()));
+                subject.setSection(comboBoxSection.getValue());
                 String personnelNumber = professorsMap.get(comboBoxProfessorName.getValue());
                 subject.setProfessorPersonnelNumber(personnelNumber);
                 String selectedPeriod = comboBoxPeriodName.getValue();
@@ -147,6 +155,7 @@ public class FXMLRegisterSubjectController extends ValidationHandler {
         textFieldNRC.clear();
         comboBoxProfessorName.getSelectionModel().clearSelection();
         comboBoxPeriodName.getSelectionModel().clearSelection();
+        comboBoxSection.getSelectionModel().clearSelection();
         labelMessage.setText("");
     }
 }

@@ -89,6 +89,13 @@
                      <font><Font size="14.0" /></font>
                   </Label>
 
+                  <Label text="Bloque:" textFill="GREY" GridPane.columnIndex="2" GridPane.rowIndex="4">
+                     <font><Font name="System Bold" size="14.0" /></font>
+                  </Label>
+                  <Label fx:id="labelBlock" text="7" GridPane.columnIndex="3" GridPane.rowIndex="4">
+                     <font><Font size="14.0" /></font>
+                  </Label>
+
                   <Label text="Asignatura:" textFill="GREY" GridPane.columnIndex="2" GridPane.rowIndex="2">
                      <font><Font name="System Bold" size="14.0" /></font>
                   </Label>

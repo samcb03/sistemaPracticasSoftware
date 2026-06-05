@@ -10,6 +10,7 @@ public class Subject {
     private String professorPersonnelNumber;
     private int schoolPeriodId;
     private String schoolPeriodName;
+    private String section;
 
     public String getSchoolPeriodName() {
         return schoolPeriodName;
@@ -75,7 +76,14 @@ public class Subject {
     public void setProfessorPersonnelNumber(String professorPersonnelNumber) {
         this.professorPersonnelNumber = professorPersonnelNumber;
     }
+    public String getSection() {
+        return section;
+    }
 
+    public void setSection(String section) {
+        this.section = section;
+    }
+    
     @Override
     public boolean equals(Object object) {
         if (this == object) {

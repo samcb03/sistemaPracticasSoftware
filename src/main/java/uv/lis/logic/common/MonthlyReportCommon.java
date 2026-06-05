@@ -94,14 +94,11 @@ public class MonthlyReportCommon {
         report.setCoordinatorName(context.getCoordinatorName());
         report.setMonth(context.getMonth());
         report.setReportNumber(context.getReportNumber());
-        report.setBlock(context.getBlock());
         report.setSection(context.getSection());
         report.setPeriod(context.getPeriod());
         report.setProfessorName(context.getProfessorName());
         report.setYear(extractYearFromPeriod(context.getPeriod()));
  
-        String totalHours = reportContextDAO.getTotalReportedHoursByStudentId(studentId);
-        report.setAccumulatedHours(Integer.parseInt(totalHours));
     }
 
     private Map<String, Object> buildReportParameters(MonthlyReport report) {
