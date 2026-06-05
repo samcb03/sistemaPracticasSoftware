@@ -108,4 +108,8 @@ public class Activity {
         && Objects.equals(endDate, other.endDate);
     }
 
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, name, description, startDate, endDate, projectId);
+    }
 }

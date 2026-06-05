@@ -321,7 +321,7 @@ public class FXMLConsultAffiliatedOrganizationController extends ValidationHandl
         } else {
             try {
                 ArrayList<String> matches = affiliatedOrganizationDAO
-                    .searchOrganizationByName(newValue.trim());
+                    .searchActiveOrganizationsByNamePrefix(newValue.trim());
 
                 if (matches.isEmpty()) {
                     contextMenuSuggestions.hide();
