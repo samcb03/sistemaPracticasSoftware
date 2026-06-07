@@ -115,9 +115,9 @@ public class FXMLGenerateAutoevaluation extends ValidationHandler {
     private ToggleGroup createGroup(RadioButton... parameters) {
         ToggleGroup group = new ToggleGroup(); 
         int value = 1;                        
-        for (RadioButton rb : parameters) {
-            rb.setToggleGroup(group);
-            rb.setUserData(value++); 
+        for (RadioButton radioButton : parameters) {
+            radioButton.setToggleGroup(group);
+            radioButton.setUserData(value++); 
         }
         return group;
     }

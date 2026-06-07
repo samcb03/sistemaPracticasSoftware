@@ -149,9 +149,8 @@ public class FXMLAssignationProjectController extends ValidationHandler {
     private void loadApplicantsForProject(int idProject) {
         try {
             List<Student> applicants = requestProjectDAO.getApplicantsByProjectId(idProject);
-            List<String> applicantNames = applicants.stream()
-                .map(student -> student.getFirstName() + " " + student.getLastName()
-                    + APPLICANT_SEPARATOR + student.getIdStudent())
+            List<String> applicantNames = applicants.stream().map(student -> student.getFirstName() 
+                + " " + student.getLastName() + APPLICANT_SEPARATOR + student.getIdStudent())
                 .collect(Collectors.toList());
 
             listViewApplicants.setItems(FXCollections.observableArrayList(applicantNames));
@@ -208,7 +207,7 @@ public class FXMLAssignationProjectController extends ValidationHandler {
                 showError("El proyecto no se encontró");
             }
         } catch (OperationException e) {
-            showError("No se pudo asignar: " + e.getMessage());
+            showError(e.getMessage());
         }
     }
 
@@ -251,7 +250,8 @@ public class FXMLAssignationProjectController extends ValidationHandler {
     }
 
     private String buildAssignmentMessage(String projectName, String reason) {
-        return ASSIGNMENT_MESSAGE_PREFIX + projectName + ASSIGNMENT_MESSAGE_REASON + reason;
+        String message = ASSIGNMENT_MESSAGE_PREFIX + projectName + ASSIGNMENT_MESSAGE_REASON + reason;
+        return message;
     }
 
     private void refreshApplicantsList(String selectedRow) {

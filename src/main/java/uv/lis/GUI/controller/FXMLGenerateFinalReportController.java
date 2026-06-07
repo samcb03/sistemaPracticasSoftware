@@ -71,8 +71,7 @@ public class FXMLGenerateFinalReportController extends ValidationHandler {
             validateSecondActivityBlock(),
             validateFirstDeliverableBlock(),
             validateSecondDeliverableBlock(),
-            InputValidator.validateText(
-                textAreaGeneralObservations.getText(), "Observaciones Generales")
+            InputValidator.validateText(textAreaGeneralObservations.getText(), "Observaciones Generales")
         );
 
         Optional<String> validationError = validationStream
@@ -85,12 +84,10 @@ public class FXMLGenerateFinalReportController extends ValidationHandler {
 
     private Optional<String> validateFirstActivityBlock() {
         Stream<Optional<String>> validationStream = Stream.of(
-            InputValidator.validateText(
-                textFieldActivity1.getText(), "Actividad 1"),
-            InputValidator.validatePositiveInteger(
-                textFieldAdvance1.getText(), "Porcentaje de Avance de Actividad 1"),
-            InputValidator.validateText(
-                textAreaObservation1.getText(), "Observación de Actividad 1")
+            InputValidator.validateText(textFieldActivity1.getText(), "Actividad 1"),
+            InputValidator.validatePositiveInteger(textFieldAdvance1.getText(), 
+                "Porcentaje de Avance de Actividad 1"),
+            InputValidator.validateText(textAreaObservation1.getText(), "Observación de Actividad 1")
         );
 
         Optional<String> firstError = validationStream
@@ -103,12 +100,10 @@ public class FXMLGenerateFinalReportController extends ValidationHandler {
 
     private Optional<String> validateSecondActivityBlock() {
         Stream<Optional<String>> validationStream = Stream.of(
-            InputValidator.validateText(
-                textFieldActivity2.getText(), "Actividad 2"),
-            InputValidator.validatePositiveInteger(
-                textFieldAdvance2.getText(), "Porcentaje de Avance de Actividad 2"),
-            InputValidator.validateText(
-                textAreaObservation2.getText(), "Observación de Actividad 2")
+            InputValidator.validateText(textFieldActivity2.getText(), "Actividad 2"),
+            InputValidator.validatePositiveInteger(textFieldAdvance2.getText(), 
+                "Porcentaje de Avance de Actividad 2"),
+            InputValidator.validateText(textAreaObservation2.getText(), "Observación de Actividad 2")
         );
 
         Optional<String> firstError = validationStream
@@ -121,12 +116,10 @@ public class FXMLGenerateFinalReportController extends ValidationHandler {
 
     private Optional<String> validateFirstDeliverableBlock() {
         Stream<Optional<String>> validationStream = Stream.of(
-            InputValidator.validateText(
-                textFieldResult1.getText(), "Entregable 1"),
-            InputValidator.validatePositiveInteger(
-                textFieldResultAdvance1.getText(), "Porcentaje de Avance de Entregable 1"),
-            InputValidator.validateText(
-                textAreaObservationResult1.getText(), "Observación de Entregable 1")
+            InputValidator.validateText(textFieldResult1.getText(), "Entregable 1"),
+            InputValidator.validatePositiveInteger(textFieldResultAdvance1.getText(), 
+                "Porcentaje de Avance de Entregable 1"),
+            InputValidator.validateText(textAreaObservationResult1.getText(), "Observación de Entregable 1")
         );
 
         Optional<String> firstError = validationStream
@@ -139,12 +132,10 @@ public class FXMLGenerateFinalReportController extends ValidationHandler {
 
     private Optional<String> validateSecondDeliverableBlock() {
         Stream<Optional<String>> validationStream = Stream.of(
-            InputValidator.validateText(
-                textFieldResult2.getText(), "Entregable 2"),
-            InputValidator.validatePositiveInteger(
-                textFieldResultAdvance2.getText(), "Porcentaje de Avance de Entregable 2"),
-            InputValidator.validateText(
-                textAreaObservationResult2.getText(), "Observación de Entregable 2")
+            InputValidator.validateText(textFieldResult2.getText(), "Entregable 2"),
+            InputValidator.validatePositiveInteger(textFieldResultAdvance2.getText(), 
+                "Porcentaje de Avance de Entregable 2"),
+            InputValidator.validateText(textAreaObservationResult2.getText(), "Observación de Entregable 2")
         );
 
         Optional<String> firstError = validationStream

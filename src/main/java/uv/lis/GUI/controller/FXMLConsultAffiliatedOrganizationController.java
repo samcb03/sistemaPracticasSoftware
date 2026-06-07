@@ -1,6 +1,5 @@
 package uv.lis.GUI.controller;
 
-
 import static uv.lis.logic.utils.InputValidator.validateText;
 import static uv.lis.logic.utils.InputValidator.validateEmail;
 import static uv.lis.logic.utils.InputValidator.validateExactLength;
@@ -36,8 +35,7 @@ import uv.lis.logic.exceptions.OperationException;
 
 public class FXMLConsultAffiliatedOrganizationController extends ValidationHandler {
 
-    private static final Logger LOGGER = Logger.getLogger(
-        FXMLConsultAffiliatedOrganizationController.class.getName());
+    private static final Logger LOGGER = Logger.getLogger(FXMLConsultAffiliatedOrganizationController.class.getName());
 
     private static final String LABEL_INACTIVE = "Inactivo";
     private static final String LABEL_ACTIVE   = "Activo";
@@ -45,7 +43,6 @@ public class FXMLConsultAffiliatedOrganizationController extends ValidationHandl
     private static final int DOUBLE_CLICK_COUNT = 2;
     private static final int NO_SELECTION = -1;
     private static final String CONSULT_PROJECT_VIEW = "/uv/lis/GUI/view/FXMLShowProjectDetail.fxml";
-
 
     @FXML private Button buttonBack;
     @FXML private Button buttonSearch;
@@ -78,7 +75,7 @@ public class FXMLConsultAffiliatedOrganizationController extends ValidationHandl
     @FXML private TextField textFieldPhoneNumber;
     @FXML private TextField textFieldNumberOfDirectUsers;
     @FXML private TextField textFieldNumberOfIndirectUsers;
-    @FXML private GridPane  gridPaneOrganizationInfo;
+    @FXML private GridPane gridPaneOrganizationInfo;
 
     private ContextMenu contextMenuSuggestions;
     private AffiliatedOrganizationDAO affiliatedOrganizationDAO;
@@ -114,8 +111,7 @@ public class FXMLConsultAffiliatedOrganizationController extends ValidationHandl
 
     private void executeOrganizationSearch(String organizationName) {
         try {
-            Optional<AffiliatedOrganization> result =
-                affiliatedOrganizationDAO.getOrganizationByName(organizationName);
+            Optional<AffiliatedOrganization> result = affiliatedOrganizationDAO.getOrganizationByName(organizationName);
 
             if (result.isPresent()) {
                 currentOrganization = result.get();
@@ -145,25 +141,20 @@ public class FXMLConsultAffiliatedOrganizationController extends ValidationHandl
         labelSector.setText(organization.getSector());
         labelEmail.setText(organization.getEmail());
         labelPhoneNumber.setText(organization.getPhoneNumber());
-        labelNumberOfDirectUsers.setText(
-            String.valueOf(organization.getNumberOfDirectUsers()));
-        labelNumberOfIndirectUsers.setText(
-            String.valueOf(organization.getNumberOfIndirectUsers()));
+        labelNumberOfDirectUsers.setText(String.valueOf(organization.getNumberOfDirectUsers()));
+        labelNumberOfIndirectUsers.setText(String.valueOf(organization.getNumberOfIndirectUsers()));
     }
 
     private void loadOrganizationAcademicInformation(String organizationName) throws OperationException {
-        boolean isInactive = affiliatedOrganizationDAO
-            .isOrganizationInactive(organizationName);
+        boolean isInactive = affiliatedOrganizationDAO.isOrganizationInactive(organizationName);
         labelStatus.setText(isInactive ? LABEL_INACTIVE : LABEL_ACTIVE);
         buttonInactive.setDisable(isInactive);
 
-        ArrayList<String> projects = affiliatedOrganizationDAO
-            .getProjectsByOrganization(currentOrganization.getName());
+        ArrayList<String> projects = affiliatedOrganizationDAO.getProjectsByOrganization(currentOrganization.getName());
         ObservableList<String> items = FXCollections.observableArrayList(projects);
         listViewProjects.setItems(items);
 
-        currentProjects = affiliatedOrganizationDAO
-        .getCompleteProjectsByOrganization(currentOrganization.getName());
+        currentProjects = affiliatedOrganizationDAO.getCompleteProjectsByOrganization(currentOrganization.getName());
     }
 
     private void resetOrganizationView() {
@@ -219,8 +210,8 @@ public class FXMLConsultAffiliatedOrganizationController extends ValidationHandl
 
     private Optional<String> validateInputs() {
         return Stream.of(
-            validateText(textFieldName.getText(),  "El nombre"),
-            validateText(textFieldCity.getText(),  "La ciudad"),
+            validateText(textFieldName.getText(), "El nombre"),
+            validateText(textFieldCity.getText(), "La ciudad"),
             validateText(textFieldState.getText(), "El estado"),
             validateEmail(textFieldEmail.getText(), "El correo"),
             validateExactLength(textFieldPostalCode.getText(), POSTAL_CODE,"El código postal")
@@ -285,8 +276,7 @@ public class FXMLConsultAffiliatedOrganizationController extends ValidationHandl
     }
 
     private void confirmAndInactivate(String organizationName) throws OperationException {
-        boolean confirmed = showConfirmation(
-            "Confirmar inactivación",
+        boolean confirmed = showConfirmation("Confirmar inactivación",
             "¿Está seguro que desea inactivar esta organización?"
         );
 
@@ -327,8 +317,7 @@ public class FXMLConsultAffiliatedOrganizationController extends ValidationHandl
                     contextMenuSuggestions.hide();
                 } else {
                     populateSuggestions(matches);
-                    contextMenuSuggestions.show(
-                        textFieldOrganizationName, Side.BOTTOM, 0, 0);
+                    contextMenuSuggestions.show(textFieldOrganizationName, Side.BOTTOM, 0, 0);
                 }
             } catch (OperationException e) {
                 LOGGER.log(Level.WARNING, "Error en autocompletado", e);

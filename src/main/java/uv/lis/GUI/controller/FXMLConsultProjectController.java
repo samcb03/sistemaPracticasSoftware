@@ -50,8 +50,7 @@ public class FXMLConsultProjectController extends WindowHandler {
 
     private void configureTableColumns() {
         tableColumnProjectName.setCellValueFactory(new PropertyValueFactory<>("name"));
-        tableColumnOrganization.setCellValueFactory(new PropertyValueFactory<>
-            ("affiliatedOrganizationName"));
+        tableColumnOrganization.setCellValueFactory(new PropertyValueFactory<>("affiliatedOrganizationName"));
     }
 
     private void configureOrganizationListener() {
@@ -85,8 +84,7 @@ public class FXMLConsultProjectController extends WindowHandler {
     private void loadOrganizations() {
         try {
             ArrayList<String> Organizations = AffiliatedOrganizationDAO.getAllOrganizationNames();
-            ObservableList<String> observableOrganizations
-                = FXCollections.observableArrayList(Organizations);
+            ObservableList<String> observableOrganizations = FXCollections.observableArrayList(Organizations);
             comboBoxOrganization.setItems(observableOrganizations);
 
             if (observableOrganizations.isEmpty()) {

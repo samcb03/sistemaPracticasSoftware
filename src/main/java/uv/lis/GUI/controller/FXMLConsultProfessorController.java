@@ -34,8 +34,7 @@ import uv.lis.logic.exceptions.OperationException;
 
 public class FXMLConsultProfessorController extends ValidationHandler {
 
-    private static final Logger LOGGER
-        = Logger.getLogger(FXMLConsultProfessorController.class.getName());
+    private static final Logger LOGGER = Logger.getLogger(FXMLConsultProfessorController.class.getName());
 
     private static final String LABEL_INACTIVE = "Inactivo";
     private static final String LABEL_ACTIVE = "Activo";
@@ -155,8 +154,7 @@ public class FXMLConsultProfessorController extends ValidationHandler {
     private void loadCurrentDataIntoEditors() {
         textFieldFirstName.setText(currentProfessor.getFirstName());
         textFieldLastName.setText(currentProfessor.getLastName());
-        comboBoxCoordinator.setValue(
-            currentProfessor.getIsCoordinator() ? ROLE_COORDINATOR : ROLE_PROFESSOR);
+        comboBoxCoordinator.setValue(currentProfessor.getIsCoordinator() ? ROLE_COORDINATOR : ROLE_PROFESSOR);
     }
 
     @FXML
@@ -175,10 +173,9 @@ public class FXMLConsultProfessorController extends ValidationHandler {
             Professor updatedProfessor = buildUpdatedProfessor();
             boolean isUpdated = professorDAO.modifyProfessor(updatedProfessor);
             handleUpdateResult(isUpdated, updatedProfessor);
-        } catch (OperationException operationException) {
-            LOGGER.log(Level.WARNING, "Error al actualizar al profesor: {0}",
-                operationException.getMessage());
-            showError(operationException.getMessage());
+        } catch (OperationException e) {
+            LOGGER.log(Level.WARNING, "Error al actualizar al profesor: {0}", e.getMessage());
+            showError(e.getMessage());
         }
     }
 
@@ -246,8 +243,7 @@ public class FXMLConsultProfessorController extends ValidationHandler {
             contextMenuSuggestions.hide();
         } else {
             try {
-                ArrayList<String> matches
-                    = professorDAO.searchProfessorPersonalNumbers(newValue.trim());
+                ArrayList<String> matches = professorDAO.searchProfessorPersonalNumbers(newValue.trim());
 
                 if (matches.isEmpty()) {
                     contextMenuSuggestions.hide();
@@ -310,27 +306,11 @@ public class FXMLConsultProfessorController extends ValidationHandler {
         if (!confirmed) {
             showError("Inactivación cancelada.");
         } else if (professorDAO.hasSubjectAssigned(personnelNumber)) {
-            handleInactivationWithSubject(personnelNumber);
+            showError("El profesor tiene asignaturas a su cargo. No se puede inactivar.");
         } else {
             professorDAO.inactivateProfessor(personnelNumber);
             showSuccess("El profesor ha sido inactivado correctamente.");
             updateInactivationState();
-        }
-    }
-
-    private void handleInactivationWithSubject(String personnelNumber) throws OperationException {
-        boolean confirmedAnyway = showConfirmation(
-            "Profesor asignado a experiencias educativas",
-            "El profesor tiene clases asignadas. "
-            + "¿Desea inactivarlo y removerlo de sus clases de todas formas?"
-        );
-
-        if (confirmedAnyway) {
-            professorDAO.inactivateProfessor(personnelNumber);
-            showSuccess("El profesor ha sido inactivado y removido de sus clases correctamente.");
-            updateInactivationState();
-        } else {
-            showError("Inactivación cancelada");
         }
     }
 

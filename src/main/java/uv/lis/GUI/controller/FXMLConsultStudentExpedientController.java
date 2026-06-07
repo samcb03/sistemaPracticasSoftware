@@ -104,8 +104,7 @@ public class FXMLConsultStudentExpedientController extends ValidationHandler {
         boolean newStatus = checkBox.isSelected();
 
         try {
-            boolean isUpdated
-                = expedientDAO.updateValidationStatus(expedient.getId(), newStatus);
+            boolean isUpdated = expedientDAO.updateValidationStatus(expedient.getId(), newStatus);
 
             if (!isUpdated) {
                 revertCheckBox(checkBox, newStatus, VALIDATION_FAILURE_MESSAGE);
@@ -113,8 +112,7 @@ public class FXMLConsultStudentExpedientController extends ValidationHandler {
                 confirmValidationChange(expedient, newStatus);
             }
         } catch (OperationException e) {
-            LOGGER.log(Level.SEVERE,
-                "Error al actualizar el estado de validación del documento", e);
+            LOGGER.log(Level.SEVERE, "Error al actualizar el estado de validación del documento", e);
             revertCheckBox(checkBox, newStatus, e.getMessage());
         }
     }
@@ -122,8 +120,7 @@ public class FXMLConsultStudentExpedientController extends ValidationHandler {
     private void confirmValidationChange(Expedient expedient, boolean newStatus) {
         expedient.setIsValidated(newStatus);
         showSuccess(VALIDATION_SUCCESS_MESSAGE);
-        LOGGER.log(Level.INFO,
-            "Documento con id {0} marcado como validado: {1}",
+        LOGGER.log(Level.INFO, "Documento con id {0} marcado como validado: {1}", 
             new Object[] { expedient.getId(), newStatus });
     }
 
@@ -157,11 +154,13 @@ public class FXMLConsultStudentExpedientController extends ValidationHandler {
     }
 
     private boolean isReport(Expedient expedient) {
-        return expedient.getIdTypeDocument() <= LAST_REPORT_TYPE_ID;
+        boolean isReportType = expedient.getIdTypeDocument() <= LAST_REPORT_TYPE_ID;
+        return isReportType;
     }
 
     private boolean isInitialDocument(Expedient expedient) {
-        return expedient.getIdTypeDocument() >= FIRST_INITIAL_DOCUMENT_TYPE_ID;
+        boolean isInitialDocumentType = expedient.getIdTypeDocument() >= FIRST_INITIAL_DOCUMENT_TYPE_ID;
+        return isInitialDocumentType;
     }
 
     private void populateTable(List<Expedient> documents) {
@@ -174,8 +173,7 @@ public class FXMLConsultStudentExpedientController extends ValidationHandler {
             showError(NO_DOCUMENTS_FOR_FILTER_MESSAGE);
             tableViewArchives.getItems().clear();
         } else {
-            ObservableList<Expedient> documentList
-                = FXCollections.observableArrayList(documents);
+            ObservableList<Expedient> documentList = FXCollections.observableArrayList(documents);
             tableViewArchives.setItems(documentList);
         }
     }
@@ -225,13 +223,10 @@ public class FXMLConsultStudentExpedientController extends ValidationHandler {
             LOGGER.log(Level.WARNING, "Ruta de documento inválida", illegalArgumentException);
             showError("La ruta del documento no es válida");
         } catch (UnsupportedOperationException unsupportedOperationException) {
-            LOGGER.log(Level.WARNING,
-                "La acción de abrir documentos no está soportada",
-                unsupportedOperationException);
+            LOGGER.log(Level.WARNING, "La acción de abrir documentos no está soportada", unsupportedOperationException);
             showError("Esta acción no está soportada en el sistema");
         } catch (SecurityException securityException) {
-            LOGGER.log(Level.WARNING,
-                "Permisos insuficientes para abrir el documento", securityException);
+            LOGGER.log(Level.WARNING, "Permisos insuficientes para abrir el documento", securityException);
             showError("No se cuenta con permisos para abrir el documento");
         }
     }
