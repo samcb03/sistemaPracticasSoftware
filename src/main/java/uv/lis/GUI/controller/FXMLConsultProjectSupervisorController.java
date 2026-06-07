@@ -32,8 +32,7 @@ import uv.lis.logic.exceptions.OperationException;
 
 public class FXMLConsultProjectSupervisorController extends ValidationHandler {
 
-    private static final Logger LOGGER = Logger.getLogger(
-        FXMLConsultProjectSupervisorController.class.getName());
+    private static final Logger LOGGER = Logger.getLogger(FXMLConsultProjectSupervisorController.class.getName());
     private static final String LABEL_INACTIVE = "Inactivo";
     private static final String LABEL_ACTIVE = "Activo";
 
@@ -59,7 +58,6 @@ public class FXMLConsultProjectSupervisorController extends ValidationHandler {
     private ProjectSupervisorDAO projectSupervisorDAO;
     private ProjectSupervisor currentSupervisor;
     private boolean isEditing = false;
-    
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
@@ -164,7 +162,6 @@ public class FXMLConsultProjectSupervisorController extends ValidationHandler {
         textFieldNameProjectSupervisor.setText(currentSupervisor.getName());
     }
 
-
     @FXML
     private void handleModifyToggle() {
         if (!isEditing) {
@@ -191,14 +188,14 @@ public class FXMLConsultProjectSupervisorController extends ValidationHandler {
     }
 
     private Optional<String> validateInputs() {
-        return Stream.of(
+        Optional<String> nameValidation = Stream.of(
             validateText(textFieldName.getText(),     "El nombre"),
             validateText(textFieldPosition.getText(), "El puesto"),
-            validateEmail(textFieldEmail.getText(),   "El correo")
-        )
-        .filter(Optional::isPresent)
-        .map(Optional::get)
-        .findFirst();
+            validateEmail(textFieldEmail.getText(),   "El correo"))
+            .filter(Optional::isPresent)
+            .map(Optional::get)
+            .findFirst();
+        return nameValidation;
     }
 
     private ProjectSupervisor buildUpdatedSupervisor() {
@@ -313,22 +310,22 @@ public class FXMLConsultProjectSupervisorController extends ValidationHandler {
     }
 
     private void toggleEditMode(boolean isEditing) {
-    this.isEditing = isEditing;
-    
-    setNodeVisibility(labelName,!isEditing);
-    setNodeVisibility(labelPosition,!isEditing);
-    setNodeVisibility(labelEmail,!isEditing);
-    
-    setNodeVisibility(textFieldName,isEditing);
-    setNodeVisibility(textFieldPosition,isEditing);
-    setNodeVisibility(textFieldEmail,isEditing);
+        this.isEditing = isEditing;
+        
+        setNodeVisibility(labelName,!isEditing);
+        setNodeVisibility(labelPosition,!isEditing);
+        setNodeVisibility(labelEmail,!isEditing);
+        
+        setNodeVisibility(textFieldName,isEditing);
+        setNodeVisibility(textFieldPosition,isEditing);
+        setNodeVisibility(textFieldEmail,isEditing);
 
-    setNodeVisibility(buttonUpdate, !isEditing);
-    buttonUpdate.setDisable(isEditing); 
-    
-    setNodeVisibility(buttonSave, isEditing);
-    buttonSave.setDisable(!isEditing); 
-}
+        setNodeVisibility(buttonUpdate, !isEditing);
+        buttonUpdate.setDisable(isEditing); 
+        
+        setNodeVisibility(buttonSave, isEditing);
+        buttonSave.setDisable(!isEditing); 
+    }
 
     private void setNodeVisibility(Node node, boolean isVisible) {
         node.setVisible(isVisible);

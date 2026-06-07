@@ -132,10 +132,8 @@ public class FXMLGeneratePartialReportController extends ValidationHandler {
         Stream<Optional<String>> validationStream = Stream.of(
             validateFirstActivityRow(),
             validateNoDuplicateActivities(),
-            InputValidator.validateText(
-                textAreaGeneralObservations.getText(), "Observaciones Generales"),
-            InputValidator.validateText(
-                textAreaResults.getText(), "Resultados Obtenidos")
+            InputValidator.validateText(textAreaGeneralObservations.getText(), "Observaciones Generales"),
+            InputValidator.validateText(textAreaResults.getText(), "Resultados Obtenidos")
         );
 
         Optional<String> validationError = validationStream

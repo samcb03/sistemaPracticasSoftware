@@ -1,6 +1,7 @@
 package uv.lis.GUI.cell;
 
 import javafx.scene.control.ListCell;
+
 import uv.lis.logic.dto.Student;
 
 public class StudentListCell extends ListCell<Student> {

@@ -16,26 +16,32 @@ public class FXMLCoordinatorMenuController extends WindowHandler{
     @FXML private Button buttonSubjectManagement;
     @FXML private Button buttonLogOut;
 
-    @FXML public void initialize(URL location, ResourceBundle resources) {
+    @FXML 
+    public void initialize(URL location, ResourceBundle resources) {
     }
 
-    @FXML public void goToStudentManagement() {
+    @FXML 
+    public void goToStudentManagement() {
         navigateTo("/uv/lis/GUI/view/FXMLStudentManagement.fxml");
     }
 
-    @FXML public void goToProjectManagement() {
+    @FXML 
+    public void goToProjectManagement() {
         navigateTo("/uv/lis/GUI/view/FXMLProjectManagement.fxml");
     }
 
-    @FXML public void goToSupervisorManagement() {
+    @FXML 
+    public void goToSupervisorManagement() {
         navigateTo("/uv/lis/GUI/view/FXMLSupervisorManagement.fxml");
     }
 
-    @FXML public void goToOrganizationManagement() {
+    @FXML 
+    public void goToOrganizationManagement() {
         navigateTo("/uv/lis/GUI/view/FXMLOrganizationManagement.fxml");
     }
 
-    @FXML public void goToSubjectManagement() {
+    @FXML 
+    public void goToSubjectManagement() {
         navigateTo("/uv/lis/GUI/view/FXMLSubjectManagement.fxml");
     }
 

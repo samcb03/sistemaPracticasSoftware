@@ -1,9 +1,9 @@
 package uv.lis.GUI.controller;
 
-
 import java.net.URL;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.ResourceBundle;
 import java.util.logging.Level;
@@ -34,8 +34,7 @@ import uv.lis.logic.utils.SessionManager;
 
 public class FXMLGenerateMonthlyReportController extends ValidationHandler {
 
-    private static final Logger LOGGER
-        = Logger.getLogger(FXMLGenerateMonthlyReportController.class.getName());
+    private static final Logger LOGGER = Logger.getLogger(FXMLGenerateMonthlyReportController.class.getName());
 
     private static final String NO_STUDENT_IN_SESSION_MESSAGE = "No hay alumno en sesión";
     private static final String REPORT_GENERATED_MESSAGE = "Reporte generado correctamente.";
@@ -62,6 +61,21 @@ public class FXMLGenerateMonthlyReportController extends ValidationHandler {
     private static final int MONTH_NOVEMBER = 11;
     private static final int MONTH_DECEMBER = 12;
     private static final int MONTH_UNKNOWN = 0;
+
+    private static final Map<String, Integer> MONTH_NUMBERS_BY_NAME = Map.ofEntries(
+        Map.entry("enero", MONTH_JANUARY),
+        Map.entry("febrero", MONTH_FEBRUARY),
+        Map.entry("marzo", MONTH_MARCH),
+        Map.entry("abril", MONTH_APRIL),
+        Map.entry("mayo", MONTH_MAY),
+        Map.entry("junio", MONTH_JUNE),
+        Map.entry("julio", MONTH_JULY),
+        Map.entry("agosto", MONTH_AUGUST),
+        Map.entry("septiembre", MONTH_SEPTEMBER),
+        Map.entry("octubre", MONTH_OCTOBER),
+        Map.entry("noviembre", MONTH_NOVEMBER),
+        Map.entry("diciembre", MONTH_DECEMBER)
+    );
 
     @FXML private Label labelStudentName;
     @FXML private Label labelCoordinatorName;
@@ -164,15 +178,15 @@ public class FXMLGenerateMonthlyReportController extends ValidationHandler {
         String activityText = activityFields[index].getText().trim();
         String observationText = observationFields[index].getText().trim();
 
-        Optional<String> activityValidation = InputValidator.validateText(
-            activityText, ACTIVITY_FIELD_LABEL + rowNumber);
+        Optional<String> activityValidation = InputValidator.validateText(activityText, ACTIVITY_FIELD_LABEL 
+            + rowNumber);
         Optional<String> observationValidation = InputValidator.validateText(
             observationText, OBSERVATION_FIELD_LABEL + rowNumber);
 
         return activityValidation.or(() -> observationValidation);
     }
 
-        private void loadStudentData() {
+    private void loadStudentData() {
         if (currentStudent == null) {
             showError(NO_STUDENT_IN_SESSION_MESSAGE);
         } else {
@@ -182,13 +196,11 @@ public class FXMLGenerateMonthlyReportController extends ValidationHandler {
 
     private void fetchAndDisplayContext() {
         try {
-            MonthlyReport context = reportContextDAO.getMonthlyReportData(
-                currentStudent.getIdStudent());
+            MonthlyReport context = reportContextDAO.getMonthlyReportData(currentStudent.getIdStudent());
             populateContextLabels(context);
 
         } catch (OperationException operationException) {
-            LOGGER.log(Level.SEVERE,
-                "Error al cargar contexto del reporte mensual", operationException);
+            LOGGER.log(Level.SEVERE, "Error al cargar contexto del reporte mensual", operationException);
             showError(operationException.getMessage());
         }
     }
@@ -212,8 +224,7 @@ public class FXMLGenerateMonthlyReportController extends ValidationHandler {
             int totalHours = reportContextDAO.getSumOfReportedHours(context.getIdProject(), month, year);
             labelReportedHours.setText(String.valueOf(totalHours));
 
-            int previouslyAccumulatedHours = advanceDAO.getAccumulatedHoursByProject(
-                context.getIdProject());
+            int previouslyAccumulatedHours = advanceDAO.getAccumulatedHoursByProject(context.getIdProject());
             int displayedReportedHours = previouslyAccumulatedHours + totalHours;
             labelAccumulatedHours.setText(String.valueOf(displayedReportedHours));
             buttonRegisterActivity.setDisable(registered.size() >= MAX_ACTIVITY_INPUTS);
@@ -237,8 +248,7 @@ public class FXMLGenerateMonthlyReportController extends ValidationHandler {
 
     private void generateMonthlyReport() {
         try {
-            MonthlyReport context = reportContextDAO.getMonthlyReportData(
-                    currentStudent.getIdStudent());
+            MonthlyReport context = reportContextDAO.getMonthlyReportData(currentStudent.getIdStudent());
 
             int month = convertMonthNameToNumber(context.getMonth());
             int year = LocalDate.now().getYear();
@@ -246,10 +256,8 @@ public class FXMLGenerateMonthlyReportController extends ValidationHandler {
             MonthlyReport report = buildReport();
             JasperPrint jasperPrint = monthlyReportCommon.generateMonthlyReport(report);
 
-            int previousAccumulated = advanceDAO.getAccumulatedHoursByProject(
-                    context.getIdProject());
-            int currentReported = reportContextDAO.getSumOfReportedHours(
-                    context.getIdProject(), month, year);
+            int previousAccumulated = advanceDAO.getAccumulatedHoursByProject(context.getIdProject());
+            int currentReported = reportContextDAO.getSumOfReportedHours(context.getIdProject(), month, year);
             int newAccumulated = previousAccumulated + currentReported;
 
             if (!advanceDAO.existsAdvanceForReport(context.getIdReport())) {
@@ -270,12 +278,10 @@ public class FXMLGenerateMonthlyReportController extends ValidationHandler {
             loadRegisteredActivities();
 
         } catch (OperationException operationException) {
-            LOGGER.log(Level.SEVERE,
-                    "Error de operación al generar el reporte mensual", operationException);
+            LOGGER.log(Level.SEVERE, "Error de operación al generar el reporte mensual", operationException);
             showError(operationException.getMessage());
         } catch (JRException jasperException) {
-            LOGGER.log(Level.SEVERE,
-                    "Error de JasperReports al generar el reporte mensual", jasperException);
+            LOGGER.log(Level.SEVERE, "Error de JasperReports al generar el reporte mensual", jasperException);
             showError(REPORT_GENERATION_ERROR);
         }
     }
@@ -314,34 +320,8 @@ public class FXMLGenerateMonthlyReportController extends ValidationHandler {
     }
     
     private int convertMonthNameToNumber(String monthName) {
-        switch (monthName.toLowerCase()) {
-            case "enero": 
-            return MONTH_JANUARY;
-            case "febrero": 
-            return MONTH_FEBRUARY;
-            case "marzo": 
-            return MONTH_MARCH;
-            case "abril": 
-            return MONTH_APRIL;
-            case "mayo": 
-            return MONTH_MAY;
-            case "junio": 
-            return MONTH_JUNE;
-            case "julio": 
-            return MONTH_JULY;
-            case "agosto": 
-            return MONTH_AUGUST;
-            case "septiembre": 
-            return MONTH_SEPTEMBER;
-            case "octubre": 
-            return MONTH_OCTOBER;
-            case "noviembre": 
-            return MONTH_NOVEMBER;
-            case "diciembre": 
-            return MONTH_DECEMBER;
-            default: 
-            return MONTH_UNKNOWN;
-        }
+        int monthNumber = MONTH_NUMBERS_BY_NAME.getOrDefault(monthName.toLowerCase(), MONTH_UNKNOWN);
+        return monthNumber;
     }
 
     @FXML

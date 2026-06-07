@@ -61,8 +61,7 @@ public class FXMLConsultSubjectController extends WindowHandler {
 
     private void loadEnrolledStudents() {
         try {
-            ArrayList<Student> enrolledStudents
-                = subjectDAO.getEnrolledStudentsBySubject(currentSubject.getNrc());
+            ArrayList<Student> enrolledStudents = subjectDAO.getEnrolledStudentsBySubject(currentSubject.getNrc());
             listViewStudent.setItems(FXCollections.observableArrayList(enrolledStudents));
 
             if (enrolledStudents.isEmpty()) {

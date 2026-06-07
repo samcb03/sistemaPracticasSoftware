@@ -58,8 +58,10 @@ public class FXMLLoginController implements Initializable {
     public void initialize(URL location, ResourceBundle resources) {
         this.userDAO = new UserDAO();
         textFieldPasswordVisible.textProperty().bindBidirectional(passwordFieldPassword.textProperty());
-        eyeOpen = new Image(getClass().getResourceAsStream("/uv/lis/GUI/view/images/show-password-icon-eye-symbol-vision-hide-from-watch-icon-secret-view-web-design-element-vector2.png"));
-        eyeClosed = new Image(getClass().getResourceAsStream("/uv/lis/GUI/view/images/show-password-icon-eye-symbol-vision-hide-from-watch-icon-secret-view-web-design-element-vector1.png"));
+        eyeOpen = new Image(getClass().getResourceAsStream("/uv/lis/GUI/view/images/show-password-icon-eye-symbol" 
+            + "-vision-hide-from-watch-icon-secret-view-web-design-element-vector2.png"));
+        eyeClosed = new Image(getClass().getResourceAsStream("/uv/lis/GUI/view/images/show-password-icon-eye-symbol" 
+            + "-vision-hide-from-watch-icon-secret-view-web-design-element-vector1.png"));
 
         toggleButtonShowPassword.setGraphic(createIcon(eyeClosed));
     }
@@ -157,7 +159,7 @@ public class FXMLLoginController implements Initializable {
                 }
         } catch (OperationException e) {
             LOGGER.log(Level.SEVERE, "Error al cargar los datos del usuario para la sesión", e);
-            showError("Error al cargar los datos del usuario. Intente de nuevo.");
+            showError(e.getMessage());
         }
     }
 

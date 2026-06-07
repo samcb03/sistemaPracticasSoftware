@@ -38,8 +38,7 @@ import uv.lis.logic.utils.SessionManager;
 
 public class FXMLConsultStudentController extends ValidationHandler {
 
-    private static final Logger LOGGER
-        = Logger.getLogger(FXMLConsultStudentController.class.getName());
+    private static final Logger LOGGER = Logger.getLogger(FXMLConsultStudentController.class.getName());
 
     private static final String LABEL_INACTIVE = "Inactivo";
     private static final String LABEL_ACTIVE = "Activo";
