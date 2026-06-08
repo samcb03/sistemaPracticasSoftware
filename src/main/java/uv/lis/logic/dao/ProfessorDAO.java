@@ -40,13 +40,12 @@ public class ProfessorDAO extends UserDAO implements IProfessorDAO {
                               + " INNER JOIN Usuario u ON p.idUsuario = u.idUsuario"
                               + " WHERE u.estado = 1";
 
-        try (Connection connection = connectionManager.getConnection();
-             PreparedStatement statement = connection.prepareStatement(professorQuery);
-             ResultSet resultSet = statement.executeQuery()) {
+        try (Connection databaseConnection = connectionManager.getConnection();
+            PreparedStatement preparedStatement = databaseConnection.prepareStatement(professorQuery);
+            ResultSet resultSet = preparedStatement.executeQuery()) {
 
             while (resultSet.next()) {
-                String fullName = resultSet.getString("nombre") + " "
-                    + resultSet.getString("apellidos");
+                String fullName = resultSet.getString("nombre") + " " + resultSet.getString("apellidos");
                 map.put(fullName, resultSet.getString("numeroPersonal"));
             }
 
@@ -59,14 +58,15 @@ public class ProfessorDAO extends UserDAO implements IProfessorDAO {
     }
 
     @Override
-    public Optional<String> getProfessorPersonnelNumberByName(String firstName, String lastName) throws OperationException {
+    public Optional<String> getProfessorPersonnelNumberByName(String firstName, String lastName) 
+        throws OperationException {
         Optional<String> validatePersonnelNumber = Optional.empty();
         String professorQuery = "SELECT p.numeroPersonal "
                               + "FROM Profesor p INNER JOIN Usuario u ON p.idUsuario = u.idUsuario "
                               + "WHERE u.nombre = ? AND u.apellidos = ?";
 
         try (Connection databaseConnection = connectionManager.getConnection();
-             PreparedStatement preparedStatement = databaseConnection.prepareStatement(professorQuery)) {
+            PreparedStatement preparedStatement = databaseConnection.prepareStatement(professorQuery)) {
 
             preparedStatement.setString(1, firstName);
             preparedStatement.setString(2, lastName);
@@ -97,7 +97,7 @@ public class ProfessorDAO extends UserDAO implements IProfessorDAO {
                                 + "WHERE p.idUsuario = ? AND u.estado = 1";
 
         try (Connection databaseConnection = connectionManager.getConnection();
-             PreparedStatement preparedStatement = databaseConnection.prepareStatement(professorQuery)) {
+            PreparedStatement preparedStatement = databaseConnection.prepareStatement(professorQuery)) {
 
             preparedStatement.setInt(1, id);
 
@@ -145,7 +145,7 @@ public class ProfessorDAO extends UserDAO implements IProfessorDAO {
             }
 
         } catch (SQLException e) {
-            LOGGER.log(Level.SEVERE, "Error de conexión con la base de datos", e);
+            LOGGER.log(Level.SEVERE, "Error de conexión con la base de datos al registrar el profesor", e);
             throw new OperationException("Error al registrar el profesor", e);
         }
 
@@ -156,7 +156,8 @@ public class ProfessorDAO extends UserDAO implements IProfessorDAO {
     public boolean modifyProfessor(Professor professor) throws OperationException {
         if (professor.getIsCoordinator()) {
             if (isAnotherCoordinatorActive(professor.getPersonnelNumber())) {
-                throw new OperationException("No es posible asignar el cargo: ya existe un coordinador activo en el sistema.", null);
+                throw new OperationException("No es posible asignar el cargo:" 
+                + " ya existe un coordinador activo en el sistema.", null);
             }
         }
 
@@ -175,14 +176,13 @@ public class ProfessorDAO extends UserDAO implements IProfessorDAO {
 
             if (preparedStatement.executeUpdate() > NO_ROWS_AFFECTED) {
                 isModified = true;
-                LOGGER.log(Level.INFO, "Profesor {0} modificado exitosamente.",
-                    professor.getPersonnelNumber());
+                LOGGER.log(Level.INFO, "Profesor {0} modificado exitosamente.", professor.getPersonnelNumber());
             } else {
                 throw new OperationException("No se pudo modificar al profesor con número: "
                     + professor.getPersonnelNumber(), null);
             }
         } catch (SQLException e) {
-            LOGGER.log(Level.SEVERE, "Error de conexión con la base de datos", e);
+            LOGGER.log(Level.SEVERE, "Error de conexión con la base de datos al modificar el profesor", e);
             throw new OperationException("Error al modificar el profesor", e);
         }
 
@@ -209,7 +209,7 @@ public class ProfessorDAO extends UserDAO implements IProfessorDAO {
             }
 
         } catch (SQLException e) {
-            LOGGER.log(Level.SEVERE, "Error de conexión con la base de datos", e);
+            LOGGER.log(Level.SEVERE, "Error de conexión con la base de datos al inactivar un profesor", e);
             throw new OperationException("Error al inactivar el profesor", e);
         }
 
@@ -250,7 +250,7 @@ public class ProfessorDAO extends UserDAO implements IProfessorDAO {
         String professorQuery = "SELECT idUsuario FROM Profesor WHERE numeroPersonal = ?";
 
         try (Connection databaseConnection = connectionManager.getConnection();
-             PreparedStatement preparedStatement = databaseConnection.prepareStatement(professorQuery)) {
+            PreparedStatement preparedStatement = databaseConnection.prepareStatement(professorQuery)) {
 
             preparedStatement.setString(1, personnelNumber);
 
@@ -305,7 +305,7 @@ public class ProfessorDAO extends UserDAO implements IProfessorDAO {
                               + " WHERE numeroPersonal = ? AND estaActiva = TRUE";
 
         try (Connection databaseConnection = connectionManager.getConnection();
-             PreparedStatement preparedStatement = databaseConnection.prepareStatement(professorQuery)) {
+            PreparedStatement preparedStatement = databaseConnection.prepareStatement(professorQuery)) {
 
             preparedStatement.setString(1, personnelNumber);
 
@@ -332,16 +332,16 @@ public class ProfessorDAO extends UserDAO implements IProfessorDAO {
                               + "ORDER BY pe.FechaInicio DESC";
 
         try (Connection databaseConnection = connectionManager.getConnection();
-             PreparedStatement preparedStatement = databaseConnection.prepareStatement(professorQuery)) {
+            PreparedStatement preparedStatement = databaseConnection.prepareStatement(professorQuery)) {
 
             preparedStatement.setString(1, personnelNumber);
 
             try (ResultSet resultSet = preparedStatement.executeQuery()) {
                 while (resultSet.next()) {
                     String entry = "NRC: " + resultSet.getInt("NRC")
-                    + " — " + resultSet.getString("nombreExperiencia")
-                    + " — " + resultSet.getString("carrera")
-                    + " (" + resultSet.getString("periodo") + ")";
+                        + " — " + resultSet.getString("nombreExperiencia")
+                        + " — " + resultSet.getString("carrera")
+                        + " (" + resultSet.getString("periodo") + ")";
                     history.add(entry);
                 }
             }
@@ -354,6 +354,7 @@ public class ProfessorDAO extends UserDAO implements IProfessorDAO {
         return history;
     }
 
+    @Override
     public boolean isAnotherCoordinatorActive(String personnelNumber) throws OperationException {
         boolean exits = false;
         String query = "SELECT COUNT(*) " +
@@ -372,6 +373,7 @@ public class ProfessorDAO extends UserDAO implements IProfessorDAO {
                 }
             }
         } catch (SQLException e) {
+            LOGGER.log(Level.SEVERE, "Error al validar el coordinador activo", e);
             throw new OperationException("Error al validar el coordinador ", e);
         }
         return exits;

@@ -18,6 +18,7 @@ import uv.lis.dataaccess.MySQLConnectionManager;
 import uv.lis.logic.contracts.IActivityDAO;
 import uv.lis.logic.dto.Activity;
 import uv.lis.logic.exceptions.OperationException;
+
 public class ActivityDAO implements IActivityDAO {
         private static final Logger LOGGER = Logger.getLogger(ActivityDAO.class.getName());
         private MySQLConnectionManager connectionManager;
@@ -90,7 +91,7 @@ public class ActivityDAO implements IActivityDAO {
     public boolean registerActivity(Activity activity) throws OperationException {
         boolean isRegistered = false;
     
-        String activityQuery = "INSERT INTO Actividad(nombreActividad, descripcionActividad, FechaInicio," 
+        String activityQuery = "INSERT INTO Actividad(nombreActividad, descripcionActividad, FechaInicio, " 
                              + "FechaFin, idProyecto,horasReportadas) " 
                              + "VALUES(?, ?, ?, ?, ?, ?);";
 
@@ -201,8 +202,7 @@ public class ActivityDAO implements IActivityDAO {
         LocalDate startDate = resultSet.getObject("FechaInicio", LocalDate.class);
         LocalDate endDate = resultSet.getObject("FechaFin", LocalDate.class);
         int idProject = resultSet.getInt("idProyecto");
-        Activity activity = new Activity(idActivity, activityName, activityDescription,
-                    startDate, endDate, idProject);
+        Activity activity = new Activity(idActivity, activityName, activityDescription,startDate, endDate, idProject);
             
         return activity;
     }

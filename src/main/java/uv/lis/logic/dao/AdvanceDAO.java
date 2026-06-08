@@ -34,7 +34,7 @@ public class AdvanceDAO implements IAdvanceDAO {
                             + "horasAcumuladas) VALUES (?, ?, ?, ?)";
 
         try (Connection databaseConnection = connectionManager.getConnection();
-             PreparedStatement preparedStatement = databaseConnection.prepareStatement(advanceQuery)) {
+            PreparedStatement preparedStatement = databaseConnection.prepareStatement(advanceQuery)) {
 
             preparedStatement.setInt(1, advance.getProjectId());
             preparedStatement.setInt(2, advance.getReportId());
@@ -71,6 +71,7 @@ public class AdvanceDAO implements IAdvanceDAO {
         return advances;
     }
 
+    @Override
     public boolean existsAdvanceForReport(int reportId) throws OperationException {
         boolean advanceExists = false;
         String advanceQuery = "SELECT COUNT(*) FROM Avance WHERE idReporte = ?";

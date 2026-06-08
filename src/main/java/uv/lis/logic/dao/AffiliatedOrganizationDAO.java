@@ -19,8 +19,7 @@ import uv.lis.logic.exceptions.OperationException;
 
 public class AffiliatedOrganizationDAO implements IAffiliatedOrganizationDAO {
 
-    private static final Logger LOGGER =
-        Logger.getLogger(AffiliatedOrganizationDAO.class.getName());
+    private static final Logger LOGGER = Logger.getLogger(AffiliatedOrganizationDAO.class.getName());
     private static final int INACTIVE_STATE = 0;
 
     private MySQLConnectionManager connectionManager;
@@ -34,15 +33,14 @@ public class AffiliatedOrganizationDAO implements IAffiliatedOrganizationDAO {
     }
 
     @Override
-    public Optional<AffiliatedOrganization> getOrganizationById(int idAffiliatedOrganization)
-            throws OperationException {
+    public Optional<AffiliatedOrganization> getOrganizationById(int idAffiliatedOrganization) 
+        throws OperationException {
         Optional<AffiliatedOrganization> validateOrganization = Optional.empty();
         String affiliatedOrganizationQuery = "SELECT * FROM OrganizacionVinculada "
                                            + "WHERE idOrganizacionVinculada = ?";
 
         try (Connection databaseConnection = connectionManager.getConnection();
-             PreparedStatement preparedStatement =
-                 databaseConnection.prepareStatement(affiliatedOrganizationQuery)) {
+            PreparedStatement preparedStatement = databaseConnection.prepareStatement(affiliatedOrganizationQuery)) {
 
             preparedStatement.setInt(1, idAffiliatedOrganization);
 
@@ -50,11 +48,9 @@ public class AffiliatedOrganizationDAO implements IAffiliatedOrganizationDAO {
                 if (resultSet.next()) {
                     validateOrganization = Optional.of(mapAffiliatedOrganization(resultSet));
                 } else {
-                    LOGGER.log(Level.INFO,
-                        "No se encontró una organización vinculada con el id {0}.",
+                    LOGGER.log(Level.INFO, "No se encontró una organización vinculada con el id {0}.",
                         idAffiliatedOrganization);
-                    throw new OperationException(
-                        "No se encontró una organización vinculada con el id: "
+                    throw new OperationException("No se encontró una organización vinculada con el id: "
                         + idAffiliatedOrganization, null);
                 }
             }
@@ -66,8 +62,7 @@ public class AffiliatedOrganizationDAO implements IAffiliatedOrganizationDAO {
     }
 
     @Override
-    public boolean registerOrganization(AffiliatedOrganization affiliatedOrganization)
-            throws OperationException {
+    public boolean registerOrganization(AffiliatedOrganization affiliatedOrganization) throws OperationException {
         boolean isRegistered = false;
         String affiliatedOrganizationQuery = "INSERT INTO OrganizacionVinculada (nombreOV, "
                                            + "ciudad, estado, calle, numeroDomicilio, codigoPostal, "
@@ -77,7 +72,7 @@ public class AffiliatedOrganizationDAO implements IAffiliatedOrganizationDAO {
 
         try (Connection databaseConnection = connectionManager.getConnection();
             PreparedStatement preparedStatement = databaseConnection.prepareStatement(
-                affiliatedOrganizationQuery, PreparedStatement.RETURN_GENERATED_KEYS)) {
+            affiliatedOrganizationQuery, PreparedStatement.RETURN_GENERATED_KEYS)) {
 
             preparedStatement.setString(1, affiliatedOrganization.getName());
             preparedStatement.setString(2, affiliatedOrganization.getCity());
@@ -109,15 +104,13 @@ public class AffiliatedOrganizationDAO implements IAffiliatedOrganizationDAO {
             }
         } catch (SQLException e) {
             LOGGER.log(Level.SEVERE, "Error de conexion con la base de datos", e);
-            throw new OperationException("No se pudo registrar la Organizacion. Intentelo mas tarde",
-                e);
+            throw new OperationException("No se pudo registrar la Organizacion. Intentelo mas tarde", e);
         }
         return isRegistered;
     }
 
     @Override
-    public boolean modifyOrganization(AffiliatedOrganization affiliatedOrganization)
-            throws OperationException {
+    public boolean modifyOrganization(AffiliatedOrganization affiliatedOrganization) throws OperationException {
         boolean isModified = false;
         String affiliatedOrganizationQuery = "UPDATE OrganizacionVinculada "
                                            + "SET nombreOV = ?, ciudad = ?, estado = ?, calle = ?, "
@@ -166,8 +159,7 @@ public class AffiliatedOrganizationDAO implements IAffiliatedOrganizationDAO {
                                            + "WHERE nombreOV = ?;";
 
         try (Connection databaseConnection = connectionManager.getConnection();
-             PreparedStatement preparedStatement =
-                 databaseConnection.prepareStatement(affiliatedOrganizationQuery)) {
+            PreparedStatement preparedStatement = databaseConnection.prepareStatement(affiliatedOrganizationQuery)) {
 
             preparedStatement.setString(1, organizationName);
 
@@ -192,8 +184,7 @@ public class AffiliatedOrganizationDAO implements IAffiliatedOrganizationDAO {
         String affiliatedOrganizationQuery = "SELECT nombreOV FROM OrganizacionVinculada";
 
         try (Connection databaseConnection = connectionManager.getConnection();
-             PreparedStatement preparedStatement =
-                 databaseConnection.prepareStatement(affiliatedOrganizationQuery)) {
+             PreparedStatement preparedStatement = databaseConnection.prepareStatement(affiliatedOrganizationQuery)) {
 
             try (ResultSet resultSet = preparedStatement.executeQuery()) {
                 while (resultSet.next()) {
@@ -214,8 +205,7 @@ public class AffiliatedOrganizationDAO implements IAffiliatedOrganizationDAO {
                                            + "FROM OrganizacionVinculada WHERE nombreOV = ?";
 
         try (Connection databaseConnection = connectionManager.getConnection();
-             PreparedStatement preparedStatement =
-                 databaseConnection.prepareStatement(affiliatedOrganizationQuery)) {
+            PreparedStatement preparedStatement = databaseConnection.prepareStatement(affiliatedOrganizationQuery)) {
 
             preparedStatement.setString(1, organizationName);
 
@@ -281,8 +271,7 @@ public class AffiliatedOrganizationDAO implements IAffiliatedOrganizationDAO {
             }
         } catch (SQLException e) {
             LOGGER.log(Level.SEVERE, "Error al verificar el estado de la organización", e);
-            throw new OperationException("No se pudo verificar la organización. Intente más tarde",
-                e);
+            throw new OperationException("No se pudo verificar la organización. Intente más tarde", e);
         }
         return isInactive;
     }
@@ -295,8 +284,7 @@ public class AffiliatedOrganizationDAO implements IAffiliatedOrganizationDAO {
                                            + "LIMIT 10";
 
         try (Connection databaseConnection = connectionManager.getConnection();
-             PreparedStatement preparedStatement =
-                 databaseConnection.prepareStatement(affiliatedOrganizationQuery)) {
+            PreparedStatement preparedStatement = databaseConnection.prepareStatement(affiliatedOrganizationQuery)) {
 
             preparedStatement.setString(1, prefix + "%");
 
@@ -313,8 +301,7 @@ public class AffiliatedOrganizationDAO implements IAffiliatedOrganizationDAO {
     }
 
     @Override
-    public Optional<AffiliatedOrganization> getOrganizationByName(String organizationName)
-            throws OperationException {
+    public Optional<AffiliatedOrganization> getOrganizationByName(String organizationName) throws OperationException {
         Optional<AffiliatedOrganization> validateOrganization = Optional.empty();
         String affiliatedOrganizationQuery = "SELECT * FROM OrganizacionVinculada "
                                            + "WHERE nombreOV = ?";
@@ -349,7 +336,7 @@ public class AffiliatedOrganizationDAO implements IAffiliatedOrganizationDAO {
                             + "ORDER BY p.nombre ASC";
 
         try (Connection databaseConnection = connectionManager.getConnection();
-             PreparedStatement preparedStatement = databaseConnection.prepareStatement(projectQuery)) {
+            PreparedStatement preparedStatement = databaseConnection.prepareStatement(projectQuery)) {
 
             preparedStatement.setString(1, organizationName);
 
@@ -363,8 +350,7 @@ public class AffiliatedOrganizationDAO implements IAffiliatedOrganizationDAO {
             }
         } catch (SQLException e) {
             LOGGER.log(Level.SEVERE, "Error al obtener proyectos de la organización", e);
-            throw new OperationException(
-                "No se pudo obtener la lista de proyectos de la organización.", e);
+            throw new OperationException("No se pudo obtener la lista de proyectos de la organización.", e);
         }
         return projectList;
     }
@@ -378,7 +364,7 @@ public class AffiliatedOrganizationDAO implements IAffiliatedOrganizationDAO {
                             + "WHERE ov.nombreOV = ? LIMIT 1";
 
         try (Connection databaseConnection = connectionManager.getConnection();
-             PreparedStatement preparedStatement = databaseConnection.prepareStatement(projectQuery)) {
+            PreparedStatement preparedStatement = databaseConnection.prepareStatement(projectQuery)) {
 
             preparedStatement.setString(1, organizationName);
 
@@ -392,6 +378,7 @@ public class AffiliatedOrganizationDAO implements IAffiliatedOrganizationDAO {
         return hasProjectsActives;
     }
 
+    @Override
     public ArrayList<Project> getCompleteProjectsByOrganization(String organizationName) throws OperationException {
         ArrayList<Project> projectList = new ArrayList<>();
         String projectQuery = "SELECT p.idProyecto, p.nombre, p.descripcion, p.objetivo, "

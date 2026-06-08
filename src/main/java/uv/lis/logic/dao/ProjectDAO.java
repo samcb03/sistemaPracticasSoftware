@@ -1,6 +1,7 @@
 package uv.lis.logic.dao;
 
 import static uv.lis.logic.utils.InputValidator.NO_ROWS_AFFECTED;
+import static uv.lis.logic.utils.InputValidator.STATUS_ASSIGNED;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -112,6 +113,7 @@ public class ProjectDAO implements IProjectDAO{
             preparedStatement.setBoolean(6, project.isActive());
             preparedStatement.setInt(7, project.getIdAffiliatedOrganization());
             preparedStatement.setInt(8, project.getIdSupervisor());
+
             if (preparedStatement.executeUpdate() > NO_ROWS_AFFECTED){
                 try(ResultSet resultSet = preparedStatement.getGeneratedKeys()) {
                     if (resultSet.next()) {
@@ -172,12 +174,13 @@ public class ProjectDAO implements IProjectDAO{
     @Override
     public boolean inactivateProject(Project project) throws OperationException {
         boolean isInactive = false;
-        String projectQuery = "UPDATE Proyecto SET estado = 0 WHERE idProyecto = ?;";
+        String projectQuery = "UPDATE Proyecto SET estado = ? WHERE idProyecto = ?;";
 
         try (Connection databaseConnection = connectionManager.getConnection();
-             PreparedStatement preparedStatement = databaseConnection.prepareStatement(projectQuery)) {
+            PreparedStatement preparedStatement = databaseConnection.prepareStatement(projectQuery)) {
 
-            preparedStatement.setInt(1, project.getId());
+            preparedStatement.setBoolean(1, false);
+            preparedStatement.setInt(2, project.getId());
 
             if (preparedStatement.executeUpdate() > NO_ROWS_AFFECTED) {
                 isInactive = true;
@@ -215,43 +218,44 @@ public class ProjectDAO implements IProjectDAO{
         return projectNames;
     }
 
-   @Override
+    @Override
     public Optional<String> getProjectBySupervisorName(String supervisorName) throws OperationException {
         Optional<String> project = Optional.empty();
         
         String supervisorQuery = "SELECT p.nombre FROM Proyecto p"  
-                                + " JOIN ResponsableProyecto rp ON p.idResponsableProyecto = rp.idResponsableProyecto"
-                                + " WHERE rp.nombre = ?";
+                               + " JOIN ResponsableProyecto rp ON p.idResponsableProyecto = rp.idResponsableProyecto"
+                               + " WHERE rp.nombre = ?";
 
-            try(Connection databaseConnection = connectionManager.getConnection();
-                    PreparedStatement preparedStatement = databaseConnection.prepareStatement(supervisorQuery)) {
+        try(Connection databaseConnection = connectionManager.getConnection();
+            PreparedStatement preparedStatement = databaseConnection.prepareStatement(supervisorQuery)) {
 
-                        preparedStatement.setString(1,supervisorName);
+                preparedStatement.setString(1,supervisorName);
 
-                        try(ResultSet resultSet = preparedStatement.executeQuery()) {
-                            if(resultSet.next()) {
-                               String projectName = resultSet.getString("nombre");
-                               project = Optional.of(projectName);
-                            }
-                        }
-                    } catch(SQLException e) {
-                        LOGGER.log(Level.SEVERE,"Error de conexión a la base de datos", e);
-                        throw new OperationException("Error al cargar el nombre de la organización", e);
+                try(ResultSet resultSet = preparedStatement.executeQuery()) {
+                    if(resultSet.next()) {
+                        String projectName = resultSet.getString("nombre");
+                        project = Optional.of(projectName);
                     }
-            return project;
-        }
+                }
+            } catch(SQLException e) {
+                LOGGER.log(Level.SEVERE,"Error de conexión a la base de datos", e);
+                throw new OperationException("Error al cargar el nombre de la organización", e);
+            }
+        return project;
+    }
 
     @Override
     public ArrayList<String> getProjectNamesByOrganizationId(int organizationId) throws OperationException {
         ArrayList<String> projectNames = new ArrayList<>();
-        String query = "SELECT nombre FROM Proyecto "
-                    + "WHERE idOrganizacionVinculada = ? "
-                    + "AND estado = 1";
+        String projectQuery = "SELECT nombre FROM Proyecto "
+                            + "WHERE idOrganizacionVinculada = ? "
+                            + "AND estado = ?";
  
     try (Connection databaseConnection = connectionManager.getConnection();
-         PreparedStatement preparedStatement = databaseConnection.prepareStatement(query)) {
+         PreparedStatement preparedStatement = databaseConnection.prepareStatement(projectQuery)) {
  
         preparedStatement.setInt(1, organizationId);
+        preparedStatement.setBoolean(2, true);
  
         try (ResultSet resultSet = preparedStatement.executeQuery()) {
             while (resultSet.next()) {
@@ -271,12 +275,12 @@ public class ProjectDAO implements IProjectDAO{
     public Optional<Project> getProjectByStudentId(String studentId) throws OperationException {
         Optional<Project> projectOptional = Optional.empty();
         String projectQuery = "SELECT p.idProyecto, p.nombre FROM Proyecto p"
-                     + " JOIN Solicita_Proyecto sp ON p.idProyecto = sp.idProyecto"
-                     + " WHERE sp.matricula = ? "
-                     + " AND sp.estatus = 2";
+                            + " JOIN Solicita_Proyecto sp ON p.idProyecto = sp.idProyecto"
+                            + " WHERE sp.matricula = ? "
+                            + " AND sp.estatus = 2";
 
         try (Connection databaseConnection = connectionManager.getConnection();
-             PreparedStatement preparedStatement = databaseConnection.prepareStatement(projectQuery)) {
+            PreparedStatement preparedStatement = databaseConnection.prepareStatement(projectQuery)) {
 
             preparedStatement.setString(1, studentId);
 
@@ -296,6 +300,8 @@ public class ProjectDAO implements IProjectDAO{
         return projectOptional;
     }
 
+
+    @Override
     public ArrayList<Project> getAllProjectsWithCapacity() throws OperationException {
         ArrayList<Project> projectsAvailable = new ArrayList<>();
         String projectQuery = "SELECT p.idProyecto, p.nombre, p.cupo, "
@@ -303,12 +309,15 @@ public class ProjectDAO implements IProjectDAO{
                             + "FROM Proyecto p "
                             + "INNER JOIN OrganizacionVinculada o "
                             + "ON p.idOrganizacionVinculada = o.idOrganizacionVinculada "
-                            + "WHERE p.estado = 1 "
+                            + "WHERE p.estado = ? "
                             + "AND p.cupo > (SELECT COUNT(*) FROM Solicita_Proyecto sp "
-                            + "             WHERE sp.idProyecto = p.idProyecto AND sp.estatus = 2)";
+                            + "WHERE sp.idProyecto = p.idProyecto AND sp.estatus = ?)";
 
         try (Connection databaseConnection = connectionManager.getConnection();
             PreparedStatement preparedStatement = databaseConnection.prepareStatement(projectQuery)) {
+            
+            preparedStatement.setBoolean(1, true);
+            preparedStatement.setInt(2, STATUS_ASSIGNED);
 
             try (ResultSet resultSet = preparedStatement.executeQuery()) {
                 while (resultSet.next()) {

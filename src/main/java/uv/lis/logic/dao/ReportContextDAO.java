@@ -192,11 +192,11 @@ public class ReportContextDAO implements IReportContextDAO {
             
             try (ResultSet resultSet = preparedStatement.executeQuery()) {
                 while (resultSet.next()) {
-                    Activity act = new Activity();
-                    act.setName(resultSet.getString("nombreActividad"));
-                    act.setDescription(resultSet.getString("descripcionActividad"));
-                    act.setHoursReported(resultSet.getInt("horas"));
-                    activities.add(act);
+                    Activity activity = new Activity();
+                    activity.setName(resultSet.getString("nombreActividad"));
+                    activity.setDescription(resultSet.getString("descripcionActividad"));
+                    activity.setHoursReported(resultSet.getInt("horas"));
+                    activities.add(activity);
                 }
             }
         } catch (SQLException e) {
@@ -216,7 +216,7 @@ public class ReportContextDAO implements IReportContextDAO {
                                   + "WHERE sp.matricula = ? AND a.nombreActividad = ?";
 
         try (Connection databaseConnection = connectionManager.getConnection();
-                PreparedStatement preparedStatement = databaseConnection.prepareStatement(reportContextQuery)) {
+            PreparedStatement preparedStatement = databaseConnection.prepareStatement(reportContextQuery)) {
 
             preparedStatement.setString(1, studentId);
             preparedStatement.setString(2, activityName);
@@ -236,11 +236,11 @@ public class ReportContextDAO implements IReportContextDAO {
     @Override
     public int getSumOfReportedHours(int projectId, int month, int year) throws OperationException {
         int total = 0;
-        String reportContextQuery =  "SELECT COALESCE(SUM(horasReportadas), 0) AS total "
-                                + "FROM Actividad "
-                                + "WHERE idProyecto = ? "
-                                + "AND MONTH(FechaInicio) = ? "
-                                + "AND YEAR(FechaInicio) = ?";
+        String reportContextQuery = "SELECT COALESCE(SUM(horasReportadas), 0) AS total "
+                                  + "FROM Actividad "
+                                  + "WHERE idProyecto = ? "
+                                  + "AND MONTH(FechaInicio) = ? "
+                                  + "AND YEAR(FechaInicio) = ?";
         
         try (Connection databaseConnection = connectionManager.getConnection();
             PreparedStatement preparedStatement = databaseConnection.prepareStatement(reportContextQuery)) {
@@ -253,6 +253,7 @@ public class ReportContextDAO implements IReportContextDAO {
                 }
             }
         } catch (SQLException e) {
+            LOGGER.log(Level.SEVERE, TOTAL_HOURS_ERROR, e);
             throw new OperationException("Error al calcular total de horas", e);
         }
         return total;
@@ -273,6 +274,7 @@ public class ReportContextDAO implements IReportContextDAO {
                 return resultSet.next() && resultSet.getInt(1) > 0;
             }
         } catch (SQLException e) {
+            LOGGER.log(Level.SEVERE, "Error al verificar duplicidad de reporte", e);
             throw new OperationException("Error al verificar duplicidad de reporte", e);
         }
     }

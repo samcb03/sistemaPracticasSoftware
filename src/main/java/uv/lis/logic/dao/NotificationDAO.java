@@ -39,7 +39,7 @@ public class NotificationDAO implements INotificationDAO {
 
         try (Connection databaseConnection = connectionManager.getConnection();
             PreparedStatement preparedStatement = databaseConnection.prepareStatement(
-                notificationQuery, PreparedStatement.RETURN_GENERATED_KEYS)) {
+            notificationQuery, PreparedStatement.RETURN_GENERATED_KEYS)) {
 
             preparedStatement.setString(1, notification.getIdStudent());
             preparedStatement.setString(2, notification.getTitle());

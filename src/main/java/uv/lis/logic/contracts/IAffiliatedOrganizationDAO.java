@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Optional;
 
 import uv.lis.logic.dto.AffiliatedOrganization;
+import uv.lis.logic.dto.Project;
 import uv.lis.logic.exceptions.OperationException;
 
 public interface IAffiliatedOrganizationDAO {
@@ -30,4 +31,6 @@ public interface IAffiliatedOrganizationDAO {
     ArrayList<String> getProjectsByOrganization(String organizationName) throws OperationException;
 
     boolean hasActiveProjects(String organizationName) throws OperationException;
+
+    ArrayList<Project> getCompleteProjectsByOrganization(String organizationName) throws OperationException;
 }

@@ -29,4 +29,6 @@ public interface IProfessorDAO {
     boolean hasSubjectAssigned(String personnelNumber) throws OperationException;
 
     ArrayList<String> getSubjectsByProfessor(String personnelNumber) throws OperationException;
+
+    boolean isAnotherCoordinatorActive(String personnelNumber) throws OperationException;
 }
