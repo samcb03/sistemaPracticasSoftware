@@ -98,10 +98,11 @@ public class FXMLRegisterSubjectController extends ValidationHandler {
             validateComboBox(comboBoxProfessorName.getValue(), "un profesor"),
             validateComboBox(comboBoxSection.getValue(), "una sección")
         );
-        return validationStream
+        Optional<String> firstError = validationStream
             .filter(Optional::isPresent)
             .map(Optional::get)
             .findFirst();
+        return firstError;
     }
 
     private void registerSubject() {

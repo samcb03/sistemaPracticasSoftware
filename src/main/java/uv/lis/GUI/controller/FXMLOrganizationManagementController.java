@@ -16,11 +16,13 @@ public class FXMLOrganizationManagementController extends WindowHandler{
     public void initialize(URL location, ResourceBundle resources) {
     }
 
-    @FXML public void goToRegisterOrganization() { 
+    @FXML 
+    public void goToRegisterOrganization() { 
         navigateTo("/uv/lis/GUI/view/FXMLRegisterAffiliatedOrganization.fxml"); 
     }
 
-    @FXML public void goToConsultOrganization() { 
+    @FXML 
+    public void goToConsultOrganization() { 
         navigateTo("/uv/lis/GUI/view/FXMLConsultAffiliatedOrganization.fxml"); 
     }
 

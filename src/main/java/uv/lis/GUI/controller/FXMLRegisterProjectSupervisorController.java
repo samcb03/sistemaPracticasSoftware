@@ -35,7 +35,6 @@ public class FXMLRegisterProjectSupervisorController extends ValidationHandler {
     private ProjectSupervisorDAO projectSupervisorDAO;
     private AffiliatedOrganizationDAO affiliatedOrganizationDAO;
 
-
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
         projectSupervisorDAO = new ProjectSupervisorDAO();
@@ -102,7 +101,7 @@ public class FXMLRegisterProjectSupervisorController extends ValidationHandler {
             int organizationId = affiliatedOrganizationDAO.getOrganizationIdByName(selectedOrganization);
             projectSupervisor.setOrganizationInt(organizationId); 
         } catch (OperationException e) {
-            showError("Error al recuperar la organización seleccionada");
+            showError(e.getMessage());
         }
     }
     

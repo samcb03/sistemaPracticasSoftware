@@ -36,7 +36,7 @@ public class FXMLShowProjectDetailController extends ValidationHandler {
     private static final Logger LOGGER = Logger.getLogger(FXMLShowProjectDetailController.class.getName());
 
     private static final int MINIMUM_CAPACITY = 1;
-    private static final int MAXIMUM_CAPACITY = 99;
+    private static final int MAXIMUM_CAPACITY = 2;
     private static final boolean INACTIVE_PROJECT = false;
 
     @FXML private Label labelName;
@@ -89,7 +89,7 @@ public class FXMLShowProjectDetailController extends ValidationHandler {
 
     private void loadAssignedStudents() {
         try {
-            ArrayList<Student> assignedStudents
+            ArrayList<Student> assignedStudents 
                 = requestProjectDAO.getAssignedStudentsByProjectId(currentProject.getId());
             listViewStudent.setItems(FXCollections.observableArrayList(assignedStudents));
 
@@ -97,8 +97,7 @@ public class FXMLShowProjectDetailController extends ValidationHandler {
                 LOGGER.log(Level.INFO, "El proyecto con ID {0} no tiene alumnos asignados", currentProject.getId());
             }
         } catch (OperationException operationException) {
-            LOGGER.log(Level.SEVERE,
-                "Error al cargar los alumnos asignados al proyecto", operationException);
+            LOGGER.log(Level.SEVERE, "Error al cargar los alumnos asignados al proyecto", operationException);
             showError(operationException.getMessage());
         }
     }
