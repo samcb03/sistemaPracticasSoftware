@@ -7,5 +7,4 @@ public interface IPracticeDAO {
 
     boolean registerPractice(Practice practice) throws OperationException;
     
-
     }

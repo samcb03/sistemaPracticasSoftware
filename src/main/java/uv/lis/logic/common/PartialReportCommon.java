@@ -258,6 +258,7 @@ public class PartialReportCommon {
     }
 
     private String buildCellKey(String prefix, int weekNumber, int activityNumber) {
-        return prefix + weekNumber + ACTIVITY_KEY_FRAGMENT + activityNumber;
+        String cell = prefix + weekNumber + ACTIVITY_KEY_FRAGMENT + activityNumber;
+        return cell;
     }
 }

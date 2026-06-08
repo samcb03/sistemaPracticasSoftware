@@ -18,7 +18,7 @@ import uv.lis.logic.utils.SessionManager;
 
 public abstract class WindowHandler implements Initializable {
 
-     private static final Logger LOGGER = Logger.getLogger(WindowHandler.class.getName());
+    private static final Logger LOGGER = Logger.getLogger(WindowHandler.class.getName());
     @FXML protected Button buttonLogOut;
     @FXML protected Button buttonBack;
 
