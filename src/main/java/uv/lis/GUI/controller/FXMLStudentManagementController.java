@@ -16,11 +16,13 @@ public class FXMLStudentManagementController extends WindowHandler {
     public void initialize(URL location, ResourceBundle resources) {
     }
 
-    @FXML public void goToRegisterStudent() { 
+    @FXML 
+    public void goToRegisterStudent() { 
         navigateTo("/uv/lis/GUI/view/FXMLRegisterStudent.fxml"); 
     }
 
-    @FXML public void goToConsultStudent() { 
+    @FXML
+    public void goToConsultStudent() { 
         navigateTo("/uv/lis/GUI/view/FXMLConsultStudent.fxml"); 
     }
 

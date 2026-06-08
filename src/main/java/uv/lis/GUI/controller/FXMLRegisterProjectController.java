@@ -67,13 +67,12 @@ public class FXMLRegisterProjectController extends ValidationHandler {
             try {
                 comboBoxResponsableName.getItems().clear(); 
                 
-                int orgId = affiliatedOrganizationDAO.getOrganizationIdByName(selectedOrganization);
-                ArrayList<String> supervisorNames = projectSupervisorDAO.getSupervisorsByOrganizationId(orgId);
+                int organizationId = affiliatedOrganizationDAO.getOrganizationIdByName(selectedOrganization);
+                ArrayList<String> supervisorNames = projectSupervisorDAO.getSupervisorsByOrganizationId(organizationId);
                 comboBoxResponsableName.setItems(FXCollections.observableArrayList(supervisorNames));
                 
             } catch (OperationException e) {
-                System.out.println("X. ERROR: " + e.getMessage());
-                showError("Error al cargar los responsables: " + e.getMessage());
+                showError(e.getMessage());
             }
         }
     }

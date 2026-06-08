@@ -1,15 +1,20 @@
 package uv.lis.GUI.controller;
 
+import static uv.lis.logic.utils.InputValidator.validateEndDate;
+import static uv.lis.logic.utils.InputValidator.validatePositiveInteger;
+import static uv.lis.logic.utils.InputValidator.validateRecentStartDate;
+import static uv.lis.logic.utils.InputValidator.validateText;
+
 import java.net.URL;
 import java.util.Optional;
 import java.util.ResourceBundle;
+import java.util.stream.Stream;
 
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.DatePicker;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
-import uv.lis.GUI.FormValidator;
 import uv.lis.GUI.ValidationHandler;
 import uv.lis.logic.dao.ActivityDAO;
 import uv.lis.logic.dao.ProjectDAO;
@@ -20,6 +25,12 @@ import uv.lis.logic.exceptions.OperationException;
 import uv.lis.logic.utils.SessionManager;
 
 public class FXMLRegisterActivityController extends ValidationHandler {
+    
+    private static final String ACTIVITY_NAME_FIELD = "El nombre de la actividad";
+    private static final String DESCRIPTION_FIELD = "La descripción";
+    private static final String START_DATE_FIELD = "La fecha de inicio";
+    private static final String END_DATE_FIELD = "La fecha de finalización";
+    private static final String HOURS_FIELD = "Las horas";
 
     @FXML private Button buttonRegister;
     @FXML private Button buttonBack;
@@ -49,22 +60,25 @@ public class FXMLRegisterActivityController extends ValidationHandler {
         loadStudentProject();
     }
 
-@FXML
+    @FXML
     public void validateFields() {
-        Activity activity = new Activity();
-        activity.setName(textFieldActivity.getText());
-        activity.setDescription(textFieldDescription.getText());
-        activity.setStartDate(datePickerStartDate.getValue());
-        activity.setEndDate(datePickerFinalDate.getValue());
-        try {
-            String hoursText = textFieldHours.getText();
-            activity.setHoursReported(hoursText.isEmpty() ? 0 : Integer.parseInt(hoursText));
-        } catch (NumberFormatException e) {
-            activity.setHoursReported(0); 
-        }
-
-        Optional<String> validationError = FormValidator.validateActivityForm(activity);
+        Optional<String> validationError = getFirstValidationError();
         handleValidation(validationError, this::registerActivity);
+    }
+
+    private Optional<String> getFirstValidationError() {
+        Stream<Optional<String>> validationStream = Stream.of(
+            validateText(textFieldActivity.getText(), ACTIVITY_NAME_FIELD),
+            validateText(textFieldDescription.getText(), DESCRIPTION_FIELD),
+            validateRecentStartDate(datePickerStartDate.getValue(), START_DATE_FIELD),
+            validateEndDate(datePickerStartDate.getValue(), datePickerFinalDate.getValue(), END_DATE_FIELD),
+            validatePositiveInteger(textFieldHours.getText().trim(), HOURS_FIELD)
+        );
+        Optional<String> firstError = validationStream
+            .filter(Optional::isPresent)
+            .map(Optional::get)
+            .findFirst();
+        return firstError;
     }
 
     private void loadStudentProject() {
@@ -85,8 +99,8 @@ public class FXMLRegisterActivityController extends ValidationHandler {
                 showError("No hay una sesión activa. Por favor, inicia sesión.");
                 disableForm();
             }
-        } catch (Exception e) {
-            showError("Error crítico al verificar tu proyecto.");
+        } catch (OperationException operationException) {
+            showError(operationException.getMessage());
             disableForm();
         }
     }
@@ -101,45 +115,30 @@ public class FXMLRegisterActivityController extends ValidationHandler {
     }
 
     private void registerActivity() {
-        Optional<Activity> builtActivity = buildActivity();
+        try {
+            Activity activity = buildActivity();
+            boolean registrationSuccessful = activityDAO.registerActivity(activity);
 
-        if (builtActivity.isPresent()) {
-            try {
-                boolean registrationSuccessful = activityDAO.registerActivity(builtActivity.get());
-
-                if (registrationSuccessful) {
-                    showSuccess("Actividad registrada correctamente");
-                    clearFields();
-                } else {
-                    showError("Error al registrar la actividad");
-                }
-            } catch (OperationException operationException) {
-                showError(operationException.getMessage());
+            if (registrationSuccessful) {
+                showSuccess("Actividad registrada correctamente");
+                clearFields();
+            } else {
+                showError("Error al registrar la actividad");
             }
+        } catch (OperationException operationException) {
+            showError(operationException.getMessage());
         }
     }
 
-    private Optional<Activity> buildActivity() {
-        Optional<Activity> activityOptional = Optional.empty();
-
-        try {
-            Activity activity = new Activity();
-            activity.setName(textFieldActivity.getText().trim());
-            activity.setDescription(textFieldDescription.getText().trim());
-            activity.setStartDate(datePickerStartDate.getValue());
-            activity.setEndDate(datePickerFinalDate.getValue());
-            activity.setHoursReported(Integer.parseInt(textFieldHours.getText().trim()));
-            activity.setProjectId(currentProjectId);
-
-            if (activity.getStartDate() != null && activity.getEndDate() != null) {
-                activityOptional = Optional.of(activity);
-            } else {
-                showError("Por favor, seleccione ambas fechas.");
-            }
-        } catch (NumberFormatException e) {
-            showError("El campo Horas debe ser un número entero.");
-        }
-        return activityOptional;
+    private Activity buildActivity() {
+        Activity activity = new Activity();
+        activity.setName(textFieldActivity.getText().trim());
+        activity.setDescription(textFieldDescription.getText().trim());
+        activity.setStartDate(datePickerStartDate.getValue());
+        activity.setEndDate(datePickerFinalDate.getValue());
+        activity.setHoursReported(Integer.parseInt(textFieldHours.getText().trim()));
+        activity.setProjectId(currentProjectId);
+        return activity;
     }
 
     @Override

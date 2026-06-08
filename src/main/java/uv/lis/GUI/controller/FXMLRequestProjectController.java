@@ -118,7 +118,7 @@ public class FXMLRequestProjectController extends ValidationHandler {
                 showError("No se encontraron los detalles del proyecto seleccionado.");
             }
         } catch (OperationException e) {
-            showError("Error al cargar los detalles: " + e.getMessage());
+            showError(e.getMessage());
         }
     }
 
@@ -151,7 +151,7 @@ public class FXMLRequestProjectController extends ValidationHandler {
                     showError("El proyecto seleccionado no se encontró en la base de datos.");
                 }
             } catch (OperationException e) {
-                showError("Error al procesar la solicitud: " + e.getMessage());
+                showError(e.getMessage());
             }
         }   
     }

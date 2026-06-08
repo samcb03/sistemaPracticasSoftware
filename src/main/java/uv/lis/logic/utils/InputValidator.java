@@ -24,6 +24,7 @@ public final class InputValidator {
     public static final int INVALID_ID = -1;
     private static final int MINIMUM_AGE = 18;
     private static final int MAX_PROJECT_CAPACITY = 2;
+    private static final int MAX_PAST_MONTHS = 6;
     public static final String LETTERS_ONLY_REGEX = "^[\\p{L}\\s]+$";
     public static final String LEADING_SPACE_REGEX = "^\\s.*";
     public static final String TRAILING_SPACE_REGEX = ".*\\s$";
@@ -217,7 +218,7 @@ public final class InputValidator {
             validationResult = Optional.empty();
         }
         return validationResult;
-        }
+    }
     
 
     public static Optional<String> validateComboBox(Object selectedValue, String fieldName) {
@@ -278,8 +279,6 @@ public final class InputValidator {
     }
 
     public static Optional<String> validateProjectCapacity(int capacity, String fieldName) {
-
-
         Optional<String> validateResult;
         if(capacity > MAX_PROJECT_CAPACITY) {
             validateResult = Optional.of(fieldName + " no puede tener una capacidad mayor a " + MAX_PROJECT_CAPACITY + " alumnos");
@@ -287,5 +286,23 @@ public final class InputValidator {
             validateResult = Optional.empty();
         }
         return validateResult;
+    }
+
+    public static Optional<String> validateRecentStartDate(LocalDate startDate, String fieldName) {
+        Optional<String> validationResult = Optional.empty();
+        if (startDate == null) {
+            validationResult = Optional.of("Seleccione una fecha de inicio");
+        } else {
+            LocalDate today = LocalDate.now();
+            LocalDate earliestAllowedDate = today.minusMonths(MAX_PAST_MONTHS);
+
+            if (startDate.isAfter(today)) {
+                validationResult = Optional.of(fieldName + " no puede ser futura");
+            } else if (startDate.isBefore(earliestAllowedDate)) {
+                validationResult = Optional.of(
+                    fieldName + " no puede tener más de " + MAX_PAST_MONTHS + " meses de antigüedad");
+            }
+        }
+        return validationResult;
     }
 }

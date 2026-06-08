@@ -16,11 +16,13 @@ public class FXMLSupervisorManagementController extends WindowHandler{
     public void initialize(URL location, ResourceBundle resources) {
     }
 
-    @FXML public void goToRegisterProjectSupervisor() { 
+    @FXML 
+    public void goToRegisterProjectSupervisor() { 
         navigateTo("/uv/lis/GUI/view/FXMLRegisterProjectSupervisor.fxml"); 
     }
 
-    @FXML public void goToConsultSupervisor() { 
+    @FXML 
+    public void goToConsultSupervisor() { 
         navigateTo("/uv/lis/GUI/view/FXMLConsultProjectSupervisor.fxml"); 
     }
 

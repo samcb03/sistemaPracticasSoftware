@@ -103,15 +103,13 @@ public class FXMLProfessorMenuController extends WindowHandler {
     private void loadSchoolPeriods() {
         try {
             ArrayList<String> schoolPeriods = schoolPeriodDAO.getAllSchoolPeriodsNames();
-            ObservableList<String> observableSchoolPeriods
-                = FXCollections.observableArrayList(schoolPeriods);
+            ObservableList<String> observableSchoolPeriods = FXCollections.observableArrayList(schoolPeriods);
             comboBoxSchoolPeriod.setItems(observableSchoolPeriods);
 
             if (observableSchoolPeriods.isEmpty()) {
                 LOGGER.log(Level.WARNING, "No se encontraron periodos escolares registrados");
             }
         } catch (OperationException e) {
-            LOGGER.log(Level.SEVERE, "Error al cargar periodos escolares", e);
             showError(e.getMessage());
         }
     }
