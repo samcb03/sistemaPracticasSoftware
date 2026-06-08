@@ -27,7 +27,6 @@ public class ExpedientDAO implements IExpedientDAO {
 
     public ExpedientDAO() {
         this.connectionManager = new MySQLConnectionManager();
-
     }
 
     public ExpedientDAO(MySQLConnectionManager connectionManager) {
@@ -38,7 +37,7 @@ public class ExpedientDAO implements IExpedientDAO {
     public int saveDocument(Expedient expedient) throws OperationException {
         int generatedId = -1;
         String expedientQuery = "INSERT INTO expediente (nombre, tipoDocumento,url, matricula,idTipoDocumento)" 
-                              + " VALUES (?, ?, ?,?,?)";
+                              + " VALUES (?, ?, ?, ?, ?)";
 
         try (Connection databaseConnection = connectionManager.getConnection();
             PreparedStatement preparedStatement = databaseConnection.prepareStatement(expedientQuery, 
@@ -61,7 +60,7 @@ public class ExpedientDAO implements IExpedientDAO {
             }
         } catch (SQLException e) {
             LOGGER.log(Level.SEVERE, "Error al guardar el documento en el expediente", e);
-            throw new OperationException("Error de SQL al guardar el documento en el expediente.", e);
+            throw new OperationException("Error al guardar el documento en el expediente.", e);
         }
         
         return generatedId;
@@ -73,8 +72,8 @@ public class ExpedientDAO implements IExpedientDAO {
         String expedientQuery = "SELECT nombre, tipoDocumento, url, matricula, idTipoDocumento FROM expediente";
 
         try (Connection databaseConnection = connectionManager.getConnection();
-             PreparedStatement preparedStatement = databaseConnection.prepareStatement(expedientQuery);
-             ResultSet resultSet = preparedStatement.executeQuery()) {
+            PreparedStatement preparedStatement = databaseConnection.prepareStatement(expedientQuery);
+            ResultSet resultSet = preparedStatement.executeQuery()) {
              
             while (resultSet.next()) {
                 Expedient expedient = new Expedient(
@@ -94,12 +93,13 @@ public class ExpedientDAO implements IExpedientDAO {
         return documents;
     }
 
+    @Override
     public Optional<Integer> getIdDocumentTypeByName(String typeName) throws OperationException {
         Optional<Integer> idType = Optional.empty();
         String expedientQuery = "SELECT idTipoDocumento FROM Tipo_Documento WHERE nombreTipoDocumento = ?";
         
         try (Connection databaseConnection = connectionManager.getConnection();
-             PreparedStatement preparedStatement = databaseConnection.prepareStatement(expedientQuery)) {
+            PreparedStatement preparedStatement = databaseConnection.prepareStatement(expedientQuery)) {
             
             preparedStatement.setString(1, typeName);
             
@@ -116,7 +116,8 @@ public class ExpedientDAO implements IExpedientDAO {
         
         return idType;
     }
-
+    //FIXME verificar si este metodo en realidad deberia regresar uuna operationexceptin y como manejarla correctamente
+    @Override
     public void uploadDocument(String idStudent, String typeDocument, File file) throws OperationException {
         FileValidator.validateFile(file);
         Optional<Integer> valideTypeDocument = getIdDocumentTypeByName(typeDocument);
@@ -139,13 +140,14 @@ public class ExpedientDAO implements IExpedientDAO {
         }
     }
 
+    @Override
     public ArrayList<String> getAllDocumentsTypes() throws OperationException {
         String documentTypesQuery = "SELECT nombreTipoDocumento FROM Tipo_Documento";
         ArrayList<String> documentTypes = new ArrayList<>();
 
         try (Connection databaseConnection = connectionManager.getConnection();
-             PreparedStatement preparedStatement = databaseConnection.prepareStatement(documentTypesQuery);
-             ResultSet resultSet = preparedStatement.executeQuery()) {
+            PreparedStatement preparedStatement = databaseConnection.prepareStatement(documentTypesQuery);
+            ResultSet resultSet = preparedStatement.executeQuery()) {
 
             while (resultSet.next()) {
                 documentTypes.add(resultSet.getString("nombreTipoDocumento"));
@@ -162,9 +164,9 @@ public class ExpedientDAO implements IExpedientDAO {
     public List<Expedient> getDocumentsByStudentId(String idStudent) throws OperationException {
         List<Expedient> studentDocuments = new ArrayList<>();
         String expedientQuery = "SELECT idExpediente, nombre, tipoDocumento, url, "
-                            + "matricula, idTipoDocumento, estaValidado "
-                            + "FROM expediente "
-                            + "WHERE matricula = ?";
+                              + "matricula, idTipoDocumento, estaValidado "
+                              + "FROM expediente "
+                              + "WHERE matricula = ?";
     
         try (Connection databaseConnection = connectionManager.getConnection();
             PreparedStatement preparedStatement = databaseConnection.prepareStatement(expedientQuery)) {
@@ -177,17 +179,16 @@ public class ExpedientDAO implements IExpedientDAO {
                     studentDocuments.add(expedient);
                 }
             }
-        } catch (SQLException e) {
-            LOGGER.log(Level.SEVERE, "Error al obtener los documentos del alumno", e);
+        } catch (SQLException exception) {
+            LOGGER.log(Level.SEVERE, "Error al obtener los documentos del alumno", exception);
             throw new OperationException(
-                "No se pudieron obtener los documentos del alumno. Intente más tarde", e);
+                "No se pudieron obtener los documentos del alumno. Intente más tarde", exception);
         }
         return studentDocuments;
     }
 
     @Override
-    public boolean updateValidationStatus(int idExpedient, boolean isValidated)
-            throws OperationException {
+    public boolean updateValidationStatus(int idExpedient, boolean isValidated) throws OperationException {
         boolean isUpdated = false;
         String expedientQuery = "UPDATE expediente SET estaValidado = ? WHERE idExpediente = ?";
     
@@ -201,8 +202,7 @@ public class ExpedientDAO implements IExpedientDAO {
             isUpdated = affectedRows > NO_ROWS_AFFECTED;
         } catch (SQLException e) {
             LOGGER.log(Level.SEVERE, "Error al actualizar el estado de validación del documento", e);
-            throw new OperationException(
-                "No se pudo actualizar el estado del documento. Intente más tarde", e);
+            throw new OperationException("No se pudo actualizar el estado del documento. Intente más tarde", e);
         }
         return isUpdated;
     }
@@ -219,7 +219,7 @@ public class ExpedientDAO implements IExpedientDAO {
         expedient.setIsValidated(resultSet.getBoolean("estaValidado"));
         return expedient;
     }
-
+    //FIXME verificar numeros magicos, asi como eliminar ese DELETE ya que el usuario no tiene permisos de delete, igual verificar si realmente es necesario el metodo
     private void deletePreviousDocumentIfExists(String idStudent, int idDocumentType) throws OperationException {
     List<Integer> uniqueIds = new ArrayList<>();
         uniqueIds.add(1);
@@ -235,8 +235,8 @@ public class ExpedientDAO implements IExpedientDAO {
             String remplaceQuery = "DELETE FROM expediente WHERE matricula = ? AND idTipoDocumento = ?";
             String oldUrl = null;
 
-            try (Connection conn = connectionManager.getConnection();
-                PreparedStatement preparedStatementInsert = conn.prepareStatement(insertDocumentQuery)) {
+            try (Connection databaseConnection = connectionManager.getConnection();
+                PreparedStatement preparedStatementInsert = databaseConnection.prepareStatement(insertDocumentQuery)) {
                 
                 preparedStatementInsert.setString(1, idStudent);
                 preparedStatementInsert.setInt(2, idDocumentType);
@@ -248,7 +248,7 @@ public class ExpedientDAO implements IExpedientDAO {
                 }
                 
                 if (oldUrl != null) {
-                    try (PreparedStatement preparedStatementDelete = conn.prepareStatement(remplaceQuery)) {
+                    try (PreparedStatement preparedStatementDelete = databaseConnection.prepareStatement(remplaceQuery)) {
                         preparedStatementDelete.setString(1, idStudent);
                         preparedStatementDelete.setInt(2, idDocumentType);
                         preparedStatementDelete.executeUpdate();

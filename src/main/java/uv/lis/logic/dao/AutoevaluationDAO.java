@@ -40,9 +40,11 @@ public class AutoevaluationDAO implements IAutoevaluationDAO {
                                     + "JOIN Alumno a ON sp.matricula = a.matricula "
                                     + "JOIN Usuario u ON a.idUsuario = u.idUsuario "
                                     + "JOIN Proyecto p ON sp.idProyecto = p.idProyecto "
-                                    + "JOIN OrganizacionVinculada ov ON p.idOrganizacionVinculada = ov.idOrganizacionVinculada "
-                                    + "JOIN ResponsableProyecto rp ON p.idResponsableProyecto = rp.idResponsableProyecto "
-                                    + "WHERE sp.matricula = ? "
+                                    + "JOIN OrganizacionVinculada ov ON p.idOrganizacionVinculada" 
+                                    + " = ov.idOrganizacionVinculada "
+                                    + "JOIN ResponsableProyecto rp ON p.idResponsableProyecto =" 
+                                    + "rp.idResponsableProyecto"
+                                    + " WHERE sp.matricula = ? "
                                     + "AND sp.estatus = 2;";
 
         try (Connection connection = connectionManager.getConnection();
@@ -66,8 +68,8 @@ public class AutoevaluationDAO implements IAutoevaluationDAO {
                 }
             }
         } catch (SQLException e) {
-            throw new OperationException(
-                "Error al conectar con la base de datos al recuperar datos de autoevaluación.", e);
+            LOGGER.log(Level.SEVERE, "Error al recuperar datos de autoevaluacion", e);
+            throw new OperationException("Error al recuperar datos de autoevaluacion", e);
         }
 
         return autoevaluationData;

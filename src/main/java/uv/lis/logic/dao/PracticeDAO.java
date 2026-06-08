@@ -31,8 +31,8 @@ public class PracticeDAO implements IPracticeDAO {
         String practiceQuery = "INSERT INTO Actividad (idActividad, nombreActividad, FechaInicio, FechaFin, idReporte) "
                              + "VALUES (?, ?, ?, ?, ?)";
 
-        try (Connection connection = connectionManager.getConnection();
-             PreparedStatement preparedStatement = connection.prepareStatement(practiceQuery)) {
+        try (Connection databaseConnection = connectionManager.getConnection();
+            PreparedStatement preparedStatement = databaseConnection.prepareStatement(practiceQuery)) {
 
             preparedStatement.setInt(1, practice.getIdPractice());
             preparedStatement.setString(2, practice.getPracticeName());

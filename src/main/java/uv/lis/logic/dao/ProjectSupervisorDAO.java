@@ -31,15 +31,15 @@ public class ProjectSupervisorDAO implements IProjectSupervisorDAO {
         ArrayList<String> supervisorNames = new ArrayList<>();
 
         try (Connection databaseConnection = connectionManager.getConnection();
-             PreparedStatement preparedStatement = databaseConnection.prepareStatement(supervisorQuery)) {
-                try (ResultSet resultSet = preparedStatement.executeQuery()) {
-                    while (resultSet.next()) {
-                        supervisorNames.add(resultSet.getString("nombre"));
-                    } 
+            PreparedStatement preparedStatement = databaseConnection.prepareStatement(supervisorQuery)) {
+            try (ResultSet resultSet = preparedStatement.executeQuery()) {
+                while (resultSet.next()) {
+                    supervisorNames.add(resultSet.getString("nombre"));
+                } 
             }
         } catch (SQLException e) {
-               LOGGER.log(Level.SEVERE, "Error de conexion con la base de datos",e);
-                throw new OperationException("Error al conseguir los responsables", e);
+            LOGGER.log(Level.SEVERE, "Error de conexion con la base de datos",e);
+            throw new OperationException("Error al conseguir los responsables", e);
         }
 
         return supervisorNames;
@@ -94,8 +94,8 @@ public class ProjectSupervisorDAO implements IProjectSupervisorDAO {
             try (ResultSet resultSet = preparedStatement.executeQuery()) {
                 while (resultSet.next()) {
                     String entry = "ID: " + resultSet.getInt("idProyecto")
-                                 + " — " + resultSet.getString("nombre")
-                                 + " (" + resultSet.getString("descripcion") + ")";
+                        + " — " + resultSet.getString("nombre")
+                        + " (" + resultSet.getString("descripcion") + ")";
                     projectList.add(entry);
                 }
             }
@@ -147,7 +147,7 @@ public class ProjectSupervisorDAO implements IProjectSupervisorDAO {
                                + "nombre = ?, cargo = ?, correo = ? WHERE idResponsableProyecto = ?;";
 
         try (Connection databaseConnection = connectionManager.getConnection();
-             PreparedStatement preparedStatement = databaseConnection.prepareStatement(supervisorQuery)){
+            PreparedStatement preparedStatement = databaseConnection.prepareStatement(supervisorQuery)){
             
             preparedStatement.setString(1, projectSupervisor.getName());
             preparedStatement.setString(2, projectSupervisor.getPosition());
@@ -178,7 +178,7 @@ public class ProjectSupervisorDAO implements IProjectSupervisorDAO {
         String supervisorQuery = "UPDATE responsableProyecto SET estado = '0' WHERE idResponsableProyecto = ?;";
 
         try (Connection databaseConnection = connectionManager.getConnection();
-             PreparedStatement preparedStatement = databaseConnection.prepareStatement(supervisorQuery)) {
+            PreparedStatement preparedStatement = databaseConnection.prepareStatement(supervisorQuery)) {
 
             preparedStatement.setString(1,projectSupervisorName);
 
@@ -238,6 +238,7 @@ public class ProjectSupervisorDAO implements IProjectSupervisorDAO {
                 }
             }
         } catch (SQLException e) {
+            LOGGER.log(Level.SEVERE, "Error de conexion con la base de datos",e);
             throw new OperationException("Error al obtener el ID del responsable de proyecto", e);
         }
 
@@ -248,12 +249,13 @@ public class ProjectSupervisorDAO implements IProjectSupervisorDAO {
     public ArrayList<String> getSupervisorsByOrganizationId(int organizationId) throws OperationException {
         ArrayList<String> supervisorNames = new ArrayList<>();
         String supervisorQuery = "SELECT nombre FROM ResponsableProyecto WHERE idOrganizacionVinculada = ? " 
-            + "AND estado = 1;";
+                               + "AND estado = ?;";
 
         try (Connection databaseConnection = connectionManager.getConnection();
              PreparedStatement preparedStatement = databaseConnection.prepareStatement(supervisorQuery)) {
 
             preparedStatement.setInt(1, organizationId);
+            preparedStatement.setBoolean(2, true);
 
             try (ResultSet resultSet = preparedStatement.executeQuery()) {
                 while (resultSet.next()) {
@@ -271,7 +273,7 @@ public class ProjectSupervisorDAO implements IProjectSupervisorDAO {
     public boolean assignSupervisorToOrganization(int supervisorId, int organizationId) throws OperationException {
         boolean isAssigned = false;
         String query = "INSERT INTO Organizacion_Tiene_Responsable (idOrganizacionVinculada, idResponsableProyecto)" 
-            + "VALUES (?, ?)";
+                     + "VALUES (?, ?)";
 
         try (Connection databaseConnection = connectionManager.getConnection();
              PreparedStatement preparedStatement = databaseConnection.prepareStatement(query)) {
@@ -302,7 +304,7 @@ public class ProjectSupervisorDAO implements IProjectSupervisorDAO {
         String supervisorQuery = "SELECT estado FROM ResponsableProyecto WHERE nombre = ?";
 
         try (Connection databaseConnection = connectionManager.getConnection();
-             PreparedStatement preparedStatement = databaseConnection.prepareStatement(supervisorQuery)) {
+            PreparedStatement preparedStatement = databaseConnection.prepareStatement(supervisorQuery)) {
 
             preparedStatement.setString(1, supervisorName);
 
@@ -310,7 +312,7 @@ public class ProjectSupervisorDAO implements IProjectSupervisorDAO {
                 if (resultSet.next()) {
                     isInactive = resultSet.getInt("estado") == INACTIVE_STATUS;
                 } else {
-                    throw new OperationException("No se encontró al profesor con número: "
+                    throw new OperationException("No se encontró al profesor con número: " 
                         + supervisorName, null);
                 }
             }
@@ -329,12 +331,13 @@ public class ProjectSupervisorDAO implements IProjectSupervisorDAO {
         String projectQuery = "SELECT 1 FROM Proyecto p "
                             + "JOIN ResponsableProyecto rp ON p.idResponsableProyecto = rp.idResponsableProyecto "
                             + "WHERE rp.nombre = ? "
-                            + "AND p.estado = 1 "
+                            + "AND p.estado = ? "
                             + "LIMIT 1;";
        try (Connection databaseConnection = connectionManager.getConnection();
-             PreparedStatement preparedStatement = databaseConnection.prepareStatement(projectQuery)) {
+            PreparedStatement preparedStatement = databaseConnection.prepareStatement(projectQuery)) {
 
             preparedStatement.setString(1, supervisorName);
+            preparedStatement.setBoolean(2, true);
 
             try (ResultSet resultSet = preparedStatement.executeQuery()) {
                 hasProjectActives = resultSet.next();
@@ -350,37 +353,37 @@ public class ProjectSupervisorDAO implements IProjectSupervisorDAO {
 
     @Override
     public Optional<ProjectSupervisor> getProjectSupervisorByName(String supervisorName) throws OperationException {
-    Optional<ProjectSupervisor> validateSupervisor = Optional.empty();
-    String supervisorQuery = "SELECT rp.idResponsableProyecto, rp.nombre, rp.cargo, rp.correo, ov.nombreOV "
-                           + "FROM ResponsableProyecto rp "
-                           + "LEFT JOIN OrganizacionVinculada ov ON rp.idOrganizacionVinculada = " 
-                           + "ov.idOrganizacionVinculada "
-                           + "WHERE rp.nombre = ?";
+        Optional<ProjectSupervisor> validateSupervisor = Optional.empty();
+        String supervisorQuery = "SELECT rp.idResponsableProyecto, rp.nombre, rp.cargo, rp.correo, ov.nombreOV "
+                               + "FROM ResponsableProyecto rp "
+                               + "LEFT JOIN OrganizacionVinculada ov ON rp.idOrganizacionVinculada = " 
+                               + "ov.idOrganizacionVinculada "
+                               + "WHERE rp.nombre = ?";
 
-    try (Connection databaseConnection = connectionManager.getConnection();
-         PreparedStatement preparedStatement = databaseConnection.prepareStatement(supervisorQuery)) {
+        try (Connection databaseConnection = connectionManager.getConnection();
+            PreparedStatement preparedStatement = databaseConnection.prepareStatement(supervisorQuery)) {
 
-        preparedStatement.setString(1, supervisorName);
+            preparedStatement.setString(1, supervisorName);
 
-        try (ResultSet resultSet = preparedStatement.executeQuery()) {
-            if (resultSet.next()) {
-                ProjectSupervisor supervisor = new ProjectSupervisor();
-                supervisor.setId(resultSet.getInt("idResponsableProyecto"));
-                supervisor.setName(resultSet.getString("nombre"));
-                supervisor.setPosition(resultSet.getString("cargo"));
-                supervisor.setEmail(resultSet.getString("correo"));
-                supervisor.setAffiliatedOrganizationName(resultSet.getString("nombreOV"));
-                
-                validateSupervisor = Optional.of(supervisor);
-            } else {
-                LOGGER.log(Level.INFO, "No se encontró un supervisor con el nombre: {0}", supervisorName);
+            try (ResultSet resultSet = preparedStatement.executeQuery()) {
+                if (resultSet.next()) {
+                    ProjectSupervisor supervisor = new ProjectSupervisor();
+                    supervisor.setId(resultSet.getInt("idResponsableProyecto"));
+                    supervisor.setName(resultSet.getString("nombre"));
+                    supervisor.setPosition(resultSet.getString("cargo"));
+                    supervisor.setEmail(resultSet.getString("correo"));
+                    supervisor.setAffiliatedOrganizationName(resultSet.getString("nombreOV"));
+                    
+                    validateSupervisor = Optional.of(supervisor);
+                } else {
+                    LOGGER.log(Level.INFO, "No se encontró un supervisor con el nombre: {0}", supervisorName);
+                }
             }
+        } catch (SQLException e) {
+            LOGGER.log(Level.SEVERE, "Error al buscar al supervisor en la base de datos", e);
+            throw new OperationException("Error al buscar al supervisor", e);
         }
-    } catch (SQLException e) {
-        LOGGER.log(Level.SEVERE, "Error al buscar al supervisor en la base de datos", e);
-        throw new OperationException("Error al buscar al supervisor", e);
-    }
 
-    return validateSupervisor;
-}
+        return validateSupervisor;
+    }
 }

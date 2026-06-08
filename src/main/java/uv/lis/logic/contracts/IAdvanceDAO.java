@@ -10,4 +10,6 @@ public interface IAdvanceDAO {
     ArrayList<Advance> getAdvancesByProject(int projectId) throws OperationException;
 
     int getAccumulatedHoursByProject(int projectId) throws OperationException;
+
+    boolean existsAdvanceForReport(int reportId) throws OperationException;
 }
