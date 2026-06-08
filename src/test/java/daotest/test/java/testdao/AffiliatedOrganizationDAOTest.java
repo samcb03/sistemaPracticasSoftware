@@ -460,28 +460,28 @@ class AffiliatedOrganizationDAOTest {
     }
 
     @Test
-    void hasProjectsActives_projectsExist_returnsTrue() throws Exception {
+    void hasActiveProjects_projectsExist_returnsTrue() throws Exception {
         mockQueryExecution();
         when(resultSet.next()).thenReturn(true);
 
-        assertTrue(affiliatedOrganizationDAO.hasProjectsActives(ORGANIZATION_NAME));
+        assertTrue(affiliatedOrganizationDAO.hasActiveProjects(ORGANIZATION_NAME));
     }
 
     @Test
-    void hasProjectsActives_noProjects_returnsFalse() throws Exception {
+    void hasActiveProjects_noProjects_returnsFalse() throws Exception {
         mockQueryExecution();
         when(resultSet.next()).thenReturn(false);
 
-        assertFalse(affiliatedOrganizationDAO.hasProjectsActives(ORGANIZATION_NAME));
+        assertFalse(affiliatedOrganizationDAO.hasActiveProjects(ORGANIZATION_NAME));
     }
 
     @Test
-    void hasProjectsActives_sqlError_throwsOperationException() throws Exception {
+    void hasActiveProjects_sqlError_throwsOperationException() throws Exception {
         when(connection.prepareStatement(anyString()))
             .thenThrow(new SQLException(DATABASE_ERROR_MESSAGE));
 
         assertThrows(OperationException.class,
-            () -> affiliatedOrganizationDAO.hasProjectsActives(ORGANIZATION_NAME));
+            () -> affiliatedOrganizationDAO.hasActiveProjects(ORGANIZATION_NAME));
     }
 
     @Test

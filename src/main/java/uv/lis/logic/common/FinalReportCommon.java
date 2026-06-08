@@ -97,8 +97,7 @@ public class FinalReportCommon {
         finalReport.setProjectMethodology(context.getProjectMethodology());
         finalReport.setAffiliatedOrganization(context.getAffiliatedOrganization());
 
-        finalReport.setTotalHours(
-            reportContextDAO.getTotalReportedHoursByStudentId(studentId));
+        finalReport.setTotalHours(reportContextDAO.getTotalReportedHoursByStudentId(studentId));
         finalReport.setDateReport(LocalDate.now().format(DATE_FORMATTER));
     }
 

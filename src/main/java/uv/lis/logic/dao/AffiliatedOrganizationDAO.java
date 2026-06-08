@@ -370,7 +370,7 @@ public class AffiliatedOrganizationDAO implements IAffiliatedOrganizationDAO {
     }
 
     @Override
-    public boolean hasProjectsActives(String organizationName) throws OperationException {
+    public boolean hasActiveProjects(String organizationName) throws OperationException {
         boolean hasProjectsActives = false;
         String projectQuery = "SELECT 1 FROM Proyecto p "
                             + "JOIN OrganizacionVinculada ov "

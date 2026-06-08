@@ -29,5 +29,5 @@ public interface IAffiliatedOrganizationDAO {
 
     ArrayList<String> getProjectsByOrganization(String organizationName) throws OperationException;
 
-    boolean hasProjectsActives(String organizationName) throws OperationException;
+    boolean hasActiveProjects(String organizationName) throws OperationException;
 }
