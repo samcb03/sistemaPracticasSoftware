@@ -100,4 +100,9 @@ public class Subject {
         }
         return isEqual;
     }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(nrc, schoolPeriodId, professorPersonnelNumber, schoolPeriodName);
+    }
 }

@@ -101,4 +101,9 @@ public class ProjectSupervisor {
         }
         return isEqual;
     }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, name, email, position);
+    }
 }

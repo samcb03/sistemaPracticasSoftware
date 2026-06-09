@@ -97,4 +97,9 @@ public class Student extends User {
         }
         return isEqual;
     }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(getId(), idStudent, getFirstName(), getLastName(), gender);
+    }
 }

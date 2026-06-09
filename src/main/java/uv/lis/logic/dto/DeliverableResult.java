@@ -56,4 +56,9 @@ public class DeliverableResult {
         }
         return isEqual;
     }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(result, advancePercentage, observations);
+    }
 }

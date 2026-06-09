@@ -160,4 +160,10 @@ public class Project {
         }
         return isEqual;
     }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, name, methodology, capacity, objective, 
+                            description, activities, affiliatedOrganization, idStudent);
+    }
 }
