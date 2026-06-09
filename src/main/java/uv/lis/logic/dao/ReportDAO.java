@@ -96,26 +96,31 @@ public class ReportDAO implements IReportDAO {
         }
         return validReport;
     }
-    //FIXME verificar este doble catch y como arreglarlo manteniendo la OperationException
+
     @Override
     public boolean registerPartialReport(PartialReport partialReport) throws OperationException {
         boolean isRegistered = false;
 
         try (Connection databaseConnection = connectionManager.getConnection()) {
             databaseConnection.setAutoCommit(false);
+            boolean isCompleted = false;
+
             try {
                 insertReportRow(databaseConnection, partialReport);
                 isRegistered = insertPartialDetail(databaseConnection, partialReport);
                 insertPartialActivityDetails(databaseConnection, partialReport);
                 commitOrRollback(databaseConnection, isRegistered);
-            } catch (SQLException innerException) {
-                databaseConnection.rollback();
-                throw innerException;
+                isCompleted = true;
+            } finally {
+                if (!isCompleted) {
+                    databaseConnection.rollback();
+                }
             }
         } catch (SQLException e) {
             LOGGER.log(Level.SEVERE, REGISTER_PARTIAL_ERROR, e);
             throw new OperationException(REGISTER_PARTIAL_ERROR, e);
         }
+
         return isRegistered;
     }
 
@@ -125,18 +130,23 @@ public class ReportDAO implements IReportDAO {
 
         try (Connection databaseConnection = connectionManager.getConnection()) {
             databaseConnection.setAutoCommit(false);
+            boolean isCompleted = false;
+
             try {
                 updateReportRow(databaseConnection, partialReport);
                 isModified = updatePartialDetail(databaseConnection, partialReport);
                 commitOrRollback(databaseConnection, isModified);
-            } catch (SQLException innerException) {
-                databaseConnection.rollback();
-                throw innerException;
+                isCompleted = true;
+            } finally {
+                if (!isCompleted) {
+                    databaseConnection.rollback();
+                }
             }
         } catch (SQLException e) {
             LOGGER.log(Level.SEVERE, MODIFY_PARTIAL_ERROR, e);
             throw new OperationException(MODIFY_PARTIAL_ERROR, e);
         }
+
         return isModified;
     }
 
@@ -172,20 +182,25 @@ public class ReportDAO implements IReportDAO {
 
         try (Connection databaseConnection = connectionManager.getConnection()) {
             databaseConnection.setAutoCommit(false);
+            boolean isCompleted = false;
+
             try {
                 insertReportRow(databaseConnection, finalReport);
                 isRegistered = insertFinalDetail(databaseConnection, finalReport);
                 insertFinalActivityDetails(databaseConnection, finalReport);
                 insertFinalDeliverableDetails(databaseConnection, finalReport);
                 commitOrRollback(databaseConnection, isRegistered);
-            } catch (SQLException innerException) {
-                databaseConnection.rollback();
-                throw innerException;
+                isCompleted = true;
+            } finally {
+                if (!isCompleted) {
+                    databaseConnection.rollback();
+                }
             }
         } catch (SQLException e) {
             LOGGER.log(Level.SEVERE, REGISTER_FINAL_ERROR, e);
             throw new OperationException(REGISTER_FINAL_ERROR, e);
         }
+
         return isRegistered;
     }
 
@@ -195,18 +210,23 @@ public class ReportDAO implements IReportDAO {
 
         try (Connection databaseConnection = connectionManager.getConnection()) {
             databaseConnection.setAutoCommit(false);
+            boolean isCompleted = false;
+
             try {
                 updateReportRow(databaseConnection, finalReport);
                 isModified = updateFinalDetail(databaseConnection, finalReport);
                 commitOrRollback(databaseConnection, isModified);
-            } catch (SQLException innerException) {
-                databaseConnection.rollback();
-                throw innerException;
+                isCompleted = true;
+            } finally {
+                if (!isCompleted) {
+                    databaseConnection.rollback();
+                }
             }
         } catch (SQLException e) {
             LOGGER.log(Level.SEVERE, MODIFY_FINAL_ERROR, e);
             throw new OperationException(MODIFY_FINAL_ERROR, e);
         }
+
         return isModified;
     }
 
@@ -216,19 +236,24 @@ public class ReportDAO implements IReportDAO {
 
         try (Connection databaseConnection = connectionManager.getConnection()) {
             databaseConnection.setAutoCommit(false);
+            boolean isCompleted = false;
+
             try {
                 insertReportRow(databaseConnection, monthlyReport);
                 isRegistered = insertMonthlyDetail(databaseConnection, monthlyReport);
                 insertMonthlyActivityDetails(databaseConnection, monthlyReport);
                 commitOrRollback(databaseConnection, isRegistered);
-            } catch (SQLException innerException) {
-                databaseConnection.rollback();
-                throw innerException;
+                isCompleted = true;
+            } finally {
+                if (!isCompleted) {
+                    databaseConnection.rollback();
+                }
             }
         } catch (SQLException e) {
             LOGGER.log(Level.SEVERE, REGISTER_MONTHLY_ERROR, e);
             throw new OperationException(REGISTER_MONTHLY_ERROR, e);
         }
+
         return isRegistered;
     }
 

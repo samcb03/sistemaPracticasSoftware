@@ -87,20 +87,17 @@ public class Subject {
     
     @Override
     public boolean equals(Object object) {
-        boolean isEquals = false;
+        boolean isEqual = false;
+
         if (this == object) {
-            isEquals = true;
-        }
-        if (object == null || getClass() != object.getClass()) {
-            isEquals = false;
-        } else {
+            isEqual = true;
+        } else if (object != null && getClass() == object.getClass()) {
             Subject other = (Subject) object;
-            isEquals = nrc == other.nrc
-                && Objects.equals(nrc, other.nrc)
+            isEqual = nrc == other.nrc
+                && schoolPeriodId == other.schoolPeriodId
                 && Objects.equals(professorPersonnelNumber, other.professorPersonnelNumber)
-                && Objects.equals(schoolPeriodId, other.schoolPeriodId)
                 && Objects.equals(schoolPeriodName, other.schoolPeriodName);
         }
-        return isEquals;
+        return isEqual;
     }
 }

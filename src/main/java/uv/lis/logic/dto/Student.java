@@ -83,20 +83,18 @@ public class Student extends User {
 
     @Override
     public boolean equals(Object object) {
-        boolean isEquals = false;
+        boolean isEqual = false;
+
         if (this == object) {
-            isEquals = true;
-        } 
-        if (object == null || getClass() != object.getClass()) {
-            isEquals = false;
-        } else {
+            isEqual = true;
+        } else if (object != null && getClass() == object.getClass()) {
             Student other = (Student) object;
-            isEquals = getId() == other.getId()
+            isEqual = getId() == other.getId()
                 && Objects.equals(idStudent, other.idStudent)
                 && Objects.equals(getFirstName(), other.getFirstName())
                 && Objects.equals(getLastName(), other.getLastName())
                 && Objects.equals(gender, other.gender);
-        }   
-        return isEquals;
+        }
+        return isEqual;
     }
 }

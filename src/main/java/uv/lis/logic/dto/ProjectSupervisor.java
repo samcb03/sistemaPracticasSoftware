@@ -86,21 +86,19 @@ public class ProjectSupervisor {
         this.organizationInt = organizationInt;
     }
 
-        @Override
+    @Override
     public boolean equals(Object object) {
-        boolean isEquals = false;
+        boolean isEqual = false;
+
         if (this == object) {
-            isEquals = true;
-        }
-        if (object == null || getClass() != object.getClass()) {
-            isEquals = false;
-        } else {
+            isEqual = true;
+        } else if (object != null && getClass() == object.getClass()) {
             ProjectSupervisor other = (ProjectSupervisor) object;
-            isEquals = id == other.id
+            isEqual = id == other.id
                 && Objects.equals(name, other.name)
                 && Objects.equals(email, other.email)
                 && Objects.equals(position, other.position);
         }
-        return isEquals;
+        return isEqual;
     }
 }

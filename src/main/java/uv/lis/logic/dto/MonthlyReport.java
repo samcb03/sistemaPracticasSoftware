@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
+import uv.lis.logic.utils.InputValidator;
+
 public class MonthlyReport extends Report {
 
     private int idReport;
@@ -117,12 +119,12 @@ public class MonthlyReport extends Report {
     public int getActivityCount() {
         return activities.size();
     }
-    //FIXME numeros magicos
+
     public String getPeriodAt(int index) {
         String periodValue = "";
 
-        if (index >= 1 && index <= periods.size()) {
-            periodValue = periods.get(index - 1);
+        if (index >= InputValidator.MIN_POSITIVE_INTEGER && index <= periods.size()) {
+            periodValue = periods.get(index - InputValidator.MIN_POSITIVE_INTEGER);
         }
         return periodValue;
     }
@@ -130,8 +132,8 @@ public class MonthlyReport extends Report {
     public String getActivityAt(int index) {
         String activityValue = "";
 
-        if (index >= 1 && index <= activities.size()) {
-            activityValue = activities.get(index - 1);
+        if (index >= InputValidator.MIN_POSITIVE_INTEGER && index <= activities.size()) {
+            activityValue = activities.get(index - InputValidator.MIN_POSITIVE_INTEGER);
         }
         return activityValue;
     }
@@ -139,8 +141,8 @@ public class MonthlyReport extends Report {
     public String getObservationAt(int index) {
         String observationValue = "";
 
-        if (index >= 1 && index <= observations.size()) {
-            observationValue = observations.get(index - 1);
+        if (index >= InputValidator.MIN_POSITIVE_INTEGER && index <= observations.size()) {
+            observationValue = observations.get(index - InputValidator.MIN_POSITIVE_INTEGER);
         }
         return observationValue;
     }
@@ -159,9 +161,7 @@ public class MonthlyReport extends Report {
 
         if (this == object) {
             isEqual = true;
-        } else if (object == null || getClass() != object.getClass()) {
-            isEqual = false;
-        } else {
+        } else if (object != null && getClass() == object.getClass()) {
             MonthlyReport other = (MonthlyReport) object;
             isEqual = idReport == other.idReport
                 && reportedHours == other.reportedHours

@@ -147,21 +147,20 @@ public class AffiliatedOrganization {
     @Override
     public boolean equals(Object object) {
         boolean isEqual = false;
+
         if (this == object) {
             isEqual = true;
-        } else if (object == null || getClass() != object.getClass()) {
-            isEqual = false;
-        } else {
+        } else if (object != null && getClass() == object.getClass()) {
             AffiliatedOrganization other = (AffiliatedOrganization) object;
             isEqual = id == other.id
+                && numberOfDirectUsers == other.numberOfDirectUsers
+                && numberOfIndirectUsers == other.numberOfIndirectUsers
                 && Objects.equals(name, other.name)
                 && Objects.equals(city, other.city)
                 && Objects.equals(state, other.state)
                 && Objects.equals(sector, other.sector)
                 && Objects.equals(email, other.email)
-                && Objects.equals(phoneNumber, other.phoneNumber)
-                && numberOfDirectUsers == other.numberOfDirectUsers
-                && numberOfIndirectUsers == other.numberOfIndirectUsers;
+                && Objects.equals(phoneNumber, other.phoneNumber);
         }
         return isEqual;
     }
