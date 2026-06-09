@@ -92,6 +92,7 @@ public class Practice {
 
     @Override
     public int hashCode() {
-        return Objects.hash(idPractice, startDate, finalDate, practiceName, period, calification, student, subject);
+        return Objects.hash(idPractice, startDate, finalDate, practiceName, 
+                            period, calification, student, subject);
     }
 }

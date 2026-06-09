@@ -168,4 +168,9 @@ public class MonthlyReport extends Report {
         }
         return isEqual;
     }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(super.hashCode(), idReport, month, reportedHours, reportNumber);
+    }
 }

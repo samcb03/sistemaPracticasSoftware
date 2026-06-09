@@ -162,4 +162,10 @@ public class Project {
             && Objects.equals(affiliatedOrganization, other.affiliatedOrganization)
             && Objects.equals(idStudent, other.idStudent);
     }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, name, methodology, capacity, objective, description, 
+                            activities, affiliatedOrganization, idStudent);
+    }
 }

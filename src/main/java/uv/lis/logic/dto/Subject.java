@@ -100,4 +100,12 @@ public class Subject {
             && Objects.equals(schoolPeriodId, other.schoolPeriodId)
             && Objects.equals(schoolPeriodName, other.schoolPeriodName);
     }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(nrc, professorPersonnelNumber, schoolPeriodId, 
+                            schoolPeriodName);
+
+    }
+    
 }

@@ -98,4 +98,9 @@ public class Expedient {
         }
         return isEqual;
     }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(name, typeDocument, url, idStudent);
+    }
 }

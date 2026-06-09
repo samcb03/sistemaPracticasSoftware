@@ -98,4 +98,9 @@ public class Student extends User {
             && Objects.equals(getLastName(), other.getLastName())
             && Objects.equals(gender, other.gender);
     }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(getId(), idStudent, getFirstName(), getLastName());
+    }
 }

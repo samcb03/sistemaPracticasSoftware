@@ -124,4 +124,10 @@ public class Report {
         }
         return isEqual;
     }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, description, observations, activity, 
+                            studentId, calification);
+    }
 }

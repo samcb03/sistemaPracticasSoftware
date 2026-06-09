@@ -101,4 +101,9 @@ public class User {
             && Objects.equals(roleId, other.roleId)
             && Objects.equals(isActive, other.isActive);
     }
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, firstName, lastName, password, 
+                            email, roleId, isActive);
+    }
 }

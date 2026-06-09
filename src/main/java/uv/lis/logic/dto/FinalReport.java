@@ -128,4 +128,10 @@ public class FinalReport extends Report {
         }
         return isEqual;
     }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(super.hashCode(), projectName, firstActivity, secondActivity,
+                            firstDeliverable, secondDeliverable, generalObservations);
+    }
 }

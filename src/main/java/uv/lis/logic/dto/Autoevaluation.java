@@ -235,4 +235,11 @@ public class Autoevaluation {
         && internshipImportance == other.internshipImportance
         && finalScore == other.finalScore;
     }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(idStudent, productiveParticipation, appliedKnowledge, confidenceInActivities,
+                            activitiesInterest, organizationSupport, rulesAwareness, supervisorGuidance,
+                            effectiveMonitoring, careerAlignment, internshipImportance, finalScore);
+    }
 }

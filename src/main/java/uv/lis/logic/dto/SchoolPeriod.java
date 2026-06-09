@@ -65,4 +65,9 @@ public class SchoolPeriod {
             && Objects.equals(endDate, other.endDate);
     }
 
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, startDate, endDate);
+    }
+
 }

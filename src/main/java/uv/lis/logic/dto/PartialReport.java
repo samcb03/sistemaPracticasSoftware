@@ -188,4 +188,10 @@ public class PartialReport extends Report {
         }
         return isEqual;
     }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(super.hashCode(), plannedAdvanceWeek, realAdvanceWeek,
+                            activityName, reportPeriod, reportNumber, result);
+    }
 }
