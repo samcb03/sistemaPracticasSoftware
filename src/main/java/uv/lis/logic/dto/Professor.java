@@ -35,17 +35,15 @@ public class Professor extends User {
 
     @Override
     public boolean equals(Object object) {
-        boolean isEquals = false;
+        boolean isEqual = false;
+
         if (this == object) {
-            isEquals = true;
-        }
-        if (object == null || getClass() != object.getClass()) {
-            isEquals = false;
-        } else {
+            isEqual = true;
+        } else if (object != null && getClass() == object.getClass()) {
             Professor other = (Professor) object;
-            isEquals = personnelNumber == other.personnelNumber
-                && Objects.equals(isCoordinator, other.isCoordinator);
+            isEqual = isCoordinator == other.isCoordinator
+                && Objects.equals(personnelNumber, other.personnelNumber);
         }
-        return isEquals;
+        return isEqual;
     }
 }

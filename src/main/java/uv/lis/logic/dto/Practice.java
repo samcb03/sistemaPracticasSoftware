@@ -74,16 +74,14 @@ public class Practice {
 
     @Override
     public boolean equals(Object object) {
-        boolean isEquals = false;
+        boolean isEqual = false;
+
         if (this == object) {
-            isEquals = true;
-        }
-        if (object == null || getClass() != object.getClass()) {
-            isEquals = false;
-        } else {
+            isEqual = true;
+        } else if (object != null && getClass() == object.getClass()) {
             Practice other = (Practice) object;
-            isEquals = idPractice == other.idPractice
-                && Objects.equals(startDate, other.startDate) 
+            isEqual = idPractice == other.idPractice
+                && Objects.equals(startDate, other.startDate)
                 && Objects.equals(finalDate, other.finalDate)
                 && Objects.equals(practiceName, other.practiceName)
                 && Objects.equals(period, other.period)
@@ -91,7 +89,7 @@ public class Practice {
                 && Objects.equals(student, other.student)
                 && Objects.equals(subject, other.subject);
         }
-        return isEquals;
+        return isEqual;
     }
 
     @Override

@@ -142,24 +142,22 @@ public class Project {
 
     @Override
     public boolean equals(Object object) {
-        boolean isEquals = false;
+        boolean isEqual = false;
+
         if (this == object) {
-            isEquals = true;
-        }
-        if (object == null || getClass() != object.getClass()) {
-            isEquals = false;
-        } else {
+            isEqual = true;
+        } else if (object != null && getClass() == object.getClass()) {
             Project other = (Project) object;
-            isEquals = id == other.id
+            isEqual = id == other.id
+                && capacity == other.capacity
                 && Objects.equals(name, other.name)
                 && Objects.equals(methodology, other.methodology)
-                && capacity == other.capacity
                 && Objects.equals(objective, other.objective)
                 && Objects.equals(description, other.description)
                 && Objects.equals(activities, other.activities)
                 && Objects.equals(affiliatedOrganization, other.affiliatedOrganization)
                 && Objects.equals(idStudent, other.idStudent);
         }
-        return isEquals;
+        return isEqual;
     }
 }

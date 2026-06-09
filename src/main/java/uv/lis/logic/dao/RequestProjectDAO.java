@@ -187,32 +187,11 @@ public class RequestProjectDAO implements IRequestProjectDAO {
 
         return validationError;
     }
-    //FIXME verificar los catch duplicados y si se pueden evitar
+
     @Override
     public boolean assignStudentToProject(String idStudent, int idProject) throws OperationException {
         boolean isAssigned = false;
-
-        try (Connection databaseConnection = connectionManager.getConnection()) {
-            databaseConnection.setAutoCommit(false);
-            try {
-                executeAssignmentTransaction(databaseConnection, idStudent, idProject);
-                databaseConnection.commit();
-                isAssigned = true;
-            } catch (SQLException sqlException) {
-                databaseConnection.rollback();
-                LOGGER.log(Level.SEVERE, "Transacción de asignación cancelada", sqlException);
-                throw new OperationException("Error al ejecutar la transacción de asignación", sqlException);
-            } catch (OperationException operationException) {
-                databaseConnection.rollback();
-                throw operationException;
-            } finally {
-                databaseConnection.setAutoCommit(true);
-            }
-        } catch (SQLException e) {
-            LOGGER.log(Level.SEVERE, "Error de conexión a la base de datos", e);
-            throw new OperationException("Intentelo mas tarde", e);
-        }
-
+        isAssigned = runAssignmentInTransaction(idStudent, idProject, false);
         return isAssigned;
     }
 
@@ -414,33 +393,11 @@ public class RequestProjectDAO implements IRequestProjectDAO {
         }
         return students;
     }
-    //FIXME verificar los catch duplicados y si se pueden evitar
+
     @Override
     public boolean assignStudentToProjectAlternative(String idStudent, int idProject) throws OperationException {
         boolean isAssigned = false;
-
-        try (Connection databaseConnection = connectionManager.getConnection()) {
-            databaseConnection.setAutoCommit(false);
-            try {
-                ensureStudentNotAlreadyAssigned(databaseConnection, idStudent);
-                insertAssignment(databaseConnection, idStudent, idProject);
-                databaseConnection.commit();
-                isAssigned = true;
-            } catch (SQLException sqlException) {
-                databaseConnection.rollback();
-                LOGGER.log(Level.SEVERE, "Transacción de asignación alternativa cancelada", sqlException);
-                throw new OperationException("Error al ejecutar la asignación alternativa", sqlException);
-            } catch (OperationException operationException) {
-                databaseConnection.rollback();
-                throw operationException;
-            } finally {
-                databaseConnection.setAutoCommit(true);
-            }
-        } catch (SQLException e) {
-            LOGGER.log(Level.SEVERE, "Error de conexión a la base de datos", e);
-            throw new OperationException("Intentelo mas tarde", e);
-        }
-
+        isAssigned = runAssignmentInTransaction(idStudent, idProject, true);
         return isAssigned;
     }
 
@@ -453,5 +410,44 @@ public class RequestProjectDAO implements IRequestProjectDAO {
             preparedStatement.setInt(3, STATUS_ASSIGNED);
             preparedStatement.executeUpdate();
         }
+    }
+    //FIXME creo que los metodos para asignar proyectos de manera alternativa o no, no son necesarios separarlos ya que hacen lo mismo
+    private void executeAlternativeAssignment(Connection databaseConnection, String idStudent, int idProject) 
+        throws SQLException, OperationException {
+        ensureStudentNotAlreadyAssigned(databaseConnection, idStudent);
+        insertAssignment(databaseConnection, idStudent, idProject);
+    }
+
+    private boolean runAssignmentInTransaction(String idStudent, int idProject, boolean isAlternative) 
+        throws OperationException {
+        boolean isAssigned = false;
+
+        try (Connection databaseConnection = connectionManager.getConnection()) {
+            databaseConnection.setAutoCommit(false);
+
+            try {
+                if (isAlternative) {
+                    executeAlternativeAssignment(databaseConnection, idStudent, idProject);
+                } else {
+                    executeAssignmentTransaction(databaseConnection, idStudent, idProject);
+                }
+                databaseConnection.commit();
+                isAssigned = true;
+            } catch (SQLException sqlException) {
+                databaseConnection.rollback();
+                LOGGER.log(Level.SEVERE, "Transacción de asignación cancelada", sqlException);
+                throw new OperationException("Error al ejecutar la transacción de asignación", sqlException);
+            } catch (OperationException operationException) {
+                databaseConnection.rollback();
+                throw operationException;
+            } finally {
+                databaseConnection.setAutoCommit(true);
+            }
+        } catch (SQLException e) {
+            LOGGER.log(Level.SEVERE, "Error de conexión a la base de datos", e);
+            throw new OperationException("Error al asignar un proyecto", e);
+        }
+
+        return isAssigned;
     }
 }

@@ -84,22 +84,20 @@ public class User {
 
     @Override
     public boolean equals(Object object) {
-        boolean isEquals = false;
+        boolean isEqual = false;
+
         if (this == object) {
-            isEquals = true;
-        }
-        if (object == null || getClass() != object.getClass()) {
-            isEquals = false;
-        } else {
+            isEqual = true;
+        } else if (object != null && getClass() == object.getClass()) {
             User other = (User) object;
-            isEquals = id == other.id
+            isEqual = id == other.id
+                && roleId == other.roleId
+                && isActive == other.isActive
                 && Objects.equals(firstName, other.firstName)
                 && Objects.equals(lastName, other.lastName)
                 && Objects.equals(password, other.password)
-                && Objects.equals(email, other.email)
-                && Objects.equals(roleId, other.roleId)
-                && Objects.equals(isActive, other.isActive);
-        }   
-        return isEquals;
+                && Objects.equals(email, other.email);
+        }
+        return isEqual;
     }
 }

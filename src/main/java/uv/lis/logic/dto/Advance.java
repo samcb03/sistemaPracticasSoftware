@@ -44,12 +44,10 @@ public class Advance {
     @Override
     public boolean equals(Object object) {
         boolean isEqual = false;
-        if(this == object) {
+
+        if (this == object) {
             isEqual = true;
-        }
-        if(object == null || getClass() != object.getClass()) {
-            isEqual = false;
-        } else {
+        } else if (object != null && getClass() == object.getClass()) {
             Advance other = (Advance) object;
             isEqual = projectId == other.projectId
                 && reportId == other.reportId

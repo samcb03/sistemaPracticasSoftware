@@ -215,14 +215,12 @@ public class Autoevaluation {
     @Override
     public boolean equals(Object object) {
         boolean isEqual = false;
+
         if (this == object) {
             isEqual = true;
-        } else if (object == null || getClass() != object.getClass()) {
-            isEqual = false;
-        } else {
+        } else if (object != null && getClass() == object.getClass()) {
             Autoevaluation other = (Autoevaluation) object;
-            isEqual = Objects.equals(idStudent,other.idStudent)
-                && productiveParticipation == other.productiveParticipation
+            isEqual = productiveParticipation == other.productiveParticipation
                 && appliedKnowledge == other.appliedKnowledge
                 && confidenceInActivities == other.confidenceInActivities
                 && activitiesInterest == other.activitiesInterest
@@ -232,7 +230,8 @@ public class Autoevaluation {
                 && effectiveMonitoring == other.effectiveMonitoring
                 && careerAlignment == other.careerAlignment
                 && internshipImportance == other.internshipImportance
-                && finalScore == other.finalScore;
+                && Double.compare(finalScore, other.finalScore) == 0
+                && Objects.equals(idStudent, other.idStudent);
         }
         return isEqual;
     }

@@ -48,8 +48,6 @@ public class ActivityProgress {
         if (this == object) {
             isEqual = true;
         } else if (object != null && getClass() == object.getClass()) {
-            isEqual = false;
-        } else {
             ActivityProgress other = (ActivityProgress) object;
             isEqual = Objects.equals(name, other.name)
                 && Objects.equals(advancePercentage, other.advancePercentage)
