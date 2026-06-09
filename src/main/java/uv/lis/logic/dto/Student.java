@@ -1,6 +1,5 @@
 package uv.lis.logic.dto;
 
-
 import java.sql.Date;
 import java.util.Objects;
 
@@ -84,18 +83,20 @@ public class Student extends User {
 
     @Override
     public boolean equals(Object object) {
+        boolean isEquals = false;
         if (this == object) {
-            return true;
+            isEquals = true;
         } 
         if (object == null || getClass() != object.getClass()) {
-            return false;
-        }
-        
-        Student other = (Student) object;
-        return getId() == other.getId()
-            && Objects.equals(idStudent, other.idStudent)
-            && Objects.equals(getFirstName(), other.getFirstName())
-            && Objects.equals(getLastName(), other.getLastName())
-            && Objects.equals(gender, other.gender);
+            isEquals = false;
+        } else {
+            Student other = (Student) object;
+            isEquals = getId() == other.getId()
+                && Objects.equals(idStudent, other.idStudent)
+                && Objects.equals(getFirstName(), other.getFirstName())
+                && Objects.equals(getLastName(), other.getLastName())
+                && Objects.equals(gender, other.gender);
+        }   
+        return isEquals;
     }
 }

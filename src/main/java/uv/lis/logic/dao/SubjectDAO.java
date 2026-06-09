@@ -32,7 +32,8 @@ public class SubjectDAO implements ISubjectDAO {
     public boolean registerSubject(Subject subject) throws OperationException {
         boolean isRegistered = false;
 
-        String subjectQuery = "INSERT INTO ExperienciaEducativa (NRC, nombreExperiencia, carrera, idPeriodoEscolar, seccion) "
+        String subjectQuery = "INSERT INTO ExperienciaEducativa (NRC, nombreExperiencia, carrera, idPeriodoEscolar," 
+                            + "seccion) "
                             + "VALUES (?, ?, ?, ?, ?);";
 
         String professorSubjectQuery = "INSERT INTO Profesor_Imparte_Experiencia (NRC, numeroPersonal) "
@@ -44,8 +45,8 @@ public class SubjectDAO implements ISubjectDAO {
             databaseConnection.setAutoCommit(false);
 
             try (PreparedStatement subjectStatement = databaseConnection.prepareStatement(subjectQuery);
-                    PreparedStatement professorSubjectStatement = 
-                    databaseConnection.prepareStatement(professorSubjectQuery)) {
+                PreparedStatement professorSubjectStatement = 
+                databaseConnection.prepareStatement(professorSubjectQuery)) {
 
                 subjectStatement.setInt(1, subject.getNrc());
                 subjectStatement.setString(2, subject.getSUBJECT_NAME());
@@ -69,12 +70,7 @@ public class SubjectDAO implements ISubjectDAO {
                     LOGGER.log(Level.WARNING, "No se afectaron filas al registrar la Experiencia Educativa.");
                 }
 
-            } catch (SQLException e) {
-                databaseConnection.rollback();
-                LOGGER.log(Level.SEVERE, "Error al registrar la Experiencia Educativa", e);
-                throw new OperationException("No se pudo registrar la Experiencia Educativa", e);
             }
-
         } catch (SQLException e) {
             LOGGER.log(Level.SEVERE, "Error de conexión al registrar la Experiencia Educativa", e);
             throw new OperationException("No se pudo registrar la Experiencia Educativa. Intentelo mas tarde", 
@@ -94,8 +90,8 @@ public class SubjectDAO implements ISubjectDAO {
                             + "WHERE pe.FechaFin IS NULL OR pe.FechaFin >= CURDATE()";
 
         try (Connection databaseConnection = connectionManager.getConnection();
-                PreparedStatement preparedStatement = databaseConnection.prepareStatement(subjectQuery);
-                ResultSet resultSet = preparedStatement.executeQuery()) {
+            PreparedStatement preparedStatement = databaseConnection.prepareStatement(subjectQuery);
+            ResultSet resultSet = preparedStatement.executeQuery()) {
 
             while (resultSet.next()) {
                 String formatted = resultSet.getInt("NRC") + " - "
@@ -110,6 +106,7 @@ public class SubjectDAO implements ISubjectDAO {
         return subjects;
     }
 
+    @Override
     public boolean assignStudentToSubject(String studentId, int subjectNrc) throws OperationException {
         boolean isAssigned = false;
         String subjectQuery = "INSERT INTO alumno_esta_ee (matricula, NRC) VALUES (?, ?);";
@@ -179,7 +176,7 @@ public class SubjectDAO implements ISubjectDAO {
                             + "WHERE i.numeroPersonal = ?";
 
         try (Connection databaseConnection = connectionManager.getConnection();
-             PreparedStatement preparedStatement = databaseConnection.prepareStatement(subjectQuery)) {
+            PreparedStatement preparedStatement = databaseConnection.prepareStatement(subjectQuery)) {
 
             preparedStatement.setString(1, personalNumber);
 

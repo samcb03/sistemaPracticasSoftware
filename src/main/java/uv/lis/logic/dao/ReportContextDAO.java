@@ -200,7 +200,8 @@ public class ReportContextDAO implements IReportContextDAO {
                 }
             }
         } catch (SQLException e) {
-            throw new OperationException("Error al cargar actividades del mes", e);
+            LOGGER.log(Level.SEVERE, ACTIVITIES_QUERY_ERROR, e);
+            throw new OperationException("Error al obtener actividades del mes", e);
         }
         return activities;
     }
@@ -258,9 +259,10 @@ public class ReportContextDAO implements IReportContextDAO {
         }
         return total;
     }
-
+    //FIXME eliminar numeros magicos
     @Override
     public boolean hasReportAlreadyBeenGenerated(String studentId, String month) throws OperationException {
+        boolean isDuplicate = false;
         String reportContextQuery = "SELECT COUNT(*) FROM Reporte r "
                                   + "INNER JOIN ReporteMensual rm ON r.idReporte = rm.idReporte "
                                   + "WHERE r.matricula = ? AND rm.mes = ?";
@@ -271,12 +273,13 @@ public class ReportContextDAO implements IReportContextDAO {
             preparedStatement.setString(2, month);
             
             try (ResultSet resultSet = preparedStatement.executeQuery()) {
-                return resultSet.next() && resultSet.getInt(1) > 0;
+                isDuplicate = resultSet.next() && resultSet.getInt(1) > 0;
             }
         } catch (SQLException e) {
             LOGGER.log(Level.SEVERE, "Error al verificar duplicidad de reporte", e);
             throw new OperationException("Error al verificar duplicidad de reporte", e);
         }
+        return isDuplicate;
     }
 
     private String buildContextQuery() {

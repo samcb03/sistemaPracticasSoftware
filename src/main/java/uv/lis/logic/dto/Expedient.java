@@ -15,8 +15,7 @@ public class Expedient {
     public Expedient() {
     }
 
-    public Expedient(String name, String typeDocument,
-            String url, String idStudent, int idTypeDocument) {
+    public Expedient(String name, String typeDocument, String url, String idStudent, int idTypeDocument) {
         this.name = name;
         this.typeDocument = typeDocument;
         this.url = url;

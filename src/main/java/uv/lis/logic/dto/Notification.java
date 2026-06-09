@@ -79,9 +79,16 @@ public class Notification {
 
         if (this == object) {
             isEqual = true;
-        } else if (object != null && getClass() == object.getClass()) {
+        } else if (object == null || getClass() != object.getClass()) {
+            isEqual = false;
+        } else {
             Notification other = (Notification) object;
-            isEqual = id == other.id && Objects.equals(idStudent, other.idStudent);
+            isEqual = other.id == id
+                && other.idStudent == idStudent
+                && other.title == title
+                && other.message == message
+                && other.creationDate == creationDate
+                && other.isRead == isRead;
         }
 
         return isEqual;

@@ -81,7 +81,7 @@ public class SchoolPeriodDAO implements ISchoolPeriodDAO{
     public boolean registerSchoolPeriod(SchoolPeriod schoolPeriod) throws OperationException {
         boolean isRegistered = false;
         String schoolPeriodQuery = "INSERT INTO PeriodoEscolar(idPeriodoEscolar, FechaInicio, FechaFin) " 
-                                    + "VALUES(?, ?, ?);";
+                                 + "VALUES(?, ?, ?);";
 
         try (Connection databaseConnection = connectionManager.getConnection();
             PreparedStatement preparedStatement = databaseConnection.prepareStatement(schoolPeriodQuery)){
@@ -131,6 +131,7 @@ public class SchoolPeriodDAO implements ISchoolPeriodDAO{
 
     @Override
     public boolean existsSchoolPeriod(int idPeriod) throws OperationException {
+        boolean exists = false;
         String periodQuery = "SELECT 1 FROM PeriodoEscolar WHERE idPeriodoEscolar = ?";
 
         try (Connection databaseConnection = connectionManager.getConnection();
@@ -138,11 +139,12 @@ public class SchoolPeriodDAO implements ISchoolPeriodDAO{
 
             preparedStatement.setInt(1, idPeriod);
             try (ResultSet resultSet = preparedStatement.executeQuery()) {
-                return resultSet.next();
+                exists = resultSet.next();
             }
         } catch (SQLException e) {
             LOGGER.log(Level.SEVERE, "Error validando periodo escolar", e);
             throw new OperationException("Error al validar el periodo escolar", e);
         }
+        return exists;
     }
 }

@@ -52,17 +52,19 @@ public class SchoolPeriod {
 
     @Override
     public boolean equals(Object object) {
+        boolean isEquals = false;
         if (this == object) {
-            return true;
+            isEquals = true;
         }
         if (object == null || getClass() != object.getClass()) {
-            return false;
+            isEquals = false;
+        } else {
+            SchoolPeriod other = (SchoolPeriod) object;
+            isEquals = id == other.id
+                && Objects.equals(startDate, other.startDate)
+                && Objects.equals(endDate, other.endDate);
         }
-        
-        SchoolPeriod other = (SchoolPeriod) object;
-        return id == other.id
-            && Objects.equals(startDate, other.startDate)
-            && Objects.equals(endDate, other.endDate);
+        return isEquals;
     }
 
 }

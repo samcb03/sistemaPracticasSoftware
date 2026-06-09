@@ -170,7 +170,7 @@ public class PartialReport extends Report {
     public void setRealAdvances(int[][] realAdvances) {
         this.realAdvances = realAdvances;
     }
-
+    //FIXME hacer que todos los dto tengan este formato de equals
     @Override
     public boolean equals(Object object) {
         boolean isEqual = false;

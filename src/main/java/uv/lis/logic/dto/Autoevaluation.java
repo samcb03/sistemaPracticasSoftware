@@ -29,7 +29,7 @@ public class Autoevaluation {
     public Autoevaluation(String idStudent, int[] answers) throws IllegalArgumentException {
         this.idStudent = idStudent;
         if (answers == null || answers.length != 10) {
-            throw new IllegalArgumentException("Invalid number of answers. Expected 10.");
+            throw new IllegalArgumentException("Numero incorrecto de respuestas. Se esperaban 10 respuestas.");
         }
             this.productiveParticipation = answers[0];
             this.appliedKnowledge = answers[1];
@@ -214,25 +214,26 @@ public class Autoevaluation {
 
     @Override
     public boolean equals(Object object) {
+        boolean isEqual = false;
         if (this == object) {
-            return true;
+            isEqual = true;
+        } else if (object == null || getClass() != object.getClass()) {
+            isEqual = false;
+        } else {
+            Autoevaluation other = (Autoevaluation) object;
+            isEqual = Objects.equals(idStudent,other.idStudent)
+                && productiveParticipation == other.productiveParticipation
+                && appliedKnowledge == other.appliedKnowledge
+                && confidenceInActivities == other.confidenceInActivities
+                && activitiesInterest == other.activitiesInterest
+                && organizationSupport == other.organizationSupport
+                && rulesAwareness == other.rulesAwareness
+                && supervisorGuidance == other.supervisorGuidance
+                && effectiveMonitoring == other.effectiveMonitoring
+                && careerAlignment == other.careerAlignment
+                && internshipImportance == other.internshipImportance
+                && finalScore == other.finalScore;
         }
-        if (object == null || getClass() != object.getClass()) {
-            return false;
-        }
-        
-        Autoevaluation other = (Autoevaluation) object;
-        return Objects.equals(idStudent,other.idStudent)
-        && productiveParticipation == other.productiveParticipation
-        && appliedKnowledge == other.appliedKnowledge
-        && confidenceInActivities == other.confidenceInActivities
-        && activitiesInterest == other.activitiesInterest
-        && organizationSupport == other.organizationSupport
-        && rulesAwareness == other.rulesAwareness
-        && supervisorGuidance == other.supervisorGuidance
-        && effectiveMonitoring == other.effectiveMonitoring
-        && careerAlignment == other.careerAlignment
-        && internshipImportance == other.internshipImportance
-        && finalScore == other.finalScore;
+        return isEqual;
     }
 }

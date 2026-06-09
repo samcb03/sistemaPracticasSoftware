@@ -22,15 +22,15 @@ public class FileManager {
            }
         }
         
-        Path baseAbsoluta = Paths.get(BASE_PATH,idStudent).toAbsolutePath().normalize();
-        Path targetAbsoluta = baseAbsoluta.resolve(idStudent + "_" + file.getName()).normalize();
+        Path absoluteBase = Paths.get(BASE_PATH,idStudent).toAbsolutePath().normalize();
+        Path absoluteTarget = absoluteBase.resolve(idStudent + "_" + file.getName()).normalize();
         
-        if (!targetAbsoluta.startsWith(baseAbsoluta)) {
+        if (!absoluteTarget.startsWith(absoluteBase)) {
             throw new OperationException("Ruta de archivo no permitida", null);
         } else {
             try {
-                Files.copy(file.toPath(), targetAbsoluta, StandardCopyOption.REPLACE_EXISTING);
-                return targetAbsoluta.toString();
+                Files.copy(file.toPath(), absoluteTarget, StandardCopyOption.REPLACE_EXISTING);
+                return absoluteTarget.toString();
             } catch (IOException e) {
                 throw new OperationException("Error al guardar el archivo en el servidor", e);
             }

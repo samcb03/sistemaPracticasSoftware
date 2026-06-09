@@ -4,6 +4,7 @@ import static uv.lis.logic.utils.InputValidator.NO_ROWS_AFFECTED;
 import static uv.lis.logic.utils.InputValidator.STATUS_ASSIGNED;
 
 import java.sql.Connection;
+import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -19,6 +20,7 @@ import uv.lis.logic.exceptions.OperationException;
 
 public class StudentDAO extends UserDAO implements IStudentDAO {
     private static final Logger LOGGER = Logger.getLogger(UserDAO.class.getName());
+    private static final int STATUS_ACTIVE = 1;
     
     private MySQLConnectionManager connectionManager;
 
@@ -54,8 +56,7 @@ public class StudentDAO extends UserDAO implements IStudentDAO {
                     student.setGender(resultSet.getString("genero"));
                     validateStudent = Optional.of(student);
 
-                    LOGGER.log(Level.INFO, "Busqueda de alumno con matricula {0} exitosa.", 
-                        idStudent);
+                    LOGGER.log(Level.INFO, "Busqueda de alumno con matricula {0} exitosa.", idStudent);
                 } else {
                     LOGGER.log(Level.INFO, "No se encontro un alumno con la matricula {0}.", idStudent);
                     throw new OperationException("No se encontró un alumno con la matricula: " + idStudent, null);
@@ -101,12 +102,14 @@ public class StudentDAO extends UserDAO implements IStudentDAO {
         String studentQuery = "SELECT a.matricula, u.nombre, u.apellidos "
                             + "FROM Alumno a "
                             + "JOIN Usuario u ON a.idUsuario = u.idUsuario "
-                            + "WHERE u.estado = 1 "
+                            + "WHERE u.estado = ? "
                             + "AND a.matricula NOT IN ("
                             + "SELECT matricula FROM Alumno_Esta_EE)";
 
         try (Connection databaseConnection = connectionManager.getConnection();
-                PreparedStatement preparedStatement = databaseConnection.prepareStatement(studentQuery)) {
+            PreparedStatement preparedStatement = databaseConnection.prepareStatement(studentQuery)) {
+            
+            preparedStatement.setInt(1, STATUS_ACTIVE);
 
             try (ResultSet resultSet = preparedStatement.executeQuery()) {
                 while (resultSet.next()) {
@@ -130,17 +133,16 @@ public class StudentDAO extends UserDAO implements IStudentDAO {
         boolean isRegistered = false;
 
         String studentQuery = "INSERT INTO Alumno (idUsuario, matricula, fechaNacimiento, genero)" 
-                              + " VALUES (?, ?, ?, ?);";
+                            + " VALUES (?, ?, ?, ?);";
 
         try (Connection databaseConnection = connectionManager.getConnection();
              PreparedStatement preparedStatement = databaseConnection.prepareStatement(studentQuery)) {
             
             preparedStatement.setInt(1, student.getId());
             preparedStatement.setString(2, student.getIdStudent());
-            java.util.Date birthDate = student.getBirthDate();
-            java.sql.Date sqlBirthDate = new java.sql.Date(birthDate.getTime());
+            Date birthDate = student.getBirthDate();;
 
-            preparedStatement.setDate(3, sqlBirthDate);
+            preparedStatement.setDate(3, birthDate);
             preparedStatement.setString(4, student.getGender());
 
             if (preparedStatement.executeUpdate() > NO_ROWS_AFFECTED) {
@@ -164,9 +166,9 @@ public class StudentDAO extends UserDAO implements IStudentDAO {
         boolean isModified = false;
 
         String studentQuery = "UPDATE Alumno a " 
-                              + "INNER JOIN Usuario u ON a.idUsuario = u.idUsuario SET u.nombre = ?, u.apellidos = ?, " 
-                              + "a.fechanacimiento = ?, a.genero = ? "
-                              + "WHERE a.matricula = ?;";
+                            + "INNER JOIN Usuario u ON a.idUsuario = u.idUsuario SET u.nombre = ?, u.apellidos = ?, " 
+                            + "a.fechanacimiento = ?, a.genero = ? "
+                            + "WHERE a.matricula = ?;";
 
         try (Connection databaseConnection = connectionManager.getConnection();
             PreparedStatement preparedStatement = databaseConnection.prepareStatement(studentQuery)) {
@@ -209,7 +211,8 @@ public class StudentDAO extends UserDAO implements IStudentDAO {
                 isInactive = true;
                 LOGGER.log(Level.INFO, "Inactivacion de alumno con matricula exitosa.", studentId);
             } else {
-                throw new OperationException("No se pudo inactivar al alumno. Intentelo mas tarde", null);
+                throw new OperationException("No se pudo inactivar al alumno. Intentelo mas tarde", 
+                null);
             }
 
         } catch (SQLException e) {

@@ -10,7 +10,7 @@ public final class InputValidator {
     private InputValidator() {
 
     }
-
+    //FIXME eliminar constantes que tengan el mismo valor
     public static final int IS_COORDINATOR = 3;
     public static final int NO_ROWS_AFFECTED = 0;
     public static final int MAX_REQUESTS = 3;
@@ -50,13 +50,11 @@ public final class InputValidator {
         return validationResult;
     }
 
-    public static Optional<String> validateMaxLength(String fieldValue, int maxLength,
-            String fieldName) {
+    public static Optional<String> validateMaxLength(String fieldValue, int maxLength, String fieldName) {
         Optional<String> validationResult;
 
         if (fieldValue.length() > maxLength) {
-            validationResult = Optional.of(
-                fieldName + " no puede exceder los " + maxLength + " caracteres");
+            validationResult = Optional.of(fieldName + " no puede exceder los " + maxLength + " caracteres");
         } else {
             validationResult = Optional.empty();
         }
@@ -68,8 +66,7 @@ public final class InputValidator {
         Optional<String> validationResult = Optional.empty();
 
         if (!fieldValue.matches(LETTERS_ONLY_REGEX)) {
-            validationResult = Optional.of(
-                fieldName + " solo acepta letras y espacios");
+            validationResult = Optional.of(fieldName + " solo acepta letras y espacios");
         }
 
         return validationResult;
@@ -79,8 +76,7 @@ public final class InputValidator {
         Optional<String> validationResult = Optional.empty();
 
         if (fieldValue.matches(LEADING_SPACE_REGEX)) {
-            validationResult = Optional.of(
-                fieldName + " no puede comenzar con un espacio");
+            validationResult = Optional.of(fieldName + " no puede comenzar con un espacio");
         }
 
         return validationResult;
@@ -90,32 +86,26 @@ public final class InputValidator {
         Optional<String> validationResult = Optional.empty();
 
         if (fieldValue.matches(TRAILING_SPACE_REGEX)) {
-            validationResult = Optional.of(
-                fieldName + " no puede terminar con un espacio");
+            validationResult = Optional.of(fieldName + " no puede terminar con un espacio");
         }
-
         return validationResult;
     }
 
-    public static Optional<String> validateNoConsecutiveSpaces(String fieldValue,
-            String fieldName) {
+    public static Optional<String> validateNoConsecutiveSpaces(String fieldValue, String fieldName) {
         Optional<String> validationResult = Optional.empty();
 
         if (fieldValue.matches(CONSECUTIVE_SPACES_REGEX)) {
-            validationResult = Optional.of(
-                fieldName + " no puede contener espacios consecutivos");
+            validationResult = Optional.of(fieldName + " no puede contener espacios consecutivos");
         }
 
         return validationResult;
     }
 
-    public static Optional<String> validateNoConsecutiveRepeatedLetters(String fieldValue,
-            String fieldName) {
+    public static Optional<String> validateNoConsecutiveRepeatedLetters(String fieldValue, String fieldName) {
         Optional<String> validationResult;
 
         if (fieldValue.matches(REPEAT_LETTERS_REGEX)) {
-            validationResult = Optional.of(
-                fieldName + " no puede contener la misma letra repetida 3 veces o más");
+            validationResult = Optional.of(fieldName + " no puede contener la misma letra repetida 3 veces o más");
         } else {
             validationResult = Optional.empty();
         }
@@ -281,7 +271,8 @@ public final class InputValidator {
     public static Optional<String> validateProjectCapacity(int capacity, String fieldName) {
         Optional<String> validateResult;
         if(capacity > MAX_PROJECT_CAPACITY) {
-            validateResult = Optional.of(fieldName + " no puede tener una capacidad mayor a " + MAX_PROJECT_CAPACITY + " alumnos");
+            validateResult = Optional.of(fieldName + " no puede tener una capacidad mayor a " + MAX_PROJECT_CAPACITY 
+                + " alumnos");
         } else {
             validateResult = Optional.empty();
         }

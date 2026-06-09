@@ -19,4 +19,6 @@ public interface ISubjectDAO {
     ArrayList<Subject> getSubjectsByProfessor(String personnelNumber) throws OperationException;
 
     ArrayList<Student> getEnrolledStudentsBySubject(int nrc) throws OperationException;
+
+    boolean assignStudentToSubject(String studentId, int subjectNrc) throws OperationException;
 }

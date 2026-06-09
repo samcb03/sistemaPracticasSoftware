@@ -117,7 +117,9 @@ public class FinalReport extends Report {
 
         if (this == object) {
             isEqual = true;
-        } else if (object != null && getClass() == object.getClass() && super.equals(object)) {
+        } else if (object == null || getClass() != object.getClass()) {
+            isEqual = false;
+        } else {
             FinalReport other = (FinalReport) object;
             isEqual = Objects.equals(projectName, other.projectName)
                 && Objects.equals(firstActivity, other.firstActivity)
