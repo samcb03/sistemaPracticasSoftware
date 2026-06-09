@@ -10,7 +10,7 @@ public final class InputValidator {
     private InputValidator() {
 
     }
-    //FIXME eliminar constantes que tengan el mismo valor
+    
     public static final int IS_COORDINATOR = 3;
     public static final int NO_ROWS_AFFECTED = 0;
     public static final int MAX_REQUESTS = 3;

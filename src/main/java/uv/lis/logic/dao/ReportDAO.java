@@ -103,19 +103,10 @@ public class ReportDAO implements IReportDAO {
 
         try (Connection databaseConnection = connectionManager.getConnection()) {
             databaseConnection.setAutoCommit(false);
-            boolean isCompleted = false;
-
-            try {
-                insertReportRow(databaseConnection, partialReport);
-                isRegistered = insertPartialDetail(databaseConnection, partialReport);
-                insertPartialActivityDetails(databaseConnection, partialReport);
-                commitOrRollback(databaseConnection, isRegistered);
-                isCompleted = true;
-            } finally {
-                if (!isCompleted) {
-                    databaseConnection.rollback();
-                }
-            }
+            insertReportRow(databaseConnection, partialReport);
+            isRegistered = insertPartialDetail(databaseConnection, partialReport);
+            insertPartialActivityDetails(databaseConnection, partialReport);
+            commitOrRollback(databaseConnection, isRegistered);
         } catch (SQLException e) {
             LOGGER.log(Level.SEVERE, REGISTER_PARTIAL_ERROR, e);
             throw new OperationException(REGISTER_PARTIAL_ERROR, e);
@@ -130,18 +121,9 @@ public class ReportDAO implements IReportDAO {
 
         try (Connection databaseConnection = connectionManager.getConnection()) {
             databaseConnection.setAutoCommit(false);
-            boolean isCompleted = false;
-
-            try {
-                updateReportRow(databaseConnection, partialReport);
-                isModified = updatePartialDetail(databaseConnection, partialReport);
-                commitOrRollback(databaseConnection, isModified);
-                isCompleted = true;
-            } finally {
-                if (!isCompleted) {
-                    databaseConnection.rollback();
-                }
-            }
+            updateReportRow(databaseConnection, partialReport);
+            isModified = updatePartialDetail(databaseConnection, partialReport);
+            commitOrRollback(databaseConnection, isModified);
         } catch (SQLException e) {
             LOGGER.log(Level.SEVERE, MODIFY_PARTIAL_ERROR, e);
             throw new OperationException(MODIFY_PARTIAL_ERROR, e);
@@ -160,7 +142,7 @@ public class ReportDAO implements IReportDAO {
                            + "WHERE rf.idReporte = ?";
 
         try (Connection databaseConnection = connectionManager.getConnection();
-                PreparedStatement preparedStatement = databaseConnection.prepareStatement(reportQuery)) {
+            PreparedStatement preparedStatement = databaseConnection.prepareStatement(reportQuery)) {
 
             preparedStatement.setInt(1, idFinalReport);
 
@@ -182,20 +164,11 @@ public class ReportDAO implements IReportDAO {
 
         try (Connection databaseConnection = connectionManager.getConnection()) {
             databaseConnection.setAutoCommit(false);
-            boolean isCompleted = false;
-
-            try {
-                insertReportRow(databaseConnection, finalReport);
-                isRegistered = insertFinalDetail(databaseConnection, finalReport);
-                insertFinalActivityDetails(databaseConnection, finalReport);
-                insertFinalDeliverableDetails(databaseConnection, finalReport);
-                commitOrRollback(databaseConnection, isRegistered);
-                isCompleted = true;
-            } finally {
-                if (!isCompleted) {
-                    databaseConnection.rollback();
-                }
-            }
+            insertReportRow(databaseConnection, finalReport);
+            isRegistered = insertFinalDetail(databaseConnection, finalReport);
+            insertFinalActivityDetails(databaseConnection, finalReport);
+            insertFinalDeliverableDetails(databaseConnection, finalReport);
+            commitOrRollback(databaseConnection, isRegistered);
         } catch (SQLException e) {
             LOGGER.log(Level.SEVERE, REGISTER_FINAL_ERROR, e);
             throw new OperationException(REGISTER_FINAL_ERROR, e);
@@ -210,18 +183,9 @@ public class ReportDAO implements IReportDAO {
 
         try (Connection databaseConnection = connectionManager.getConnection()) {
             databaseConnection.setAutoCommit(false);
-            boolean isCompleted = false;
-
-            try {
-                updateReportRow(databaseConnection, finalReport);
-                isModified = updateFinalDetail(databaseConnection, finalReport);
-                commitOrRollback(databaseConnection, isModified);
-                isCompleted = true;
-            } finally {
-                if (!isCompleted) {
-                    databaseConnection.rollback();
-                }
-            }
+            updateReportRow(databaseConnection, finalReport);
+            isModified = updateFinalDetail(databaseConnection, finalReport);
+            commitOrRollback(databaseConnection, isModified);
         } catch (SQLException e) {
             LOGGER.log(Level.SEVERE, MODIFY_FINAL_ERROR, e);
             throw new OperationException(MODIFY_FINAL_ERROR, e);
@@ -236,19 +200,10 @@ public class ReportDAO implements IReportDAO {
 
         try (Connection databaseConnection = connectionManager.getConnection()) {
             databaseConnection.setAutoCommit(false);
-            boolean isCompleted = false;
-
-            try {
-                insertReportRow(databaseConnection, monthlyReport);
-                isRegistered = insertMonthlyDetail(databaseConnection, monthlyReport);
-                insertMonthlyActivityDetails(databaseConnection, monthlyReport);
-                commitOrRollback(databaseConnection, isRegistered);
-                isCompleted = true;
-            } finally {
-                if (!isCompleted) {
-                    databaseConnection.rollback();
-                }
-            }
+            insertReportRow(databaseConnection, monthlyReport);
+            isRegistered = insertMonthlyDetail(databaseConnection, monthlyReport);
+            insertMonthlyActivityDetails(databaseConnection, monthlyReport);
+            commitOrRollback(databaseConnection, isRegistered);
         } catch (SQLException e) {
             LOGGER.log(Level.SEVERE, REGISTER_MONTHLY_ERROR, e);
             throw new OperationException(REGISTER_MONTHLY_ERROR, e);
@@ -275,21 +230,13 @@ public class ReportDAO implements IReportDAO {
 
     private Report mapReport(ResultSet resultSet) throws SQLException {
         Report report = new Report();
-        report.setId(resultSet.getInt("idReporte"));
-        report.setDescription(resultSet.getString("descripcion"));
-        report.setObservations(resultSet.getString("observaciones"));
-        report.setActivity(resultSet.getString("actividad"));
-        report.setStudentId(resultSet.getString("matricula"));
+        populateBaseReport(resultSet, report);
         return report;
     }
 
     private PartialReport mapPartialReport(ResultSet resultSet) throws SQLException {
         PartialReport report = new PartialReport();
-        report.setId(resultSet.getInt("idReporte"));
-        report.setDescription(resultSet.getString("descripcion"));
-        report.setObservations(resultSet.getString("observaciones"));
-        report.setActivity(resultSet.getString("actividad"));
-        report.setStudentId(resultSet.getString("matricula"));
+        populateBaseReport(resultSet, report);
         report.setPlannedAdvanceWeek(resultSet.getInt("tiempoPlaneado"));
         report.setRealAdvanceWeek(resultSet.getInt("tiempoReal"));
         return report;
@@ -297,17 +244,13 @@ public class ReportDAO implements IReportDAO {
 
     private FinalReport mapFinalReport(ResultSet resultSet) throws SQLException {
         FinalReport report = new FinalReport();
-        report.setId(resultSet.getInt("idReporte"));
-        report.setDescription(resultSet.getString("descripcion"));
-        report.setObservations(resultSet.getString("observaciones"));
-        report.setActivity(resultSet.getString("actividad"));
-        report.setStudentId(resultSet.getString("matricula"));
+        populateBaseReport(resultSet, report);
         report.getFirstActivity().setAdvancePercentage(
             String.valueOf(resultSet.getInt("porcentajeAvance")));
         report.getFirstDeliverable().setResult(resultSet.getString("ResultadoEntregable"));
         return report;
     }
-    //FIXME verificar si estos metodos privados que tienen conexiones a la base de datos pueden ser refactorizados para evitar código repetido y mejorar la legibilidad, ademas de agregarlos a a interface
+    
     private void insertReportRow(Connection databaseConnection, Report report) throws SQLException {
         String reportQuery = "INSERT INTO Reporte (descripcion, observaciones, actividad, matricula) "
                            + "VALUES (?, ?, ?, ?)";
@@ -562,6 +505,14 @@ public class ReportDAO implements IReportDAO {
             }
             preparedStatement.executeBatch();
         }
+    }
+
+    private void populateBaseReport(ResultSet resultSet, Report report) throws SQLException {
+        report.setId(resultSet.getInt("idReporte"));
+        report.setDescription(resultSet.getString("descripcion"));
+        report.setObservations(resultSet.getString("observaciones"));
+        report.setActivity(resultSet.getString("actividad"));
+        report.setStudentId(resultSet.getString("matricula"));
     }
 
     private int parseAdvancePercentage(String rawValue) {

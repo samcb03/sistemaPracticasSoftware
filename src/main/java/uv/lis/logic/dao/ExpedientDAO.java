@@ -23,8 +23,10 @@ import uv.lis.logic.utils.FileValidator;
 
 public class ExpedientDAO implements IExpedientDAO {
     private static final Logger LOGGER = Logger.getLogger(ExpedientDAO.class.getName());
-    private MySQLConnectionManager connectionManager;
 
+    private static final int MONTHLY_REPORT_DOCUMENT_TYPE_ID = 3;
+
+    private MySQLConnectionManager connectionManager;
     public ExpedientDAO() {
         this.connectionManager = new MySQLConnectionManager();
     }
@@ -116,26 +118,30 @@ public class ExpedientDAO implements IExpedientDAO {
         
         return idType;
     }
-    //FIXME verificar si este metodo en realidad deberia regresar uuna operationexceptin y como manejarla correctamente
+
     @Override
     public void uploadDocument(String idStudent, String typeDocument, File file) throws OperationException {
         FileValidator.validateFile(file);
-        Optional<Integer> valideTypeDocument = getIdDocumentTypeByName(typeDocument);
+        Optional<Integer> validTypeDocument = getIdDocumentTypeByName(typeDocument);
 
-        if (valideTypeDocument.isEmpty()) {
+        if (validTypeDocument.isEmpty()) {
             throw new OperationException("Tipo de documento no válido: " + typeDocument, null);
         }
 
-        int idTypeDocument = valideTypeDocument.get();
-
-        deletePreviousDocumentIfExists(idStudent, idTypeDocument);
+        int idTypeDocument = validTypeDocument.get();
         String url = FileManager.saveFile(file, idStudent);
+        boolean isRegistered = false;
 
-        Expedient expedient = new Expedient(file.getName(), typeDocument, url, idStudent, idTypeDocument);
-        int generatedId = saveDocument(expedient);
+        try {
+            Expedient expedient = new Expedient(file.getName(), typeDocument, url, idStudent, idTypeDocument);
+            isRegistered = persistDocument(expedient);
+        } finally {
+            if (!isRegistered) {
+                FileManager.deleteFile(url);
+            }
+        }
 
-        if (generatedId <= NO_ROWS_AFFECTED) {
-            FileManager.deleteFile(url);
+        if (!isRegistered) {
             throw new OperationException("No se pudo registrar el documento en la base de datos.", null);
         }
     }
@@ -219,47 +225,76 @@ public class ExpedientDAO implements IExpedientDAO {
         expedient.setIsValidated(resultSet.getBoolean("estaValidado"));
         return expedient;
     }
-    //FIXME verificar numeros magicos, asi como eliminar ese DELETE ya que el usuario no tiene permisos de delete, igual verificar si realmente es necesario el metodo
-    private void deletePreviousDocumentIfExists(String idStudent, int idDocumentType) throws OperationException {
-    List<Integer> uniqueIds = new ArrayList<>();
-        uniqueIds.add(1);
-        uniqueIds.add(2);
-        uniqueIds.add(3);
-        uniqueIds.add(4);
-        uniqueIds.add(5);
-        uniqueIds.add(6);
-        uniqueIds.add(9);
 
-        if (uniqueIds.contains(idDocumentType)) {
-            String  insertDocumentQuery= "SELECT url FROM expediente WHERE matricula = ? AND idTipoDocumento = ?";
-            String remplaceQuery = "DELETE FROM expediente WHERE matricula = ? AND idTipoDocumento = ?";
-            String oldUrl = null;
+    private Optional<String> getDocumentUrl(String idStudent, int idTypeDocument) throws OperationException {
+        Optional<String> documentUrl = Optional.empty();
+        String expedientQuery = "SELECT url FROM expediente "
+                              + "WHERE matricula = ? AND idTipoDocumento = ?";
 
-            try (Connection databaseConnection = connectionManager.getConnection();
-                PreparedStatement preparedStatementInsert = databaseConnection.prepareStatement(insertDocumentQuery)) {
-                
-                preparedStatementInsert.setString(1, idStudent);
-                preparedStatementInsert.setInt(2, idDocumentType);
-                
-                try (ResultSet resultSet = preparedStatementInsert.executeQuery()) {
-                    if (resultSet.next()) {
-                        oldUrl = resultSet.getString("url");
-                    }
+        try (Connection databaseConnection = connectionManager.getConnection();
+            PreparedStatement preparedStatement = databaseConnection.prepareStatement(expedientQuery)) {
+
+            preparedStatement.setString(1, idStudent);
+            preparedStatement.setInt(2, idTypeDocument);
+
+            try (ResultSet resultSet = preparedStatement.executeQuery()) {
+                if (resultSet.next()) {
+                    documentUrl = Optional.ofNullable(resultSet.getString("url"));
                 }
-                
-                if (oldUrl != null) {
-                    try (PreparedStatement preparedStatementDelete = databaseConnection.prepareStatement(remplaceQuery)) {
-                        preparedStatementDelete.setString(1, idStudent);
-                        preparedStatementDelete.setInt(2, idDocumentType);
-                        preparedStatementDelete.executeUpdate();
-                    }
-                    FileManager.deleteFile(oldUrl);
-                }
-            } catch (SQLException e) {
-                LOGGER.log(Level.SEVERE, "Error al procesar el reemplazo de documento", e);
-                throw new OperationException("Error al intentar reemplazar el archivo anterior", e);
             }
+        } catch (SQLException e) {
+            LOGGER.log(Level.SEVERE, "Error al consultar el documento previo del expediente", e);
+            throw new OperationException("Error al consultar el documento previo", e);
         }
+        return documentUrl;
     }
 
+    private boolean replaceDocument(Expedient expedient) throws OperationException {
+        boolean isReplaced = false;
+        String expedientQuery = "UPDATE expediente SET nombre = ?, url = ?, estaValidado = ? "
+                              + "WHERE matricula = ? AND idTipoDocumento = ?";
+
+        try (Connection databaseConnection = connectionManager.getConnection();
+            PreparedStatement preparedStatement = databaseConnection.prepareStatement(expedientQuery)) {
+
+            preparedStatement.setString(1, expedient.getName());
+            preparedStatement.setString(2, expedient.getUrl());
+            preparedStatement.setBoolean(3, false);
+            preparedStatement.setString(4, expedient.getIdStudent());
+            preparedStatement.setInt(5, expedient.getIdTypeDocument());
+
+            isReplaced = preparedStatement.executeUpdate() > NO_ROWS_AFFECTED;
+        } catch (SQLException e) {
+            LOGGER.log(Level.SEVERE, "Error al reemplazar el documento del expediente", e);
+            throw new OperationException("No se pudo reemplazar el documento. Intente más tarde", e);
+        }
+        return isReplaced;
+    }
+
+    private boolean persistDocument(Expedient expedient) throws OperationException {
+        boolean isSaved;
+
+        if (expedient.getIdTypeDocument() == MONTHLY_REPORT_DOCUMENT_TYPE_ID) {
+            isSaved = saveDocument(expedient) > NO_ROWS_AFFECTED;
+        } else {
+            isSaved = replaceOrInsertDocument(expedient);
+        }
+        return isSaved;
+    }
+
+    private boolean replaceOrInsertDocument(Expedient expedient) throws OperationException {
+        Optional<String> previousUrl =
+            getDocumentUrl(expedient.getIdStudent(), expedient.getIdTypeDocument());
+        boolean isSaved;
+
+        if (previousUrl.isPresent()) {
+            isSaved = replaceDocument(expedient);
+            if (isSaved && !previousUrl.get().equals(expedient.getUrl())) {
+                FileManager.deleteFile(previousUrl.get());
+            }
+        } else {
+            isSaved = saveDocument(expedient) > NO_ROWS_AFFECTED;
+        }
+        return isSaved;
+    }
 }
