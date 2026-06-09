@@ -79,7 +79,7 @@ public class ReportDAO implements IReportDAO {
                            + "WHERE rp.idReporte = ?";
 
         try (Connection databaseConnection = connectionManager.getConnection();
-                PreparedStatement preparedStatement = databaseConnection.prepareStatement(reportQuery)) {
+            PreparedStatement preparedStatement = databaseConnection.prepareStatement(reportQuery)) {
 
             preparedStatement.setInt(1, idPartialReport);
 
@@ -96,7 +96,7 @@ public class ReportDAO implements IReportDAO {
         }
         return validReport;
     }
-
+    //FIXME verificar este doble catch y como arreglarlo manteniendo la OperationException
     @Override
     public boolean registerPartialReport(PartialReport partialReport) throws OperationException {
         boolean isRegistered = false;
@@ -237,7 +237,7 @@ public class ReportDAO implements IReportDAO {
         String reportQuery = "UPDATE Reporte SET calificacion = ? WHERE idReporte = ?";
 
         try (Connection databaseConnection = connectionManager.getConnection();
-                PreparedStatement preparedStatement = databaseConnection.prepareStatement(reportQuery)) {
+            PreparedStatement preparedStatement = databaseConnection.prepareStatement(reportQuery)) {
 
             preparedStatement.setFloat(1, report.getCalification());
             preparedStatement.setInt(2, report.getId());
@@ -282,7 +282,7 @@ public class ReportDAO implements IReportDAO {
         report.getFirstDeliverable().setResult(resultSet.getString("ResultadoEntregable"));
         return report;
     }
-
+    //FIXME verificar si estos metodos privados que tienen conexiones a la base de datos pueden ser refactorizados para evitar código repetido y mejorar la legibilidad, ademas de agregarlos a a interface
     private void insertReportRow(Connection databaseConnection, Report report) throws SQLException {
         String reportQuery = "INSERT INTO Reporte (descripcion, observaciones, actividad, matricula) "
                            + "VALUES (?, ?, ?, ?)";

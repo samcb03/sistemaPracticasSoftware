@@ -9,8 +9,10 @@ import java.util.Map;
 import uv.lis.logic.exceptions.OperationException;
 
 public class FileValidator {
+
     private static final long MAX_FILE_SIZE_BYTES = 20 * 1024 *1024;
     public static final String EXTENSION_PDF = ".pdf";
+    
     private static final Map<String,byte[]> MAGIC_BYTES = Map.of(
         EXTENSION_PDF, new byte[] {0x25, 0x50, 0x44, 0x46}
     );

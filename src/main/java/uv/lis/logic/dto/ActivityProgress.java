@@ -9,7 +9,6 @@ public class ActivityProgress {
     private String observations;
 
     public ActivityProgress() {
-
     }
 
     public ActivityProgress(String name, String advancePercentage, String observations) {
@@ -49,11 +48,18 @@ public class ActivityProgress {
         if (this == object) {
             isEqual = true;
         } else if (object != null && getClass() == object.getClass()) {
+            isEqual = false;
+        } else {
             ActivityProgress other = (ActivityProgress) object;
             isEqual = Objects.equals(name, other.name)
                 && Objects.equals(advancePercentage, other.advancePercentage)
                 && Objects.equals(observations, other.observations);
         }
         return isEqual;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(name, advancePercentage, observations);
     }
 }

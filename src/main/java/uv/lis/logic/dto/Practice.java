@@ -59,6 +59,7 @@ public class Practice {
     public Subject getSubject() {
         return subject;
     }
+
     public void setSubject(Subject subject) {
         this.subject = subject;
     }
@@ -66,28 +67,31 @@ public class Practice {
     public int getProjectId() {
         return projectId;
     }
+
     public void setProjectId(int projectId) {
         this.projectId = projectId;
     }
 
     @Override
     public boolean equals(Object object) {
+        boolean isEquals = false;
         if (this == object) {
-            return true;
+            isEquals = true;
         }
         if (object == null || getClass() != object.getClass()) {
-            return false;
+            isEquals = false;
+        } else {
+            Practice other = (Practice) object;
+            isEquals = idPractice == other.idPractice
+                && Objects.equals(startDate, other.startDate) 
+                && Objects.equals(finalDate, other.finalDate)
+                && Objects.equals(practiceName, other.practiceName)
+                && Objects.equals(period, other.period)
+                && Objects.equals(calification, other.calification)
+                && Objects.equals(student, other.student)
+                && Objects.equals(subject, other.subject);
         }
-        
-        Practice other = (Practice) object;
-        return idPractice == other.idPractice
-            && Objects.equals(startDate, other.startDate) 
-            && Objects.equals(finalDate, other.finalDate)
-            && Objects.equals(practiceName, other.practiceName)
-            && Objects.equals(period, other.period)
-            && Objects.equals(calification, other.calification)
-            && Objects.equals(student, other.student)
-            && Objects.equals(subject, other.subject);
+        return isEquals;
     }
 
     @Override

@@ -19,6 +19,8 @@ import uv.lis.logic.utils.PasswordHasher;
 
 public class UserDAO implements IUserDAO {
     private static final int ROL_COORDINATOR = 3;
+    private static final int ROLE_PROFESSOR = 2;
+    private static final int STATUS_ACTIVE = 1;
     private static final Logger LOGGER = Logger.getLogger(UserDAO.class.getName());
     private MySQLConnectionManager connectionManager;
 
@@ -38,8 +40,8 @@ public class UserDAO implements IUserDAO {
         user.setPassword(hashedPassword);
 
         String userQuery = "INSERT INTO Usuario" 
-            + "(nombre, apellidos, contraseña, email, idRol, estado) "
-            + "VALUES (?, ?, ?, ?, ?, ?);";
+                         + "(nombre, apellidos, contraseña, email, idRol, estado) "
+                         + "VALUES (?, ?, ?, ?, ?, ?);";
 
         try (Connection databaseConnection = connectionManager.getConnection();
             PreparedStatement preparedStatement = databaseConnection.prepareStatement(userQuery,
@@ -82,15 +84,16 @@ public class UserDAO implements IUserDAO {
         Optional<User> validateUser = Optional.empty();
 
         String userQuery = "SELECT u.idUsuario, u.email, u.idRol, u.contraseña, ru.nombreRol "
-            + "FROM Usuario u "
-            + "JOIN Rol_Usuario ru ON u.idRol = ru.idRol "
-            + "WHERE u.email = ? AND u.estado = 1;";
+                         + "FROM Usuario u "
+                         + "JOIN Rol_Usuario ru ON u.idRol = ru.idRol "
+                         + "WHERE u.email = ? AND u.estado = ?;";
 
         try (Connection databaseConnection = connectionManager.getConnection();
             PreparedStatement preparedStatement = databaseConnection.prepareStatement(userQuery)) {
 
             preparedStatement.setString(1, email);
-
+            preparedStatement.setInt(2, STATUS_ACTIVE);
+            
             try (ResultSet resultSet = preparedStatement.executeQuery()) {
                 if (resultSet.next()) {
                     String hashedPassword = resultSet.getString("contraseña");
@@ -120,15 +123,18 @@ public class UserDAO implements IUserDAO {
     @Override
     public boolean existActiveCoordinator() throws OperationException {
         boolean exists = false;
-        String userQuery = "SELECT COUNT(*) FROM Usuario WHERE idRol = 2 AND estado = 1";
+        String userQuery = "SELECT COUNT(*) FROM Usuario WHERE idRol = ? AND estado = ?";
 
         try (Connection databaseConnection = connectionManager.getConnection();
-            PreparedStatement preparedStatement
-                = databaseConnection.prepareStatement(userQuery);
-            ResultSet resultSet = preparedStatement.executeQuery()) {
+            PreparedStatement preparedStatement = databaseConnection.prepareStatement(userQuery)) {
 
-            if (resultSet.next()) {
-                exists = resultSet.getInt(1) > NO_ROWS_AFFECTED; 
+            preparedStatement.setInt(1, ROLE_PROFESSOR);
+            preparedStatement.setInt(2, STATUS_ACTIVE);
+
+            try (ResultSet resultSet = preparedStatement.executeQuery()) {
+                if (resultSet.next()) {
+                    exists = resultSet.getInt(1) > NO_ROWS_AFFECTED; 
+                }
             }
         } catch (SQLException e) {
             LOGGER.log(Level.SEVERE, "Error al verificar coordinador activo", e);

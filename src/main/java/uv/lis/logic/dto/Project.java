@@ -120,8 +120,6 @@ public class Project {
         this.affiliatedOrganizationName = affiliatedOrganizationName;
     }
 
-    
-
     public void setActivities(ArrayList<Activity> activities) {
         this.activities = activities;
     }
@@ -144,22 +142,24 @@ public class Project {
 
     @Override
     public boolean equals(Object object) {
+        boolean isEquals = false;
         if (this == object) {
-            return true;
+            isEquals = true;
         }
         if (object == null || getClass() != object.getClass()) {
-            return false;
+            isEquals = false;
+        } else {
+            Project other = (Project) object;
+            isEquals = id == other.id
+                && Objects.equals(name, other.name)
+                && Objects.equals(methodology, other.methodology)
+                && capacity == other.capacity
+                && Objects.equals(objective, other.objective)
+                && Objects.equals(description, other.description)
+                && Objects.equals(activities, other.activities)
+                && Objects.equals(affiliatedOrganization, other.affiliatedOrganization)
+                && Objects.equals(idStudent, other.idStudent);
         }
-        
-        Project other = (Project) object;
-        return id == other.id
-            && Objects.equals(name, other.name)
-            && Objects.equals(methodology, other.methodology)
-            && capacity == other.capacity
-            && Objects.equals(objective, other.objective)
-            && Objects.equals(description, other.description)
-            && Objects.equals(activities, other.activities)
-            && Objects.equals(affiliatedOrganization, other.affiliatedOrganization)
-            && Objects.equals(idStudent, other.idStudent);
+        return isEquals;
     }
 }

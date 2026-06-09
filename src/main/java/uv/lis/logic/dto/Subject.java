@@ -76,6 +76,7 @@ public class Subject {
     public void setProfessorPersonnelNumber(String professorPersonnelNumber) {
         this.professorPersonnelNumber = professorPersonnelNumber;
     }
+
     public String getSection() {
         return section;
     }
@@ -86,18 +87,20 @@ public class Subject {
     
     @Override
     public boolean equals(Object object) {
+        boolean isEquals = false;
         if (this == object) {
-            return true;
+            isEquals = true;
         }
         if (object == null || getClass() != object.getClass()) {
-            return false;
+            isEquals = false;
+        } else {
+            Subject other = (Subject) object;
+            isEquals = nrc == other.nrc
+                && Objects.equals(nrc, other.nrc)
+                && Objects.equals(professorPersonnelNumber, other.professorPersonnelNumber)
+                && Objects.equals(schoolPeriodId, other.schoolPeriodId)
+                && Objects.equals(schoolPeriodName, other.schoolPeriodName);
         }
-        
-        Subject other = (Subject) object;
-        return nrc == other.nrc
-            && Objects.equals(nrc, other.nrc)
-            && Objects.equals(professorPersonnelNumber, other.professorPersonnelNumber)
-            && Objects.equals(schoolPeriodId, other.schoolPeriodId)
-            && Objects.equals(schoolPeriodName, other.schoolPeriodName);
+        return isEquals;
     }
 }

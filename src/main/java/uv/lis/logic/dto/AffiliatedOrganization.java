@@ -111,6 +111,7 @@ public class AffiliatedOrganization {
     private int generateId() {
         return counter++;
     }
+
     public ProjectSupervisor getProjectSupervisor() {
         return projectSupervisor;
     }
@@ -145,28 +146,29 @@ public class AffiliatedOrganization {
 
     @Override
     public boolean equals(Object object) {
+        boolean isEqual = false;
         if (this == object) {
-            return true;
+            isEqual = true;
+        } else if (object == null || getClass() != object.getClass()) {
+            isEqual = false;
+        } else {
+            AffiliatedOrganization other = (AffiliatedOrganization) object;
+            isEqual = id == other.id
+                && Objects.equals(name, other.name)
+                && Objects.equals(city, other.city)
+                && Objects.equals(state, other.state)
+                && Objects.equals(sector, other.sector)
+                && Objects.equals(email, other.email)
+                && Objects.equals(phoneNumber, other.phoneNumber)
+                && numberOfDirectUsers == other.numberOfDirectUsers
+                && numberOfIndirectUsers == other.numberOfIndirectUsers;
         }
-        if (object == null || getClass() != object.getClass()) {
-            return false;
-        }
-        
-        AffiliatedOrganization other = (AffiliatedOrganization) object;
-        return id == other.id
-            && Objects.equals(name, other.name)
-            && Objects.equals(city, other.city)
-            && Objects.equals(state, other.state)
-            && Objects.equals(sector, other.sector)
-            && Objects.equals(email, other.email)
-            && Objects.equals(phoneNumber, other.phoneNumber)
-            && numberOfDirectUsers == other.numberOfDirectUsers
-            && numberOfIndirectUsers == other.numberOfIndirectUsers;
+        return isEqual;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, name, city, state, sector, email, phoneNumber, 
-                            numberOfDirectUsers, numberOfIndirectUsers);
+        return Objects.hash(id, name, city, state, sector, email, phoneNumber, numberOfDirectUsers, 
+            numberOfIndirectUsers);
     }
 }

@@ -1,6 +1,5 @@
 package uv.lis.logic.dto;
 
-
 import java.time.LocalDate;
 import java.util.Objects;
 
@@ -93,19 +92,21 @@ public class Activity {
     
     @Override
     public boolean equals(Object object) {
+        boolean isEqual = false;
         if (this == object) {
-            return true;
+            isEqual = true;
         }
         if (object == null || getClass() != object.getClass()) {
-            return false;
+            isEqual = false;
+        } else {
+            Activity other = (Activity) object;
+            isEqual = id == other.id
+                && Objects.equals(name, other.name)
+                && Objects.equals(description, other.description)
+                && Objects.equals(startDate, other.startDate)
+                && Objects.equals(endDate, other.endDate);
         }
-        
-        Activity other = (Activity) object;
-        return id == other.id
-        && Objects.equals(name, other.name)
-        && Objects.equals(description, other.description)
-        && Objects.equals(startDate, other.startDate)
-        && Objects.equals(endDate, other.endDate);
+        return isEqual;
     }
 
     @Override

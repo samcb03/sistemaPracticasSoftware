@@ -88,17 +88,19 @@ public class ProjectSupervisor {
 
         @Override
     public boolean equals(Object object) {
+        boolean isEquals = false;
         if (this == object) {
-            return true;
+            isEquals = true;
         }
         if (object == null || getClass() != object.getClass()) {
-            return false;
+            isEquals = false;
+        } else {
+            ProjectSupervisor other = (ProjectSupervisor) object;
+            isEquals = id == other.id
+                && Objects.equals(name, other.name)
+                && Objects.equals(email, other.email)
+                && Objects.equals(position, other.position);
         }
-        
-        ProjectSupervisor other = (ProjectSupervisor) object;
-        return id == other.id
-            && Objects.equals(name, other.name)
-            && Objects.equals(email, other.email)
-            && Objects.equals(position, other.position);
+        return isEquals;
     }
 }

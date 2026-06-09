@@ -75,8 +75,7 @@ public class RequestProjectDAO implements IRequestProjectDAO {
                                    + "GROUP BY p.idProyecto HAVING cupoDisponible > 0;";
 
         try (Connection databaseConnection = connectionManager.getConnection();
-            PreparedStatement preparedStatement
-                = databaseConnection.prepareStatement(requestProjectQuery)) {
+            PreparedStatement preparedStatement = databaseConnection.prepareStatement(requestProjectQuery)) {
 
             preparedStatement.setInt(1, STATUS_ASSIGNED);
             preparedStatement.setInt(2, STATUS_REQUESTED);
@@ -101,8 +100,7 @@ public class RequestProjectDAO implements IRequestProjectDAO {
                                    + "WHERE matricula = ? AND idProyecto = ?;";
 
         try (Connection databaseConnection = connectionManager.getConnection();
-            PreparedStatement preparedStatement
-                = databaseConnection.prepareStatement(requestProjectQuery)) {
+            PreparedStatement preparedStatement = databaseConnection.prepareStatement(requestProjectQuery)) {
 
             preparedStatement.setString(1, idStudent);
             preparedStatement.setInt(2, idProject);
@@ -131,8 +129,7 @@ public class RequestProjectDAO implements IRequestProjectDAO {
                                    + "GROUP BY p.idProyecto, p.cupo;";
 
         try (Connection databaseConnection = connectionManager.getConnection();
-            PreparedStatement preparedStatement
-                = databaseConnection.prepareStatement(requestProjectQuery)) {
+            PreparedStatement preparedStatement = databaseConnection.prepareStatement(requestProjectQuery)) {
 
             preparedStatement.setInt(1, STATUS_ASSIGNED);
             preparedStatement.setInt(2, idProject);
@@ -177,8 +174,7 @@ public class RequestProjectDAO implements IRequestProjectDAO {
     }
 
     @Override
-    public Optional<String> validateProjectRequest(String idStudent, int idProject)
-            throws OperationException {
+    public Optional<String> validateProjectRequest(String idStudent, int idProject) throws OperationException {
         Optional<String> validationError = Optional.empty();
 
         if (getActiveRequestCountByStudentId(idStudent) >= MAX_REQUESTS) {
@@ -191,7 +187,7 @@ public class RequestProjectDAO implements IRequestProjectDAO {
 
         return validationError;
     }
-
+    //FIXME verificar los catch duplicados y si se pueden evitar
     @Override
     public boolean assignStudentToProject(String idStudent, int idProject) throws OperationException {
         boolean isAssigned = false;
@@ -292,8 +288,7 @@ public class RequestProjectDAO implements IRequestProjectDAO {
     }
 
     @Override
-    public ArrayList<Student> getAssignedStudentsByProjectId(int idProject)
-            throws OperationException {
+    public ArrayList<Student> getAssignedStudentsByProjectId(int idProject) throws OperationException {
         ArrayList<Student> assignedStudents = new ArrayList<>();
         String requestProjectQuery = "SELECT a.matricula, u.nombre, u.apellidos "
                                    + "FROM Solicita_Proyecto sp "
@@ -320,8 +315,8 @@ public class RequestProjectDAO implements IRequestProjectDAO {
         return assignedStudents;
     }
 
-    private void executeAssignmentTransaction(Connection databaseConnection, String idStudent,
-            int idProject) throws SQLException, OperationException {
+    private void executeAssignmentTransaction(Connection databaseConnection, String idStudent,  
+        int idProject) throws SQLException, OperationException {
         ensureStudentNotAlreadyAssigned(databaseConnection, idStudent);
         hasAvailableCapacity(idProject);
         assignRequest(databaseConnection, idStudent, idProject);
@@ -346,8 +341,7 @@ public class RequestProjectDAO implements IRequestProjectDAO {
         }
     }
 
-    private void assignRequest(Connection databaseConnection, String idStudent, int idProject)
-            throws SQLException {
+    private void assignRequest(Connection databaseConnection, String idStudent, int idProject) throws SQLException {
         String requestProjectQuery = "UPDATE Solicita_Proyecto SET estatus = ? "
                                    + "WHERE matricula = ? AND idProyecto = ?";
 
@@ -394,11 +388,11 @@ public class RequestProjectDAO implements IRequestProjectDAO {
     public ArrayList<Student> getStudentsWithoutAssignedProject() throws OperationException {
         ArrayList<Student> students = new ArrayList<>();
         String requestProjectQuery = "SELECT a.matricula, u.nombre, u.apellidos "
-                                + "FROM Alumno a "
-                                + "INNER JOIN Usuario u ON a.idUsuario = u.idUsuario "
-                                + "WHERE NOT EXISTS ( "
-                                + "    SELECT 1 FROM Solicita_Proyecto sp "
-                                + "    WHERE sp.matricula = a.matricula AND sp.estatus = ?)";
+                                   + "FROM Alumno a "
+                                   + "INNER JOIN Usuario u ON a.idUsuario = u.idUsuario "
+                                   + "WHERE NOT EXISTS ( "
+                                   + "SELECT 1 FROM Solicita_Proyecto sp "
+                                   + "WHERE sp.matricula = a.matricula AND sp.estatus = ?)";
 
         try (Connection databaseConnection = connectionManager.getConnection();
             PreparedStatement preparedStatement = databaseConnection.prepareStatement(requestProjectQuery)) {
@@ -420,7 +414,7 @@ public class RequestProjectDAO implements IRequestProjectDAO {
         }
         return students;
     }
-
+    //FIXME verificar los catch duplicados y si se pueden evitar
     @Override
     public boolean assignStudentToProjectAlternative(String idStudent, int idProject) throws OperationException {
         boolean isAssigned = false;
@@ -450,8 +444,7 @@ public class RequestProjectDAO implements IRequestProjectDAO {
         return isAssigned;
     }
 
-    private void insertAssignment(Connection databaseConnection, String idStudent, int idProject)
-            throws SQLException {
+    private void insertAssignment(Connection databaseConnection, String idStudent, int idProject) throws SQLException {
         String query = "INSERT INTO Solicita_Proyecto (idProyecto, matricula, estatus) VALUES (?, ?, ?)";
 
         try (PreparedStatement preparedStatement = databaseConnection.prepareStatement(query)) {

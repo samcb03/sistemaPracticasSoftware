@@ -48,7 +48,9 @@ public class DeliverableResult {
 
         if (this == object) {
             isEqual = true;
-        } else if (object != null && getClass() == object.getClass()) {
+        } else if (object == null || getClass() != object.getClass()) {
+            isEqual = false;
+        } else {
             DeliverableResult other = (DeliverableResult) object;
             isEqual = Objects.equals(result, other.result)
                 && Objects.equals(advancePercentage, other.advancePercentage)

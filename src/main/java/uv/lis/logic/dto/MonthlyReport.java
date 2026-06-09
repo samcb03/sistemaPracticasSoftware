@@ -117,7 +117,7 @@ public class MonthlyReport extends Report {
     public int getActivityCount() {
         return activities.size();
     }
-
+    //FIXME numeros magicos
     public String getPeriodAt(int index) {
         String periodValue = "";
 
@@ -159,7 +159,9 @@ public class MonthlyReport extends Report {
 
         if (this == object) {
             isEqual = true;
-        } else if (object != null && getClass() == object.getClass() && super.equals(object)) {
+        } else if (object == null || getClass() != object.getClass()) {
+            isEqual = false;
+        } else {
             MonthlyReport other = (MonthlyReport) object;
             isEqual = idReport == other.idReport
                 && reportedHours == other.reportedHours
