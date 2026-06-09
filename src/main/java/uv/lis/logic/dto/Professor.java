@@ -46,4 +46,10 @@ public class Professor extends User {
         }
         return isEqual;
     }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(getId(), getFirstName(), getLastName(), getPassword(), 
+                            getEmail(), getRoleId(), isActive(), personnelNumber, isCoordinator);
+    }
 }
