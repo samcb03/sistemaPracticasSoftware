@@ -1,5 +1,6 @@
 package uv.lis.logic.dao;
 
+import static uv.lis.logic.utils.InputValidator.NO_ROWS_AFFECTED;
 import static uv.lis.logic.utils.InputValidator.STATUS_ASSIGNED;
 
 import java.sql.Connection;
@@ -259,21 +260,21 @@ public class ReportContextDAO implements IReportContextDAO {
         }
         return total;
     }
-    //FIXME eliminar numeros magicos
+
     @Override
     public boolean hasReportAlreadyBeenGenerated(String studentId, String month) throws OperationException {
         boolean isDuplicate = false;
         String reportContextQuery = "SELECT COUNT(*) FROM Reporte r "
                                   + "INNER JOIN ReporteMensual rm ON r.idReporte = rm.idReporte "
                                   + "WHERE r.matricula = ? AND rm.mes = ?";
-        
+
         try (Connection databaseConnection = connectionManager.getConnection();
             PreparedStatement preparedStatement = databaseConnection.prepareStatement(reportContextQuery)) {
             preparedStatement.setString(1, studentId);
             preparedStatement.setString(2, month);
-            
+
             try (ResultSet resultSet = preparedStatement.executeQuery()) {
-                isDuplicate = resultSet.next() && resultSet.getInt(1) > 0;
+                isDuplicate = resultSet.next() && resultSet.getInt(1) > NO_ROWS_AFFECTED;
             }
         } catch (SQLException e) {
             LOGGER.log(Level.SEVERE, "Error al verificar duplicidad de reporte", e);
