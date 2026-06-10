@@ -18,16 +18,14 @@ import java.util.List;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.MockitoAnnotations;
 
 import uv.lis.dataaccess.MySQLConnectionManager;
 import uv.lis.logic.dao.AdvanceDAO;
 import uv.lis.logic.dto.Advance;
 import uv.lis.logic.exceptions.OperationException;
 
-@ExtendWith(MockitoExtension.class)
 class AdvanceDAOTest {
 
     private static final int PROJECT_ID = 2;
@@ -50,6 +48,8 @@ class AdvanceDAOTest {
 
     @BeforeEach
     void setUp() throws Exception {
+        MockitoAnnotations.openMocks(this);
+
         advanceDAO = new AdvanceDAO();
         Field field = AdvanceDAO.class.getDeclaredField("connectionManager");
         field.setAccessible(true);
