@@ -8,6 +8,8 @@ import static uv.lis.logic.utils.InputValidator.validateText;
 
 import java.net.URL;
 import java.sql.Date;
+import java.time.LocalDate;
+import java.util.List;                 
 import java.util.ArrayList;
 import java.util.Optional;
 import java.util.ResourceBundle;
@@ -25,12 +27,19 @@ import javafx.scene.control.DatePicker;
 import javafx.scene.control.Label;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.TabPane;
+import javafx.collections.FXCollections;
+import javafx.scene.control.TableColumn;              
+import javafx.scene.control.TableView;
+import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.control.TextField;
 
 import uv.lis.GUI.ValidationHandler;
 import uv.lis.logic.dao.RequestProjectDAO;
+import uv.lis.logic.dao.ActivityDAO;
+import uv.lis.logic.dao.ReportContextDAO;
 import uv.lis.logic.dao.StudentDAO;
 import uv.lis.logic.dao.SubjectDAO;
+import uv.lis.logic.dto.Activity;   
 import uv.lis.logic.dto.Professor;
 import uv.lis.logic.dto.Student;
 import uv.lis.logic.exceptions.OperationException;
@@ -47,6 +56,7 @@ public class FXMLConsultStudentController extends ValidationHandler {
     private static final String GENDER_OTHER = "Otro";
 
     private static final int TAB_PERSONAL = 0;
+    private static final String DEFAULT_HOURS = "0";
 
     @FXML private TextField textFieldStudentId;
     @FXML private Button buttonSearch;
@@ -69,10 +79,18 @@ public class FXMLConsultStudentController extends ValidationHandler {
     @FXML private TextField textFieldLastName;
     @FXML private DatePicker datePickerBirthDate;
     @FXML private ComboBox<String> comboBoxGender;
+    @FXML private Label labelCompletedHours;
+    @FXML private TableView<Activity> tableViewActivityDetails;
+    @FXML private TableColumn<Activity, String> tableColumnActivityName;
+    @FXML private TableColumn<Activity, String> tableColumnActivityDescription;
+    @FXML private TableColumn<Activity, LocalDate> tableColumnActivityStartDate;
+    @FXML private TableColumn<Activity, LocalDate> tableColumnActivityEndDate;
 
     private StudentDAO studentDAO;
     private RequestProjectDAO requestProjectDAO;
     private SubjectDAO subjectDAO;
+    private ActivityDAO activityDAO;
+    private ReportContextDAO reportContextDAO;
     private Student currentStudent;
 
     @Override
@@ -80,9 +98,12 @@ public class FXMLConsultStudentController extends ValidationHandler {
         studentDAO = new StudentDAO();
         requestProjectDAO = new RequestProjectDAO();
         subjectDAO = new SubjectDAO();
+        activityDAO = new ActivityDAO();
+        reportContextDAO = new ReportContextDAO();
         setupControls(labelMessage, buttonBack);
         tabPaneStudent.setVisible(true);
         comboBoxGender.getItems().addAll(GENDER_MALE, GENDER_FEMALE, GENDER_OTHER);
+        setupActivityTableColumns();
         applyRolePermissions();
         setupAutocomplete();
     }
@@ -125,6 +146,10 @@ public class FXMLConsultStudentController extends ValidationHandler {
         labelSubject.setText(assignedNrc);
         labelProject.setText(requestProjectDAO.getProjectAssignedToStudent(studentId));
         labelIsInactive.setText(studentDAO.isStudentInactive(studentId) ? LABEL_INACTIVE : LABEL_ACTIVE);
+
+        List<Activity> activities = activityDAO.getActivitiesByStudentId(studentId);
+        tableViewActivityDetails.setItems(FXCollections.observableArrayList(activities));
+        labelCompletedHours.setText(resolveCompletedHours(activities));
     }
 
     @FXML
@@ -196,7 +221,7 @@ public class FXMLConsultStudentController extends ValidationHandler {
     }
 
     private Optional<String> validateInputs() {
-        return Stream.of(
+        Optional <String> validateErrors = Stream.of(
             validateText(textFieldName.getText(), "El nombre"),
             validateText(textFieldLastName.getText(), "Los apellidos"),
             validateBirthDate(datePickerBirthDate.getValue(), "La fecha de nacimiento"),
@@ -205,6 +230,7 @@ public class FXMLConsultStudentController extends ValidationHandler {
         .filter(Optional::isPresent)
         .map(Optional::get)
         .findFirst();
+        return validateErrors;
     }
 
     private Student buildUpdatedStudent() {
@@ -359,6 +385,22 @@ public class FXMLConsultStudentController extends ValidationHandler {
         setNodeVisibility(buttonInactivate, false);
     }
 
+    private void setupActivityTableColumns() {
+        tableColumnActivityName.setCellValueFactory(new PropertyValueFactory<>("name"));
+        tableColumnActivityDescription.setCellValueFactory(new PropertyValueFactory<>("description"));
+        tableColumnActivityStartDate.setCellValueFactory(new PropertyValueFactory<>("startDate"));
+        tableColumnActivityEndDate.setCellValueFactory(new PropertyValueFactory<>("endDate"));
+    }
+
+    private String resolveCompletedHours(List<Activity> activities) throws OperationException {
+        String completedHours = DEFAULT_HOURS;
+
+        if (!activities.isEmpty()) {
+            completedHours = reportContextDAO.getTotalReportedHoursByStudentId(currentStudent.getIdStudent());
+        }
+        return completedHours;
+    }
+
     @Override
     protected void clearFields() {
         labelStudentId.setText("");
@@ -367,5 +409,8 @@ public class FXMLConsultStudentController extends ValidationHandler {
         labelDateBirth.setText("");
         labelGender.setText("");
         labelMessage.setText("");
+        labelMessage.setText("");
+        labelCompletedHours.setText("");
+        tableViewActivityDetails.getItems().clear();
     }
 }

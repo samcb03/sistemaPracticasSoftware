@@ -306,15 +306,15 @@ public class FXMLGenerateMonthlyReportController extends ValidationHandler {
             report.addActivityEntry(schoolPeriod, activityText, observationText);
         }
 
-        String horasText = labelReportedHours.getText();
-        if (!horasText.isEmpty()) {
-            totalReportedHours = Integer.parseInt(horasText);
+        String hoursText = labelReportedHours.getText();
+        if (!hoursText.isEmpty()) {
+            totalReportedHours = Integer.parseInt(hoursText);
         }
         report.setReportedHours(totalReportedHours);
         
-        String horasAcumuladasText = labelAccumulatedHours.getText();
-        if (!horasAcumuladasText.isEmpty()) {
-            report.setAccumulatedHours(Integer.parseInt(horasAcumuladasText));
+        String accumulatedHoursText = labelAccumulatedHours.getText();
+        if (!accumulatedHoursText.isEmpty()) {
+            report.setAccumulatedHours(Integer.parseInt(accumulatedHoursText));
         }
         return report;
     }

@@ -114,11 +114,10 @@
                     </GridPane>
                            <TableView fx:id="tableViewActivityDetails" prefHeight="200.0" prefWidth="200.0">
                              <columns>
-                               <TableColumn fx:id="tableColumnActivityName" prefWidth="75.0" text="Actividad" />
-                               <TableColumn fx:id="tableColumnActivityDescription" prefWidth="108.0" text="Descripcion" />
-                                 <TableColumn fx:id="tableColumnActivityStartDate" prefWidth="77.60005187988281" text="Fecha Inicio" />
-                                 <TableColumn fx:id="tableColumnActivityEndDate" prefWidth="84.79998779296875" text="Fecha Fin" />
-                                 <TableColumn fx:id="tableColumnAdvancePercentage" prefWidth="71.20001220703125" text="\% Avance" />
+                               <TableColumn fx:id="tableColumnActivityName" prefWidth="87.20000916719437" text="Actividad" />
+                               <TableColumn fx:id="tableColumnActivityDescription" prefWidth="162.4000244140625" text="Descripcion" />
+                                 <TableColumn fx:id="tableColumnActivityStartDate" prefWidth="80.00001525878906" text="Fecha Inicio" />
+                                 <TableColumn fx:id="tableColumnActivityEndDate" prefWidth="89.60003662109375" text="Fecha Fin" />
                              </columns>
                            </TableView>
                         </children>
