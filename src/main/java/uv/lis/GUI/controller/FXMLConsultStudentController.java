@@ -24,8 +24,8 @@ import javafx.scene.control.ContextMenu;
 import javafx.scene.control.DatePicker;
 import javafx.scene.control.Label;
 import javafx.scene.control.MenuItem;
+import javafx.scene.control.TabPane;
 import javafx.scene.control.TextField;
-import javafx.scene.layout.GridPane;
 
 import uv.lis.GUI.ValidationHandler;
 import uv.lis.logic.dao.RequestProjectDAO;
@@ -46,9 +46,12 @@ public class FXMLConsultStudentController extends ValidationHandler {
     private static final String GENDER_FEMALE = "Mujer";
     private static final String GENDER_OTHER = "Otro";
 
+    private static final int TAB_PERSONAL = 0;
+    private static final int TAB_ESCOLAR = 1;
+
     @FXML private TextField textFieldStudentId;
     @FXML private Button buttonSearch;
-    @FXML private GridPane gridPaneStudentInfo;
+    @FXML private TabPane tabPaneStudent;       
     @FXML private Label labelStudentId;
     @FXML private Label labelFirstName;
     @FXML private Label labelLastName;
@@ -79,7 +82,7 @@ public class FXMLConsultStudentController extends ValidationHandler {
         requestProjectDAO = new RequestProjectDAO();
         subjectDAO = new SubjectDAO();
         setupControls(labelMessage, buttonBack);
-        gridPaneStudentInfo.setVisible(true);
+        tabPaneStudent.setVisible(true);
         comboBoxGender.getItems().addAll(GENDER_MALE, GENDER_FEMALE, GENDER_OTHER);
         applyRolePermissions();
         setupAutocomplete();
@@ -100,7 +103,7 @@ public class FXMLConsultStudentController extends ValidationHandler {
                     currentStudent = studentOptional.get();
                     displayStudentInformation(currentStudent);
                     loadStudentAcademicInformation(studentId);
-                    gridPaneStudentInfo.setVisible(true);
+                    tabPaneStudent.setVisible(true);
                     buttonInactivate.setVisible(true);
                 }
             }
@@ -129,7 +132,6 @@ public class FXMLConsultStudentController extends ValidationHandler {
     private void searchStudent() {
         clearFields();
         String studentId = textFieldStudentId.getText().trim();
-
         Optional<String> validationError = validateExactLength(studentId, STUDENT_ID_LENGTH, "La matricula");
 
         if (validationError.isPresent()) {
@@ -143,24 +145,16 @@ public class FXMLConsultStudentController extends ValidationHandler {
                     Optional<Student> studentOptional = studentDAO.getStudentById(userId);
 
                     if (studentOptional.isPresent()) {
-                        Student student = studentOptional.get();
-                        
-                        labelStudentId.setText(student.getIdStudent());
-                        labelFirstName.setText(student.getFirstName());
-                        labelLastName.setText(student.getLastName());
-                        labelDateBirth.setText(student.getBirthDate().toString());
-                        labelGender.setText(student.getGender());
-                        
-                        String assignedNrc = subjectDAO.getSubjectNRCByStudentID(studentId);
-                        labelSubject.setText(assignedNrc);
-                        
-                        labelProject.setText(requestProjectDAO.getProjectAssignedToStudent(studentId));
-                        labelIsInactive.setText(studentDAO.isStudentInactive(studentId) ? "Inactivo" : "Activo");
-                        currentStudent = student;
+                        currentStudent = studentOptional.get();
+                        displayStudentInformation(currentStudent);
+                        loadStudentAcademicInformation(studentId);
+                        tabPaneStudent.getSelectionModel().select(TAB_PERSONAL);
                     }
+                } else {
+                    showError("No se encontró al alumno con esa matrícula");
                 }
             } catch (OperationException e) {
-                LOGGER.log(Level.SEVERE, "Error al consultar al alumno");
+                LOGGER.log(Level.SEVERE, "Error al consultar al alumno", e);
                 showError(e.getMessage());
             }
         }
@@ -170,9 +164,10 @@ public class FXMLConsultStudentController extends ValidationHandler {
     private void enableEditMode() {
         if (currentStudent == null) {
             showError("Primero debe buscar un alumno");
-        } else {    
+        } else {
             loadCurrentDataIntoEditors();
             toggleEditMode(true);
+            tabPaneStudent.getSelectionModel().select(TAB_PERSONAL);
         }
     }
 
@@ -277,8 +272,7 @@ public class FXMLConsultStudentController extends ValidationHandler {
                     contextMenuSuggestions.show(textFieldStudentId, Side.BOTTOM, 0, 0);
                 }
             } catch (OperationException operationException) {
-                LOGGER.log(Level.WARNING, "Error al cargar sugerencias",
-                    operationException);
+                LOGGER.log(Level.WARNING, "Error al cargar sugerencias", operationException);
                 showError(operationException.getMessage());
                 contextMenuSuggestions.hide();
             }
@@ -333,8 +327,7 @@ public class FXMLConsultStudentController extends ValidationHandler {
         }
     }
 
-    private void handleInactivationWithProject(String studentId)
-            throws OperationException {
+    private void handleInactivationWithProject(String studentId) throws OperationException {
         boolean confirmedAnyway = showConfirmation("Proyecto asignado",
             "El estudiante tiene un proyecto asignado. ¿Desea inactivarlo de todas formas?"
         );
