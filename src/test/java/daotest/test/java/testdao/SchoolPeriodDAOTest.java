@@ -1,5 +1,6 @@
 package daotest.test.java.testdao;
 
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -7,40 +8,46 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 
+import java.lang.reflect.Field;
 import java.sql.Connection;
 import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.List;
 import java.util.Optional;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.MockitoAnnotations;
 
 import uv.lis.dataaccess.MySQLConnectionManager;
 import uv.lis.logic.dao.SchoolPeriodDAO;
 import uv.lis.logic.dto.SchoolPeriod;
 import uv.lis.logic.exceptions.OperationException;
 
-@ExtendWith(MockitoExtension.class)
 class SchoolPeriodDAOTest {
 
     private static final int VALID_PERIOD_ID = 1;
     private static final int INVALID_PERIOD_ID = 99;
-    private static final int EXPECTED_LIST_SIZE = 2;
+    private static final int ROWS_AFFECTED = 1;
+    private static final int NO_ROWS_AFFECTED = 0;
+
     private static final String EXPECTED_PERIOD_ID_STRING = "1";
-    private static final String VALID_PERIOD_NAME = "Febrero-Julio 2026";
+    private static final String FIRST_PERIOD_NAME = "Febrero-Julio 2026";
     private static final String SECOND_PERIOD_NAME = "Agosto 2026-Enero 2027";
-    private static final String INVALID_PERIOD_NAME = "NoExiste";
+    private static final String INVALID_PERIOD_NAME = "No Existe";
     private static final String START_DATE = "2025-01-20";
     private static final String END_DATE = "2025-06-20";
-    private static final String CONNECTION_ERROR = "Fallo";
+    private static final String DATABASE_ERROR_MESSAGE = "Fallo";
+    private static final String CONNECTION_MANAGER_FIELD = "connectionManager";
+
+    private static final String COLUMN_NAME = "nombre";
+    private static final String COLUMN_PERIOD_ID = "idPeriodoEscolar";
 
     @Mock private MySQLConnectionManager connectionManager;
-    @Mock private Connection connection;
+    @Mock private Connection databaseConnection;
     @Mock private PreparedStatement preparedStatement;
     @Mock private ResultSet resultSet;
 
@@ -48,8 +55,24 @@ class SchoolPeriodDAOTest {
 
     @BeforeEach
     void setUp() throws Exception {
-        schoolPeriodDAO = new SchoolPeriodDAO(connectionManager);
-        when(connectionManager.getConnection()).thenReturn(connection);
+        MockitoAnnotations.openMocks(this);
+
+        schoolPeriodDAO = new SchoolPeriodDAO();
+        Field field = SchoolPeriodDAO.class.getDeclaredField(CONNECTION_MANAGER_FIELD);
+        field.setAccessible(true);
+        field.set(schoolPeriodDAO, connectionManager);
+
+        when(connectionManager.getConnection()).thenReturn(databaseConnection);
+    }
+
+    private void mockQueryExecution() throws Exception {
+        when(databaseConnection.prepareStatement(anyString())).thenReturn(preparedStatement);
+        when(preparedStatement.executeQuery()).thenReturn(resultSet);
+    }
+
+    private void mockUpdateExecution(int rowsAffected) throws Exception {
+        when(databaseConnection.prepareStatement(anyString())).thenReturn(preparedStatement);
+        when(preparedStatement.executeUpdate()).thenReturn(rowsAffected);
     }
 
     private SchoolPeriod builderSchoolPeriod() {
@@ -61,19 +84,18 @@ class SchoolPeriodDAOTest {
     }
 
     @Test
-    void getAllSchoolPeriodsNames_withResults_returnsPopulatedList() throws Exception {
-        when(connection.prepareStatement(anyString())).thenReturn(preparedStatement);
-        when(preparedStatement.executeQuery()).thenReturn(resultSet);
+    void getAllSchoolPeriodsNames_withResults_returnsExpectedList() throws Exception {
+        mockQueryExecution();
         when(resultSet.next()).thenReturn(true, true, false);
-        when(resultSet.getString("nombre")).thenReturn(VALID_PERIOD_NAME, SECOND_PERIOD_NAME);
+        when(resultSet.getString(COLUMN_NAME)).thenReturn(FIRST_PERIOD_NAME, SECOND_PERIOD_NAME);
 
-        assertEquals(EXPECTED_LIST_SIZE, schoolPeriodDAO.getAllSchoolPeriodsNames().size());
+        assertEquals(List.of(FIRST_PERIOD_NAME, SECOND_PERIOD_NAME),
+            schoolPeriodDAO.getAllSchoolPeriodsNames());
     }
 
     @Test
     void getAllSchoolPeriodsNames_emptyResultSet_returnsEmptyList() throws Exception {
-        when(connection.prepareStatement(anyString())).thenReturn(preparedStatement);
-        when(preparedStatement.executeQuery()).thenReturn(resultSet);
+        mockQueryExecution();
         when(resultSet.next()).thenReturn(false);
 
         assertTrue(schoolPeriodDAO.getAllSchoolPeriodsNames().isEmpty());
@@ -81,28 +103,25 @@ class SchoolPeriodDAOTest {
 
     @Test
     void getAllSchoolPeriodsNames_sqlError_throwsOperationException() throws Exception {
-        when(connectionManager.getConnection()).thenThrow(new SQLException(CONNECTION_ERROR));
+        when(connectionManager.getConnection()).thenThrow(new SQLException(DATABASE_ERROR_MESSAGE));
 
         assertThrows(OperationException.class,
             () -> schoolPeriodDAO.getAllSchoolPeriodsNames());
     }
 
     @Test
-    void getSchoolPeriodIdByName_found_returnsPeriodId() throws Exception {
-        when(connection.prepareStatement(anyString())).thenReturn(preparedStatement);
-        when(preparedStatement.executeQuery()).thenReturn(resultSet);
+    void getSchoolPeriodIdByName_found_returnsExpectedOptional() throws Exception {
+        mockQueryExecution();
         when(resultSet.next()).thenReturn(true);
-        when(resultSet.getString("idPeriodoEscolar")).thenReturn(EXPECTED_PERIOD_ID_STRING);
+        when(resultSet.getString(COLUMN_PERIOD_ID)).thenReturn(EXPECTED_PERIOD_ID_STRING);
 
-        Optional<String> result = schoolPeriodDAO.getSchoolPeriodIdByName(VALID_PERIOD_NAME);
-
-        assertEquals(EXPECTED_PERIOD_ID_STRING, result.get());
+        assertEquals(Optional.of(EXPECTED_PERIOD_ID_STRING),
+            schoolPeriodDAO.getSchoolPeriodIdByName(FIRST_PERIOD_NAME));
     }
 
     @Test
     void getSchoolPeriodIdByName_notFound_throwsOperationException() throws Exception {
-        when(connection.prepareStatement(anyString())).thenReturn(preparedStatement);
-        when(preparedStatement.executeQuery()).thenReturn(resultSet);
+        mockQueryExecution();
         when(resultSet.next()).thenReturn(false);
 
         assertThrows(OperationException.class,
@@ -111,24 +130,22 @@ class SchoolPeriodDAOTest {
 
     @Test
     void getSchoolPeriodIdByName_sqlError_throwsOperationException() throws Exception {
-        when(connectionManager.getConnection()).thenThrow(new SQLException(CONNECTION_ERROR));
+        when(connectionManager.getConnection()).thenThrow(new SQLException(DATABASE_ERROR_MESSAGE));
 
         assertThrows(OperationException.class,
-            () -> schoolPeriodDAO.getSchoolPeriodIdByName(VALID_PERIOD_NAME));
+            () -> schoolPeriodDAO.getSchoolPeriodIdByName(FIRST_PERIOD_NAME));
     }
 
     @Test
     void registerSchoolPeriod_successful_returnsTrue() throws Exception {
-        when(connection.prepareStatement(anyString())).thenReturn(preparedStatement);
-        when(preparedStatement.executeUpdate()).thenReturn(1);
+        mockUpdateExecution(ROWS_AFFECTED);
 
         assertTrue(schoolPeriodDAO.registerSchoolPeriod(builderSchoolPeriod()));
     }
 
     @Test
     void registerSchoolPeriod_noRowsAffected_throwsOperationException() throws Exception {
-        when(connection.prepareStatement(anyString())).thenReturn(preparedStatement);
-        when(preparedStatement.executeUpdate()).thenReturn(0);
+        mockUpdateExecution(NO_ROWS_AFFECTED);
 
         assertThrows(OperationException.class,
             () -> schoolPeriodDAO.registerSchoolPeriod(builderSchoolPeriod()));
@@ -136,7 +153,7 @@ class SchoolPeriodDAOTest {
 
     @Test
     void registerSchoolPeriod_sqlError_throwsOperationException() throws Exception {
-        when(connectionManager.getConnection()).thenThrow(new SQLException(CONNECTION_ERROR));
+        when(connectionManager.getConnection()).thenThrow(new SQLException(DATABASE_ERROR_MESSAGE));
 
         assertThrows(OperationException.class,
             () -> schoolPeriodDAO.registerSchoolPeriod(builderSchoolPeriod()));
@@ -144,16 +161,14 @@ class SchoolPeriodDAOTest {
 
     @Test
     void modifySchoolPeriod_successful_returnsTrue() throws Exception {
-        when(connection.prepareStatement(anyString())).thenReturn(preparedStatement);
-        when(preparedStatement.executeUpdate()).thenReturn(1);
+        mockUpdateExecution(ROWS_AFFECTED);
 
         assertTrue(schoolPeriodDAO.modifySchoolPeriod(builderSchoolPeriod()));
     }
 
     @Test
     void modifySchoolPeriod_noRowsAffected_throwsOperationException() throws Exception {
-        when(connection.prepareStatement(anyString())).thenReturn(preparedStatement);
-        when(preparedStatement.executeUpdate()).thenReturn(0);
+        mockUpdateExecution(NO_ROWS_AFFECTED);
 
         assertThrows(OperationException.class,
             () -> schoolPeriodDAO.modifySchoolPeriod(builderSchoolPeriod()));
@@ -161,7 +176,7 @@ class SchoolPeriodDAOTest {
 
     @Test
     void modifySchoolPeriod_sqlError_throwsOperationException() throws Exception {
-        when(connectionManager.getConnection()).thenThrow(new SQLException(CONNECTION_ERROR));
+        when(connectionManager.getConnection()).thenThrow(new SQLException(DATABASE_ERROR_MESSAGE));
 
         assertThrows(OperationException.class,
             () -> schoolPeriodDAO.modifySchoolPeriod(builderSchoolPeriod()));
@@ -169,8 +184,7 @@ class SchoolPeriodDAOTest {
 
     @Test
     void existsSchoolPeriod_exists_returnsTrue() throws Exception {
-        when(connection.prepareStatement(anyString())).thenReturn(preparedStatement);
-        when(preparedStatement.executeQuery()).thenReturn(resultSet);
+        mockQueryExecution();
         when(resultSet.next()).thenReturn(true);
 
         assertTrue(schoolPeriodDAO.existsSchoolPeriod(VALID_PERIOD_ID));
@@ -178,8 +192,7 @@ class SchoolPeriodDAOTest {
 
     @Test
     void existsSchoolPeriod_notExists_returnsFalse() throws Exception {
-        when(connection.prepareStatement(anyString())).thenReturn(preparedStatement);
-        when(preparedStatement.executeQuery()).thenReturn(resultSet);
+        mockQueryExecution();
         when(resultSet.next()).thenReturn(false);
 
         assertFalse(schoolPeriodDAO.existsSchoolPeriod(INVALID_PERIOD_ID));
@@ -187,7 +200,7 @@ class SchoolPeriodDAOTest {
 
     @Test
     void existsSchoolPeriod_sqlError_throwsOperationException() throws Exception {
-        when(connectionManager.getConnection()).thenThrow(new SQLException(CONNECTION_ERROR));
+        when(connectionManager.getConnection()).thenThrow(new SQLException(DATABASE_ERROR_MESSAGE));
 
         assertThrows(OperationException.class,
             () -> schoolPeriodDAO.existsSchoolPeriod(VALID_PERIOD_ID));
