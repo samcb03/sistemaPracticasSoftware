@@ -1,8 +1,8 @@
 package daotest.test.java.testdao;
 
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -14,21 +14,42 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.MockitoAnnotations;
 
 import uv.lis.dataaccess.MySQLConnectionManager;
 import uv.lis.logic.dao.ProjectSupervisorDAO;
 import uv.lis.logic.dto.ProjectSupervisor;
 import uv.lis.logic.exceptions.OperationException;
 
-@ExtendWith(MockitoExtension.class)
 class ProjectSupervisorDAOTest {
+
+    private static final int ROWS_AFFECTED = 1;
+    private static final int NO_ROWS = 0;
+    private static final int SUPERVISOR_ID = 1;
+    private static final int ORGANIZATION_ID = 1;
+    private static final int GENERATED_ID = 5;
+    private static final int ACTIVE_STATUS = 1;
+    private static final int INACTIVE_STATUS = 0;
+    private static final int NOT_FOUND_ID = -1;
+
+    private static final String SUPERVISOR_NAME = "Juan Lopez";
+    private static final String SUPERVISOR_POSITION = "Gerente";
+    private static final String SUPERVISOR_EMAIL = "juan@empresa.com";
+    private static final String NONEXISTENT_SUPERVISOR = "NoExiste";
+    private static final String CONNECTION_ERROR = "Fallo";
+    private static final String CONNECTION_MANAGER_FIELD = "connectionManager";
+
+    private static final String COLUMN_SUPERVISOR_ID = "idResponsableProyecto";
+    private static final String COLUMN_NAME = "nombre";
+    private static final String COLUMN_POSITION = "cargo";
+    private static final String COLUMN_EMAIL = "correo";
+    private static final String COLUMN_STATUS = "estado";
 
     @Mock private MySQLConnectionManager connectionManager;
     @Mock private Connection databaseConnection;
@@ -39,29 +60,61 @@ class ProjectSupervisorDAOTest {
 
     @BeforeEach
     void setUp() throws Exception {
+        MockitoAnnotations.openMocks(this);
         projectSupervisorDAO = new ProjectSupervisorDAO();
-        Field field = ProjectSupervisorDAO.class.getDeclaredField("connectionManager");
+        Field field = ProjectSupervisorDAO.class.getDeclaredField(CONNECTION_MANAGER_FIELD);
         field.setAccessible(true);
         field.set(projectSupervisorDAO, connectionManager);
         when(connectionManager.getConnection()).thenReturn(databaseConnection);
     }
 
-    @Test
-    void getAllSupervisorNames_supervisorsExist_returnsNonEmptyList() throws Exception {
+    private void mockQueryExecution() throws Exception {
         when(databaseConnection.prepareStatement(anyString())).thenReturn(preparedStatement);
         when(preparedStatement.executeQuery()).thenReturn(resultSet);
+    }
+
+    private void mockResultSetSingleSupervisor() throws Exception {
         when(resultSet.next()).thenReturn(true, false);
-        when(resultSet.getString("nombre")).thenReturn("Juan Lopez");
+        when(resultSet.getInt(COLUMN_SUPERVISOR_ID)).thenReturn(SUPERVISOR_ID);
+        when(resultSet.getString(COLUMN_NAME)).thenReturn(SUPERVISOR_NAME);
+        when(resultSet.getString(COLUMN_POSITION)).thenReturn(SUPERVISOR_POSITION);
+        when(resultSet.getString(COLUMN_EMAIL)).thenReturn(SUPERVISOR_EMAIL);
+    }
+
+    private ProjectSupervisor buildSupervisor() {
+        ProjectSupervisor supervisor = new ProjectSupervisor();
+        supervisor.setId(SUPERVISOR_ID);
+        supervisor.setName(SUPERVISOR_NAME);
+        supervisor.setPosition(SUPERVISOR_POSITION);
+        supervisor.setEmail(SUPERVISOR_EMAIL);
+        supervisor.setIsActive(true);
+        supervisor.setOrganizationInt(ORGANIZATION_ID);
+        return supervisor;
+    }
+
+    private ProjectSupervisor buildExpectedMappedSupervisor() {
+        ProjectSupervisor supervisor = new ProjectSupervisor();
+        supervisor.setId(SUPERVISOR_ID);
+        supervisor.setName(SUPERVISOR_NAME);
+        supervisor.setPosition(SUPERVISOR_POSITION);
+        supervisor.setEmail(SUPERVISOR_EMAIL);
+        return supervisor;
+    }
+
+    @Test
+    void getAllSupervisorNames_supervisorsExist_returnsExpectedList() throws Exception {
+        mockQueryExecution();
+        when(resultSet.next()).thenReturn(true, false);
+        when(resultSet.getString(COLUMN_NAME)).thenReturn(SUPERVISOR_NAME);
 
         ArrayList<String> result = projectSupervisorDAO.getAllSupervisorNames();
 
-        assertFalse(result.isEmpty());
+        assertEquals(List.of(SUPERVISOR_NAME), result);
     }
 
     @Test
     void getAllSupervisorNames_noSupervisors_returnsEmptyList() throws Exception {
-        when(databaseConnection.prepareStatement(anyString())).thenReturn(preparedStatement);
-        when(preparedStatement.executeQuery()).thenReturn(resultSet);
+        mockQueryExecution();
         when(resultSet.next()).thenReturn(false);
 
         ArrayList<String> result = projectSupervisorDAO.getAllSupervisorNames();
@@ -71,59 +124,52 @@ class ProjectSupervisorDAOTest {
 
     @Test
     void getAllSupervisorNames_databaseError_throwsOperationException() throws Exception {
-        when(databaseConnection.prepareStatement(anyString())).thenThrow(new SQLException());
+        when(connectionManager.getConnection()).thenThrow(new SQLException(CONNECTION_ERROR));
 
         assertThrows(OperationException.class,
             () -> projectSupervisorDAO.getAllSupervisorNames());
     }
 
     @Test
-    void getProjectSupervisorById_supervisorFound_returnsNonEmpty() throws Exception {
-        when(databaseConnection.prepareStatement(anyString())).thenReturn(preparedStatement);
-        when(preparedStatement.executeQuery()).thenReturn(resultSet);
-        when(resultSet.next()).thenReturn(true);
-        when(resultSet.getInt("idResponsableProyecto")).thenReturn(1);
-        when(resultSet.getString("nombre")).thenReturn("Juan Lopez");
-        when(resultSet.getString("cargo")).thenReturn("Gerente");
-        when(resultSet.getString("correo")).thenReturn("juan@empresa.com");
+    void getProjectSupervisorById_supervisorFound_returnsExpectedSupervisor() throws Exception {
+        mockQueryExecution();
+        mockResultSetSingleSupervisor();
+        Optional<ProjectSupervisor> expected = Optional.of(buildExpectedMappedSupervisor());
 
-        Optional<ProjectSupervisor> result = projectSupervisorDAO.getProjectSupervisorById(1);
+        Optional<ProjectSupervisor> result = projectSupervisorDAO.getProjectSupervisorById(SUPERVISOR_ID);
 
-        assertTrue(result.isPresent());
+        assertEquals(expected, result);
     }
 
     @Test
     void getProjectSupervisorById_supervisorNotFound_throwsOperationException() throws Exception {
-        when(databaseConnection.prepareStatement(anyString())).thenReturn(preparedStatement);
-        when(preparedStatement.executeQuery()).thenReturn(resultSet);
+        mockQueryExecution();
         when(resultSet.next()).thenReturn(false);
 
         assertThrows(OperationException.class,
-            () -> projectSupervisorDAO.getProjectSupervisorById(99));
+            () -> projectSupervisorDAO.getProjectSupervisorById(SUPERVISOR_ID));
     }
 
     @Test
     void getProjectSupervisorById_databaseError_throwsOperationException() throws Exception {
-        when(databaseConnection.prepareStatement(anyString())).thenThrow(new SQLException());
+        when(connectionManager.getConnection()).thenThrow(new SQLException(CONNECTION_ERROR));
 
         assertThrows(OperationException.class,
-            () -> projectSupervisorDAO.getProjectSupervisorById(1));
+            () -> projectSupervisorDAO.getProjectSupervisorById(SUPERVISOR_ID));
     }
 
     @Test
     void registerProjectSupervisor_validSupervisor_returnsTrue() throws Exception {
         when(databaseConnection.prepareStatement(anyString())).thenReturn(preparedStatement);
-        when(preparedStatement.executeUpdate()).thenReturn(1);
+        when(preparedStatement.executeUpdate()).thenReturn(ROWS_AFFECTED);
 
-        boolean result = projectSupervisorDAO.registerProjectSupervisor(buildSupervisor());
-
-        assertTrue(result);
+        assertTrue(projectSupervisorDAO.registerProjectSupervisor(buildSupervisor()));
     }
 
     @Test
     void registerProjectSupervisor_noRowsAffected_throwsOperationException() throws Exception {
         when(databaseConnection.prepareStatement(anyString())).thenReturn(preparedStatement);
-        when(preparedStatement.executeUpdate()).thenReturn(0);
+        when(preparedStatement.executeUpdate()).thenReturn(NO_ROWS);
 
         assertThrows(OperationException.class,
             () -> projectSupervisorDAO.registerProjectSupervisor(buildSupervisor()));
@@ -131,7 +177,7 @@ class ProjectSupervisorDAOTest {
 
     @Test
     void registerProjectSupervisor_databaseError_throwsOperationException() throws Exception {
-        when(databaseConnection.prepareStatement(anyString())).thenThrow(new SQLException());
+        when(connectionManager.getConnection()).thenThrow(new SQLException(CONNECTION_ERROR));
 
         assertThrows(OperationException.class,
             () -> projectSupervisorDAO.registerProjectSupervisor(buildSupervisor()));
@@ -140,17 +186,15 @@ class ProjectSupervisorDAOTest {
     @Test
     void modifyProjectSupervisor_validSupervisor_returnsTrue() throws Exception {
         when(databaseConnection.prepareStatement(anyString())).thenReturn(preparedStatement);
-        when(preparedStatement.executeUpdate()).thenReturn(1);
+        when(preparedStatement.executeUpdate()).thenReturn(ROWS_AFFECTED);
 
-        boolean result = projectSupervisorDAO.modifyProjectSupervisor(buildSupervisor());
-
-        assertTrue(result);
+        assertTrue(projectSupervisorDAO.modifyProjectSupervisor(buildSupervisor()));
     }
 
     @Test
     void modifyProjectSupervisor_noRowsAffected_throwsOperationException() throws Exception {
         when(databaseConnection.prepareStatement(anyString())).thenReturn(preparedStatement);
-        when(preparedStatement.executeUpdate()).thenReturn(0);
+        when(preparedStatement.executeUpdate()).thenReturn(NO_ROWS);
 
         assertThrows(OperationException.class,
             () -> projectSupervisorDAO.modifyProjectSupervisor(buildSupervisor()));
@@ -158,7 +202,7 @@ class ProjectSupervisorDAOTest {
 
     @Test
     void modifyProjectSupervisor_databaseError_throwsOperationException() throws Exception {
-        when(databaseConnection.prepareStatement(anyString())).thenThrow(new SQLException());
+        when(connectionManager.getConnection()).thenThrow(new SQLException(CONNECTION_ERROR));
 
         assertThrows(OperationException.class,
             () -> projectSupervisorDAO.modifyProjectSupervisor(buildSupervisor()));
@@ -167,28 +211,26 @@ class ProjectSupervisorDAOTest {
     @Test
     void inactivateProjectSupervisor_supervisorExists_returnsTrue() throws Exception {
         when(databaseConnection.prepareStatement(anyString())).thenReturn(preparedStatement);
-        when(preparedStatement.executeUpdate()).thenReturn(1);
+        when(preparedStatement.executeUpdate()).thenReturn(ROWS_AFFECTED);
 
-        boolean result = projectSupervisorDAO.inactivateProjectSupervisor("Juan Lopez");
-
-        assertTrue(result);
+        assertTrue(projectSupervisorDAO.inactivateProjectSupervisor(SUPERVISOR_NAME));
     }
 
     @Test
     void inactivateProjectSupervisor_noRowsAffected_throwsOperationException() throws Exception {
         when(databaseConnection.prepareStatement(anyString())).thenReturn(preparedStatement);
-        when(preparedStatement.executeUpdate()).thenReturn(0);
+        when(preparedStatement.executeUpdate()).thenReturn(NO_ROWS);
 
         assertThrows(OperationException.class,
-            () -> projectSupervisorDAO.inactivateProjectSupervisor("Juan Lopez"));
+            () -> projectSupervisorDAO.inactivateProjectSupervisor(SUPERVISOR_NAME));
     }
 
     @Test
     void inactivateProjectSupervisor_databaseError_throwsOperationException() throws Exception {
-        when(databaseConnection.prepareStatement(anyString())).thenThrow(new SQLException());
+        when(connectionManager.getConnection()).thenThrow(new SQLException(CONNECTION_ERROR));
 
         assertThrows(OperationException.class,
-            () -> projectSupervisorDAO.inactivateProjectSupervisor("Juan Lopez"));
+            () -> projectSupervisorDAO.inactivateProjectSupervisor(SUPERVISOR_NAME));
     }
 
     @Test
@@ -196,11 +238,9 @@ class ProjectSupervisorDAOTest {
         when(databaseConnection.prepareStatement(anyString())).thenReturn(preparedStatement);
         when(preparedStatement.executeQuery()).thenReturn(resultSet);
         when(resultSet.next()).thenReturn(true);
-        when(resultSet.getInt("estado")).thenReturn(0);
+        when(resultSet.getInt(COLUMN_STATUS)).thenReturn(INACTIVE_STATUS);
 
-        boolean result = projectSupervisorDAO.isSupervisorInactive("Juan Lopez");
-
-        assertTrue(result);
+        assertTrue(projectSupervisorDAO.isSupervisorInactive(SUPERVISOR_NAME));
     }
 
     @Test
@@ -208,11 +248,9 @@ class ProjectSupervisorDAOTest {
         when(databaseConnection.prepareStatement(anyString())).thenReturn(preparedStatement);
         when(preparedStatement.executeQuery()).thenReturn(resultSet);
         when(resultSet.next()).thenReturn(true);
-        when(resultSet.getInt("estado")).thenReturn(1);
+        when(resultSet.getInt(COLUMN_STATUS)).thenReturn(ACTIVE_STATUS);
 
-        boolean result = projectSupervisorDAO.isSupervisorInactive("Juan Lopez");
-
-        assertFalse(result);
+        assertFalse(projectSupervisorDAO.isSupervisorInactive(SUPERVISOR_NAME));
     }
 
     @Test
@@ -222,62 +260,47 @@ class ProjectSupervisorDAOTest {
         when(resultSet.next()).thenReturn(false);
 
         assertThrows(OperationException.class,
-            () -> projectSupervisorDAO.isSupervisorInactive("NoExiste"));
+            () -> projectSupervisorDAO.isSupervisorInactive(NONEXISTENT_SUPERVISOR));
     }
 
     @Test
-    void getSupervisorIdByName_supervisorFound_returnsId() throws Exception {
-        when(databaseConnection.prepareStatement(anyString())).thenReturn(preparedStatement);
-        when(preparedStatement.executeQuery()).thenReturn(resultSet);
+    void getSupervisorIdByName_supervisorFound_returnsExpectedId() throws Exception {
+        mockQueryExecution();
         when(resultSet.next()).thenReturn(true);
-        when(resultSet.getInt("idResponsableProyecto")).thenReturn(5);
+        when(resultSet.getInt(COLUMN_SUPERVISOR_ID)).thenReturn(GENERATED_ID);
 
-        int result = projectSupervisorDAO.getSupervisorIdByName("Juan Lopez");
+        int result = projectSupervisorDAO.getSupervisorIdByName(SUPERVISOR_NAME);
 
-        assertNotEquals(-1, result);
+        assertEquals(GENERATED_ID, result);
     }
 
     @Test
-    void getSupervisorIdByName_supervisorNotFound_returnsMinusOne() throws Exception {
-        when(databaseConnection.prepareStatement(anyString())).thenReturn(preparedStatement);
-        when(preparedStatement.executeQuery()).thenReturn(resultSet);
+    void getSupervisorIdByName_supervisorNotFound_returnsNotFoundId() throws Exception {
+        mockQueryExecution();
         when(resultSet.next()).thenReturn(false);
 
-        int result = projectSupervisorDAO.getSupervisorIdByName("NoExiste");
+        int result = projectSupervisorDAO.getSupervisorIdByName(NONEXISTENT_SUPERVISOR);
 
-        assertTrue(result == -1);
+        assertEquals(NOT_FOUND_ID, result);
     }
 
     @Test
     void hasProjectsActives_hasActiveProjects_returnsTrue() throws Exception {
-        when(databaseConnection.prepareStatement(anyString())).thenReturn(preparedStatement);
-        when(preparedStatement.executeQuery()).thenReturn(resultSet);
+        mockQueryExecution();
         when(resultSet.next()).thenReturn(true);
 
-        boolean result = projectSupervisorDAO.hasProjectsActives("Juan Lopez");
+        boolean result = projectSupervisorDAO.hasProjectsActives(SUPERVISOR_NAME);
 
         assertTrue(result);
     }
 
     @Test
     void hasProjectsActives_noActiveProjects_returnsFalse() throws Exception {
-        when(databaseConnection.prepareStatement(anyString())).thenReturn(preparedStatement);
-        when(preparedStatement.executeQuery()).thenReturn(resultSet);
+        mockQueryExecution();
         when(resultSet.next()).thenReturn(false);
 
-        boolean result = projectSupervisorDAO.hasProjectsActives("Juan Lopez");
+        boolean result = projectSupervisorDAO.hasProjectsActives(SUPERVISOR_NAME);
 
         assertFalse(result);
-    }
-
-    private ProjectSupervisor buildSupervisor() {
-        ProjectSupervisor supervisor = new ProjectSupervisor();
-        supervisor.setId(1);
-        supervisor.setName("Juan Lopez");
-        supervisor.setPosition("Gerente");
-        supervisor.setEmail("juan@empresa.com");
-        supervisor.setIsActive(true);
-        supervisor.setOrganizationInt(1);
-        return supervisor;
     }
 }
