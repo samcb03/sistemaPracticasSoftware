@@ -155,7 +155,8 @@ public class ReportContextDAO implements IReportContextDAO {
                                   + "FROM Actividad a "
                                   + "INNER JOIN Proyecto p ON a.idProyecto = p.idProyecto "
                                   + "INNER JOIN Solicita_Proyecto sp ON p.idProyecto = sp.idProyecto "
-                                  + "WHERE sp.matricula = ?";
+                                  + "WHERE sp.matricula = ? "
+                                  + "ORDER BY a.idActividad";
 
         try (Connection databaseConnection = connectionManager.getConnection();
             PreparedStatement preparedStatement = databaseConnection.prepareStatement(reportContextQuery)) {
