@@ -179,7 +179,7 @@ public class ActivityDAO implements IActivityDAO {
                                     + "ORDER BY a.idActividad";
  
         try (Connection databaseConnection = connectionManager.getConnection();
-                PreparedStatement preparedStatement = databaseConnection.prepareStatement(activityContextQuery)) {
+            PreparedStatement preparedStatement = databaseConnection.prepareStatement(activityContextQuery)) {
  
             preparedStatement.setString(1, studentId);
             preparedStatement.setInt(2, STATUS_ASSIGNED);
