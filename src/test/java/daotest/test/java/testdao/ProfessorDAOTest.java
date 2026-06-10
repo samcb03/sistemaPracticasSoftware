@@ -30,10 +30,6 @@ import uv.lis.logic.exceptions.OperationException;
 class ProfessorDAOTest {
 
     private static final int EXPECTED_USER_ID = 5;
-    private static final int COORDINATOR_ROLE_ID = 3;
-    private static final int PROFESSOR_ROLE_ID = 2;
-    private static final int INACTIVE_STATUS = 0;
-    private static final int ACTIVE_STATUS = 1;
     private static final int EXPECTED_LIST_SIZE = 2;
     private static final int ROWS_AFFECTED = 1;
     private static final int NO_ROWS = 0;

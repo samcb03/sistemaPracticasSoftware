@@ -62,8 +62,6 @@ public class FXMLAssignationProjectController extends ValidationHandler {
     private static final String ASSIGNMENT_MESSAGE_REASON = ". Motivo: ";
     private static final String ALTERNATIVE_MODE_LABEL = "Asignación alternativa";
     private static final String NORMAL_MODE_LABEL = "Modo normal";
-    private static final String STUDENTS_WITHOUT_PROJECT_LABEL = "Alumnos sin proyecto:";
-    private static final String APPLICANTS_LABEL = "Alumnos solicitantes:";
     private boolean isAlternativeMode = false;
 
     @Override

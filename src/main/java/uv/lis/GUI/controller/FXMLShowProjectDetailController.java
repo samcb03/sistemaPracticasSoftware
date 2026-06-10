@@ -35,8 +35,6 @@ public class FXMLShowProjectDetailController extends ValidationHandler {
 
     private static final Logger LOGGER = Logger.getLogger(FXMLShowProjectDetailController.class.getName());
 
-    private static final int MINIMUM_CAPACITY = 1;
-    private static final int MAXIMUM_CAPACITY = 2;
     private static final boolean INACTIVE_PROJECT = false;
 
     @FXML private Label labelName;
@@ -142,22 +140,6 @@ public class FXMLShowProjectDetailController extends ValidationHandler {
         .filter(Optional::isPresent)
         .map(Optional::get)
         .findFirst();
-    }
-
-    private Optional<String> checkCapacityRange(int capacity) {
-        Optional<String> validationResult = Optional.empty();
-        int assignedStudentsCount = listViewStudent.getItems().size();
-
-        if (capacity < MINIMUM_CAPACITY || capacity > MAXIMUM_CAPACITY) {
-            validationResult = Optional.of(
-                "El cupo debe estar entre " + MINIMUM_CAPACITY + " y " + MAXIMUM_CAPACITY);
-        } else if (capacity < assignedStudentsCount) {
-            validationResult = Optional.of(
-                "El cupo no puede ser menor a los alumnos ya asignados ("
-                + assignedStudentsCount + ")");
-        }
-
-        return validationResult;
     }
 
     private void executeProjectUpdate() {

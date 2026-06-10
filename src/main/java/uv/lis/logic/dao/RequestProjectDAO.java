@@ -24,7 +24,6 @@ import uv.lis.logic.exceptions.OperationException;
 
 public class RequestProjectDAO implements IRequestProjectDAO {
 
-    private static final String COLUMN_AVAILABLE = "disponibles";
     private static final String DEFAULT_NO_PROJECT_MESSAGE = "Sin proyecto asignado";
     private static final Logger LOGGER = Logger.getLogger(RequestProjectDAO.class.getName());
     private MySQLConnectionManager connectionManager;
