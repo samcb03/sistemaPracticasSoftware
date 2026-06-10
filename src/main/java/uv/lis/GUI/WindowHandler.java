@@ -30,7 +30,7 @@ public abstract class WindowHandler implements Initializable {
             stage.setScene(new Scene(root));
             stage.show();
         } catch (IOException e) {
-            LOGGER.log(Level.SEVERE, "Error al cargar la pantalla: {0}", fxml);
+            LOGGER.log(Level.SEVERE, "Error al cargar la pantalla: {0} " + e, fxml);
             showError("Error al cargar la pantalla.");
         }
     }

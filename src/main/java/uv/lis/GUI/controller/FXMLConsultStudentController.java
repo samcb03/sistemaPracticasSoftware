@@ -47,7 +47,6 @@ public class FXMLConsultStudentController extends ValidationHandler {
     private static final String GENDER_OTHER = "Otro";
 
     private static final int TAB_PERSONAL = 0;
-    private static final int TAB_ESCOLAR = 1;
 
     @FXML private TextField textFieldStudentId;
     @FXML private Button buttonSearch;

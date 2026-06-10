@@ -1,6 +1,7 @@
 package uv.lis.GUI.controller;
 
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
@@ -19,12 +20,14 @@ import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
-
+import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.GridPane;
 import net.sf.jasperreports.engine.JRException;
 import net.sf.jasperreports.engine.JasperPrint;
 import net.sf.jasperreports.view.JasperViewer;
 
 import uv.lis.GUI.ValidationHandler;
+import uv.lis.GUI.WeeklyAdvanceGridEditor;
 import uv.lis.logic.common.PartialReportCommon;
 import uv.lis.logic.dao.ActivityDAO;
 import uv.lis.logic.dao.ReportDAO;
@@ -34,6 +37,7 @@ import uv.lis.logic.dto.Student;
 import uv.lis.logic.exceptions.OperationException;
 import uv.lis.logic.utils.InputValidator;
 import uv.lis.logic.utils.SessionManager;
+import uv.lis.logic.utils.WorkProgressCalculator;
 
 public class FXMLGeneratePartialReportController extends ValidationHandler {
 
@@ -46,16 +50,18 @@ public class FXMLGeneratePartialReportController extends ValidationHandler {
     private static final String PARTIAL_REPORT_TITLE = "Reporte Parcial";
     private static final String DUPLICATE_ACTIVITY_MESSAGE
         = "La actividad ya fue seleccionada. Cada actividad solo puede elegirse una vez.";
+    private static final String PLANNED_EDITOR_TITLE = "Editar Avance Esperado";
+    private static final String REAL_EDITOR_TITLE = "Editar Avance Real";
+    private static final String NO_ACTIVITY_SELECTED_MESSAGE 
+        = "Selecciona al menos una actividad antes de editar el avance.";
 
     private static final int DEFAULT_REPORT_NUMBER = 1;
     private static final int INVALID_ADVANCE = 0;
+    private static final int MAX_ADVANCE = 100;
 
     private final PartialReportCommon partialReportCommon = new PartialReportCommon();
     private final ActivityDAO activityDAO = new ActivityDAO();
     private final ReportDAO reportDAO = new ReportDAO();
-
-    private ComboBox<String>[] comboBoxActivities;
-    private TextField[] textFieldAdvances;
 
     @FXML private Label labelMessage;
     @FXML private Button buttonBack;
@@ -76,11 +82,25 @@ public class FXMLGeneratePartialReportController extends ValidationHandler {
 
     @FXML private TextArea textAreaGeneralObservations;
     @FXML private TextArea textAreaResults;
+    @FXML private AnchorPane paneAdvanceEditor;
+    @FXML private Label labelAdvanceEditorTitle;
+    @FXML private GridPane gridAdvanceEditor;
+    @FXML private Label labelAdvanceEditorMessage;
+
+    private ComboBox<String>[] comboBoxActivities;
+    private TextField[] textFieldAdvances;
+    private WeeklyAdvanceGridEditor advanceGridEditor;
+    private List<Activity> studentActivities = new ArrayList<>();
+    private int[][] plannedAdvances = new int[PartialReport.MAX_WEEKS][PartialReport.MAX_ACTIVITIES];
+    private int[][] realAdvances = new int[PartialReport.MAX_WEEKS][PartialReport.MAX_ACTIVITIES];
+    private boolean manualAdvances;
+    private boolean editingPlanned;
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         setupControls(labelMessage, buttonBack);
         groupComponents();
+        advanceGridEditor = new WeeklyAdvanceGridEditor(gridAdvanceEditor);
         loadStudentActivities();
     }
 
@@ -108,9 +128,9 @@ public class FXMLGeneratePartialReportController extends ValidationHandler {
 
     private void populateActivityComboBoxes(String studentId) {
         try {
-            List<Activity> activities = activityDAO.getActivitiesByStudentId(studentId);
+            studentActivities = activityDAO.getActivitiesByStudentId(studentId);
             ObservableList<String> activityNames = FXCollections.observableArrayList(
-                activities.stream()
+                studentActivities.stream()
                     .map(Activity::getName)
                     .collect(Collectors.toList()));
 
@@ -162,8 +182,8 @@ public class FXMLGeneratePartialReportController extends ValidationHandler {
     private Optional<String> validateFirstActivityRow() {
         Stream<Optional<String>> validationStream = Stream.of(
             InputValidator.validateComboBox(comboBoxActivity1.getValue(), "una actividad"),
-            InputValidator.validatePositiveInteger(
-                textFieldAdvance1.getText(), "Porcentaje de Avance de Actividad 1")
+            InputValidator.validateMaxIntValue(
+                textFieldAdvance1.getText(),  MAX_ADVANCE,"Porcentaje de Avance de Actividad 1")
         );
 
         Optional<String> firstError = validationStream
@@ -220,6 +240,7 @@ public class FXMLGeneratePartialReportController extends ValidationHandler {
         }
  
         fillActivityInputs(partialReport);
+        applyManualAdvances(partialReport);
         return partialReport;
     }
 
@@ -251,6 +272,129 @@ public class FXMLGeneratePartialReportController extends ValidationHandler {
         return parsedAdvance;
     }
 
+    @FXML
+    public void openPlannedAdvanceEditor() {
+        editingPlanned = true;
+        prepareAndShowEditor();
+    }
+
+    @FXML
+    public void openRealAdvanceEditor() {
+        editingPlanned = false;
+        prepareAndShowEditor();
+    }
+
+    private void prepareAndShowEditor() {
+        Activity[] activitiesBySlot = resolveSelectedActivities();
+
+        if (hasAnySelectedActivity(activitiesBySlot)) {
+            if (!manualAdvances) {
+                computeAutoAdvances(activitiesBySlot);
+            }
+            int[][] target = editingPlanned ? plannedAdvances : realAdvances;
+            String editorTitle = editingPlanned ? PLANNED_EDITOR_TITLE : REAL_EDITOR_TITLE;
+
+            advanceGridEditor.buildGrid(activitiesBySlot, target);
+            labelAdvanceEditorTitle.setText(editorTitle);
+            labelAdvanceEditorMessage.setText("");
+            paneAdvanceEditor.setVisible(true);
+        } else {
+            showError(NO_ACTIVITY_SELECTED_MESSAGE);
+        }
+    }
+
+    @FXML
+    public void saveAdvanceEdits() {
+        Optional<String> validationError = advanceGridEditor.validateAdvances();
+
+        if (validationError.isPresent()) {
+            labelAdvanceEditorMessage.setText(validationError.get());
+        } else {
+            int[][] target = editingPlanned ? plannedAdvances : realAdvances;
+
+            advanceGridEditor.applyEditsTo(target);
+            manualAdvances = true;
+            labelAdvanceEditorMessage.setText("");
+            paneAdvanceEditor.setVisible(false);
+        }
+    }
+
+    @FXML
+    public void cancelAdvanceEdits() {
+        paneAdvanceEditor.setVisible(false);
+    }
+
+    private Activity[] resolveSelectedActivities() {
+        Activity[] activitiesBySlot = new Activity[PartialReport.MAX_ACTIVITIES];
+
+        for (int slot = 0; slot < comboBoxActivities.length; slot++) {
+            String selectedName = comboBoxActivities[slot].getValue();
+            activitiesBySlot[slot] = findActivityByName(selectedName);
+        }
+        return activitiesBySlot;
+    }
+
+    private Activity findActivityByName(String activityName) {
+        Activity foundActivity = null;
+
+        if (activityName != null) {
+            int index = 0;
+
+            while (index < studentActivities.size() && foundActivity == null) {
+                Activity activity = studentActivities.get(index);
+
+                if (activityName.equals(activity.getName())) {
+                    foundActivity = activity;
+                }
+                index++;
+            }
+        }
+        return foundActivity;
+    }
+
+    private boolean hasAnySelectedActivity(Activity[] activitiesBySlot) {
+        boolean hasActivity = false;
+
+        for (Activity activity : activitiesBySlot) {
+            if (activity != null) {
+                hasActivity = true;
+                break;
+            }
+        }
+        return hasActivity;
+    }
+
+    private void computeAutoAdvances(Activity[] activitiesBySlot) {
+        for (int slot = 0; slot < PartialReport.MAX_ACTIVITIES; slot++) {
+            Activity activity = activitiesBySlot[slot];
+
+            if (activity != null) {
+                fillAutoColumn(activity, slot);
+            }
+        }
+    }
+
+    private void fillAutoColumn(Activity activity, int slot) {
+        int activityWeeks = WorkProgressCalculator.calculateActivityWeeks(activity);
+        int totalWeeks = Math.min(activityWeeks, PartialReport.MAX_WEEKS);
+        int plannedWeekly = WorkProgressCalculator.calculateWeeklyPlannedAdvance(activity);
+        int writtenReal = parseAdvance(textFieldAdvances[slot].getText());
+        int realWeekly = WorkProgressCalculator.calculateWeeklyRealAdvance(writtenReal, activity);
+
+        for (int weekIndex = 0; weekIndex < totalWeeks; weekIndex++) {
+            plannedAdvances[weekIndex][slot] = plannedWeekly;
+            realAdvances[weekIndex][slot] = realWeekly;
+        }
+    }
+
+    private void applyManualAdvances(PartialReport partialReport) {
+        if (manualAdvances) {
+            partialReport.setPlannedAdvances(plannedAdvances);
+            partialReport.setRealAdvances(realAdvances);
+            partialReport.setManualAdvances(true);
+        }
+    }
+
     @Override
     protected void clearFields() {
         for (ComboBox<String> comboBoxActivity : comboBoxActivities) {
@@ -263,5 +407,10 @@ public class FXMLGeneratePartialReportController extends ValidationHandler {
         textAreaGeneralObservations.clear();
         textAreaResults.clear();
         labelMessage.setText("");
+
+        plannedAdvances = new int[PartialReport.MAX_WEEKS][PartialReport.MAX_ACTIVITIES];
+        realAdvances = new int[PartialReport.MAX_WEEKS][PartialReport.MAX_ACTIVITIES];
+        manualAdvances = false;
+        paneAdvanceEditor.setVisible(false);
     }
 }

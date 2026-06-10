@@ -198,6 +198,20 @@ public final class InputValidator {
         return validationResult;
     }
 
+    public static Optional<String> validateMaxIntValue(String integerValue, int maxInt, String fieldName) {
+        Optional<String> validationResult = Optional.empty();
+        validationResult = validateNotEmpty(integerValue, fieldName);
+        if(validationResult.isEmpty()) {
+            int parsedNumber = Integer.parseInt(integerValue);
+
+            if (parsedNumber > maxInt) {
+                validationResult = Optional.of(fieldName + " no puede tener un valor mayor a " + maxInt);
+            }
+        }
+
+        return validationResult;
+    }
+
     public static Optional<String> validateIdStudent(String fieldValue, int requiredLenght, String fieldName) {
         Optional<String> validationResult;
         if(fieldValue.isEmpty() || fieldValue.length() != requiredLenght) {

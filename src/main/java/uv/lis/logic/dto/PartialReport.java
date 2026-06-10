@@ -21,6 +21,7 @@ public class PartialReport extends Report {
     private String affiliatedOrganization;
     private String totalHours;
     private String dateReport;
+    private boolean manualAdvances;
 
     private String[] activityNames;
     private int[] realWeeklyAdvances;
@@ -170,6 +171,14 @@ public class PartialReport extends Report {
     public void setRealAdvances(int[][] realAdvances) {
         this.realAdvances = realAdvances;
     }
+
+    public boolean isManualAdvances() {
+        return manualAdvances;
+    }
+
+    public void setManualAdvances(boolean manualAdvances) {
+        this.manualAdvances = manualAdvances;
+    }
     
     @Override
     public boolean equals(Object object) {
@@ -184,7 +193,8 @@ public class PartialReport extends Report {
                 && reportNumber == other.reportNumber
                 && Objects.equals(activityName, other.activityName)
                 && Objects.equals(reportPeriod, other.reportPeriod)
-                && Objects.equals(result, other.result);
+                && Objects.equals(result, other.result)
+                && manualAdvances == other.manualAdvances;
         }
         return isEqual;
     }
@@ -192,6 +202,6 @@ public class PartialReport extends Report {
     @Override
     public int hashCode() {
         return Objects.hash(plannedAdvanceWeek, realAdvanceWeek, activityName, 
-                            reportPeriod, reportNumber, result);
+                            reportPeriod, reportNumber, result, manualAdvances);
     }
 }

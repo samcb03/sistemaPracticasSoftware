@@ -26,6 +26,12 @@ public final class WorkProgressCalculator {
         return weeklyAdvance;
     }
 
+    public static int calculateWeeklyRealAdvance(int writtenRealAdvance, Activity activity) {
+        int activityWeeks = calculateActivityWeeks(activity);
+        int advancePerWeek = writtenRealAdvance / activityWeeks;
+        return advancePerWeek;
+    }
+
     public static int calculateActivityWeeks(Activity activity) {
         int weeks = MINIMUM_WEEKS;
 

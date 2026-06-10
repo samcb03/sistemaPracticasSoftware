@@ -116,13 +116,17 @@ public class PartialReportCommon {
     private void fillAdvanceMatrix(PartialReport partialReport, String studentId) throws OperationException {
         List<Activity> selectedActivities = new ArrayList<>();
         String[] activityNames = partialReport.getActivityNames();
+        boolean useManualAdvances = partialReport.isManualAdvances();
 
         for (int activityIndex = 0; activityIndex < PartialReport.MAX_ACTIVITIES; activityIndex++) {
             String activityName = activityNames[activityIndex];
 
             if (activityName != null && !activityName.isBlank()) {
                 Activity activity = resolveActivity(studentId, activityName);
-                fillActivityColumn(partialReport, activity, activityIndex);
+
+                if (!useManualAdvances) {
+                    fillActivityColumn(partialReport, activity, activityIndex);
+                }
                 selectedActivities.add(activity);
             }
         }
@@ -144,7 +148,7 @@ public class PartialReportCommon {
         int totalWeeks = Math.min(activityWeeks, PartialReport.MAX_WEEKS);
         int plannedWeeklyAdvance = WorkProgressCalculator.calculateWeeklyPlannedAdvance(activity);
         int writtenRealAdvance = partialReport.getRealWeeklyAdvances()[activityIndex];
-        int realWeeklyAdvance = writtenRealAdvance / activityWeeks;
+        int realWeeklyAdvance = WorkProgressCalculator.calculateWeeklyRealAdvance(writtenRealAdvance, activity);
 
         int[][] plannedAdvances = partialReport.getPlannedAdvances();
         int[][] realAdvances = partialReport.getRealAdvances();
