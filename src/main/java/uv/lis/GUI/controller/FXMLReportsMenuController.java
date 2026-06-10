@@ -26,7 +26,7 @@ public class FXMLReportsMenuController extends WindowHandler {
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         this.student = SessionManager.getInstance().getCurrentStudent();
-        disableReportOptions();
+        //disableReportOptions();
     }
     
     @FXML

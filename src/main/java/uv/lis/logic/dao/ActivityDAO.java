@@ -175,7 +175,8 @@ public class ActivityDAO implements IActivityDAO {
                                     + "FROM Actividad a "
                                     + "INNER JOIN Proyecto p ON a.idProyecto = p.idProyecto "
                                     + "INNER JOIN Solicita_Proyecto sp ON p.idProyecto = sp.idProyecto "
-                                    + "WHERE sp.matricula = ? AND sp.estatus = ?";
+                                    + "WHERE sp.matricula = ? AND sp.estatus = ? "
+                                    + "ORDER BY a.idActividad";
  
         try (Connection databaseConnection = connectionManager.getConnection();
                 PreparedStatement preparedStatement = databaseConnection.prepareStatement(activityContextQuery)) {

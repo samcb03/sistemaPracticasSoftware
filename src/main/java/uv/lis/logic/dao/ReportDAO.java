@@ -35,7 +35,6 @@ public class ReportDAO implements IReportDAO {
     private static final String REGISTER_FINAL_ERROR = "Error al registrar el reporte final";
     private static final String MODIFY_FINAL_ERROR = "Error al modificar el reporte final";
     private static final String REGISTER_MONTHLY_ERROR = "Error al registrar reporte mensual";
-    private static final String EMPTY_DELIVERABLE_NAME = "";
     private static final int NO_ADVANCE = 0;
     private static final int WEEK_OFFSET = 1;
     private static final int FIRST_DETAIL = 1;
@@ -136,7 +135,7 @@ public class ReportDAO implements IReportDAO {
     public Optional<FinalReport> getFinalReportById(int idFinalReport) throws OperationException {
         Optional<FinalReport> validReport = Optional.empty();
         String reportQuery = "SELECT r.idReporte, r.descripcion, r.observaciones, r.actividad, "
-                           + "r.matricula, rf.porcentajeAvance, rf.ResultadoEntregable "
+                           + "r.matricula, rf.observacionesGenerales "
                            + "FROM ReporteFinal rf "
                            + "INNER JOIN Reporte r ON rf.idReporte = r.idReporte "
                            + "WHERE rf.idReporte = ?";
@@ -245,9 +244,7 @@ public class ReportDAO implements IReportDAO {
     private FinalReport mapFinalReport(ResultSet resultSet) throws SQLException {
         FinalReport report = new FinalReport();
         populateBaseReport(resultSet, report);
-        report.getFirstActivity().setAdvancePercentage(
-            String.valueOf(resultSet.getInt("porcentajeAvance")));
-        report.getFirstDeliverable().setResult(resultSet.getString("ResultadoEntregable"));
+        report.setGeneralObservations(resultSet.getString("observacionesGenerales"));
         return report;
     }
     
@@ -371,18 +368,13 @@ public class ReportDAO implements IReportDAO {
 
     private boolean insertFinalDetail(Connection databaseConnection, FinalReport finalReport) throws SQLException {
         boolean isInserted = false;
-        int advancePercentage = parseAdvancePercentage(finalReport.getFirstActivity().getAdvancePercentage());
-        String deliverableResult = finalReport.getFirstDeliverable().getResult();
-        String reportQuery = "INSERT INTO ReporteFinal "
-                           + "(idReporte, porcentajeAvance, ResultadoEntregable, observacionesGenerales) "
-                           + "VALUES (?, ?, ?, ?)";
+        String reportQuery = "INSERT INTO ReporteFinal (idReporte, observacionesGenerales) "
+                           + "VALUES (?, ?)";
 
         try (PreparedStatement preparedStatement = databaseConnection.prepareStatement(reportQuery)) {
 
             preparedStatement.setInt(1, finalReport.getId());
-            preparedStatement.setInt(2, advancePercentage);
-            preparedStatement.setString(3, deliverableResult);
-            preparedStatement.setString(4, finalReport.getGeneralObservations());
+            preparedStatement.setString(2, finalReport.getGeneralObservations());
 
             if (preparedStatement.executeUpdate() > NO_ROWS_AFFECTED) {
                 isInserted = true;
@@ -417,10 +409,10 @@ public class ReportDAO implements IReportDAO {
     }
 
     private void insertFinalDeliverableDetails(Connection databaseConnection, FinalReport finalReport)
-        throws SQLException {
+            throws SQLException {
         String reportQuery = "INSERT INTO EntregableReporteFinal "
-                           + "(idReporte, nombreEntregable, resultado, porcentajeAvance, observaciones) "
-                           + "VALUES (?, ?, ?, ?, ?)";
+                           + "(idReporte, resultado, porcentajeAvance, observaciones) "
+                           + "VALUES (?, ?, ?, ?)";
         DeliverableResult[] deliverables = {
             finalReport.getFirstDeliverable(), finalReport.getSecondDeliverable()
         };
@@ -431,10 +423,10 @@ public class ReportDAO implements IReportDAO {
 
                 if (deliverableResult != null && !deliverableResult.isBlank()) {
                     preparedStatement.setInt(1, finalReport.getId());
-                    preparedStatement.setString(2, EMPTY_DELIVERABLE_NAME);
-                    preparedStatement.setString(3, deliverableResult);
-                    preparedStatement.setInt(4, parseAdvancePercentage(deliverable.getAdvancePercentage()));
-                    preparedStatement.setString(5, deliverable.getObservations());
+                    preparedStatement.setString(2, deliverableResult);
+                    preparedStatement.setInt(3,
+                        parseAdvancePercentage(deliverable.getAdvancePercentage()));
+                    preparedStatement.setString(4, deliverable.getObservations());
                     preparedStatement.addBatch();
                 }
             }
@@ -442,19 +434,15 @@ public class ReportDAO implements IReportDAO {
         }
     }
 
-    private boolean updateFinalDetail(Connection databaseConnection, FinalReport finalReport)
-        throws SQLException {
+    private boolean updateFinalDetail(Connection databaseConnection, FinalReport finalReport) throws SQLException {
         boolean isUpdated = false;
-        int advancePercentage = parseAdvancePercentage(finalReport.getFirstActivity().getAdvancePercentage());
-        String deliverableResult = finalReport.getFirstDeliverable().getResult();
-        String reportQuery = "UPDATE ReporteFinal SET porcentajeAvance = ?, ResultadoEntregable = ? "
+        String reportQuery = "UPDATE ReporteFinal SET observacionesGenerales = ? "
                            + "WHERE idReporte = ?";
 
         try (PreparedStatement preparedStatement = databaseConnection.prepareStatement(reportQuery)) {
 
-            preparedStatement.setInt(1, advancePercentage);
-            preparedStatement.setString(2, deliverableResult);
-            preparedStatement.setInt(3, finalReport.getId());
+            preparedStatement.setString(1, finalReport.getGeneralObservations());
+            preparedStatement.setInt(2, finalReport.getId());
 
             if (preparedStatement.executeUpdate() > NO_ROWS_AFFECTED) {
                 isUpdated = true;

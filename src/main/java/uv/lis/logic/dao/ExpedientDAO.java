@@ -38,18 +38,17 @@ public class ExpedientDAO implements IExpedientDAO {
     @Override
     public int saveDocument(Expedient expedient) throws OperationException {
         int generatedId = -1;
-        String expedientQuery = "INSERT INTO expediente (nombre, tipoDocumento,url, matricula,idTipoDocumento)" 
-                              + " VALUES (?, ?, ?, ?, ?)";
+        String expedientQuery = "INSERT INTO expediente (nombre, url, matricula, idTipoDocumento)" 
+                              + " VALUES (?, ?, ?, ?)";
 
         try (Connection databaseConnection = connectionManager.getConnection();
             PreparedStatement preparedStatement = databaseConnection.prepareStatement(expedientQuery, 
                 Statement.RETURN_GENERATED_KEYS)) {
 
             preparedStatement.setString(1, expedient.getName());
-            preparedStatement.setString(2, expedient.getTypeDocument()); 
-            preparedStatement.setString(3, expedient.getUrl()); 
-            preparedStatement.setString(4, expedient.getIdStudent());
-            preparedStatement.setInt(5,expedient.getIdTypeDocument());
+            preparedStatement.setString(2, expedient.getUrl()); 
+            preparedStatement.setString(3, expedient.getIdStudent());
+            preparedStatement.setInt(4, expedient.getIdTypeDocument());
             
             int affectedRows = preparedStatement.executeUpdate();
             
@@ -71,7 +70,11 @@ public class ExpedientDAO implements IExpedientDAO {
     @Override
     public List<Expedient> getAllDocuments() throws OperationException {
         List<Expedient> documents = new ArrayList<>();
-        String expedientQuery = "SELECT nombre, tipoDocumento, url, matricula, idTipoDocumento FROM expediente";
+        String expedientQuery = "SELECT e.nombre, td.nombreTipoDocumento, e.url, e.matricula, "
+                              + "e.idTipoDocumento "
+                              + "FROM expediente e "
+                              + "INNER JOIN Tipo_Documento td "
+                              + "ON e.idTipoDocumento = td.idTipoDocumento";
 
         try (Connection databaseConnection = connectionManager.getConnection();
             PreparedStatement preparedStatement = databaseConnection.prepareStatement(expedientQuery);
@@ -80,7 +83,7 @@ public class ExpedientDAO implements IExpedientDAO {
             while (resultSet.next()) {
                 Expedient expedient = new Expedient(
                     resultSet.getString("nombre"),
-                    resultSet.getString("tipoDocumento"),
+                    resultSet.getString("nombreTipoDocumento"),
                     resultSet.getString("url"),
                     resultSet.getString("matricula"),
                     resultSet.getInt("idTipoDocumento")
@@ -169,10 +172,12 @@ public class ExpedientDAO implements IExpedientDAO {
     @Override
     public List<Expedient> getDocumentsByStudentId(String idStudent) throws OperationException {
         List<Expedient> studentDocuments = new ArrayList<>();
-        String expedientQuery = "SELECT idExpediente, nombre, tipoDocumento, url, "
-                              + "matricula, idTipoDocumento, estaValidado "
-                              + "FROM expediente "
-                              + "WHERE matricula = ?";
+        String expedientQuery = "SELECT e.idExpediente, e.nombre, td.nombreTipoDocumento, e.url, "
+                              + "e.matricula, e.idTipoDocumento, e.estaValidado "
+                              + "FROM expediente e "
+                              + "INNER JOIN Tipo_Documento td "
+                              + "ON e.idTipoDocumento = td.idTipoDocumento "
+                              + "WHERE e.matricula = ?";
     
         try (Connection databaseConnection = connectionManager.getConnection();
             PreparedStatement preparedStatement = databaseConnection.prepareStatement(expedientQuery)) {
@@ -216,7 +221,7 @@ public class ExpedientDAO implements IExpedientDAO {
     private Expedient buildExpedientFromResultSet(ResultSet resultSet) throws SQLException {
         Expedient expedient = new Expedient(
             resultSet.getString("nombre"),
-            resultSet.getString("tipoDocumento"),
+            resultSet.getString("nombreTipoDocumento"),
             resultSet.getString("url"),
             resultSet.getString("matricula"),
             resultSet.getInt("idTipoDocumento")

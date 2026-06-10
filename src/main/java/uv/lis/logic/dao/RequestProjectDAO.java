@@ -410,7 +410,7 @@ public class RequestProjectDAO implements IRequestProjectDAO {
             preparedStatement.executeUpdate();
         }
     }
-    //FIXME creo que los metodos para asignar proyectos de manera alternativa o no, no son necesarios separarlos ya que hacen lo mismo
+    
     private void executeAlternativeAssignment(Connection databaseConnection, String idStudent, int idProject) 
         throws SQLException, OperationException {
         ensureStudentNotAlreadyAssigned(databaseConnection, idStudent);

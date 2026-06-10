@@ -270,34 +270,6 @@ public class ProjectSupervisorDAO implements IProjectSupervisorDAO {
         return supervisorNames;
     }
 
-    public boolean assignSupervisorToOrganization(int supervisorId, int organizationId) throws OperationException {
-        boolean isAssigned = false;
-        String query = "INSERT INTO Organizacion_Tiene_Responsable (idOrganizacionVinculada, idResponsableProyecto)" 
-                     + "VALUES (?, ?)";
-
-        try (Connection databaseConnection = connectionManager.getConnection();
-             PreparedStatement preparedStatement = databaseConnection.prepareStatement(query)) {
-
-            preparedStatement.setInt(1, organizationId);
-            preparedStatement.setInt(2, supervisorId);
-
-            if (preparedStatement.executeUpdate() > NO_ROWS_AFFECTED) {
-                isAssigned = true;
-                LOGGER.log(Level.INFO, "Responsable vinculado a la organización exitosamente");
-            } else {
-                LOGGER.log(Level.WARNING, "No se pudo vincular el responsable a la organización");
-                throw new OperationException("No se pudo vincular el responsable a la organización", 
-                    null);
-            }
-
-        } catch (SQLException e) {
-            LOGGER.log(Level.SEVERE, "Error al vincular responsable con organización", e);
-            throw new OperationException("Error al vincular el responsable con la organización", e);
-        }
-
-        return isAssigned;
-    }
-
     @Override
     public boolean isSupervisorInactive(String supervisorName) throws OperationException {
         boolean isInactive = false;
