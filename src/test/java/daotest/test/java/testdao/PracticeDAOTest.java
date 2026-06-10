@@ -14,20 +14,19 @@ import java.sql.SQLException;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.MockitoAnnotations;
 
 import uv.lis.dataaccess.MySQLConnectionManager;
 import uv.lis.logic.dao.PracticeDAO;
 import uv.lis.logic.dto.Practice;
 import uv.lis.logic.exceptions.OperationException;
 
-@ExtendWith(MockitoExtension.class)
 class PracticeDAOTest {
 
     private static final int ROWS_AFFECTED = 1;
     private static final int NO_ROWS = 0;
+    private static final int GENERATED_KEY_COLUMN = 1;
     private static final int GENERATED_ID = 7;
     private static final int PRACTICE_ID = 1;
     private static final int PROJECT_ID = 3;
@@ -45,6 +44,8 @@ class PracticeDAOTest {
 
     @BeforeEach
     void setUp() throws Exception {
+    MockitoAnnotations.openMocks(this);
+
         practiceDAO = new PracticeDAO();
         Field field = PracticeDAO.class.getDeclaredField("connectionManager");
         field.setAccessible(true);
@@ -68,7 +69,7 @@ class PracticeDAOTest {
         when(preparedStatement.executeUpdate()).thenReturn(ROWS_AFFECTED);
         when(preparedStatement.getGeneratedKeys()).thenReturn(resultSet);
         when(resultSet.next()).thenReturn(true);
-        when(resultSet.getInt(1)).thenReturn(GENERATED_ID);
+        when(resultSet.getInt(GENERATED_KEY_COLUMN)).thenReturn(GENERATED_ID);
 
         assertTrue(practiceDAO.registerPractice(builderPractice()));
     }
