@@ -17,97 +17,139 @@ import java.util.List;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.MockitoAnnotations;
 
 import uv.lis.dataaccess.MySQLConnectionManager;
 import uv.lis.logic.dao.NotificationDAO;
 import uv.lis.logic.dto.Notification;
 import uv.lis.logic.exceptions.OperationException;
 
-@ExtendWith(MockitoExtension.class)
 class NotificationDAOTest {
+
+    private static final int GENERATED_ID = 15;
+    private static final int GENERATED_KEY_COLUMN = 1;
+    private static final int ROWS_AFFECTED = 1;
+    private static final int NOTIFICATION_COUNT = 2;
+    private static final int UNREAD_COUNT = 3;
+    private static final int NOTIFICATION_ID = 15;
+
+    private static final String STUDENT_ID = "S23013127";
+    private static final String NOTIFICATION_TITLE = "Proyecto asignado";
+    private static final String NOTIFICATION_MESSAGE = "Cumples el perfil";
+    private static final String UNREAD_COUNT_COLUMN = "total";
+    private static final String DATABASE_ERROR_MESSAGE = "Fallo";
 
     @Mock private MySQLConnectionManager connectionManager;
     @Mock private Connection databaseConnection;
     @Mock private PreparedStatement preparedStatement;
     @Mock private ResultSet resultSet;
+    @Mock private ResultSet generatedKeys;
 
     private NotificationDAO notificationDAO;
 
     @BeforeEach
     void setUp() throws Exception {
+        MockitoAnnotations.openMocks(this);
+
         notificationDAO = new NotificationDAO();
         Field field = NotificationDAO.class.getDeclaredField("connectionManager");
         field.setAccessible(true);
         field.set(notificationDAO, connectionManager);
+
         when(connectionManager.getConnection()).thenReturn(databaseConnection);
     }
+
+    private void mockQueryExecution() throws Exception {
+        when(databaseConnection.prepareStatement(anyString())).thenReturn(preparedStatement);
+        when(preparedStatement.executeQuery()).thenReturn(resultSet);
+    }
+
+    private Notification builderNotification() {
+        Notification notification = new Notification();
+        notification.setIdStudent(STUDENT_ID);
+        notification.setTitle(NOTIFICATION_TITLE);
+        notification.setMessage(NOTIFICATION_MESSAGE);
+        notification.setCreationDate(new Timestamp(System.currentTimeMillis()));
+        notification.setRead(false);
+        return notification;
+    }
+
 
     @Test
     void registerNotification_successful_returnsGeneratedId() throws Exception {
         when(databaseConnection.prepareStatement(anyString(), anyInt())).thenReturn(preparedStatement);
-        when(preparedStatement.executeUpdate()).thenReturn(1);
-        when(preparedStatement.getGeneratedKeys()).thenReturn(resultSet);
-        when(resultSet.next()).thenReturn(true);
-        when(resultSet.getInt(1)).thenReturn(15);
+        when(preparedStatement.executeUpdate()).thenReturn(ROWS_AFFECTED);
+        when(preparedStatement.getGeneratedKeys()).thenReturn(generatedKeys);
+        when(generatedKeys.next()).thenReturn(true);
+        when(generatedKeys.getInt(GENERATED_KEY_COLUMN)).thenReturn(GENERATED_ID);
 
-        int result = notificationDAO.registerNotification(
-            builderNotification("S23013127", "Proyecto asignado", "Cumples el perfil"));
-
-        assertEquals(15, result);
+        assertEquals(GENERATED_ID, notificationDAO.registerNotification(builderNotification()));
     }
 
     @Test
-    void registerNotification_databaseError_throwsOperationException() throws Exception {
-        when(databaseConnection.prepareStatement(anyString(), anyInt()))
-            .thenThrow(new SQLException("fallo de conexión"));
+    void registerNotification_sqlError_throwsOperationException() throws Exception {
+        when(connectionManager.getConnection()).thenThrow(new SQLException(DATABASE_ERROR_MESSAGE));
 
-        assertThrows(OperationException.class, () -> notificationDAO.registerNotification(
-            builderNotification("S23013127", "Proyecto asignado", "Cumples el perfil")));
+        assertThrows(OperationException.class,
+            () -> notificationDAO.registerNotification(builderNotification()));
     }
 
     @Test
     void getNotificationsByStudentId_studentHasNotifications_returnsList() throws Exception {
-        when(databaseConnection.prepareStatement(anyString())).thenReturn(preparedStatement);
-        when(preparedStatement.executeQuery()).thenReturn(resultSet);
+        mockQueryExecution();
         when(resultSet.next()).thenReturn(true, true, false);
 
-        List<Notification> result = notificationDAO.getNotificationsByStudentId("S23013127");
+        assertEquals(NOTIFICATION_COUNT,
+            notificationDAO.getNotificationsByStudentId(STUDENT_ID).size());
+    }
 
-        assertEquals(2, result.size());
+    @Test
+    void getNotificationsByStudentId_noNotifications_returnsEmptyList() throws Exception {
+        mockQueryExecution();
+        when(resultSet.next()).thenReturn(false);
+
+        assertTrue(notificationDAO.getNotificationsByStudentId(STUDENT_ID).isEmpty());
+    }
+
+    @Test
+    void getNotificationsByStudentId_sqlError_throwsOperationException() throws Exception {
+        when(connectionManager.getConnection()).thenThrow(new SQLException(DATABASE_ERROR_MESSAGE));
+
+        assertThrows(OperationException.class,
+            () -> notificationDAO.getNotificationsByStudentId(STUDENT_ID));
     }
 
     @Test
     void markNotificationAsRead_successful_returnsTrue() throws Exception {
-        when(databaseConnection.prepareStatement(anyString())).thenReturn(preparedStatement);
-        when(preparedStatement.executeUpdate()).thenReturn(1);
+        mockQueryExecution();
+        when(preparedStatement.executeUpdate()).thenReturn(ROWS_AFFECTED);
 
-        boolean result = notificationDAO.markNotificationAsRead(15);
+        assertTrue(notificationDAO.markNotificationAsRead(NOTIFICATION_ID));
+    }
 
-        assertTrue(result);
+    @Test
+    void markNotificationAsRead_sqlError_throwsOperationException() throws Exception {
+        when(connectionManager.getConnection()).thenThrow(new SQLException(DATABASE_ERROR_MESSAGE));
+
+        assertThrows(OperationException.class,
+            () -> notificationDAO.markNotificationAsRead(NOTIFICATION_ID));
     }
 
     @Test
     void getUnreadCountByStudentId_hasUnreadNotifications_returnsCount() throws Exception {
-        when(databaseConnection.prepareStatement(anyString())).thenReturn(preparedStatement);
-        when(preparedStatement.executeQuery()).thenReturn(resultSet);
+        mockQueryExecution();
         when(resultSet.next()).thenReturn(true);
-        when(resultSet.getInt("total")).thenReturn(3);
+        when(resultSet.getInt(UNREAD_COUNT_COLUMN)).thenReturn(UNREAD_COUNT);
 
-        int result = notificationDAO.getUnreadCountByStudentId("S23013127");
-
-        assertEquals(3, result);
+        assertEquals(UNREAD_COUNT, notificationDAO.getUnreadCountByStudentId(STUDENT_ID));
     }
 
-    private Notification builderNotification(String idStudent, String title, String message) {
-        Notification notification = new Notification();
-        notification.setIdStudent(idStudent);
-        notification.setTitle(title);
-        notification.setMessage(message);
-        notification.setCreationDate(new Timestamp(System.currentTimeMillis()));
-        notification.setRead(false);
-        return notification;
+    @Test
+    void getUnreadCountByStudentId_sqlError_throwsOperationException() throws Exception {
+        when(connectionManager.getConnection()).thenThrow(new SQLException(DATABASE_ERROR_MESSAGE));
+
+        assertThrows(OperationException.class,
+            () -> notificationDAO.getUnreadCountByStudentId(STUDENT_ID));
     }
 }

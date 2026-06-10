@@ -12,33 +12,67 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Optional;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.CsvSource;
 import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.MockitoAnnotations;
 
 import uv.lis.dataaccess.MySQLConnectionManager;
 import uv.lis.logic.dao.ProfessorDAO;
 import uv.lis.logic.dto.Professor;
 import uv.lis.logic.exceptions.OperationException;
 
-@ExtendWith(MockitoExtension.class)
 class ProfessorDAOTest {
 
     private static final int EXPECTED_USER_ID = 5;
     private static final int EXPECTED_LIST_SIZE = 2;
     private static final int ROWS_AFFECTED = 1;
     private static final int NO_ROWS = 0;
-    private static final int FIRST_NRC = 12345;
-    private static final int SECOND_NRC = 67890;
-    private static final int SAMPLE_ID = 10;
-    private static final String PERSONNEL_NUMBER = "UV-001";
-    private static final String SEARCH_PREFIX = "UV";
+    private static final int USER_ID = 10;
+    private static final int ROLE_PROFESSOR = 2;
+    private static final int ROLE_COORDINATOR = 3;
+    private static final int ACTIVE_STATE = 1;
+    private static final int INACTIVE_STATE = 0;
+    private static final int COUNT_ONE = 1;
+    private static final int COUNT_ZERO = 0;
+    private static final int FIRST_COLUMN_INDEX = 1;
+
+    private static final String PERSONNEL_NUMBER = "ABC123";
+    private static final String SECOND_PERSONNEL_NUMBER = "XYZ789";
+    private static final String FIRST_NAME = "Juan";
+    private static final String LAST_NAME = "Pérez";
+    private static final String SECOND_FIRST_NAME = "María";
+    private static final String SECOND_LAST_NAME = "García";
+    private static final String FULL_NAME = "Juan Pérez";
+    private static final String SECOND_FULL_NAME = "María García";
+    private static final String NRC = "NRC: 1 — Cálculo — ISW (2024-1)";
+    private static final String SECOND_NRC = "NRC: 2 — Álgebra — ISW (2024-1)";
+    private static final String PREFIX = "ABC";
     private static final String CONNECTION_ERROR = "Fallo";
+    private static final String CONNECTION_MANAGER_FIELD = "connectionManager";
+
+    private static final String COLUMN_NAME = "nombre";
+    private static final String COLUMN_LAST_NAME = "apellidos";
+    private static final String COLUMN_PERSONNEL_NUMBER = "numeroPersonal";
+    private static final String COLUMN_ROLE_ID = "idRol";
+    private static final String COLUMN_STATUS = "estado";
+    private static final String COLUMN_USER_ID = "idUsuario";
+    private static final String COLUMN_NRC = "NRC";
+    private static final String COLUMN_SUBJECT_NAME = "nombreExperiencia";
+    private static final String COLUMN_CAREER = "carrera";
+    private static final String COLUMN_PERIOD = "periodo";
+
+    private static final String NRC_VALUE_ONE = "Cálculo";
+    private static final String NRC_VALUE_TWO = "Álgebra";
+    private static final String CAREER_VALUE = "ISW";
+    private static final String PERIOD_VALUE = "2024-1";
+    private static final int NRC_NUMBER_ONE = 1;
+    private static final int NRC_NUMBER_TWO = 2;
 
     @Mock private MySQLConnectionManager connectionManager;
     @Mock private Connection databaseConnection;
@@ -49,33 +83,48 @@ class ProfessorDAOTest {
 
     @BeforeEach
     void setUp() throws Exception {
+        MockitoAnnotations.openMocks(this);
         professorDAO = new ProfessorDAO();
-        Field field = ProfessorDAO.class.getDeclaredField("connectionManager");
+        Field field = ProfessorDAO.class.getDeclaredField(CONNECTION_MANAGER_FIELD);
         field.setAccessible(true);
         field.set(professorDAO, connectionManager);
         when(connectionManager.getConnection()).thenReturn(databaseConnection);
     }
 
-    private Professor builderProfessor(boolean isCoordinator) {
+    private Professor buildProfessor() {
         Professor professor = new Professor();
-        professor.setId(SAMPLE_ID);
+        professor.setId(USER_ID);
         professor.setPersonnelNumber(PERSONNEL_NUMBER);
-        professor.setFirstName("Ana");
-        professor.setLastName("García");
-        professor.setIsCoordinator(isCoordinator);
+        professor.setFirstName(FIRST_NAME);
+        professor.setLastName(LAST_NAME);
+        professor.setIsCoordinator(false);
+        return professor;
+    }
+
+    private Professor buildCoordinatorProfessor() {
+        Professor professor = new Professor();
+        professor.setId(USER_ID);
+        professor.setPersonnelNumber(PERSONNEL_NUMBER);
+        professor.setFirstName(FIRST_NAME);
+        professor.setLastName(LAST_NAME);
+        professor.setIsCoordinator(true);
         return professor;
     }
 
     @Test
-    void getAllActiveProfessorsMap_withResults_returnsPopulatedMap() throws Exception {
+    void getAllActiveProfessorsMap_withResults_returnsExpectedMap() throws Exception {
         when(databaseConnection.prepareStatement(anyString())).thenReturn(preparedStatement);
         when(preparedStatement.executeQuery()).thenReturn(resultSet);
         when(resultSet.next()).thenReturn(true, true, false);
-        when(resultSet.getString("nombre")).thenReturn("Juan", "Ana");
-        when(resultSet.getString("apellidos")).thenReturn("Pérez", "García");
-        when(resultSet.getString("numeroPersonal")).thenReturn("UV-001", "UV-002");
+        when(resultSet.getString(COLUMN_NAME)).thenReturn(FIRST_NAME, SECOND_FIRST_NAME);
+        when(resultSet.getString(COLUMN_LAST_NAME)).thenReturn(LAST_NAME, SECOND_LAST_NAME);
+        when(resultSet.getString(COLUMN_PERSONNEL_NUMBER)).thenReturn(PERSONNEL_NUMBER, SECOND_PERSONNEL_NUMBER);
 
-        assertEquals(EXPECTED_LIST_SIZE, professorDAO.getAllActiveProfessorsMap().size());
+        LinkedHashMap<String, String> expectedMap = new LinkedHashMap<>();
+        expectedMap.put(FULL_NAME, PERSONNEL_NUMBER);
+        expectedMap.put(SECOND_FULL_NAME, SECOND_PERSONNEL_NUMBER);
+
+        assertEquals(expectedMap, professorDAO.getAllActiveProfessorsMap());
     }
 
     @Test
@@ -95,14 +144,14 @@ class ProfessorDAOTest {
     }
 
     @Test
-    void getProfessorPersonnelNumberByName_found_returnsPersonnelNumber() throws Exception {
+    void getProfessorPersonnelNumberByName_found_returnsExpectedPersonnelNumber() throws Exception {
         when(databaseConnection.prepareStatement(anyString())).thenReturn(preparedStatement);
         when(preparedStatement.executeQuery()).thenReturn(resultSet);
         when(resultSet.next()).thenReturn(true);
-        when(resultSet.getString("numeroPersonal")).thenReturn(PERSONNEL_NUMBER);
+        when(resultSet.getString(COLUMN_PERSONNEL_NUMBER)).thenReturn(PERSONNEL_NUMBER);
 
-        assertEquals(PERSONNEL_NUMBER,
-            professorDAO.getProfessorPersonnelNumberByName("Juan", "Pérez").get());
+        assertEquals(Optional.of(PERSONNEL_NUMBER),
+            professorDAO.getProfessorPersonnelNumberByName(FIRST_NAME, LAST_NAME));
     }
 
     @Test
@@ -112,7 +161,7 @@ class ProfessorDAOTest {
         when(resultSet.next()).thenReturn(false);
 
         assertThrows(OperationException.class,
-            () -> professorDAO.getProfessorPersonnelNumberByName("No", "Existe"));
+            () -> professorDAO.getProfessorPersonnelNumberByName(FIRST_NAME, LAST_NAME));
     }
 
     @Test
@@ -120,19 +169,44 @@ class ProfessorDAOTest {
         when(connectionManager.getConnection()).thenThrow(new SQLException(CONNECTION_ERROR));
 
         assertThrows(OperationException.class,
-            () -> professorDAO.getProfessorPersonnelNumberByName("Juan", "Pérez"));
+            () -> professorDAO.getProfessorPersonnelNumberByName(FIRST_NAME, LAST_NAME));
     }
 
-    @ParameterizedTest
-    @CsvSource({
-        "false",
-        "true"
-    })
-    void registerProfessor_validProfessor_returnsTrue(boolean isCoordinator) throws Exception {
+    @Test
+    void getProfessorById_found_returnsExpectedProfessor() throws Exception {
+        when(databaseConnection.prepareStatement(anyString())).thenReturn(preparedStatement);
+        when(preparedStatement.executeQuery()).thenReturn(resultSet);
+        when(resultSet.next()).thenReturn(true);
+        when(resultSet.getString(COLUMN_PERSONNEL_NUMBER)).thenReturn(PERSONNEL_NUMBER);
+        when(resultSet.getString(COLUMN_NAME)).thenReturn(FIRST_NAME);
+        when(resultSet.getString(COLUMN_LAST_NAME)).thenReturn(LAST_NAME);
+        when(resultSet.getInt(COLUMN_ROLE_ID)).thenReturn(ROLE_PROFESSOR);
+
+        assertEquals(Optional.of(buildProfessor()), professorDAO.getProfessorById(USER_ID));
+    }
+
+    @Test
+    void getProfessorById_notFound_throwsOperationException() throws Exception {
+        when(databaseConnection.prepareStatement(anyString())).thenReturn(preparedStatement);
+        when(preparedStatement.executeQuery()).thenReturn(resultSet);
+        when(resultSet.next()).thenReturn(false);
+
+        assertThrows(OperationException.class, () -> professorDAO.getProfessorById(USER_ID));
+    }
+
+    @Test
+    void getProfessorById_sqlError_throwsOperationException() throws Exception {
+        when(connectionManager.getConnection()).thenThrow(new SQLException(CONNECTION_ERROR));
+
+        assertThrows(OperationException.class, () -> professorDAO.getProfessorById(USER_ID));
+    }
+
+    @Test
+    void registerProfessor_successful_returnsTrue() throws Exception {
         when(databaseConnection.prepareStatement(anyString())).thenReturn(preparedStatement);
         when(preparedStatement.executeUpdate()).thenReturn(ROWS_AFFECTED);
 
-        assertTrue(professorDAO.registerProfessor(builderProfessor(isCoordinator)));
+        assertTrue(professorDAO.registerProfessor(buildProfessor()));
     }
 
     @Test
@@ -140,52 +214,22 @@ class ProfessorDAOTest {
         when(databaseConnection.prepareStatement(anyString())).thenReturn(preparedStatement);
         when(preparedStatement.executeUpdate()).thenReturn(NO_ROWS);
 
-        assertThrows(OperationException.class,
-            () -> professorDAO.registerProfessor(builderProfessor(false)));
+        assertThrows(OperationException.class, () -> professorDAO.registerProfessor(buildProfessor()));
     }
 
     @Test
     void registerProfessor_sqlError_throwsOperationException() throws Exception {
         when(connectionManager.getConnection()).thenThrow(new SQLException(CONNECTION_ERROR));
 
-        assertThrows(OperationException.class,
-            () -> professorDAO.registerProfessor(builderProfessor(false)));
+        assertThrows(OperationException.class, () -> professorDAO.registerProfessor(buildProfessor()));
     }
 
-    @ParameterizedTest
-    @CsvSource({
-        "false",
-        "true"
-    })
-    
     @Test
-    void modifyProfessor_notCoordinator_returnsTrue() throws Exception {
+    void modifyProfessor_successful_returnsTrue() throws Exception {
         when(databaseConnection.prepareStatement(anyString())).thenReturn(preparedStatement);
         when(preparedStatement.executeUpdate()).thenReturn(ROWS_AFFECTED);
 
-        assertTrue(professorDAO.modifyProfessor(builderProfessor(false)));
-    }
-
-    @Test
-    void modifyProfessor_coordinatorWithNoOtherActive_returnsTrue() throws Exception {
-        when(databaseConnection.prepareStatement(anyString())).thenReturn(preparedStatement);
-        when(preparedStatement.executeQuery()).thenReturn(resultSet);
-        when(resultSet.next()).thenReturn(true);
-        when(resultSet.getInt(1)).thenReturn(0);
-        when(preparedStatement.executeUpdate()).thenReturn(ROWS_AFFECTED);
-
-        assertTrue(professorDAO.modifyProfessor(builderProfessor(true)));
-    }
-
-    @Test
-    void modifyProfessor_coordinatorAlreadyExists_throwsOperationException() throws Exception {
-        when(databaseConnection.prepareStatement(anyString())).thenReturn(preparedStatement);
-        when(preparedStatement.executeQuery()).thenReturn(resultSet);
-        when(resultSet.next()).thenReturn(true);
-        when(resultSet.getInt(1)).thenReturn(1); 
-
-        assertThrows(OperationException.class,
-            () -> professorDAO.modifyProfessor(builderProfessor(true)));
+        assertTrue(professorDAO.modifyProfessor(buildProfessor()));
     }
 
     @Test
@@ -193,16 +237,26 @@ class ProfessorDAOTest {
         when(databaseConnection.prepareStatement(anyString())).thenReturn(preparedStatement);
         when(preparedStatement.executeUpdate()).thenReturn(NO_ROWS);
 
+        assertThrows(OperationException.class, () -> professorDAO.modifyProfessor(buildProfessor()));
+    }
+
+    @Test
+    void modifyProfessor_asCoordinatorWithAnotherActiveCoordinator_throwsOperationException()
+            throws Exception {
+        when(databaseConnection.prepareStatement(anyString())).thenReturn(preparedStatement);
+        when(preparedStatement.executeQuery()).thenReturn(resultSet);
+        when(resultSet.next()).thenReturn(true);
+        when(resultSet.getInt(FIRST_COLUMN_INDEX)).thenReturn(COUNT_ONE);
+
         assertThrows(OperationException.class,
-            () -> professorDAO.modifyProfessor(builderProfessor(false)));
+            () -> professorDAO.modifyProfessor(buildCoordinatorProfessor()));
     }
 
     @Test
     void modifyProfessor_sqlError_throwsOperationException() throws Exception {
         when(connectionManager.getConnection()).thenThrow(new SQLException(CONNECTION_ERROR));
 
-        assertThrows(OperationException.class,
-            () -> professorDAO.modifyProfessor(builderProfessor(false)));
+        assertThrows(OperationException.class, () -> professorDAO.modifyProfessor(buildProfessor()));
     }
 
     @Test
@@ -230,55 +284,24 @@ class ProfessorDAOTest {
             () -> professorDAO.inactivateProfessor(PERSONNEL_NUMBER));
     }
 
-    @ParameterizedTest
-    @CsvSource({
-        "2, false",
-        "3, true"
-    })
-    void getProfessorById_byRole_returnsExpectedCoordinatorFlag(int roleId, boolean isCoordinator)
-            throws Exception {
+    @Test
+    void isProfessorInactive_inactiveProfessor_returnsTrue() throws Exception {
         when(databaseConnection.prepareStatement(anyString())).thenReturn(preparedStatement);
         when(preparedStatement.executeQuery()).thenReturn(resultSet);
         when(resultSet.next()).thenReturn(true);
-        when(resultSet.getString("numeroPersonal")).thenReturn(PERSONNEL_NUMBER);
-        when(resultSet.getString("nombre")).thenReturn("Juan");
-        when(resultSet.getString("apellidos")).thenReturn("Pérez");
-        when(resultSet.getInt("idRol")).thenReturn(roleId);
+        when(resultSet.getInt(COLUMN_STATUS)).thenReturn(INACTIVE_STATE);
 
-        assertEquals(isCoordinator,
-            professorDAO.getProfessorById(EXPECTED_USER_ID).get().getIsCoordinator());
+        assertTrue(professorDAO.isProfessorInactive(PERSONNEL_NUMBER));
     }
 
     @Test
-    void getProfessorById_notFound_throwsOperationException() throws Exception {
-        when(databaseConnection.prepareStatement(anyString())).thenReturn(preparedStatement);
-        when(preparedStatement.executeQuery()).thenReturn(resultSet);
-        when(resultSet.next()).thenReturn(false);
-
-        assertThrows(OperationException.class,
-            () -> professorDAO.getProfessorById(EXPECTED_USER_ID));
-    }
-
-    @Test
-    void getProfessorById_sqlError_throwsOperationException() throws Exception {
-        when(connectionManager.getConnection()).thenThrow(new SQLException(CONNECTION_ERROR));
-
-        assertThrows(OperationException.class,
-            () -> professorDAO.getProfessorById(EXPECTED_USER_ID));
-    }
-
-    @ParameterizedTest
-    @CsvSource({
-        "0, true",
-        "1, false"
-    })
-    void isProfessorInactive_byStatus_returnsExpected(int status, boolean expectedInactive) throws Exception {
+    void isProfessorInactive_activeProfessor_returnsFalse() throws Exception {
         when(databaseConnection.prepareStatement(anyString())).thenReturn(preparedStatement);
         when(preparedStatement.executeQuery()).thenReturn(resultSet);
         when(resultSet.next()).thenReturn(true);
-        when(resultSet.getInt("estado")).thenReturn(status);
+        when(resultSet.getInt(COLUMN_STATUS)).thenReturn(ACTIVE_STATE);
 
-        assertEquals(expectedInactive, professorDAO.isProfessorInactive(PERSONNEL_NUMBER));
+        assertFalse(professorDAO.isProfessorInactive(PERSONNEL_NUMBER));
     }
 
     @Test
@@ -300,13 +323,13 @@ class ProfessorDAOTest {
     }
 
     @Test
-    void getIdUserByProfessorPersonnelNumber_found_returnsIdUser() throws Exception {
+    void getIdUserByProfessorPersonnelNumber_found_returnsExpectedId() throws Exception {
         when(databaseConnection.prepareStatement(anyString())).thenReturn(preparedStatement);
         when(preparedStatement.executeQuery()).thenReturn(resultSet);
         when(resultSet.next()).thenReturn(true);
-        when(resultSet.getInt("idUsuario")).thenReturn(EXPECTED_USER_ID);
+        when(resultSet.getInt(COLUMN_USER_ID)).thenReturn(USER_ID);
 
-        assertEquals(EXPECTED_USER_ID,
+        assertEquals(USER_ID,
             professorDAO.getIdUserByProfessorPersonnelNumber(PERSONNEL_NUMBER));
     }
 
@@ -329,23 +352,24 @@ class ProfessorDAOTest {
     }
 
     @Test
-    void searchProfessorPersonalNumbers_withResults_returnsPopulatedList() throws Exception {
+    void searchProfessorPersonalNumbers_withResults_returnsExpectedList() throws Exception {
         when(databaseConnection.prepareStatement(anyString())).thenReturn(preparedStatement);
         when(preparedStatement.executeQuery()).thenReturn(resultSet);
         when(resultSet.next()).thenReturn(true, true, false);
-        when(resultSet.getString("numeroPersonal")).thenReturn("UV-001", "UV-002");
+        when(resultSet.getString(COLUMN_PERSONNEL_NUMBER))
+            .thenReturn(PERSONNEL_NUMBER, SECOND_PERSONNEL_NUMBER);
 
-        assertEquals(EXPECTED_LIST_SIZE,
-            professorDAO.searchProfessorPersonalNumbers(SEARCH_PREFIX).size());
+        assertEquals(List.of(PERSONNEL_NUMBER, SECOND_PERSONNEL_NUMBER),
+            professorDAO.searchProfessorPersonalNumbers(PREFIX));
     }
 
     @Test
-    void searchProfessorPersonalNumbers_noMatches_returnsEmptyList() throws Exception {
+    void searchProfessorPersonalNumbers_emptyResultSet_returnsEmptyList() throws Exception {
         when(databaseConnection.prepareStatement(anyString())).thenReturn(preparedStatement);
         when(preparedStatement.executeQuery()).thenReturn(resultSet);
         when(resultSet.next()).thenReturn(false);
 
-        assertTrue(professorDAO.searchProfessorPersonalNumbers(SEARCH_PREFIX).isEmpty());
+        assertTrue(professorDAO.searchProfessorPersonalNumbers(PREFIX).isEmpty());
     }
 
     @Test
@@ -353,11 +377,11 @@ class ProfessorDAOTest {
         when(connectionManager.getConnection()).thenThrow(new SQLException(CONNECTION_ERROR));
 
         assertThrows(OperationException.class,
-            () -> professorDAO.searchProfessorPersonalNumbers(SEARCH_PREFIX));
+            () -> professorDAO.searchProfessorPersonalNumbers(PREFIX));
     }
 
     @Test
-    void hasSubjectAssigned_hasAssignment_returnsTrue() throws Exception {
+    void hasSubjectAssigned_withAssignedSubject_returnsTrue() throws Exception {
         when(databaseConnection.prepareStatement(anyString())).thenReturn(preparedStatement);
         when(preparedStatement.executeQuery()).thenReturn(resultSet);
         when(resultSet.next()).thenReturn(true);
@@ -366,7 +390,7 @@ class ProfessorDAOTest {
     }
 
     @Test
-    void hasSubjectAssigned_noAssignment_returnsFalse() throws Exception {
+    void hasSubjectAssigned_withNoAssignedSubject_returnsFalse() throws Exception {
         when(databaseConnection.prepareStatement(anyString())).thenReturn(preparedStatement);
         when(preparedStatement.executeQuery()).thenReturn(resultSet);
         when(resultSet.next()).thenReturn(false);
@@ -383,18 +407,17 @@ class ProfessorDAOTest {
     }
 
     @Test
-    void getSubjectsByProfessor_withResults_returnsPopulatedList() throws Exception {
+    void getSubjectsByProfessor_withResults_returnsExpectedList() throws Exception {
         when(databaseConnection.prepareStatement(anyString())).thenReturn(preparedStatement);
         when(preparedStatement.executeQuery()).thenReturn(resultSet);
         when(resultSet.next()).thenReturn(true, true, false);
-        when(resultSet.getInt("NRC")).thenReturn(FIRST_NRC, SECOND_NRC);
-        when(resultSet.getString("nombreExperiencia")).thenReturn("Practicas", "Estancia");
-        when(resultSet.getString("carrera")).thenReturn("ISW", "ISW");
-        when(resultSet.getString("periodo"))
-            .thenReturn("Febrero-Julio 2026", "Agosto 2026-Enero 2027");
+        when(resultSet.getInt(COLUMN_NRC)).thenReturn(NRC_NUMBER_ONE, NRC_NUMBER_TWO);
+        when(resultSet.getString(COLUMN_SUBJECT_NAME)).thenReturn(NRC_VALUE_ONE, NRC_VALUE_TWO);
+        when(resultSet.getString(COLUMN_CAREER)).thenReturn(CAREER_VALUE, CAREER_VALUE);
+        when(resultSet.getString(COLUMN_PERIOD)).thenReturn(PERIOD_VALUE, PERIOD_VALUE);
 
-        assertEquals(EXPECTED_LIST_SIZE,
-            professorDAO.getSubjectsByProfessor(PERSONNEL_NUMBER).size());
+        assertEquals(List.of(NRC, SECOND_NRC),
+            professorDAO.getSubjectsByProfessor(PERSONNEL_NUMBER));
     }
 
     @Test
@@ -412,5 +435,33 @@ class ProfessorDAOTest {
 
         assertThrows(OperationException.class,
             () -> professorDAO.getSubjectsByProfessor(PERSONNEL_NUMBER));
+    }
+
+    @Test
+    void isAnotherCoordinatorActive_withActiveCoordinator_returnsTrue() throws Exception {
+        when(databaseConnection.prepareStatement(anyString())).thenReturn(preparedStatement);
+        when(preparedStatement.executeQuery()).thenReturn(resultSet);
+        when(resultSet.next()).thenReturn(true);
+        when(resultSet.getInt(FIRST_COLUMN_INDEX)).thenReturn(COUNT_ONE);
+
+        assertTrue(professorDAO.isAnotherCoordinatorActive(PERSONNEL_NUMBER));
+    }
+
+    @Test
+    void isAnotherCoordinatorActive_withNoActiveCoordinator_returnsFalse() throws Exception {
+        when(databaseConnection.prepareStatement(anyString())).thenReturn(preparedStatement);
+        when(preparedStatement.executeQuery()).thenReturn(resultSet);
+        when(resultSet.next()).thenReturn(true);
+        when(resultSet.getInt(FIRST_COLUMN_INDEX)).thenReturn(COUNT_ZERO);
+
+        assertFalse(professorDAO.isAnotherCoordinatorActive(PERSONNEL_NUMBER));
+    }
+
+    @Test
+    void isAnotherCoordinatorActive_sqlError_throwsOperationException() throws Exception {
+        when(connectionManager.getConnection()).thenThrow(new SQLException(CONNECTION_ERROR));
+
+        assertThrows(OperationException.class,
+            () -> professorDAO.isAnotherCoordinatorActive(PERSONNEL_NUMBER));
     }
 }

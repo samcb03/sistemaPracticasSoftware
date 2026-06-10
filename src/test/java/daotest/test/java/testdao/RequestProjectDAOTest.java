@@ -12,15 +12,13 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.MockitoAnnotations;
 
 import uv.lis.dataaccess.MySQLConnectionManager;
 import uv.lis.logic.dao.RequestProjectDAO;
@@ -28,8 +26,41 @@ import uv.lis.logic.dto.Project;
 import uv.lis.logic.dto.Student;
 import uv.lis.logic.exceptions.OperationException;
 
-@ExtendWith(MockitoExtension.class)
-class RequestProjectDAOTest {  
+class RequestProjectDAOTest {
+
+    private static final int FIRST_PROJECT_ID = 1;
+    private static final int ROWS_AFFECTED = 1;
+    private static final int NO_ROWS_AFFECTED = 0;
+    private static final int REQUEST_COUNT_SOME = 2;
+    private static final int REQUEST_COUNT_ZERO = 0;
+    private static final int REQUEST_COUNT_ONE = 1;
+    private static final int CAPACITY_AVAILABLE = 5;
+    private static final int CAPACITY_FULL = 3;
+    private static final int REQUESTS_UNDER = 2;
+    private static final int REQUESTS_FULL = 3;
+    private static final int REQUESTS_VALID = 1;
+
+    private static final String FIRST_STUDENT_ID = "S23013127";
+    private static final String FIRST_STUDENT_NAME = "Ana";
+    private static final String FIRST_STUDENT_SURNAMES = "Gomez Ramirez";
+    private static final String FIRST_PROJECT_NAME = "Proyecto Test";
+    private static final String FIRST_PROJECT_DESCRIPTION = "Descripcion test";
+    private static final String FIRST_PROJECT_METHODOLOGY = "Scrum";
+    private static final String FIRST_PROJECT_OBJECTIVE = "Objetivo test";
+    private static final String NO_PROJECT_MESSAGE = "Sin proyecto asignado";
+    private static final String DATABASE_ERROR_MESSAGE = "Fallo";
+    private static final String CONNECTION_MANAGER_FIELD = "connectionManager";
+
+    private static final String COLUMN_TOTAL = "total";
+    private static final String COLUMN_STUDENT_ID = "matricula";
+    private static final String COLUMN_NAME = "nombre";
+    private static final String COLUMN_LAST_NAME = "apellidos";
+    private static final String COLUMN_PROJECT_ID = "idProyecto";
+    private static final String COLUMN_DESCRIPTION = "descripcion";
+    private static final String COLUMN_CAPACITY = "cupo";
+    private static final String COLUMN_METHODOLOGY = "metodologiaProyecto";
+    private static final String COLUMN_OBJECTIVE = "objetivo";
+    private static final String COLUMN_REQUESTS = "solicitudes";
 
     @Mock private MySQLConnectionManager connectionManager;
     @Mock private Connection databaseConnection;
@@ -37,78 +68,112 @@ class RequestProjectDAOTest {
     @Mock private ResultSet resultSet;
 
     private RequestProjectDAO requestProjectDAO;
-     @BeforeEach
+
+    @BeforeEach
     void setUp() throws Exception {
+        MockitoAnnotations.openMocks(this);
+
         requestProjectDAO = new RequestProjectDAO();
-        Field field = RequestProjectDAO.class.getDeclaredField("connectionManager");
+        Field field = RequestProjectDAO.class.getDeclaredField(CONNECTION_MANAGER_FIELD);
         field.setAccessible(true);
         field.set(requestProjectDAO, connectionManager);
+
         when(connectionManager.getConnection()).thenReturn(databaseConnection);
+    }
+
+    private void mockQueryExecution() throws Exception {
+        when(databaseConnection.prepareStatement(anyString())).thenReturn(preparedStatement);
+        when(preparedStatement.executeQuery()).thenReturn(resultSet);
+    }
+
+    private void mockUpdateExecution(int rowsAffected) throws Exception {
+        when(databaseConnection.prepareStatement(anyString())).thenReturn(preparedStatement);
+        when(preparedStatement.executeUpdate()).thenReturn(rowsAffected);
+    }
+
+    private void mockResultSetSingleStudent() throws Exception {
+        when(resultSet.next()).thenReturn(true, false);
+        when(resultSet.getString(COLUMN_STUDENT_ID)).thenReturn(FIRST_STUDENT_ID);
+        when(resultSet.getString(COLUMN_NAME)).thenReturn(FIRST_STUDENT_NAME);
+        when(resultSet.getString(COLUMN_LAST_NAME)).thenReturn(FIRST_STUDENT_SURNAMES);
+    }
+
+    private void mockResultSetSingleProject() throws Exception {
+        when(resultSet.next()).thenReturn(true, false);
+        when(resultSet.getInt(COLUMN_PROJECT_ID)).thenReturn(FIRST_PROJECT_ID);
+        when(resultSet.getString(COLUMN_NAME)).thenReturn(FIRST_PROJECT_NAME);
+        when(resultSet.getString(COLUMN_DESCRIPTION)).thenReturn(FIRST_PROJECT_DESCRIPTION);
+        when(resultSet.getInt(COLUMN_CAPACITY)).thenReturn(CAPACITY_AVAILABLE);
+        when(resultSet.getString(COLUMN_METHODOLOGY)).thenReturn(FIRST_PROJECT_METHODOLOGY);
+        when(resultSet.getString(COLUMN_OBJECTIVE)).thenReturn(FIRST_PROJECT_OBJECTIVE);
+    }
+
+    private Project builderProject() {
+        Project project = new Project();
+        project.setId(FIRST_PROJECT_ID);
+        project.setName(FIRST_PROJECT_NAME);
+        project.setDescription(FIRST_PROJECT_DESCRIPTION);
+        project.setCapacity(CAPACITY_AVAILABLE);
+        project.setMethodology(FIRST_PROJECT_METHODOLOGY);
+        project.setObjective(FIRST_PROJECT_OBJECTIVE);
+        return project;
+    }
+
+    private Student builderStudent() {
+        Student student = new Student();
+        student.setIdStudent(FIRST_STUDENT_ID);
+        student.setFirstName(FIRST_STUDENT_NAME);
+        student.setLastName(FIRST_STUDENT_SURNAMES);
+        return student;
     }
 
     @Test
     void getActiveRequestCountByStudentId_studentHasRequests_returnsCount() throws Exception {
-        when(databaseConnection.prepareStatement(anyString())).thenReturn(preparedStatement);
-        when(preparedStatement.executeQuery()).thenReturn(resultSet);
+        mockQueryExecution();
         when(resultSet.next()).thenReturn(true);
-        when(resultSet.getInt("total")).thenReturn(2);
+        when(resultSet.getInt(COLUMN_TOTAL)).thenReturn(REQUEST_COUNT_SOME);
 
-        int result = requestProjectDAO.getActiveRequestCountByStudentId("S23013127");
-
-        assertEquals(2, result);
+        assertEquals(REQUEST_COUNT_SOME,
+            requestProjectDAO.getActiveRequestCountByStudentId(FIRST_STUDENT_ID));
     }
 
     @Test
     void getActiveRequestCountByStudentId_studentHasNoRequests_returnsZero() throws Exception {
-        when(databaseConnection.prepareStatement(anyString())).thenReturn(preparedStatement);
-        when(preparedStatement.executeQuery()).thenReturn(resultSet);
+        mockQueryExecution();
         when(resultSet.next()).thenReturn(true);
-        when(resultSet.getInt("total")).thenReturn(0);
+        when(resultSet.getInt(COLUMN_TOTAL)).thenReturn(REQUEST_COUNT_ZERO);
 
-        int result = requestProjectDAO.getActiveRequestCountByStudentId("S23013127");
-
-        assertEquals(0, result);
+        assertEquals(REQUEST_COUNT_ZERO,
+            requestProjectDAO.getActiveRequestCountByStudentId(FIRST_STUDENT_ID));
     }
 
     @Test
-    void getActiveRequestCountByStudentId_databaseError_throwsOperationException() throws Exception {
-        when(databaseConnection.prepareStatement(anyString())).thenThrow(new SQLException());
+    void getActiveRequestCountByStudentId_sqlError_throwsOperationException() throws Exception {
+        when(connectionManager.getConnection()).thenThrow(new SQLException(DATABASE_ERROR_MESSAGE));
 
         assertThrows(OperationException.class,
-            () -> requestProjectDAO.getActiveRequestCountByStudentId("S23013127"));
+            () -> requestProjectDAO.getActiveRequestCountByStudentId(FIRST_STUDENT_ID));
     }
 
     @Test
-    void getAvailableProjects_projectsExist_returnsNonEmptyList() throws Exception {
-        when(databaseConnection.prepareStatement(anyString())).thenReturn(preparedStatement);
-        when(preparedStatement.executeQuery()).thenReturn(resultSet);
-        when(resultSet.next()).thenReturn(true, false);
-        when(resultSet.getInt("idProyecto")).thenReturn(1);
-        when(resultSet.getString("nombre")).thenReturn("Proyecto Test");
-        when(resultSet.getString("descripcion")).thenReturn("Descripcion test");
-        when(resultSet.getInt("cupo")).thenReturn(5);
-        when(resultSet.getString("metodologiaProyecto")).thenReturn("Scrum");
-        when(resultSet.getString("objetivo")).thenReturn("Objetivo test");
+    void getAvailableProjects_projectsExist_returnsExpectedList() throws Exception {
+        mockQueryExecution();
+        mockResultSetSingleProject();
 
-        List<Project> result = requestProjectDAO.getAvailableProjects();
-
-        assertFalse(result.isEmpty());
+        assertEquals(List.of(builderProject()), requestProjectDAO.getAvailableProjects());
     }
 
     @Test
     void getAvailableProjects_noProjects_returnsEmptyList() throws Exception {
-        when(databaseConnection.prepareStatement(anyString())).thenReturn(preparedStatement);
-        when(preparedStatement.executeQuery()).thenReturn(resultSet);
+        mockQueryExecution();
         when(resultSet.next()).thenReturn(false);
 
-        List<Project> result = requestProjectDAO.getAvailableProjects();
-
-        assertTrue(result.isEmpty());
+        assertTrue(requestProjectDAO.getAvailableProjects().isEmpty());
     }
 
     @Test
-    void getAvailableProjects_databaseError_throwsOperationException() throws Exception {
-        when(databaseConnection.prepareStatement(anyString())).thenThrow(new SQLException());
+    void getAvailableProjects_sqlError_throwsOperationException() throws Exception {
+        when(connectionManager.getConnection()).thenThrow(new SQLException(DATABASE_ERROR_MESSAGE));
 
         assertThrows(OperationException.class,
             () -> requestProjectDAO.getAvailableProjects());
@@ -116,236 +181,203 @@ class RequestProjectDAOTest {
 
     @Test
     void hasAlreadyRequested_studentAlreadyRequested_returnsTrue() throws Exception {
-        when(databaseConnection.prepareStatement(anyString())).thenReturn(preparedStatement);
-        when(preparedStatement.executeQuery()).thenReturn(resultSet);
+        mockQueryExecution();
         when(resultSet.next()).thenReturn(true);
-        when(resultSet.getInt("total")).thenReturn(1);
+        when(resultSet.getInt(COLUMN_TOTAL)).thenReturn(REQUEST_COUNT_ONE);
 
-        boolean result = requestProjectDAO.hasAlreadyRequested("S23013127", 1);
-
-        assertTrue(result);
+        assertTrue(requestProjectDAO.hasAlreadyRequested(FIRST_STUDENT_ID, FIRST_PROJECT_ID));
     }
 
     @Test
     void hasAlreadyRequested_studentHasNotRequested_returnsFalse() throws Exception {
-        when(databaseConnection.prepareStatement(anyString())).thenReturn(preparedStatement);
-        when(preparedStatement.executeQuery()).thenReturn(resultSet);
+        mockQueryExecution();
         when(resultSet.next()).thenReturn(true);
-        when(resultSet.getInt("total")).thenReturn(0);
+        when(resultSet.getInt(COLUMN_TOTAL)).thenReturn(REQUEST_COUNT_ZERO);
 
-        boolean result = requestProjectDAO.hasAlreadyRequested("S23013127", 1);
-
-        assertFalse(result);
+        assertFalse(requestProjectDAO.hasAlreadyRequested(FIRST_STUDENT_ID, FIRST_PROJECT_ID));
     }
 
     @Test
-    void hasAlreadyRequested_databaseError_throwsOperationException() throws Exception {
-        when(databaseConnection.prepareStatement(anyString())).thenThrow(new SQLException());
+    void hasAlreadyRequested_sqlError_throwsOperationException() throws Exception {
+        when(connectionManager.getConnection()).thenThrow(new SQLException(DATABASE_ERROR_MESSAGE));
 
         assertThrows(OperationException.class,
-            () -> requestProjectDAO.hasAlreadyRequested("S23013127", 1));
+            () -> requestProjectDAO.hasAlreadyRequested(FIRST_STUDENT_ID, FIRST_PROJECT_ID));
     }
 
     @Test
     void hasAvailableCapacity_projectHasCapacity_returnsTrue() throws Exception {
-        when(databaseConnection.prepareStatement(anyString())).thenReturn(preparedStatement);
-        when(preparedStatement.executeQuery()).thenReturn(resultSet);
+        mockQueryExecution();
         when(resultSet.next()).thenReturn(true);
-        when(resultSet.getInt("cupo")).thenReturn(5);
-        when(resultSet.getInt("solicitudes")).thenReturn(2);
+        when(resultSet.getInt(COLUMN_CAPACITY)).thenReturn(CAPACITY_AVAILABLE);
+        when(resultSet.getInt(COLUMN_REQUESTS)).thenReturn(REQUESTS_UNDER);
 
-        boolean result = requestProjectDAO.hasAvailableCapacity(1);
-
-        assertTrue(result);
+        assertTrue(requestProjectDAO.hasAvailableCapacity(FIRST_PROJECT_ID));
     }
 
     @Test
     void hasAvailableCapacity_projectIsFull_returnsFalse() throws Exception {
-        when(databaseConnection.prepareStatement(anyString())).thenReturn(preparedStatement);
-        when(preparedStatement.executeQuery()).thenReturn(resultSet);
+        mockQueryExecution();
         when(resultSet.next()).thenReturn(true);
-        when(resultSet.getInt("cupo")).thenReturn(3);
-        when(resultSet.getInt("solicitudes")).thenReturn(3);
+        when(resultSet.getInt(COLUMN_CAPACITY)).thenReturn(CAPACITY_FULL);
+        when(resultSet.getInt(COLUMN_REQUESTS)).thenReturn(REQUESTS_FULL);
 
-        boolean result = requestProjectDAO.hasAvailableCapacity(1);
-
-        assertFalse(result);
+        assertFalse(requestProjectDAO.hasAvailableCapacity(FIRST_PROJECT_ID));
     }
 
     @Test
-    void hasAvailableCapacity_databaseError_throwsOperationException() throws Exception {
-        when(databaseConnection.prepareStatement(anyString())).thenThrow(new SQLException());
+    void hasAvailableCapacity_sqlError_throwsOperationException() throws Exception {
+        when(connectionManager.getConnection()).thenThrow(new SQLException(DATABASE_ERROR_MESSAGE));
 
         assertThrows(OperationException.class,
-            () -> requestProjectDAO.hasAvailableCapacity(1));
+            () -> requestProjectDAO.hasAvailableCapacity(FIRST_PROJECT_ID));
     }
 
     @Test
     void requestProject_validRequest_returnsTrue() throws Exception {
-        when(databaseConnection.prepareStatement(anyString())).thenReturn(preparedStatement);
-        when(preparedStatement.executeUpdate()).thenReturn(1);
+        mockUpdateExecution(ROWS_AFFECTED);
 
-        boolean result = requestProjectDAO.requestProject("S23013127", 1);
-
-        assertTrue(result);
+        assertTrue(requestProjectDAO.requestProject(FIRST_STUDENT_ID, FIRST_PROJECT_ID));
     }
 
     @Test
     void requestProject_noRowsAffected_returnsFalse() throws Exception {
-        when(databaseConnection.prepareStatement(anyString())).thenReturn(preparedStatement);
-        when(preparedStatement.executeUpdate()).thenReturn(0);
+        mockUpdateExecution(NO_ROWS_AFFECTED);
 
-        boolean result = requestProjectDAO.requestProject("S23013127", 1);
-
-        assertFalse(result);
+        assertFalse(requestProjectDAO.requestProject(FIRST_STUDENT_ID, FIRST_PROJECT_ID));
     }
 
     @Test
-    void requestProject_databaseError_throwsOperationException() throws Exception {
-        when(databaseConnection.prepareStatement(anyString())).thenThrow(new SQLException());
+    void requestProject_sqlError_throwsOperationException() throws Exception {
+        when(connectionManager.getConnection()).thenThrow(new SQLException(DATABASE_ERROR_MESSAGE));
 
         assertThrows(OperationException.class,
-            () -> requestProjectDAO.requestProject("S23013127", 1));
+            () -> requestProjectDAO.requestProject(FIRST_STUDENT_ID, FIRST_PROJECT_ID));
     }
 
     @Test
     void validateProjectRequest_maxRequestsReached_returnsError() throws Exception {
-        when(databaseConnection.prepareStatement(anyString())).thenReturn(preparedStatement);
-        when(preparedStatement.executeQuery()).thenReturn(resultSet);
+        mockQueryExecution();
         when(resultSet.next()).thenReturn(true);
-        when(resultSet.getInt("total")).thenReturn(Integer.MAX_VALUE);
+        when(resultSet.getInt(COLUMN_TOTAL)).thenReturn(Integer.MAX_VALUE);
 
-        Optional<String> result = requestProjectDAO.validateProjectRequest("S23013127", 1);
+        Optional<String> result =
+            requestProjectDAO.validateProjectRequest(FIRST_STUDENT_ID, FIRST_PROJECT_ID);
 
         assertTrue(result.isPresent());
     }
 
     @Test
     void validateProjectRequest_validRequest_returnsEmpty() throws Exception {
-        when(databaseConnection.prepareStatement(anyString())).thenReturn(preparedStatement);
-        when(preparedStatement.executeQuery()).thenReturn(resultSet);
+        mockQueryExecution();
         when(resultSet.next()).thenReturn(true);
-        when(resultSet.getInt("total")).thenReturn(0);
-        when(resultSet.getInt("cupo")).thenReturn(5);
-        when(resultSet.getInt("solicitudes")).thenReturn(1);
+        when(resultSet.getInt(COLUMN_TOTAL)).thenReturn(REQUEST_COUNT_ZERO);
+        when(resultSet.getInt(COLUMN_CAPACITY)).thenReturn(CAPACITY_AVAILABLE);
+        when(resultSet.getInt(COLUMN_REQUESTS)).thenReturn(REQUESTS_VALID);
 
-        Optional<String> result = requestProjectDAO.validateProjectRequest("S23013127", 1);
-
-        assertFalse(result.isPresent());
+        assertEquals(Optional.empty(), requestProjectDAO.validateProjectRequest(
+            FIRST_STUDENT_ID, FIRST_PROJECT_ID));
     }
 
     @Test
-    void getApplicantsByProjectId_applicantsExist_returnsNonEmptyList() throws Exception {
-        when(databaseConnection.prepareStatement(anyString())).thenReturn(preparedStatement);
-        when(preparedStatement.executeQuery()).thenReturn(resultSet);
-        when(resultSet.next()).thenReturn(true, false);
-        when(resultSet.getString("matricula")).thenReturn("S23013127");
-        when(resultSet.getString("nombre")).thenReturn("Ana");
-        when(resultSet.getString("apellidos")).thenReturn("Gomez Ramirez");
+    void validateProjectRequest_sqlError_throwsOperationException() throws Exception {
+        when(connectionManager.getConnection()).thenThrow(new SQLException(DATABASE_ERROR_MESSAGE));
 
-        List<Student> result = requestProjectDAO.getApplicantsByProjectId(1);
+        assertThrows(OperationException.class,
+            () -> requestProjectDAO.validateProjectRequest(FIRST_STUDENT_ID, FIRST_PROJECT_ID));
+    }
 
-        assertFalse(result.isEmpty());
+    @Test
+    void getApplicantsByProjectId_applicantsExist_returnsExpectedList() throws Exception {
+        mockQueryExecution();
+        mockResultSetSingleStudent();
+
+        assertEquals(List.of(builderStudent()),
+            requestProjectDAO.getApplicantsByProjectId(FIRST_PROJECT_ID));
     }
 
     @Test
     void getApplicantsByProjectId_noApplicants_returnsEmptyList() throws Exception {
-        when(databaseConnection.prepareStatement(anyString())).thenReturn(preparedStatement);
-        when(preparedStatement.executeQuery()).thenReturn(resultSet);
+        mockQueryExecution();
         when(resultSet.next()).thenReturn(false);
 
-        List<Student> result = requestProjectDAO.getApplicantsByProjectId(1);
-
-        assertTrue(result.isEmpty());
+        assertTrue(requestProjectDAO.getApplicantsByProjectId(FIRST_PROJECT_ID).isEmpty());
     }
 
     @Test
-    void getApplicantsByProjectId_databaseError_throwsOperationException() throws Exception {
-        when(databaseConnection.prepareStatement(anyString())).thenThrow(new SQLException());
+    void getApplicantsByProjectId_sqlError_throwsOperationException() throws Exception {
+        when(connectionManager.getConnection()).thenThrow(new SQLException(DATABASE_ERROR_MESSAGE));
 
         assertThrows(OperationException.class,
-            () -> requestProjectDAO.getApplicantsByProjectId(1));
+            () -> requestProjectDAO.getApplicantsByProjectId(FIRST_PROJECT_ID));
     }
 
     @Test
     void getProjectAssignedToStudent_projectFound_returnsProjectName() throws Exception {
-        when(databaseConnection.prepareStatement(anyString())).thenReturn(preparedStatement);
-        when(preparedStatement.executeQuery()).thenReturn(resultSet);
+        mockQueryExecution();
         when(resultSet.next()).thenReturn(true);
-        when(resultSet.getString("nombre")).thenReturn("Proyecto Test");
+        when(resultSet.getString(COLUMN_NAME)).thenReturn(FIRST_PROJECT_NAME);
 
-        String result = requestProjectDAO.getProjectAssignedToStudent("S23013127");
-
-        assertEquals("Proyecto Test", result);
+        assertEquals(FIRST_PROJECT_NAME,
+            requestProjectDAO.getProjectAssignedToStudent(FIRST_STUDENT_ID));
     }
 
     @Test
     void getProjectAssignedToStudent_noProjectAssigned_returnsDefaultMessage() throws Exception {
-        when(databaseConnection.prepareStatement(anyString())).thenReturn(preparedStatement);
-        when(preparedStatement.executeQuery()).thenReturn(resultSet);
+        mockQueryExecution();
         when(resultSet.next()).thenReturn(false);
 
-        String result = requestProjectDAO.getProjectAssignedToStudent("S23013127");
-
-        assertEquals("Sin proyecto asignado", result);
+        assertEquals(NO_PROJECT_MESSAGE,
+            requestProjectDAO.getProjectAssignedToStudent(FIRST_STUDENT_ID));
     }
 
     @Test
-    void getProjectAssignedToStudent_databaseError_throwsOperationException() throws Exception {
-        when(databaseConnection.prepareStatement(anyString())).thenThrow(new SQLException());
+    void getProjectAssignedToStudent_sqlError_throwsOperationException() throws Exception {
+        when(connectionManager.getConnection()).thenThrow(new SQLException(DATABASE_ERROR_MESSAGE));
 
         assertThrows(OperationException.class,
-            () -> requestProjectDAO.getProjectAssignedToStudent("S23013127"));
+            () -> requestProjectDAO.getProjectAssignedToStudent(FIRST_STUDENT_ID));
     }
 
     @Test
-    void getAssignedStudentsByProjectId_studentsExist_returnsNonEmptyList() throws Exception {
-        when(databaseConnection.prepareStatement(anyString())).thenReturn(preparedStatement);
-        when(preparedStatement.executeQuery()).thenReturn(resultSet);
-        when(resultSet.next()).thenReturn(true, false);
-        when(resultSet.getString("matricula")).thenReturn("S23013127");
-        when(resultSet.getString("nombre")).thenReturn("Ana");
-        when(resultSet.getString("apellidos")).thenReturn("Gomez Ramirez");
+    void getAssignedStudentsByProjectId_studentsExist_returnsExpectedList() throws Exception {
+        mockQueryExecution();
+        mockResultSetSingleStudent();
 
-        ArrayList<Student> result = requestProjectDAO.getAssignedStudentsByProjectId(1);
-
-        assertFalse(result.isEmpty());
+        assertEquals(List.of(builderStudent()),
+            requestProjectDAO.getAssignedStudentsByProjectId(FIRST_PROJECT_ID));
     }
 
     @Test
     void getAssignedStudentsByProjectId_noStudents_returnsEmptyList() throws Exception {
-        when(databaseConnection.prepareStatement(anyString())).thenReturn(preparedStatement);
-        when(preparedStatement.executeQuery()).thenReturn(resultSet);
+        mockQueryExecution();
         when(resultSet.next()).thenReturn(false);
 
-        ArrayList<Student> result = requestProjectDAO.getAssignedStudentsByProjectId(1);
-
-        assertTrue(result.isEmpty());
+        assertTrue(requestProjectDAO.getAssignedStudentsByProjectId(FIRST_PROJECT_ID).isEmpty());
     }
 
     @Test
-    void getAssignedStudentsByProjectId_databaseError_throwsOperationException() throws Exception {
-        when(databaseConnection.prepareStatement(anyString())).thenThrow(new SQLException());
+    void getAssignedStudentsByProjectId_sqlError_throwsOperationException() throws Exception {
+        when(connectionManager.getConnection()).thenThrow(new SQLException(DATABASE_ERROR_MESSAGE));
 
         assertThrows(OperationException.class,
-            () -> requestProjectDAO.getAssignedStudentsByProjectId(1));
+            () -> requestProjectDAO.getAssignedStudentsByProjectId(FIRST_PROJECT_ID));
     }
 
     @Test
     void unassignStudentFromProject_validStudent_executesWithoutException() throws Exception {
-        when(databaseConnection.prepareStatement(anyString())).thenReturn(preparedStatement);
-        when(preparedStatement.executeUpdate()).thenReturn(1);
+        mockUpdateExecution(ROWS_AFFECTED);
 
-        requestProjectDAO.unassignStudentFromProject("S23013127");
+        requestProjectDAO.unassignStudentFromProject(FIRST_STUDENT_ID);
 
         assertTrue(true);
     }
 
     @Test
-    void unassignStudentFromProject_databaseError_throwsOperationException() throws Exception {
-        when(databaseConnection.prepareStatement(anyString())).thenThrow(new SQLException());
+    void unassignStudentFromProject_sqlError_throwsOperationException() throws Exception {
+        when(connectionManager.getConnection()).thenThrow(new SQLException(DATABASE_ERROR_MESSAGE));
 
         assertThrows(OperationException.class,
-            () -> requestProjectDAO.unassignStudentFromProject("S23013127"));
+            () -> requestProjectDAO.unassignStudentFromProject(FIRST_STUDENT_ID));
     }
 }
