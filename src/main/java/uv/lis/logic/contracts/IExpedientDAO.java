@@ -75,4 +75,13 @@ public interface IExpedientDAO {
      * @throws OperationException if the status cannot be updated
      */
     boolean updateValidationStatus(int idExpedient, boolean isValidated) throws OperationException;
+
+    /**
+     * Indicates whether a student's final report has been validated by the professor.
+     *
+     * @param idStudent the identifier of the student to verify
+     * @return true if the final report exists and is validated, false otherwise
+     * @throws OperationException if the verification cannot be completed
+     */
+    boolean isFinalReportValidated(String idStudent) throws OperationException;
 }

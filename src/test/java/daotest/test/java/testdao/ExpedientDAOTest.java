@@ -232,4 +232,38 @@ class ExpedientDAOTest {
 
         assertThrows(OperationException.class, () -> expedientDAO.getAllDocumentsTypes());
     }
+
+    @Test
+    void isFinalReportValidated_reportValidated_returnsTrue() throws Exception {
+        mockQueryExecution();
+        when(resultSet.next()).thenReturn(true);
+        when(resultSet.getBoolean("estaValidado")).thenReturn(true);
+ 
+        assertTrue(expedientDAO.isFinalReportValidated(STUDENT_ID));
+    }
+ 
+    @Test
+    void isFinalReportValidated_reportNotValidated_returnsFalse() throws Exception {
+        mockQueryExecution();
+        when(resultSet.next()).thenReturn(true);
+        when(resultSet.getBoolean("estaValidado")).thenReturn(false);
+ 
+        assertFalse(expedientDAO.isFinalReportValidated(STUDENT_ID));
+    }
+ 
+    @Test
+    void isFinalReportValidated_reportNotFound_returnsFalse() throws Exception {
+        mockQueryExecution();
+        when(resultSet.next()).thenReturn(false);
+ 
+        assertFalse(expedientDAO.isFinalReportValidated(STUDENT_ID));
+    }
+ 
+    @Test
+    void isFinalReportValidated_sqlError_throwsOperationException() throws Exception {
+        when(connectionManager.getConnection()).thenThrow(new SQLException(DATABASE_ERROR_MESSAGE));
+ 
+        assertThrows(OperationException.class,
+            () -> expedientDAO.isFinalReportValidated(STUDENT_ID));
+    }
 }
