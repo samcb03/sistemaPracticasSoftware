@@ -167,14 +167,15 @@ public class FXMLGeneratePartialReportController extends ValidationHandler {
     private Optional<String> validateNoDuplicateActivities() {
         Optional<String> duplicateError = Optional.empty();
         Set<String> selectedActivities = new HashSet<>();
+        int index = 0;
 
-        for (ComboBox<String> comboBoxActivity : comboBoxActivities) {
-            String selectedActivity = comboBoxActivity.getValue();
+        while (index < comboBoxActivities.length && duplicateError.isEmpty()) {
+            String selectedActivity = comboBoxActivities[index].getValue();
 
             if (selectedActivity != null && !selectedActivities.add(selectedActivity)) {
                 duplicateError = Optional.of(DUPLICATE_ACTIVITY_MESSAGE);
-                break;
             }
+            index++;
         }
         return duplicateError;
     }
@@ -354,12 +355,13 @@ public class FXMLGeneratePartialReportController extends ValidationHandler {
 
     private boolean hasAnySelectedActivity(Activity[] activitiesBySlot) {
         boolean hasActivity = false;
+        int index = 0;
 
-        for (Activity activity : activitiesBySlot) {
-            if (activity != null) {
+        while (index < activitiesBySlot.length && !hasActivity) {
+            if (activitiesBySlot[index] != null) {
                 hasActivity = true;
-                break;
             }
+            index++;
         }
         return hasActivity;
     }
