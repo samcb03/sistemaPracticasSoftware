@@ -84,11 +84,10 @@ public class FXMLVerifyCodeController extends ValidationHandler {
     private void applyEmailAuthenticationPreference() {
         if (checkBoxDisableEmailAuthentication.isSelected()) {
             try {
-                userDAO.updateEmailAuthenticationPreference(user.getId(),
-                    EMAIL_AUTHENTICATION_DISABLED);
+                userDAO.updateEmailAuthenticationPreference(user.getId(), EMAIL_AUTHENTICATION_DISABLED);
             } catch (OperationException e) {
-                LOGGER.log(Level.SEVERE,
-                    "Error al actualizar la preferencia de autenticación", e);
+                LOGGER.log(Level.SEVERE, "Error al actualizar la preferencia de autenticación", e);
+                e.getMessage();
             }
         }
     }
