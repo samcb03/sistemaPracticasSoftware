@@ -33,8 +33,7 @@ class AffiliatedOrganizationDAOTest {
     private static final int DIRECT_USERS = 10;
     private static final int INDIRECT_USERS = 50;
     private static final int ROWS_AFFECTED = 1;
-    private static final int GENERATED_KEY_COLUMN = 1;
-    private static final int GENERATED_ID = 1;
+    private static final int GENERATED_ID = 2;
     private static final int INACTIVE_STATE_VALUE = 0;
     private static final int ACTIVE_STATE_VALUE = 1;
     private static final int PROJECT_ID = 100;
@@ -186,7 +185,7 @@ class AffiliatedOrganizationDAOTest {
         mockGeneratedKeyUpdate(ROWS_AFFECTED);
         when(preparedStatement.getGeneratedKeys()).thenReturn(resultSet);
         when(resultSet.next()).thenReturn(true);
-        when(resultSet.getInt(GENERATED_KEY_COLUMN)).thenReturn(GENERATED_ID);
+        when(resultSet.getInt(1)).thenReturn(GENERATED_ID);
 
         assertTrue(affiliatedOrganizationDAO.registerOrganization(builderExpectedOrganization()));
     }

@@ -36,14 +36,9 @@ class ProjectDAOTest {
     private static final int PROJECT_ID = 1;
     private static final int SECOND_PROJECT_ID = 2;
     private static final int GENERATED_ID = 7;
-    private static final int GENERATED_KEY_COLUMN = 1;
     private static final int CAPACITY = 5;
     private static final int ORGANIZATION_ID = 3;
-    private static final int SUPERVISOR_ID = 2;
-    private static final int ACTIVE_STATUS_PARAM_INDEX = 1;
-    private static final int ASSIGNED_STATUS_PARAM_INDEX = 2;
-    private static final int ORGANIZATION_ID_PARAM_INDEX = 1;
-    private static final int ACTIVE_STATE_PARAM_INDEX = 2;
+    private static final int SUPERVISOR_ID = 4;
 
     private static final String PROJECT_NAME = "Sistema de Practicas";
     private static final String SECOND_NAME = "Portal Web";
@@ -180,8 +175,7 @@ class ProjectDAOTest {
     void getAllProjects_sqlError_throwsOperationException() throws Exception {
         when(connectionManager.getConnection()).thenThrow(new SQLException(CONNECTION_ERROR));
 
-        assertThrows(OperationException.class, 
-            () -> projectDAO.getAllProjects());
+        assertThrows(OperationException.class, () -> projectDAO.getAllProjects());
     }
 
     @Test
@@ -223,7 +217,7 @@ class ProjectDAOTest {
         when(preparedStatement.executeUpdate()).thenReturn(ROWS_AFFECTED);
         when(preparedStatement.getGeneratedKeys()).thenReturn(resultSet);
         when(resultSet.next()).thenReturn(true);
-        when(resultSet.getInt(GENERATED_KEY_COLUMN)).thenReturn(GENERATED_ID);
+        when(resultSet.getInt(1)).thenReturn(GENERATED_ID);
 
         assertTrue(projectDAO.registerProject(builderProject()));
     }
@@ -367,8 +361,8 @@ class ProjectDAOTest {
         when(resultSet.next()).thenReturn(false);
 
         projectDAO.getProjectNamesByOrganizationId(ORGANIZATION_ID);
-        verify(preparedStatement).setInt(ORGANIZATION_ID_PARAM_INDEX, ORGANIZATION_ID);
-        verify(preparedStatement).setBoolean(ACTIVE_STATE_PARAM_INDEX, true);
+        verify(preparedStatement).setInt(1, ORGANIZATION_ID);
+        verify(preparedStatement).setBoolean(2, true);
     }
 
     @Test
@@ -441,8 +435,8 @@ class ProjectDAOTest {
         when(resultSet.next()).thenReturn(false);
 
         projectDAO.getAllProjectsWithCapacity();
-        verify(preparedStatement).setBoolean(ACTIVE_STATUS_PARAM_INDEX, true);
-        verify(preparedStatement).setInt(ASSIGNED_STATUS_PARAM_INDEX, STATUS_ASSIGNED);
+        verify(preparedStatement).setBoolean(1, true);
+        verify(preparedStatement).setInt(2, STATUS_ASSIGNED);
     }
 
     @Test

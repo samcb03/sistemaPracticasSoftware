@@ -29,7 +29,7 @@ import uv.lis.logic.exceptions.OperationException;
 
 class SchoolPeriodDAOTest {
 
-    private static final int VALID_PERIOD_ID = 1;
+    private static final int VALID_PERIOD_ID = 2;
     private static final int INVALID_PERIOD_ID = 99;
     private static final int ROWS_AFFECTED = 1;
     private static final int NO_ROWS_AFFECTED = 0;
