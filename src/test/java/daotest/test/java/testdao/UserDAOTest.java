@@ -184,26 +184,25 @@ class UserDAOTest {
         }
     }
 
-    @Test
-    void authenticate_notFound_throwsAuthenticateException() throws Exception {
+   @Test
+    void authenticate_notFound_returnsEmpty() throws Exception {
         mockQueryExecution();
         when(resultSet.next()).thenReturn(false);
 
-        assertThrows(AuthenticateException.class,
-            () -> userDAO.authenticate(INVALID_EMAIL, INVALID_PASSWORD));
+        assertTrue(userDAO.authenticate(INVALID_EMAIL, INVALID_PASSWORD).isEmpty());
     }
 
     @Test
-    void authenticate_wrongPassword_throwsAuthenticateException() throws Exception {
+    void authenticate_wrongPassword_returnsEmpty() throws Exception {
         mockQueryExecution();
         when(resultSet.next()).thenReturn(true);
         when(resultSet.getString(COLUMN_PASSWORD)).thenReturn(HASHED_PASSWORD);
 
         try (MockedStatic<PasswordHasher> mockedHasher = mockStatic(PasswordHasher.class)) {
-            mockedHasher.when(() -> PasswordHasher.verifyPassword(WRONG_PASSWORD, HASHED_PASSWORD)).thenReturn(false);
+            mockedHasher.when(() -> PasswordHasher.verifyPassword(WRONG_PASSWORD, HASHED_PASSWORD))
+                .thenReturn(false);
 
-            assertThrows(AuthenticateException.class,
-                () -> userDAO.authenticate(VALID_EMAIL, WRONG_PASSWORD));
+            assertTrue(userDAO.authenticate(VALID_EMAIL, WRONG_PASSWORD).isEmpty());
         }
     }
 
