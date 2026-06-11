@@ -37,4 +37,14 @@ public interface IUserDAO {
      * @throws OperationException if the verification cannot be completed
      */
     boolean existActiveCoordinator() throws OperationException;
+
+    /**
+     * Updates whether a user must receive the email authentication code.
+     *
+     * @param userId the identifier of the user to update
+     * @param isActive true to keep email authentication, false to disable it
+     * @return true if the preference was updated, false otherwise
+     * @throws OperationException if the update cannot be completed
+     */
+    boolean updateEmailAuthenticationPreference(int userId, boolean isActive) throws OperationException;
 }

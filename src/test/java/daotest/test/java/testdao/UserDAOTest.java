@@ -1,6 +1,5 @@
 package daotest.test.java.testdao;
 
-
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -50,6 +49,7 @@ class UserDAOTest {
     private static final int ADMIN_USER_ID = 14;
 
     private static final boolean ACTIVE_USER = true;
+    private static final boolean EMAIL_AUTHENTICATION_ACTIVE = true;
 
     private static final String FIRST_NAME = "Juan";
     private static final String LAST_NAME = "Pérez";
@@ -110,7 +110,7 @@ class UserDAOTest {
 
     private User builderUser() {
         return new User(DEFAULT_ID, FIRST_NAME, LAST_NAME, DEFAULT_PASSWORD, DEFAULT_EMAIL, DEFAULT_ROLE_ID, 
-            ACTIVE_USER);
+            ACTIVE_USER, EMAIL_AUTHENTICATION_ACTIVE);
     }
 
     private static Stream<Arguments> provideUsersByRole() {

@@ -11,8 +11,8 @@ public class Professor extends User {
     }
    
     public Professor(int idUser, String firstName, String lastName, String password, String email, int roleId, 
-            boolean isInactive, String personnelNumber, boolean isCoordinator) {
-        super(idUser, firstName, lastName, password, email, roleId, isInactive);
+            boolean isInactive, String personnelNumber, boolean isCoordinator, boolean isEmailAuthenticationActive) {
+        super(idUser, firstName, lastName, password, email, roleId, isInactive, isEmailAuthenticationActive);
         this.personnelNumber = personnelNumber;
         this.isCoordinator = isCoordinator;
     }

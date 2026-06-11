@@ -1,6 +1,5 @@
 package utilstest;
 
-
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -22,13 +21,13 @@ import uv.lis.logic.utils.FileManager;
 
 class FileManagerTest {
 
-    private static final String TEST_STUDENT_ID          = "S23013127_test";
-    private static final String NON_EXISTING_FILE_PATH   = "ruta/que/no/existe/archivo.pdf";
-    private static final String TEMP_FILE_PREFIX         = "documento_prueba";
-    private static final String TEMP_FILE_SUFFIX         = ".pdf";
-    private static final String STUDENT_DIRECTORY_ROOT   = "Expediente";
-    private static final byte[] PDF_HEADER               = {0x25, 0x50, 0x44, 0x46};
-    private static final byte[] PDF_CONTENT              = new byte[100];
+    private static final String TEST_STUDENT_ID = "S23013127_test";
+    private static final String NON_EXISTING_FILE_PATH = "ruta/que/no/existe/archivo.pdf";
+    private static final String TEMP_FILE_PREFIX = "documento_prueba";
+    private static final String TEMP_FILE_SUFFIX = ".pdf";
+    private static final String STUDENT_DIRECTORY_ROOT = "Expediente";
+    private static final byte[] PDF_HEADER = {0x25, 0x50, 0x44, 0x46};
+    private static final byte[] PDF_CONTENT = new byte[100];
 
     private File sourceFile;
     private String savedFilePath;

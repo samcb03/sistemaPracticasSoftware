@@ -83,7 +83,8 @@ public class UserDAO implements IUserDAO {
     public Optional<User> authenticate(String email, String password) throws AuthenticateException {
         Optional<User> validateUser = Optional.empty();
 
-        String userQuery = "SELECT u.idUsuario, u.email, u.idRol, u.contraseña, ru.nombreRol "
+        String userQuery = "SELECT u.idUsuario, u.email, u.idRol, u.contraseña, "
+                         + "u.autenticacionCorreoActiva, ru.nombreRol "
                          + "FROM Usuario u "
                          + "JOIN Rol_Usuario ru ON u.idRol = ru.idRol "
                          + "WHERE u.email = ? AND u.estado = ?;";
@@ -103,6 +104,7 @@ public class UserDAO implements IUserDAO {
                         user.setId(resultSet.getInt("idUsuario"));
                         user.setEmail(resultSet.getString("email"));
                         user.setRoleId(resultSet.getInt("idRol"));
+                        user.setEmailAuthenticationActive(resultSet.getBoolean("autenticacionCorreoActiva"));
                         validateUser = Optional.of(user);
                     } else {
                         throw new AuthenticateException("Credenciales incorrectas", null);
@@ -141,5 +143,27 @@ public class UserDAO implements IUserDAO {
             throw new OperationException("Error al verificar coordinador activo", e);
         }
         return exists;
+    }
+
+    @Override
+    public boolean updateEmailAuthenticationPreference(int userId, boolean isActive) throws OperationException {
+        boolean isUpdated = false;
+
+        String userQuery = "UPDATE Usuario SET autenticacionCorreoActiva = ? WHERE idUsuario = ?;";
+
+        try (Connection databaseConnection = connectionManager.getConnection();
+            PreparedStatement preparedStatement = databaseConnection.prepareStatement(userQuery)) {
+
+            preparedStatement.setBoolean(1, isActive);
+            preparedStatement.setInt(2, userId);
+
+            isUpdated = preparedStatement.executeUpdate() > NO_ROWS_AFFECTED;
+        } catch (SQLException e) {
+            LOGGER.log(Level.SEVERE, "Error de conexion con la base de datos", e);
+            throw new OperationException("No se pudo actualizar la preferencia de autenticación. "
+                + "Intentelo mas tarde", e);
+        }
+
+        return isUpdated;
     }
 }
