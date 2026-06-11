@@ -357,13 +357,13 @@ public class ProfessorDAO extends UserDAO implements IProfessorDAO {
     @Override
     public boolean isAnotherCoordinatorActive(String personnelNumber) throws OperationException {
         boolean exits = false;
-        String query = "SELECT COUNT(*) " +
-                       "FROM Usuario u " +
-                       "INNER JOIN Profesor p ON u.idUsuario = p.idUsuario " +
-                       "WHERE u.idRol = 3 AND u.estado = 1 AND p.numeroPersonal <> ?;";
+        String coordinatorQuery = "SELECT COUNT(*) "
+                                + "FROM Usuario u "
+                                + "INNER JOIN Profesor p ON u.idUsuario = p.idUsuario "
+                                + "WHERE u.idRol = 3 AND u.estado = 1 AND p.numeroPersonal <> ?;";
         
         try (Connection databaseConnection = connectionManager.getConnection();
-            PreparedStatement preparedStatement = databaseConnection.prepareStatement(query)) {
+            PreparedStatement preparedStatement = databaseConnection.prepareStatement(coordinatorQuery)) {
             
             preparedStatement.setString(1, personnelNumber);
 
