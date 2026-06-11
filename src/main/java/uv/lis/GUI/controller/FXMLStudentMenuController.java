@@ -8,6 +8,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 
 import uv.lis.GUI.ValidationHandler;
+import uv.lis.logic.dao.ExpedientDAO;
 import uv.lis.logic.dao.StudentDAO;
 import uv.lis.logic.dao.SubjectDAO;
 import uv.lis.logic.dto.Student;
@@ -30,7 +31,7 @@ public class FXMLStudentMenuController extends ValidationHandler {
     private Student student;
     private final StudentDAO studentDAO = new StudentDAO();
     private final SubjectDAO subjectDAO = new SubjectDAO();
-    private static final int MAX_HOURS = 420;
+    private final ExpedientDAO expedientDAO = new ExpedientDAO();
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
@@ -38,7 +39,7 @@ public class FXMLStudentMenuController extends ValidationHandler {
         try {
             disableActionsWithoutAssignedSubject();
             disableActionsWithoutAssignedProject();
-            disableAutoevaluation();
+            checkFinalReportValidation();
         } catch (OperationException e) {
             showError(e.getMessage());
         }
@@ -78,9 +79,16 @@ public class FXMLStudentMenuController extends ValidationHandler {
         navigateTo("/uv/lis/GUI/view/FXMLGenerateAutoevaluation.fxml");
     }
 
-    private void disableAutoevaluation() throws OperationException {
-        if (student.getCompletedHours() < MAX_HOURS) {
+    private void checkFinalReportValidation() { 
+        try {
+            boolean isValidated = expedientDAO.isFinalReportValidated(student.getIdStudent());
+ 
+            if (!isValidated) {
+                buttonAutoevaluation.setDisable(true);
+            }
+        } catch (OperationException e) {
             buttonAutoevaluation.setDisable(true);
+            showError("No se pudo verificar el estado del reporte final. Intente más tarde.");
         }
     }
  
@@ -102,5 +110,4 @@ public class FXMLStudentMenuController extends ValidationHandler {
     @Override
     protected void clearFields() {
     }
-
 }

@@ -25,6 +25,7 @@ public class ExpedientDAO implements IExpedientDAO {
     private static final Logger LOGGER = Logger.getLogger(ExpedientDAO.class.getName());
 
     private static final int MONTHLY_REPORT_DOCUMENT_TYPE_ID = 3;
+    private static final int FINAL_REPORT_DOCUMENT_TYPE_ID = 2;
 
     private MySQLConnectionManager connectionManager;
     public ExpedientDAO() {
@@ -216,6 +217,30 @@ public class ExpedientDAO implements IExpedientDAO {
             throw new OperationException("No se pudo actualizar el estado del documento. Intente más tarde", e);
         }
         return isUpdated;
+    }
+
+    @Override
+    public boolean isFinalReportValidated(String idStudent) throws OperationException {
+        boolean isValidated = false;
+        String expedientQuery = "SELECT estaValidado FROM expediente "
+                              + "WHERE matricula = ? AND idTipoDocumento = ? LIMIT 1";
+ 
+        try (Connection databaseConnection = connectionManager.getConnection();
+            PreparedStatement preparedStatement = databaseConnection.prepareStatement(expedientQuery)) {
+ 
+            preparedStatement.setString(1, idStudent);
+            preparedStatement.setInt(2, FINAL_REPORT_DOCUMENT_TYPE_ID);
+ 
+            try (ResultSet resultSet = preparedStatement.executeQuery()) {
+                if (resultSet.next()) {
+                    isValidated = resultSet.getBoolean("estaValidado");
+                }
+            }
+        } catch (SQLException e) {
+            LOGGER.log(Level.SEVERE, "Error al verificar la validación del reporte final", e);
+            throw new OperationException("Error al verificar el reporte final. Intente más tarde", e);
+        }
+        return isValidated;
     }
 
     private Expedient buildExpedientFromResultSet(ResultSet resultSet) throws SQLException {
