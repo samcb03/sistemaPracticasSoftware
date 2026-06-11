@@ -47,7 +47,7 @@ class UserDAOTest {
     private static final int PROFESSOR_USER_ID = 12;
     private static final int COORDINATOR_USER_ID = 13;
     private static final int ADMIN_USER_ID = 14;
-
+       
     private static final boolean IS_ACTIVE = true;
     private static final boolean EMAIL_AUTHENTICATION_DISABLED = false;
 
