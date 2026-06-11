@@ -105,15 +105,9 @@ public class UserDAO implements IUserDAO {
                         user.setRoleId(resultSet.getInt("idRol"));
                         user.setEmailAuthenticationActive(resultSet.getBoolean("autenticacionCorreoActiva"));
                         validateUser = Optional.of(user);
-                    } else {
-                        throw new AuthenticateException("Credenciales incorrectas", null);
                     }
-
-                } else {
-                    throw new AuthenticateException("Credenciales incorrectas", null);
                 }
             }
-
         } catch (SQLException e) {
             LOGGER.log(Level.SEVERE, "Error al autenticar", e);
             throw new AuthenticateException("Error al autenticar: " + e.getMessage(), e);

@@ -43,6 +43,8 @@ public class FXMLLoginController implements Initializable {
     private static final int USER_TYPE_COORDINATOR = 3;
     private static final int USER_TYPE_ADMINISTRATOR = 4;
     private static final int MAX_ATTEMPTS = 5;
+    private static final String MESSAGE_INVALID_CREDENTIALS = "Credenciales inválidas. Intentos restantes: ";
+    private static final String MESSAGE_TOO_MANY_ATTEMPTS =  "Demasiados intentos fallidos. Reinicie la aplicación.";
     private static final String VERIFY_VIEW_FXML = "/uv/lis/GUI/view/FXMLVerifyCode.fxml";
 
     private static final Logger LOGGER = Logger.getLogger(FXMLLoginController.class.getName());
@@ -112,18 +114,28 @@ public class FXMLLoginController implements Initializable {
                     user = optionalUser.get();
                     startUserSession(user);
                 } else {
-                    failedAttempts++;
-                    if (failedAttempts >= MAX_ATTEMPTS) {
-                        buttonLogin.setDisable(true);
-                        showError("Demasiados intentos fallidos. Reinicie la aplicación.");
-                    }
-                    showError("Credenciales inválidas. Intente de nuevo.");
+                    registerFailedAttempt();
                 }
             } catch (AuthenticateException e) {
                 LOGGER.log(Level.WARNING, "Error al autenticar al usuario: {0}", e.getMessage());
                 showError(e.getMessage());
             }
         }
+    }
+
+    private void registerFailedAttempt() {
+        failedAttempts++;
+        if (failedAttempts >= MAX_ATTEMPTS) {
+            blockLogin();
+        } else {
+            int remainingAttempts = MAX_ATTEMPTS - failedAttempts;
+            showError(MESSAGE_INVALID_CREDENTIALS + remainingAttempts);
+        }
+    }
+
+    private void blockLogin() {
+        buttonLogin.setDisable(true);
+        showError(MESSAGE_TOO_MANY_ATTEMPTS);
     }
 
     private void startUserSession(User user) {
