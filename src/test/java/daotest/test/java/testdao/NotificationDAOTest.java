@@ -26,21 +26,20 @@ import uv.lis.logic.exceptions.OperationException;
 
 class NotificationDAOTest {
 
-    private static final int GENERATED_ID = 15;
-    private static final int ROWS_AFFECTED = 1;
-    private static final int NOTIFICATION_COUNT = 2;
-    private static final int NOTIFICATION_ID = 15;
-
-    private static final String STUDENT_ID = "S23013127";
-    private static final String NOTIFICATION_TITLE = "Proyecto asignado";
-    private static final String NOTIFICATION_MESSAGE = "Cumples el perfil";
-    private static final String DATABASE_ERROR_MESSAGE = "Fallo";
+    private static final int    GENERATED_ID            = 15;
+    private static final int    ROWS_AFFECTED           = 1;
+    private static final int    NOTIFICATION_COUNT      = 2;
+    private static final int    NOTIFICATION_ID         = 15;
+    private static final String STUDENT_ID              = "S23013127";
+    private static final String NOTIFICATION_TITLE      = "Proyecto asignado";
+    private static final String NOTIFICATION_MESSAGE    = "Cumples el perfil";
+    private static final String DATABASE_ERROR_MESSAGE  = "Fallo";
 
     @Mock private MySQLConnectionManager connectionManager;
-    @Mock private Connection databaseConnection;
-    @Mock private PreparedStatement preparedStatement;
-    @Mock private ResultSet resultSet;
-    @Mock private ResultSet generatedKeys;
+    @Mock private Connection             databaseConnection;
+    @Mock private PreparedStatement      preparedStatement;
+    @Mock private ResultSet              resultSet;
+    @Mock private ResultSet              generatedKeys;
 
     private NotificationDAO notificationDAO;
 
@@ -61,7 +60,12 @@ class NotificationDAOTest {
         when(preparedStatement.executeQuery()).thenReturn(resultSet);
     }
 
-    private Notification builderNotification() {
+    private void mockUpdateExecution() throws Exception {
+        when(databaseConnection.prepareStatement(anyString())).thenReturn(preparedStatement);
+        when(preparedStatement.executeUpdate()).thenReturn(ROWS_AFFECTED);
+    }
+
+    private Notification buildNotification() {
         Notification notification = new Notification();
         notification.setIdStudent(STUDENT_ID);
         notification.setTitle(NOTIFICATION_TITLE);
@@ -71,16 +75,16 @@ class NotificationDAOTest {
         return notification;
     }
 
-
     @Test
     void registerNotification_successful_returnsGeneratedId() throws Exception {
-        when(databaseConnection.prepareStatement(anyString(), anyInt())).thenReturn(preparedStatement);
+        when(databaseConnection.prepareStatement(anyString(), anyInt()))
+            .thenReturn(preparedStatement);
         when(preparedStatement.executeUpdate()).thenReturn(ROWS_AFFECTED);
         when(preparedStatement.getGeneratedKeys()).thenReturn(generatedKeys);
         when(generatedKeys.next()).thenReturn(true);
         when(generatedKeys.getInt(1)).thenReturn(GENERATED_ID);
 
-        assertEquals(GENERATED_ID, notificationDAO.registerNotification(builderNotification()));
+        assertEquals(GENERATED_ID, notificationDAO.registerNotification(buildNotification()));
     }
 
     @Test
@@ -88,7 +92,7 @@ class NotificationDAOTest {
         when(connectionManager.getConnection()).thenThrow(new SQLException(DATABASE_ERROR_MESSAGE));
 
         assertThrows(OperationException.class,
-            () -> notificationDAO.registerNotification(builderNotification()));
+            () -> notificationDAO.registerNotification(buildNotification()));
     }
 
     @Test
@@ -118,8 +122,7 @@ class NotificationDAOTest {
 
     @Test
     void markNotificationAsRead_successful_returnsTrue() throws Exception {
-        mockQueryExecution();
-        when(preparedStatement.executeUpdate()).thenReturn(ROWS_AFFECTED);
+        mockUpdateExecution();
 
         assertTrue(notificationDAO.markNotificationAsRead(NOTIFICATION_ID));
     }

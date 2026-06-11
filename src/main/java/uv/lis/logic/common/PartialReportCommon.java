@@ -76,7 +76,7 @@ public class PartialReportCommon {
         return fillReportTemplate(partialReport);
     }
 
-    private JasperPrint fillReportTemplate(PartialReport partialReport) throws JRException, OperationException {
+    public JasperPrint fillReportTemplate(PartialReport partialReport) throws JRException, OperationException {
         JasperPrint jasperPrint;
 
         try (InputStream templateStream = getClass().getResourceAsStream(REPORT_TEMPLATE_PATH)) {
