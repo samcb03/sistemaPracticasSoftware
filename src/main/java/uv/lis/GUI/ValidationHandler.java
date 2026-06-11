@@ -9,7 +9,7 @@ import javafx.scene.control.ButtonType;
 import javafx.scene.control.Label;
 import javafx.stage.Stage;
 
-public abstract class ValidationHandler extends WindowHandler   {
+public abstract class ValidationHandler extends WindowHandler {
 
     protected Label messageLabel;
     protected Button backButton;
@@ -66,6 +66,4 @@ public abstract class ValidationHandler extends WindowHandler   {
         confirmed = result.isPresent() && result.get() == yesButton;
         return confirmed;
     }
-
-    
 }

@@ -23,7 +23,7 @@ import uv.lis.logic.exceptions.OperationException;
 public class FXMLConsultSubjectController extends WindowHandler {
 
     private static final Logger LOGGER = Logger.getLogger(FXMLConsultSubjectController.class.getName());
-    private static final String CONSULT_STUDENT_VIEW = "/uv/lis/GUI/view/FXMLConsultStudent.fxml";
+    private static final String CONSULT_STUDENT_VIEW = "/uv/lis/GUI/view/FXMLManageStudent.fxml";
     private static final String STUDENT_ARCHIVES_VIEW = "/uv/lis/GUI/view/FXMLConsultStudentExpedient.fxml";
     private static final String SELECT_STUDENT_MESSAGE = "Debe seleccionar un alumno de la lista";
 
@@ -89,7 +89,7 @@ public class FXMLConsultSubjectController extends WindowHandler {
         FXMLLoader loader = navigateToWithLoader(CONSULT_STUDENT_VIEW);
 
         if (loader != null) {
-            FXMLConsultStudentController controller = loader.getController();
+            FXMLManageStudentController controller = loader.getController();
             controller.loadStudentData(student.getIdStudent());
         }
     }
