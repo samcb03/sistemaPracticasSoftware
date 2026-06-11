@@ -177,7 +177,6 @@ public class WeeklyAdvanceGridEditor {
             try {
                 value = Optional.of(Integer.parseInt(rawValue.trim()));
             } catch (NumberFormatException numberFormatException) {
-                // Texto no numérico: la celda se ignora y conserva su valor previo
                 value = Optional.empty();
             }
         }
