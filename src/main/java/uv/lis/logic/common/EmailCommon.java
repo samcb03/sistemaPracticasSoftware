@@ -20,6 +20,11 @@ import uv.lis.logic.dto.VerificationChallenge;
 import uv.lis.logic.exceptions.EmailException;
 import uv.lis.logic.utils.PasswordHasher;
 
+/**
+ * Generates, sends and verifies the one-time codes used for the email-based
+ * two-step authentication. The plain code travels to the user's email while its
+ * hash and expiration time are kept in a {@link VerificationChallenge}.
+ */
 public class EmailCommon {
     private static final Logger LOGGER = Logger.getLogger(EmailCommon.class.getName());
 
@@ -46,10 +51,22 @@ public class EmailCommon {
     private final SecureRandom secureRandom = new SecureRandom();
     private Properties properties = new Properties();
 
+    /**
+     * Creates the component and loads the email configuration from the external
+     * properties file.
+     */
     public EmailCommon() {
         chargeProperties();
     }
 
+    /**
+     * Generates a verification code, sends it to the given email and returns the
+     * challenge holding the hashed code and its expiration time.
+     *
+     * @param email the email address where the code is sent
+     * @return the challenge used later to verify the code entered by the user
+     * @throws EmailException if the email cannot be sent
+     */
     public VerificationChallenge sendVerificationCode(String email) throws EmailException {
         String plainCode = generateCode();
         String hashedCode = PasswordHasher.hashPassword(plainCode);
@@ -60,6 +77,14 @@ public class EmailCommon {
         return new VerificationChallenge(email, hashedCode, expirationTime);
     }
 
+    /**
+     * Checks whether the code entered by the user matches the challenge and has
+     * not expired.
+     *
+     * @param challenge the challenge created when the code was sent
+     * @param inputCode the code entered by the user
+     * @return true if the code is valid and still in force, false otherwise
+     */
     public boolean verifyCode(VerificationChallenge challenge, String inputCode) {
         boolean isValid = false;
 

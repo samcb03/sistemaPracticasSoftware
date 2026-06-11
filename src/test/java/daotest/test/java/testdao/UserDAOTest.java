@@ -48,8 +48,8 @@ class UserDAOTest {
     private static final int COORDINATOR_USER_ID = 13;
     private static final int ADMIN_USER_ID = 14;
 
-    private static final boolean ACTIVE_USER = true;
-    private static final boolean EMAIL_AUTHENTICATION_ACTIVE = true;
+    private static final boolean IS_ACTIVE = true;
+    private static final boolean EMAIL_AUTHENTICATION_DISABLED = false;
 
     private static final String FIRST_NAME = "Juan";
     private static final String LAST_NAME = "Pérez";
@@ -110,7 +110,7 @@ class UserDAOTest {
 
     private User builderUser() {
         return new User(DEFAULT_ID, FIRST_NAME, LAST_NAME, DEFAULT_PASSWORD, DEFAULT_EMAIL, DEFAULT_ROLE_ID, 
-            ACTIVE_USER, EMAIL_AUTHENTICATION_ACTIVE);
+            IS_ACTIVE, IS_ACTIVE);
     }
 
     private static Stream<Arguments> provideUsersByRole() {
@@ -247,5 +247,33 @@ class UserDAOTest {
 
         assertThrows(OperationException.class,
             () -> userDAO.existActiveCoordinator());
+    }
+
+    @Test
+    void updateEmailAuthenticationPreference_successful_returnsTrue() throws Exception {
+        when(databaseConnection.prepareStatement(anyString())).thenReturn(preparedStatement);
+        when(preparedStatement.executeUpdate()).thenReturn(ROWS_AFFECTED);
+
+        assertTrue(userDAO.updateEmailAuthenticationPreference(DEFAULT_ID,
+            EMAIL_AUTHENTICATION_DISABLED));
+    }
+
+    @Test
+    void updateEmailAuthenticationPreference_noRowsAffected_returnsFalse() throws Exception {
+        when(databaseConnection.prepareStatement(anyString())).thenReturn(preparedStatement);
+        when(preparedStatement.executeUpdate()).thenReturn(NO_ROWS_AFFECTED);
+
+        assertFalse(userDAO.updateEmailAuthenticationPreference(DEFAULT_ID,
+            EMAIL_AUTHENTICATION_DISABLED));
+    }
+
+    @Test
+    void updateEmailAuthenticationPreference_sqlError_throwsOperationException() throws Exception {
+        when(databaseConnection.prepareStatement(anyString()))
+            .thenThrow(new SQLException(DATABASE_ERROR_MESSAGE));
+
+        assertThrows(OperationException.class,
+            () -> userDAO.updateEmailAuthenticationPreference(DEFAULT_ID,
+                EMAIL_AUTHENTICATION_DISABLED));
     }
 }
