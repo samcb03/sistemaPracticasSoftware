@@ -19,7 +19,6 @@ import uv.lis.logic.utils.PasswordHasher;
 
 public class UserDAO implements IUserDAO {
     private static final int ROL_COORDINATOR = 3;
-    private static final int ROLE_PROFESSOR = 2;
     private static final int STATUS_ACTIVE = 1;
     private static final Logger LOGGER = Logger.getLogger(UserDAO.class.getName());
     private MySQLConnectionManager connectionManager;
@@ -130,7 +129,7 @@ public class UserDAO implements IUserDAO {
         try (Connection databaseConnection = connectionManager.getConnection();
             PreparedStatement preparedStatement = databaseConnection.prepareStatement(userQuery)) {
 
-            preparedStatement.setInt(1, ROLE_PROFESSOR);
+            preparedStatement.setInt(1, ROL_COORDINATOR);
             preparedStatement.setInt(2, STATUS_ACTIVE);
 
             try (ResultSet resultSet = preparedStatement.executeQuery()) {

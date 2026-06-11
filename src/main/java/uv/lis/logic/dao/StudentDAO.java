@@ -21,6 +21,7 @@ import uv.lis.logic.exceptions.OperationException;
 public class StudentDAO extends UserDAO implements IStudentDAO {
     private static final Logger LOGGER = Logger.getLogger(UserDAO.class.getName());
     private static final int STATUS_ACTIVE = 1;
+    private static final int STATUS_INACTIVE = 0;
     
     private MySQLConnectionManager connectionManager;
 
@@ -199,13 +200,14 @@ public class StudentDAO extends UserDAO implements IStudentDAO {
     public boolean inactivateStudent(String studentId) throws OperationException {
         boolean isInactive = false;
         
-        String studentQuery = "UPDATE Alumno a INNER JOIN Usuario u ON a.idUsuario = u.idUsuario SET u.estado = 0" 
+        String studentQuery = "UPDATE Alumno a INNER JOIN Usuario u ON a.idUsuario = u.idUsuario SET u.estado = ?" 
                             + " WHERE a.matricula = ?;";
 
         try (Connection databaseConnection = connectionManager.getConnection();
             PreparedStatement preparedStatement = databaseConnection.prepareStatement(studentQuery)) {
             
-            preparedStatement.setString(1, studentId);
+            preparedStatement.setInt(1, STATUS_INACTIVE);
+            preparedStatement.setString(2, studentId);
 
             if (preparedStatement.executeUpdate() > NO_ROWS_AFFECTED) {
                 isInactive = true;

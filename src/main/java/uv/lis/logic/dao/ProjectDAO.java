@@ -36,8 +36,8 @@ public class ProjectDAO implements IProjectDAO{
                               + "ON p.idOrganizacionVinculada = o.idOrganizacionVinculada";
 
         try (Connection databaseConnection = connectionManager.getConnection();
-            PreparedStatement preparedStatement = databaseConnection.prepareStatement(projectQuery)) {
-            ResultSet resultSet = preparedStatement.executeQuery();
+            PreparedStatement preparedStatement = databaseConnection.prepareStatement(projectQuery); 
+            ResultSet resultSet = preparedStatement.executeQuery()) {
 
             while (resultSet.next()) {
                 Project project = new Project();
