@@ -108,31 +108,6 @@ public class NotificationDAO implements INotificationDAO {
         return isUpdated;
     }
 
-    @Override
-    public int getUnreadCountByStudentId(String idStudent) throws OperationException {
-        int unreadCount = NO_ROWS_AFFECTED;
-        String notificationQuery = "SELECT COUNT(*) AS total FROM Notificacion "
-                                 + "WHERE matricula = ? AND leida = ?;";
-
-        try (Connection databaseConnection = connectionManager.getConnection();
-            PreparedStatement preparedStatement = databaseConnection.prepareStatement(notificationQuery)) {
-
-            preparedStatement.setString(1, idStudent);
-            preparedStatement.setBoolean(2, false);
-
-            try (ResultSet resultSet = preparedStatement.executeQuery()) {
-                if (resultSet.next()) {
-                    unreadCount = resultSet.getInt("total");
-                }
-            }
-        } catch (SQLException e) {
-            LOGGER.log(Level.SEVERE, "Error al contar las notificaciones no leídas", e);
-            throw new OperationException("Error al contar las notificaciones no leídas", e);
-        }
-
-        return unreadCount;
-    }
-
     private Notification buildNotificationFromResultSet(ResultSet resultSet) throws SQLException {
         Notification notification = new Notification();
         notification.setId(resultSet.getInt("idNotificacion"));

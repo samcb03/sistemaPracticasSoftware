@@ -8,18 +8,71 @@ import java.util.Optional;
 import uv.lis.logic.dto.Expedient;
 import uv.lis.logic.exceptions.OperationException;
 
+/**
+ * Defines the data access operations for student expedient documents.
+ */
 public interface IExpedientDAO {
+
+    /**
+     * Registers a document in a student's expedient.
+     *
+     * @param expedient the expedient document data to register
+     * @return the generated identifier of the registered document
+     * @throws OperationException if the document cannot be registered
+     */
     int saveDocument(Expedient expedient) throws OperationException;
 
+    /**
+     * Retrieves all the registered expedient documents.
+     *
+     * @return the list of documents, empty if there are none
+     * @throws OperationException if the documents cannot be retrieved
+     */
     List<Expedient> getAllDocuments() throws OperationException;
 
+    /**
+     * Retrieves the identifier of a document type from its name.
+     *
+     * @param name the name of the document type to look up
+     * @return the document type identifier if it exists, empty otherwise
+     * @throws OperationException if the identifier cannot be retrieved
+     */
     Optional<Integer> getIdDocumentTypeByName(String name) throws OperationException;
 
+    /**
+     * Uploads a document file to a student's expedient.
+     *
+     * @param idStudent the identifier of the student who owns the expedient
+     * @param typeDocument the type of the document to upload
+     * @param file the document file to upload
+     * @throws OperationException if the document cannot be uploaded
+     */
     void uploadDocument(String idStudent, String typeDocument, File file) throws OperationException;
 
+    /**
+     * Retrieves the names of all the available document types.
+     *
+     * @return the list of document type names, empty if there are none
+     * @throws OperationException if the document types cannot be retrieved
+     */
     ArrayList<String> getAllDocumentsTypes() throws OperationException;
 
+    /**
+     * Retrieves the expedient documents that belong to a student.
+     *
+     * @param idStudent the identifier of the student whose documents are retrieved
+     * @return the list of documents for the student, empty if there are none
+     * @throws OperationException if the documents cannot be retrieved
+     */
     List<Expedient> getDocumentsByStudentId(String idStudent) throws OperationException;
 
+    /**
+     * Updates the validation status of an expedient document.
+     *
+     * @param idExpedient the identifier of the expedient document to update
+     * @param isValidated the new validation status of the document
+     * @return true if the status was updated, false otherwise
+     * @throws OperationException if the status cannot be updated
+     */
     boolean updateValidationStatus(int idExpedient, boolean isValidated) throws OperationException;
 }

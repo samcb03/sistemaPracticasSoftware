@@ -29,13 +29,11 @@ class NotificationDAOTest {
     private static final int GENERATED_ID = 15;
     private static final int ROWS_AFFECTED = 1;
     private static final int NOTIFICATION_COUNT = 2;
-    private static final int UNREAD_COUNT = 3;
     private static final int NOTIFICATION_ID = 15;
 
     private static final String STUDENT_ID = "S23013127";
     private static final String NOTIFICATION_TITLE = "Proyecto asignado";
     private static final String NOTIFICATION_MESSAGE = "Cumples el perfil";
-    private static final String UNREAD_COUNT_COLUMN = "total";
     private static final String DATABASE_ERROR_MESSAGE = "Fallo";
 
     @Mock private MySQLConnectionManager connectionManager;
@@ -132,22 +130,5 @@ class NotificationDAOTest {
 
         assertThrows(OperationException.class,
             () -> notificationDAO.markNotificationAsRead(NOTIFICATION_ID));
-    }
-
-    @Test
-    void getUnreadCountByStudentId_hasUnreadNotifications_returnsCount() throws Exception {
-        mockQueryExecution();
-        when(resultSet.next()).thenReturn(true);
-        when(resultSet.getInt(UNREAD_COUNT_COLUMN)).thenReturn(UNREAD_COUNT);
-
-        assertEquals(UNREAD_COUNT, notificationDAO.getUnreadCountByStudentId(STUDENT_ID));
-    }
-
-    @Test
-    void getUnreadCountByStudentId_sqlError_throwsOperationException() throws Exception {
-        when(connectionManager.getConnection()).thenThrow(new SQLException(DATABASE_ERROR_MESSAGE));
-
-        assertThrows(OperationException.class,
-            () -> notificationDAO.getUnreadCountByStudentId(STUDENT_ID));
     }
 }

@@ -17,11 +17,6 @@ class WorkProgressCalculatorTest {
     private static final int MINIMUM_WEEKS = 1;
     private static final int ZERO_PROGRESS = 0;
     private static final int FOURTEEN_DAYS = 14;
-    private static final int TWENTY_ONE_DAYS = 21;
-    private static final int TWO_WEEKS = 2;
-    private static final int THREE_WEEKS = 3;
-    private static final int ADVANCE_TWO_WEEKS = 50;
-    private static final int ADVANCE_THREE_WEEKS = 33;
 
     private Activity builderActivity(LocalDate startDate, LocalDate endDate) {
         Activity activity = new Activity();
