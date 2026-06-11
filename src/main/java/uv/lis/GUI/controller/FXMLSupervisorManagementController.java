@@ -23,7 +23,7 @@ public class FXMLSupervisorManagementController extends WindowHandler{
 
     @FXML 
     public void goToConsultSupervisor() { 
-        navigateTo("/uv/lis/GUI/view/FXMLConsultProjectSupervisor.fxml"); 
+        navigateTo("/uv/lis/GUI/view/FXMLManageProjectSupervisor.fxml"); 
     }
 
 }

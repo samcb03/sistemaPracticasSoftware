@@ -33,9 +33,9 @@ import uv.lis.logic.dto.AffiliatedOrganization;
 import uv.lis.logic.dto.Project;
 import uv.lis.logic.exceptions.OperationException;
 
-public class FXMLConsultAffiliatedOrganizationController extends ValidationHandler {
+public class FXMLManageAffiliatedOrganizationController extends ValidationHandler {
 
-    private static final Logger LOGGER = Logger.getLogger(FXMLConsultAffiliatedOrganizationController.class.getName());
+    private static final Logger LOGGER = Logger.getLogger(FXMLManageAffiliatedOrganizationController.class.getName());
 
     private static final String LABEL_INACTIVE = "Inactivo";
     private static final String LABEL_ACTIVE   = "Activo";
@@ -255,7 +255,7 @@ public class FXMLConsultAffiliatedOrganizationController extends ValidationHandl
         String organizationName = labelName.getText().trim();
         Optional<String> validateError = validateText(organizationName, 
             "El nombre de la Organizacion Vinculada");
-            if(validateError.isPresent()) {
+            if (validateError.isPresent()) {
                 showError(validateError.get());
             } else {
                 executeInactivationCheck(organizationName);

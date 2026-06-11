@@ -23,7 +23,7 @@ public class FXMLStudentManagementController extends WindowHandler {
 
     @FXML
     public void goToConsultStudent() { 
-        navigateTo("/uv/lis/GUI/view/FXMLConsultStudent.fxml"); 
+        navigateTo("/uv/lis/GUI/view/FXMLManageStudent.fxml"); 
     }
 
 }

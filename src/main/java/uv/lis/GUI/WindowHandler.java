@@ -84,10 +84,9 @@ public abstract class WindowHandler implements Initializable {
 
     private void closeAllOpenStages() {
         new ArrayList<>(Stage.getWindows()).forEach(window -> {
-            if(window instanceof Stage) {
+            if (window instanceof Stage) {
                 ((Stage)window).close();
             }
         });
     }
-
 }

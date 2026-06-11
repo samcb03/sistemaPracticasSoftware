@@ -32,9 +32,9 @@ import uv.lis.logic.dao.ProfessorDAO;
 import uv.lis.logic.dto.Professor;
 import uv.lis.logic.exceptions.OperationException;
 
-public class FXMLConsultProfessorController extends ValidationHandler {
+public class FXMLManageProfessorController extends ValidationHandler {
 
-    private static final Logger LOGGER = Logger.getLogger(FXMLConsultProfessorController.class.getName());
+    private static final Logger LOGGER = Logger.getLogger(FXMLManageProfessorController.class.getName());
 
     private static final String LABEL_INACTIVE = "Inactivo";
     private static final String LABEL_ACTIVE = "Activo";

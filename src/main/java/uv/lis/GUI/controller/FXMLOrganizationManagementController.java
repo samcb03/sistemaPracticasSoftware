@@ -23,7 +23,7 @@ public class FXMLOrganizationManagementController extends WindowHandler{
 
     @FXML 
     public void goToConsultOrganization() { 
-        navigateTo("/uv/lis/GUI/view/FXMLConsultAffiliatedOrganization.fxml"); 
+        navigateTo("/uv/lis/GUI/view/FXMLManageAffiliatedOrganization.fxml"); 
     }
 
 }

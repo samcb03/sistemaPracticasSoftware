@@ -30,9 +30,9 @@ import uv.lis.logic.dao.ProjectSupervisorDAO;
 import uv.lis.logic.dto.ProjectSupervisor;
 import uv.lis.logic.exceptions.OperationException;
 
-public class FXMLConsultProjectSupervisorController extends ValidationHandler {
+public class FXMLManageProjectSupervisorController extends ValidationHandler {
 
-    private static final Logger LOGGER = Logger.getLogger(FXMLConsultProjectSupervisorController.class.getName());
+    private static final Logger LOGGER = Logger.getLogger(FXMLManageProjectSupervisorController.class.getName());
     private static final String LABEL_INACTIVE = "Inactivo";
     private static final String LABEL_ACTIVE = "Activo";
 

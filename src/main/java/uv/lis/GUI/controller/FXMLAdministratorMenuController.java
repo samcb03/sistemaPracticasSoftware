@@ -25,7 +25,7 @@ public class FXMLAdministratorMenuController extends WindowHandler  {
 
     @FXML
     public void goToConsultProfessor() {
-        navigateTo("/uv/lis/GUI/view/FXMLConsultProfessor.fxml");
+        navigateTo("/uv/lis/GUI/view/FXMLManageProfessor.fxml");
     }
 
 }
