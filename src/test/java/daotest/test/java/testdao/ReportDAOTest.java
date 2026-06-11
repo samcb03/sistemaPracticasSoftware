@@ -31,11 +31,10 @@ import uv.lis.logic.exceptions.OperationException;
 
 class ReportDAOTest {
 
-    private static final int FIRST_REPORT_ID = 1;
+    private static final int FIRST_REPORT_ID = 6;
     private static final int SECOND_REPORT_ID = 2;
     private static final int SEARCHED_REPORT_ID = 3;
-    private static final int GENERATED_KEY_COLUMN = 1;
-    private static final int GENERATED_ID = 1;
+    private static final int GENERATED_ID = 4;
     private static final int ROWS_AFFECTED = 1;
 
     private static final int PLANNED_HOURS = 10;
@@ -296,7 +295,7 @@ class ReportDAOTest {
         mockUpdateExecution(ROWS_AFFECTED);
         when(preparedStatement.getGeneratedKeys()).thenReturn(generatedKeys);
         when(generatedKeys.next()).thenReturn(true);
-        when(generatedKeys.getInt(GENERATED_KEY_COLUMN)).thenReturn(GENERATED_ID);
+        when(generatedKeys.getInt(1)).thenReturn(GENERATED_ID);
 
         assertTrue(reportDAO.registerPartialReport(builderPartialReport()));
     }
@@ -315,7 +314,7 @@ class ReportDAOTest {
         mockUpdateExecution(ROWS_AFFECTED);
         when(preparedStatement.getGeneratedKeys()).thenReturn(generatedKeys);
         when(generatedKeys.next()).thenReturn(true);
-        when(generatedKeys.getInt(GENERATED_KEY_COLUMN)).thenReturn(GENERATED_ID);
+        when(generatedKeys.getInt(1)).thenReturn(GENERATED_ID);
 
         assertTrue(reportDAO.registerFinalReport(builderFinalReport()));
     }
@@ -334,7 +333,7 @@ class ReportDAOTest {
         mockUpdateExecution(ROWS_AFFECTED);
         when(preparedStatement.getGeneratedKeys()).thenReturn(generatedKeys);
         when(generatedKeys.next()).thenReturn(true);
-        when(generatedKeys.getInt(GENERATED_KEY_COLUMN)).thenReturn(GENERATED_ID);
+        when(generatedKeys.getInt(1)).thenReturn(GENERATED_ID);
 
         assertTrue(reportDAO.registerMonthlyReport(builderMonthlyReport()));
     }

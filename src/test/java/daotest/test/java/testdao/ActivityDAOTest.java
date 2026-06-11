@@ -29,14 +29,13 @@ import uv.lis.logic.exceptions.OperationException;
 
 class ActivityDAOTest {
 
-    private static final int FIRST_ACTIVITY_ID = 1;
-    private static final int SECOND_ACTIVITY_ID = 2;
+    private static final int FIRST_ACTIVITY_ID = 2;
+    private static final int SECOND_ACTIVITY_ID = 4;
     private static final int SEARCHED_ACTIVITY_ID = 3;
     private static final int FIRST_PROJECT_ID = 10;
     private static final int SECOND_PROJECT_ID = 11;
     private static final int ROWS_AFFECTED = 1;
-    private static final int GENERATED_KEY_COLUMN = 1;
-    private static final int GENERATED_ID = 1;
+    private static final int GENERATED_ID = 5;
 
     private static final String FIRST_ACTIVITY_NAME = "Actividad 1";
     private static final String SECOND_ACTIVITY_NAME = "Actividad 2";
@@ -172,7 +171,7 @@ class ActivityDAOTest {
         mockUpdateExecution(ROWS_AFFECTED);
         when(preparedStatement.getGeneratedKeys()).thenReturn(resultSet);
         when(resultSet.next()).thenReturn(true);
-        when(resultSet.getInt(GENERATED_KEY_COLUMN)).thenReturn(GENERATED_ID);
+        when(resultSet.getInt(1)).thenReturn(GENERATED_ID);
 
         assertTrue(activityDAO.registerActivity(builderFirstActivity()));
     }

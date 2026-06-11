@@ -28,12 +28,11 @@ import uv.lis.logic.exceptions.OperationException;
 class ExpedientDAOTest {
 
     private static final int EXPEDIENT_ID = 2;
-    private static final int FIRST_EXPEDIENT_ID = 1;
+    private static final int FIRST_EXPEDIENT_ID = 4;
     private static final int GENERATED_ID = 42;
     private static final int ROWS_AFFECTED = 1;
     private static final int NO_ROWS_AFFECTED = 0;
-    private static final int DOCUMENT_TYPE_ID = 1;
-    private static final int GENERATED_KEY_COLUMN = 1;
+    private static final int DOCUMENT_TYPE_ID = 3;
     private static final int MINUS_ONE = -1;
 
     private static final String STUDENT_ID = "S23013127";
@@ -94,7 +93,7 @@ class ExpedientDAOTest {
         mockUpdateExecution(ROWS_AFFECTED);
         when(preparedStatement.getGeneratedKeys()).thenReturn(generatedKeys);
         when(generatedKeys.next()).thenReturn(true);
-        when(generatedKeys.getInt(GENERATED_KEY_COLUMN)).thenReturn(GENERATED_ID);
+        when(generatedKeys.getInt(1)).thenReturn(GENERATED_ID);
 
         assertNotEquals(MINUS_ONE, expedientDAO.saveDocument(builderExpedient()));
     }

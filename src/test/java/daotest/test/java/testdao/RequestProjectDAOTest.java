@@ -6,6 +6,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
+import static uv.lis.logic.utils.InputValidator.NO_ROWS_AFFECTED;
 
 import java.lang.reflect.Field;
 import java.sql.Connection;
@@ -28,17 +29,11 @@ import uv.lis.logic.exceptions.OperationException;
 
 class RequestProjectDAOTest {
 
-    private static final int FIRST_PROJECT_ID = 1;
-    private static final int ROWS_AFFECTED = 1;
-    private static final int NO_ROWS_AFFECTED = 0;
-    private static final int REQUEST_COUNT_SOME = 2;
-    private static final int REQUEST_COUNT_ZERO = 0;
-    private static final int REQUEST_COUNT_ONE = 1;
-    private static final int CAPACITY_AVAILABLE = 5;
-    private static final int CAPACITY_FULL = 3;
-    private static final int REQUESTS_UNDER = 2;
-    private static final int REQUESTS_FULL = 3;
-    private static final int REQUESTS_VALID = 1;
+    private static final int FIRST_PROJECT_ID     = 9;
+    private static final int ROWS_AFFECTED        = 1;  
+    private static final int REQUEST_COUNT_ZERO   = 0;
+    private static final int CAPACITY_AVAILABLE   = 5;
+    private static final int CAPACITY_FULL        = 3;
 
     private static final String FIRST_STUDENT_ID = "S23013127";
     private static final String FIRST_STUDENT_NAME = "Ana";
@@ -131,9 +126,9 @@ class RequestProjectDAOTest {
     void getActiveRequestCountByStudentId_studentHasRequests_returnsCount() throws Exception {
         mockQueryExecution();
         when(resultSet.next()).thenReturn(true);
-        when(resultSet.getInt(COLUMN_TOTAL)).thenReturn(REQUEST_COUNT_SOME);
+        when(resultSet.getInt(COLUMN_TOTAL)).thenReturn(CAPACITY_FULL);
 
-        assertEquals(REQUEST_COUNT_SOME,
+        assertEquals(CAPACITY_FULL,
             requestProjectDAO.getActiveRequestCountByStudentId(FIRST_STUDENT_ID));
     }
 
@@ -183,7 +178,7 @@ class RequestProjectDAOTest {
     void hasAlreadyRequested_studentAlreadyRequested_returnsTrue() throws Exception {
         mockQueryExecution();
         when(resultSet.next()).thenReturn(true);
-        when(resultSet.getInt(COLUMN_TOTAL)).thenReturn(REQUEST_COUNT_ONE);
+        when(resultSet.getInt(COLUMN_TOTAL)).thenReturn(ROWS_AFFECTED);
 
         assertTrue(requestProjectDAO.hasAlreadyRequested(FIRST_STUDENT_ID, FIRST_PROJECT_ID));
     }
@@ -210,7 +205,7 @@ class RequestProjectDAOTest {
         mockQueryExecution();
         when(resultSet.next()).thenReturn(true);
         when(resultSet.getInt(COLUMN_CAPACITY)).thenReturn(CAPACITY_AVAILABLE);
-        when(resultSet.getInt(COLUMN_REQUESTS)).thenReturn(REQUESTS_UNDER);
+        when(resultSet.getInt(COLUMN_REQUESTS)).thenReturn(CAPACITY_FULL);
 
         assertTrue(requestProjectDAO.hasAvailableCapacity(FIRST_PROJECT_ID));
     }
@@ -220,7 +215,7 @@ class RequestProjectDAOTest {
         mockQueryExecution();
         when(resultSet.next()).thenReturn(true);
         when(resultSet.getInt(COLUMN_CAPACITY)).thenReturn(CAPACITY_FULL);
-        when(resultSet.getInt(COLUMN_REQUESTS)).thenReturn(REQUESTS_FULL);
+        when(resultSet.getInt(COLUMN_REQUESTS)).thenReturn(CAPACITY_FULL);
 
         assertFalse(requestProjectDAO.hasAvailableCapacity(FIRST_PROJECT_ID));
     }
@@ -273,7 +268,7 @@ class RequestProjectDAOTest {
         when(resultSet.next()).thenReturn(true);
         when(resultSet.getInt(COLUMN_TOTAL)).thenReturn(REQUEST_COUNT_ZERO);
         when(resultSet.getInt(COLUMN_CAPACITY)).thenReturn(CAPACITY_AVAILABLE);
-        when(resultSet.getInt(COLUMN_REQUESTS)).thenReturn(REQUESTS_VALID);
+        when(resultSet.getInt(COLUMN_REQUESTS)).thenReturn(ROWS_AFFECTED);
 
         assertEquals(Optional.empty(), requestProjectDAO.validateProjectRequest(
             FIRST_STUDENT_ID, FIRST_PROJECT_ID));

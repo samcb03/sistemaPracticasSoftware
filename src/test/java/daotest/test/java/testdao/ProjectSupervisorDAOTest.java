@@ -29,9 +29,9 @@ import uv.lis.logic.exceptions.OperationException;
 
 class ProjectSupervisorDAOTest {
 
+    private static final int NO_ROWS_AFFECTED = 0;
     private static final int ROWS_AFFECTED = 1;
-    private static final int NO_ROWS = 0;
-    private static final int SUPERVISOR_ID = 1;
+    private static final int SUPERVISOR_ID = 2;
     private static final int ORGANIZATION_ID = 1;
     private static final int GENERATED_ID = 5;
     private static final int ACTIVE_STATUS = 1;
@@ -169,7 +169,7 @@ class ProjectSupervisorDAOTest {
     @Test
     void registerProjectSupervisor_noRowsAffected_throwsOperationException() throws Exception {
         when(databaseConnection.prepareStatement(anyString())).thenReturn(preparedStatement);
-        when(preparedStatement.executeUpdate()).thenReturn(NO_ROWS);
+        when(preparedStatement.executeUpdate()).thenReturn(NO_ROWS_AFFECTED);
 
         assertThrows(OperationException.class,
             () -> projectSupervisorDAO.registerProjectSupervisor(buildSupervisor()));
@@ -194,7 +194,7 @@ class ProjectSupervisorDAOTest {
     @Test
     void modifyProjectSupervisor_noRowsAffected_throwsOperationException() throws Exception {
         when(databaseConnection.prepareStatement(anyString())).thenReturn(preparedStatement);
-        when(preparedStatement.executeUpdate()).thenReturn(NO_ROWS);
+        when(preparedStatement.executeUpdate()).thenReturn(NO_ROWS_AFFECTED);
 
         assertThrows(OperationException.class,
             () -> projectSupervisorDAO.modifyProjectSupervisor(buildSupervisor()));
@@ -219,7 +219,7 @@ class ProjectSupervisorDAOTest {
     @Test
     void inactivateProjectSupervisor_noRowsAffected_throwsOperationException() throws Exception {
         when(databaseConnection.prepareStatement(anyString())).thenReturn(preparedStatement);
-        when(preparedStatement.executeUpdate()).thenReturn(NO_ROWS);
+        when(preparedStatement.executeUpdate()).thenReturn(NO_ROWS_AFFECTED);
 
         assertThrows(OperationException.class,
             () -> projectSupervisorDAO.inactivateProjectSupervisor(SUPERVISOR_NAME));

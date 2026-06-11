@@ -10,6 +10,7 @@ import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.when;
+import static uv.lis.logic.utils.InputValidator.NO_ROWS_AFFECTED;
 
 import java.lang.reflect.Field;
 import java.sql.Connection;
@@ -36,22 +37,17 @@ import uv.lis.logic.utils.PasswordHasher;
 
 class UserDAOTest {
 
-    private static final int EXPECTED_GENERATED_ID = 3;
-    private static final int DEFAULT_ROLE_ID = 1;
+    private static final int EXPECTED_GENERATED_ID = 7;
+    private static final int DEFAULT_ROLE_ID = 8;
     private static final int PROFESSOR_ROLE_ID = 2;
     private static final int COORDINATOR_ROLE_ID = 3;
     private static final int ADMIN_ROLE_ID = 4;
     private static final int ROWS_AFFECTED = 1;
-    private static final int NO_ROWS_AFFECTED = 0;
-    private static final int COORDINATOR_EXISTS = 1;
-    private static final int COORDINATOR_NOT_EXISTS = 0;
-    private static final int GENERATED_COLUMN_INDEX = 1;
-    private static final int DEFAULT_ID = 0;
-    private static final int STUDENT_USER_ID = 1;
-    private static final int PROFESSOR_USER_ID = 2;
-    private static final int COORDINATOR_USER_ID = 3;
-    private static final int ADMIN_USER_ID = 4;
-    private static final int GENERATED_KEY_COLUMN = 1;
+    private static final int DEFAULT_ID = 99;
+    private static final int STUDENT_USER_ID = 10;
+    private static final int PROFESSOR_USER_ID = 12;
+    private static final int COORDINATOR_USER_ID = 13;
+    private static final int ADMIN_USER_ID = 14;
 
     private static final boolean ACTIVE_USER = true;
 
@@ -101,7 +97,7 @@ class UserDAOTest {
         when(preparedStatement.executeUpdate()).thenReturn(rowsAffected);
         when(preparedStatement.getGeneratedKeys()).thenReturn(resultSet);
         when(resultSet.next()).thenReturn(true);
-        when(resultSet.getInt(GENERATED_KEY_COLUMN)).thenReturn(generatedId);
+        when(resultSet.getInt(1)).thenReturn(generatedId);
     }
 
     private void mockResultSetAuthenticate(int userId, int roleId) throws Exception {
@@ -222,7 +218,7 @@ class UserDAOTest {
     void existActiveCoordinator_coordinatorExists_returnsTrue() throws Exception {
         mockQueryExecution();
         when(resultSet.next()).thenReturn(true);
-        when(resultSet.getInt(GENERATED_COLUMN_INDEX)).thenReturn(COORDINATOR_EXISTS);
+        when(resultSet.getInt(1)).thenReturn(ROWS_AFFECTED);
 
         assertTrue(userDAO.existActiveCoordinator());
     }
@@ -231,7 +227,7 @@ class UserDAOTest {
     void existActiveCoordinator_noCoordinatorExists_returnsFalse() throws Exception {
         mockQueryExecution();
         when(resultSet.next()).thenReturn(true);
-        when(resultSet.getInt(GENERATED_COLUMN_INDEX)).thenReturn(COORDINATOR_NOT_EXISTS);
+        when(resultSet.getInt(1)).thenReturn(NO_ROWS_AFFECTED);
 
         assertFalse(userDAO.existActiveCoordinator());
     }

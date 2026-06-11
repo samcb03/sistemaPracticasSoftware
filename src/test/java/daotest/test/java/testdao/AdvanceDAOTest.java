@@ -35,9 +35,7 @@ class AdvanceDAOTest {
     private static final int LATEST_ACCUMULATED_HOURS = 48;
     private static final int ZERO_ACCUMULATED_HOURS = 0;
     private static final int ROWS_AFFECTED = 1;
-    private static final int COUNT_COLUMN = 1;
-    private static final int ADVANCE_COUNT = 1;
-    private static final int NO_ADVANCE_COUNT = 0;
+    private static final int ADVANCE_COUNT = 12;
 
     @Mock private MySQLConnectionManager connectionManager;
     @Mock private Connection databaseConnection;
@@ -150,7 +148,7 @@ class AdvanceDAOTest {
     void existsAdvanceForReport_advanceExists_returnsTrue() throws Exception {
         mockQueryExecution();
         when(resultSet.next()).thenReturn(true);
-        when(resultSet.getInt(COUNT_COLUMN)).thenReturn(ADVANCE_COUNT);
+        when(resultSet.getInt(1)).thenReturn(ADVANCE_COUNT);
 
         assertTrue(advanceDAO.existsAdvanceForReport(REPORT_ID));
     }
@@ -159,7 +157,7 @@ class AdvanceDAOTest {
     void existsAdvanceForReport_noAdvance_returnsFalse() throws Exception {
         mockQueryExecution();
         when(resultSet.next()).thenReturn(true);
-        when(resultSet.getInt(COUNT_COLUMN)).thenReturn(NO_ADVANCE_COUNT);
+        when(resultSet.getInt(1)).thenReturn(NO_ROWS_AFFECTED);
 
         assertFalse(advanceDAO.existsAdvanceForReport(REPORT_ID));
     }

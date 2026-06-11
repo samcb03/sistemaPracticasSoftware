@@ -31,19 +31,13 @@ import uv.lis.logic.exceptions.OperationException;
 
 class StudentDAOTest {
 
-    private static final int EXPECTED_USER_ID = 1;
-    private static final int INACTIVE_STATUS = 0;
-    private static final int ACTIVE_STATUS = 1;
+    private static final int EXPECTED_USER_ID = 4;
     private static final int ROWS_AFFECTED = 1;
     private static final int HAS_PROJECT = 1;
-    private static final int NO_PROJECT = 0;
     private static final int DEFAULT_ID_USER = 0;
-    private static final int DEFAULT_ROLE_ID = 0;
-    private static final int DEFAULT_HOURS = 0;
-    private static final int GENERATED_COLUMN_INDEX = 1;
-
+    private static final int DEFAULT_ROLE_ID = 2;
+    private static final int DEFAULT_HOURS = 5;
     private static final boolean INACTIVE_USER = false;
-
     private static final String FIRST_STUDENT_ID = "S12345678";
     private static final String SECOND_STUDENT_ID = "S124DDDa";
     private static final String INVALID_STUDENT_ID = "Z99";
@@ -115,8 +109,6 @@ class StudentDAOTest {
         when(resultSet.getString(COLUMN_STUDENT_ID)).thenReturn(FIRST_STUDENT_ID, SECOND_STUDENT_ID);
         when(resultSet.getString(COLUMN_NAME)).thenReturn(FIRST_NAME, SECOND_FIRST_NAME);
         when(resultSet.getString(COLUMN_LAST_NAME)).thenReturn(LAST_NAME, SECOND_LAST_NAME);
-        when(resultSet.getDate(COLUMN_BIRTH_DATE)).thenReturn(BIRTH_DATE, BIRTH_DATE);
-        when(resultSet.getString(COLUMN_GENDER)).thenReturn(GENDER, GENDER);
     }
 
     private Student builderFirstStudent() {
@@ -299,7 +291,7 @@ class StudentDAOTest {
     void isStudentInactive_studentIsInactive_returnsTrue() throws Exception {
         mockQueryExecution();
         when(resultSet.next()).thenReturn(true);
-        when(resultSet.getInt(COLUMN_STATUS)).thenReturn(INACTIVE_STATUS);
+        when(resultSet.getInt(COLUMN_STATUS)).thenReturn(NO_ROWS_AFFECTED);
 
         assertTrue(studentDAO.isStudentInactive(FIRST_STUDENT_ID));
     }
@@ -308,7 +300,7 @@ class StudentDAOTest {
     void isStudentInactive_studentIsActive_returnsFalse() throws Exception {
         mockQueryExecution();
         when(resultSet.next()).thenReturn(true);
-        when(resultSet.getInt(COLUMN_STATUS)).thenReturn(ACTIVE_STATUS);
+        when(resultSet.getInt(COLUMN_STATUS)).thenReturn(ROWS_AFFECTED);
 
         assertFalse(studentDAO.isStudentInactive(FIRST_STUDENT_ID));
     }
@@ -360,7 +352,7 @@ class StudentDAOTest {
     void hasProjectAssigned_hasAssignment_returnsTrue() throws Exception {
         mockQueryExecution();
         when(resultSet.next()).thenReturn(true);
-        when(resultSet.getInt(GENERATED_COLUMN_INDEX)).thenReturn(HAS_PROJECT);
+        when(resultSet.getInt(1)).thenReturn(HAS_PROJECT);
 
         assertTrue(studentDAO.hasProjectAssigned(FIRST_STUDENT_ID));
     }
@@ -369,7 +361,7 @@ class StudentDAOTest {
     void hasProjectAssigned_noAssignment_returnsFalse() throws Exception {
         mockQueryExecution();
         when(resultSet.next()).thenReturn(true);
-        when(resultSet.getInt(GENERATED_COLUMN_INDEX)).thenReturn(NO_PROJECT);
+        when(resultSet.getInt(1)).thenReturn(NO_ROWS_AFFECTED);
 
         assertFalse(studentDAO.hasProjectAssigned(FIRST_STUDENT_ID));
     }

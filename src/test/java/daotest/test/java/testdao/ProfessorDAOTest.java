@@ -12,7 +12,6 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Optional;
@@ -33,7 +32,6 @@ class ProfessorDAOTest {
     private static final int NO_ROWS = 0;
     private static final int USER_ID = 10;
     private static final int ROLE_PROFESSOR = 2;
-    private static final int ROLE_COORDINATOR = 3;
     private static final int ACTIVE_STATE = 1;
     private static final int INACTIVE_STATE = 0;
     private static final int COUNT_ONE = 1;

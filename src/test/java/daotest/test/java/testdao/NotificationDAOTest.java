@@ -13,7 +13,6 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
-import java.util.List;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -28,7 +27,6 @@ import uv.lis.logic.exceptions.OperationException;
 class NotificationDAOTest {
 
     private static final int GENERATED_ID = 15;
-    private static final int GENERATED_KEY_COLUMN = 1;
     private static final int ROWS_AFFECTED = 1;
     private static final int NOTIFICATION_COUNT = 2;
     private static final int UNREAD_COUNT = 3;
@@ -82,7 +80,7 @@ class NotificationDAOTest {
         when(preparedStatement.executeUpdate()).thenReturn(ROWS_AFFECTED);
         when(preparedStatement.getGeneratedKeys()).thenReturn(generatedKeys);
         when(generatedKeys.next()).thenReturn(true);
-        when(generatedKeys.getInt(GENERATED_KEY_COLUMN)).thenReturn(GENERATED_ID);
+        when(generatedKeys.getInt(1)).thenReturn(GENERATED_ID);
 
         assertEquals(GENERATED_ID, notificationDAO.registerNotification(builderNotification()));
     }

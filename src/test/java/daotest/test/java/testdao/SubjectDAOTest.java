@@ -31,11 +31,10 @@ class SubjectDAOTest {
 
     private static final int EXPECTED_NRC = 12345;
     private static final int SECOND_NRC = 67890;
-    private static final int SCHOOL_PERIOD_ID = 1;
+    private static final int SCHOOL_PERIOD_ID = 3;
     private static final int EXPECTED_LIST_SIZE = 2;
     private static final int ROWS_AFFECTED = 1;
     private static final int NO_ROWS_AFFECTED = 0;
-    private static final int FIRST_INSERT_SUCCESS = 1;
 
     private static final String VALID_STUDENT_ID = "S23013127";
     private static final String SECOND_STUDENT_ID = "S23013128";
@@ -147,7 +146,7 @@ class SubjectDAOTest {
     void registerSubject_secondInsertThrows_rollsBack() throws Exception {
         when(databaseConnection.prepareStatement(anyString())).thenReturn(preparedStatement);
         when(preparedStatement.executeUpdate())
-            .thenReturn(FIRST_INSERT_SUCCESS)
+            .thenReturn(ROWS_AFFECTED)
             .thenThrow(new SQLException(CONNECTION_ERROR));
 
         assertThrows(OperationException.class,
