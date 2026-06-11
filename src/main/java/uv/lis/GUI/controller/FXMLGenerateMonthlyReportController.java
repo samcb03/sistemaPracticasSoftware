@@ -61,6 +61,7 @@ public class FXMLGenerateMonthlyReportController extends ValidationHandler {
     private static final int MONTH_NOVEMBER = 11;
     private static final int MONTH_DECEMBER = 12;
     private static final int MONTH_UNKNOWN = 0;
+    private static final int MAX_ACCUMULATED_HOURS = 420;
 
     private static final Map<String, Integer> MONTH_NUMBERS_BY_NAME = Map.ofEntries(
         Map.entry("enero", MONTH_JANUARY),
@@ -136,18 +137,25 @@ public class FXMLGenerateMonthlyReportController extends ValidationHandler {
         String studentId = currentStudent.getIdStudent();
         String currentMonth = labelMonth.getText();
 
-        boolean duplicated = false;
-            try {
-                duplicated = reportContextDAO.hasReportAlreadyBeenGenerated(studentId, currentMonth);
-            } catch (OperationException e) {
-                showError("Error al verificar reporte mensual: " + e.getMessage());
-            }
-
-            if (duplicated) {
-                showError("Ya se ha generado un reporte para el mes de " + currentMonth);
+        String accumulatedText = labelAccumulatedHours.getText();
+            if(!accumulatedText.isEmpty() && Integer.parseInt(accumulatedText) >= MAX_ACCUMULATED_HOURS) {
+                showError("Has alcanzado el límite de 420 horas acumuladas. "
+                        + "No es posible generar más reportes.");
             } else {
-                Optional<String> validationError = validateFields();
-                handleValidation(validationError, this::generateMonthlyReport);
+
+            boolean duplicated = false;
+                try {
+                    duplicated = reportContextDAO.hasReportAlreadyBeenGenerated(studentId, currentMonth);
+                } catch (OperationException e) {
+                    showError("Error al verificar reporte mensual: " + e.getMessage());
+                }
+
+                if (duplicated) {
+                    showError("Ya se ha generado un reporte para el mes de " + currentMonth);
+                } else {
+                    Optional<String> validationError = validateFields();
+                    handleValidation(validationError, this::generateMonthlyReport);
+            }
         }
     }
 
