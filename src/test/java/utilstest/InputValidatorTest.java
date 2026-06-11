@@ -23,7 +23,7 @@ class InputValidatorTest {
         "'   ', true",
         ", true"
     })
-    void validateNotEmpty_variousInputs_returnsExpectedPresence(String value, boolean hasError) {
+    void validateNotEmpty_variousInputs_returnsExpectedResult(String value, boolean hasError) {
         boolean result = InputValidator.validateNotEmpty(value, FIELD_NAME).isPresent();
 
         assertEquals(hasError, result);
@@ -34,7 +34,7 @@ class InputValidatorTest {
         "Corto, false",
         "EstaCadenaEsDemasiadoLarga, true"
     })
-    void validateMaxLength_variousInputs_returnsExpectedPresence(String value, boolean hasError) {
+    void validateMaxLength_variousInputs_returnsExpectedResult(String value, boolean hasError) {
         boolean result = InputValidator.validateMaxLength(value, MAX_LENGTH, FIELD_NAME).isPresent();
 
         assertEquals(hasError, result);
@@ -47,7 +47,7 @@ class InputValidatorTest {
         "Juan123, true",
         "Juan@, true"
     })
-    void validateLettersOnly_variousInputs_returnsExpectedPresence(String value, boolean hasError) {
+    void validateLettersOnly_variousInputs_returnsExpectedResult(String value, boolean hasError) {
         boolean result = InputValidator.validateLettersOnly(value, FIELD_NAME).isPresent();
 
         assertEquals(hasError, result);
@@ -58,8 +58,7 @@ class InputValidatorTest {
         "Juan, false",
         "' Juan', true"
     })
-    void validateNoLeadingSpace_variousInputs_returnsExpectedPresence(String value,
-            boolean hasError) {
+    void validateNoLeadingSpace_variousInputs_returnsExpectedResult(String value, boolean hasError) {
         boolean result = InputValidator.validateNoLeadingSpace(value, FIELD_NAME).isPresent();
 
         assertEquals(hasError, result);
@@ -70,8 +69,7 @@ class InputValidatorTest {
         "Juan, false",
         "'Juan ', true"
     })
-    void validateNoTrailingSpace_variousInputs_returnsExpectedPresence(String value,
-            boolean hasError) {
+    void validateNoTrailingSpace_variousInputs_returnsExpectedResult(String value, boolean hasError) {
         boolean result = InputValidator.validateNoTrailingSpace(value, FIELD_NAME).isPresent();
 
         assertEquals(hasError, result);
@@ -82,7 +80,7 @@ class InputValidatorTest {
         "Juan Perez, false",
         "'Juan  Perez', true"
     })
-    void validateNoConsecutiveSpaces_variousInputs_returnsExpectedPresence(String value,
+    void validateNoConsecutiveSpaces_variousInputs_returnsExpectedResult(String value,
             boolean hasError) {
         boolean result = InputValidator.validateNoConsecutiveSpaces(value, FIELD_NAME).isPresent();
 
@@ -94,9 +92,10 @@ class InputValidatorTest {
         "Juan, false",
         "Aaaron, true"
     })
-    void validateNoConsecutiveRepeatedLetters_variousInputs_returnsExpectedPresence(String value,
+    void validateNoConsecutiveRepeatedLetters_variousInputs_returnsExpectedResult(String value,
             boolean hasError) {
-        boolean result = InputValidator.validateNoConsecutiveRepeatedLetters(value, FIELD_NAME).isPresent();
+        boolean result =
+            InputValidator.validateNoConsecutiveRepeatedLetters(value, FIELD_NAME).isPresent();
 
         assertEquals(hasError, result);
     }
@@ -108,7 +107,7 @@ class InputValidatorTest {
         "'Juan  Perez', true",
         "' Juan', true"
     })
-    void validateText_variousInputs_returnsExpectedPresence(String value, boolean hasError) {
+    void validateText_variousInputs_returnsExpectedResult(String value, boolean hasError) {
         boolean result = InputValidator.validateText(value, FIELD_NAME).isPresent();
 
         assertEquals(hasError, result);
@@ -121,7 +120,7 @@ class InputValidatorTest {
         "correoInvalido, true",
         "correo@sin, true"
     })
-    void validateEmail_variousInputs_returnsExpectedPresence(String value, boolean hasError) {
+    void validateEmail_variousInputs_returnsExpectedResult(String value, boolean hasError) {
         boolean result = InputValidator.validateEmail(value, FIELD_NAME).isPresent();
 
         assertEquals(hasError, result);
@@ -134,7 +133,7 @@ class InputValidatorTest {
         "123, true",
         "abcdefgh, true"
     })
-    void validatePhoneNumber_variousInputs_returnsExpectedPresence(String value, boolean hasError) {
+    void validatePhoneNumber_variousInputs_returnsExpectedResult(String value, boolean hasError) {
         boolean result = InputValidator.validatePhoneNumber(value, FIELD_NAME).isPresent();
 
         assertEquals(hasError, result);
@@ -147,7 +146,7 @@ class InputValidatorTest {
         "sinmayuscula1!, true",
         "Corta1!, true"
     })
-    void validatePassword_variousInputs_returnsExpectedPresence(String value, boolean hasError) {
+    void validatePassword_variousInputs_returnsExpectedResult(String value, boolean hasError) {
         boolean result = InputValidator.validatePassword(value, FIELD_NAME).isPresent();
 
         assertEquals(hasError, result);
@@ -161,7 +160,7 @@ class InputValidatorTest {
         "-3, true",
         "abc, true"
     })
-    void validatePositiveInteger_variousInputs_returnsExpectedPresence(String value,
+    void validatePositiveInteger_variousInputs_returnsExpectedResult(String value,
             boolean hasError) {
         boolean result = InputValidator.validatePositiveInteger(value, FIELD_NAME).isPresent();
 
@@ -174,7 +173,7 @@ class InputValidatorTest {
         "'', true",
         "123, true"
     })
-    void validateExactLength_variousInputs_returnsExpectedPresence(String value, boolean hasError) {
+    void validateExactLength_variousInputs_returnsExpectedResult(String value, boolean hasError) {
         boolean result =
             InputValidator.validateExactLength(value, EXACT_LENGTH, FIELD_NAME).isPresent();
 
@@ -188,7 +187,7 @@ class InputValidatorTest {
         "S2301, true",
         "X23013127, true"
     })
-    void validateIdStudent_variousInputs_returnsExpectedPresence(String value, boolean hasError) {
+    void validateIdStudent_variousInputs_returnsExpectedResult(String value, boolean hasError) {
         boolean result =
             InputValidator.validateIdStudent(value, STUDENT_ID_LENGTH, FIELD_NAME).isPresent();
 
@@ -200,7 +199,7 @@ class InputValidatorTest {
         "seleccion, false",
         ", true"
     })
-    void validateComboBox_variousInputs_returnsExpectedPresence(String value, boolean hasError) {
+    void validateComboBox_variousInputs_returnsExpectedResult(String value, boolean hasError) {
         boolean result = InputValidator.validateComboBox(value, FIELD_NAME).isPresent();
 
         assertEquals(hasError, result);
@@ -212,7 +211,7 @@ class InputValidatorTest {
         "10, true",
         "-1, true"
     })
-    void validateBirthDate_variousAges_returnsExpectedPresence(int yearsAgo, boolean hasError) {
+    void validateBirthDate_variousAges_returnsExpectedResult(int yearsAgo, boolean hasError) {
         LocalDate birthDate = LocalDate.now().minusYears(yearsAgo);
 
         boolean result = InputValidator.validateBirthDate(birthDate, FIELD_NAME).isPresent();
@@ -225,7 +224,7 @@ class InputValidatorTest {
         "5, false",
         "-5, true"
     })
-    void validateStartDate_variousDates_returnsExpectedPresence(int daysFromNow, boolean hasError) {
+    void validateStartDate_variousDates_returnsExpectedResult(int daysFromNow, boolean hasError) {
         LocalDate startDate = LocalDate.now().plusDays(daysFromNow);
 
         boolean result = InputValidator.validateStartDate(startDate, FIELD_NAME).isPresent();
@@ -238,7 +237,7 @@ class InputValidatorTest {
         "10, false",
         "-10, true"
     })
-    void validateEndDate_variousDates_returnsExpectedPresence(int daysAfterStart, boolean hasError) {
+    void validateEndDate_variousDates_returnsExpectedResult(int daysAfterStart, boolean hasError) {
         LocalDate startDate = LocalDate.now();
         LocalDate endDate = startDate.plusDays(daysAfterStart);
 

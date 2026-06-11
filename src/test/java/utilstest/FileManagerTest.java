@@ -22,16 +22,23 @@ import uv.lis.logic.utils.FileManager;
 
 class FileManagerTest {
 
-    private static final String TEST_STUDENT_ID = "S23013127_test";
+    private static final String TEST_STUDENT_ID          = "S23013127_test";
+    private static final String NON_EXISTING_FILE_PATH   = "ruta/que/no/existe/archivo.pdf";
+    private static final String TEMP_FILE_PREFIX         = "documento_prueba";
+    private static final String TEMP_FILE_SUFFIX         = ".pdf";
+    private static final String STUDENT_DIRECTORY_ROOT   = "Expediente";
+    private static final byte[] PDF_HEADER               = {0x25, 0x50, 0x44, 0x46};
+    private static final byte[] PDF_CONTENT              = new byte[100];
+
     private File sourceFile;
     private String savedFilePath;
 
     @BeforeEach
     void setUp() throws IOException {
-        sourceFile = File.createTempFile("documento_prueba", ".pdf");
+        sourceFile = File.createTempFile(TEMP_FILE_PREFIX, TEMP_FILE_SUFFIX);
         try (FileOutputStream fos = new FileOutputStream(sourceFile)) {
-            fos.write(new byte[]{0x25, 0x50, 0x44, 0x46});
-            fos.write(new byte[100]);
+            fos.write(PDF_HEADER);
+            fos.write(PDF_CONTENT);
         }
     }
 
@@ -44,7 +51,7 @@ class FileManagerTest {
             new File(savedFilePath).delete();
         }
 
-        Path studentDirectory = Paths.get("Expediente", TEST_STUDENT_ID);
+        Path studentDirectory = Paths.get(STUDENT_DIRECTORY_ROOT, TEST_STUDENT_ID);
         if (Files.exists(studentDirectory)) {
             Files.walk(studentDirectory)
                 .map(Path::toFile)
@@ -86,6 +93,6 @@ class FileManagerTest {
     @Test
     void deleteFile_nonExistingFile_doesNotThrow() {
         assertDoesNotThrow(
-            () -> FileManager.deleteFile("ruta/que/no/existe/archivo.pdf"));
+            () -> FileManager.deleteFile(NON_EXISTING_FILE_PATH));
     }
 }

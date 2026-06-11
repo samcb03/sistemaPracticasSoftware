@@ -1,6 +1,5 @@
 package commontest;
 
-
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
@@ -9,11 +8,10 @@ import java.lang.reflect.Field;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.MockedStatic;
 import org.mockito.Mockito;
-import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.MockitoAnnotations;
 
 import uv.lis.logic.common.AutoevaluationCommon;
 import uv.lis.logic.dao.AutoevaluationDAO;
@@ -22,8 +20,12 @@ import uv.lis.logic.dto.Student;
 import uv.lis.logic.exceptions.OperationException;
 import uv.lis.logic.utils.SessionManager;
 
-@ExtendWith(MockitoExtension.class)
 class AutoevaluationCommonTest {
+
+    private static final String STUDENT_ID = "S23013127";
+    private static final String STUDENT_NAME = "Ana";
+    private static final String STUDENT_LAST_NAME = "Gomez Ramirez";
+    private static final String CONTEXT_ERROR = "Error al obtener datos";
 
     @Mock private AutoevaluationDAO autoevaluationDAO;
     @Mock private SessionManager sessionManager;
@@ -32,84 +34,25 @@ class AutoevaluationCommonTest {
 
     @BeforeEach
     void setUp() throws Exception {
+        MockitoAnnotations.openMocks(this);
         autoevaluationCommon = new AutoevaluationCommon();
+
         Field field = AutoevaluationCommon.class.getDeclaredField("autoevaluationDAO");
         field.setAccessible(true);
         field.set(autoevaluationCommon, autoevaluationDAO);
     }
 
-    @Test
-    void generateAutoevaluation_noStudentInSession_throwsOperationException() {
-        try (MockedStatic<SessionManager> sessionManagerMocked
-                = Mockito.mockStatic(SessionManager.class)) {
-            sessionManagerMocked.when(SessionManager::getInstance).thenReturn(sessionManager);
-            when(sessionManager.getCurrentStudent()).thenReturn(null);
-
-            assertThrows(OperationException.class,
-                () -> autoevaluationCommon.generateAutoevaluation(buildValidAutoevaluation()));
-        }
-    }
-
-    @Test
-    void generateAutoevaluation_scoresOutOfRange_throwsOperationException() throws Exception {
-        Student mockStudent = buildStudent();
-
-        try (MockedStatic<SessionManager> sessionManagerMocked
-                = Mockito.mockStatic(SessionManager.class)) {
-            sessionManagerMocked.when(SessionManager::getInstance).thenReturn(sessionManager);
-            when(sessionManager.getCurrentStudent()).thenReturn(mockStudent);
-
-            Autoevaluation contextAutoevaluation = buildValidAutoevaluation();
-            when(autoevaluationDAO.getAutoevaluationData(anyString()))
-                .thenReturn(contextAutoevaluation);
-
-            assertThrows(OperationException.class,
-                () -> autoevaluationCommon.generateAutoevaluation(buildInvalidRangeAutoevaluation()));
-        }
-    }
-
-    @Test
-    void generateAutoevaluation_studentAlreadyEvaluated_throwsOperationException() throws Exception {
-        Student mockStudent = buildStudent(); 
-        Autoevaluation contextAutoevaluation = buildValidAutoevaluation();
-        contextAutoevaluation.setIdStudent("S23013127");
-
-        try (MockedStatic<SessionManager> sessionManagerMocked = Mockito.mockStatic(SessionManager.class)) {
-            sessionManagerMocked.when(SessionManager::getInstance).thenReturn(sessionManager);
-            when(sessionManager.getCurrentStudent()).thenReturn(mockStudent);
-
-            when(autoevaluationDAO.getAutoevaluationData("S23013127"))
-                    .thenReturn(contextAutoevaluation);
-            
-            when(autoevaluationDAO.existsByStudent("S23013127")).thenReturn(true);
-
-            assertThrows(OperationException.class,
-                    () -> autoevaluationCommon.generateAutoevaluation(buildValidAutoevaluation()));
-        }
-    }
-
-    @Test
-    void generateAutoevaluation_contextDAOFails_throwsOperationException() throws Exception {
-        Student mockStudent = buildStudent();
-
-        try (MockedStatic<SessionManager> sessionManagerMocked
-                = Mockito.mockStatic(SessionManager.class)) {
-            sessionManagerMocked.when(SessionManager::getInstance).thenReturn(sessionManager);
-            when(sessionManager.getCurrentStudent()).thenReturn(mockStudent);
-            when(autoevaluationDAO.getAutoevaluationData(anyString()))
-                .thenThrow(new OperationException("Error al obtener datos", null));
-
-            assertThrows(OperationException.class,
-                () -> autoevaluationCommon.generateAutoevaluation(buildValidAutoevaluation()));
-        }
-    }
-
     private Student buildStudent() {
         Student student = new Student();
-        student.setIdStudent("S23013127");
-        student.setFirstName("Ana");
-        student.setLastName("Gomez Ramirez");
+        student.setIdStudent(STUDENT_ID);
+        student.setFirstName(STUDENT_NAME);
+        student.setLastName(STUDENT_LAST_NAME);
         return student;
+    }
+
+    private void mockSession(MockedStatic<SessionManager> mockedSession, Student student) {
+        mockedSession.when(SessionManager::getInstance).thenReturn(sessionManager);
+        when(sessionManager.getCurrentStudent()).thenReturn(student);
     }
 
     private Autoevaluation buildValidAutoevaluation() {
@@ -129,7 +72,7 @@ class AutoevaluationCommonTest {
 
     private Autoevaluation buildInvalidRangeAutoevaluation() {
         Autoevaluation autoevaluation = new Autoevaluation();
-        autoevaluation.setProductiveParticipation(0);        
+        autoevaluation.setProductiveParticipation(0);
         autoevaluation.setAppliedKnowledge(5);
         autoevaluation.setConfidenceInActivities(3);
         autoevaluation.setActivitiesInterest(4);
@@ -140,5 +83,57 @@ class AutoevaluationCommonTest {
         autoevaluation.setCareerAlignment(3);
         autoevaluation.setInternshipImportance(4);
         return autoevaluation;
+    }
+
+    @Test
+    void generateAutoevaluation_noStudentInSession_throwsOperationException() {
+        try (MockedStatic<SessionManager> mockedSession = Mockito.mockStatic(SessionManager.class)) {
+            mockSession(mockedSession, null);
+
+            assertThrows(OperationException.class,
+                () -> autoevaluationCommon.generateAutoevaluation(buildValidAutoevaluation()));
+        }
+    }
+
+    @Test
+    void generateAutoevaluation_contextDAOFails_throwsOperationException() throws Exception {
+        when(autoevaluationDAO.getAutoevaluationData(anyString()))
+            .thenThrow(new OperationException(CONTEXT_ERROR, null));
+
+        try (MockedStatic<SessionManager> mockedSession = Mockito.mockStatic(SessionManager.class)) {
+            mockSession(mockedSession, buildStudent());
+
+            assertThrows(OperationException.class,
+                () -> autoevaluationCommon.generateAutoevaluation(buildValidAutoevaluation()));
+        }
+    }
+
+    @Test
+    void generateAutoevaluation_scoresOutOfRange_throwsOperationException() throws Exception {
+        when(autoevaluationDAO.getAutoevaluationData(anyString()))
+            .thenReturn(buildValidAutoevaluation());
+
+        try (MockedStatic<SessionManager> mockedSession = Mockito.mockStatic(SessionManager.class)) {
+            mockSession(mockedSession, buildStudent());
+
+            assertThrows(OperationException.class,
+                () -> autoevaluationCommon.generateAutoevaluation(buildInvalidRangeAutoevaluation()));
+        }
+    }
+
+    @Test
+    void generateAutoevaluation_studentAlreadyEvaluated_throwsOperationException() throws Exception {
+        Autoevaluation context = buildValidAutoevaluation();
+        context.setIdStudent(STUDENT_ID);
+
+        when(autoevaluationDAO.getAutoevaluationData(STUDENT_ID)).thenReturn(context);
+        when(autoevaluationDAO.existsByStudent(STUDENT_ID)).thenReturn(true);
+
+        try (MockedStatic<SessionManager> mockedSession = Mockito.mockStatic(SessionManager.class)) {
+            mockSession(mockedSession, buildStudent());
+
+            assertThrows(OperationException.class,
+                () -> autoevaluationCommon.generateAutoevaluation(buildValidAutoevaluation()));
+        }
     }
 }

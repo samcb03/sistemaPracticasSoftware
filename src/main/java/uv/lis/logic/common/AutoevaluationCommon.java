@@ -76,7 +76,7 @@ public class AutoevaluationCommon {
         return jasperPrint;
     }
 
-    private JasperPrint fillAutoevaluation(Autoevaluation autoevaluation)
+    public JasperPrint fillAutoevaluation(Autoevaluation autoevaluation)
             throws JRException, OperationException {
         JasperPrint jasperPrint;
 

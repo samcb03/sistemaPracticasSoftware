@@ -65,7 +65,7 @@ public class FinalReportCommon {
         return fillReportTemplate(finalReport);
     }
 
-    private JasperPrint fillReportTemplate(FinalReport finalReport) throws JRException, OperationException {
+    public JasperPrint fillReportTemplate(FinalReport finalReport) throws JRException, OperationException {
         JasperPrint jasperPrint;
 
         try (InputStream templateStream = getClass().getResourceAsStream(REPORT_TEMPLATE_PATH)) {
