@@ -42,11 +42,7 @@ class ReportDAOTest {
     private static final int REPORTED_HOURS = 40;
     private static final float CALIFICATION = 9.0f;
 
-    private static final int ADVANCE_PERCENTAGE = 80;
-    private static final String ADVANCE_PERCENTAGE_STR = "80";
-    private static final String DELIVERABLE_RESULT = "Entregable listo";
     private static final String CONNECTION_MANAGER_FIELD = "connectionManager";
-
     private static final String FIRST_DESCRIPTION = "Descripcion test 1";
     private static final String FIRST_OBSERVATIONS = "Observacion test 1";
     private static final String FIRST_ACTIVITY = "Actividad test 1";
@@ -133,8 +129,7 @@ class ReportDAOTest {
 
     private void mockResultSetFinalReport() throws Exception {
         mockResultSetSingleReport();
-        when(resultSet.getInt(COLUMN_ADVANCE_PCT)).thenReturn(ADVANCE_PERCENTAGE);
-        when(resultSet.getString(COLUMN_DELIVERABLE)).thenReturn(DELIVERABLE_RESULT);
+        when(resultSet.getString("observacionesGenerales")).thenReturn(FIRST_OBSERVATIONS);
     }
 
     private Report builderFirstReport() {
@@ -182,8 +177,7 @@ class ReportDAOTest {
         report.setObservations(FIRST_OBSERVATIONS);
         report.setActivity(FIRST_ACTIVITY);
         report.setStudentId(FIRST_STUDENT_ID);
-        report.getFirstActivity().setAdvancePercentage(ADVANCE_PERCENTAGE_STR);
-        report.getFirstDeliverable().setResult(DELIVERABLE_RESULT);
+        report.setGeneralObservations(FIRST_OBSERVATIONS);
         return report;
     }
 
