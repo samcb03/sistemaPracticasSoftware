@@ -18,7 +18,7 @@ class WorkProgressCalculatorTest {
     private static final int ZERO_PROGRESS = 0;
     private static final int FOURTEEN_DAYS = 14;
 
-    private Activity builderActivity(LocalDate startDate, LocalDate endDate) {
+    private Activity buildActivity(LocalDate startDate, LocalDate endDate) {
         Activity activity = new Activity();
         activity.setStartDate(startDate);
         activity.setEndDate(endDate);
@@ -32,7 +32,7 @@ class WorkProgressCalculatorTest {
     })
     void calculateActivityWeeks_validSchedule_returnsRoundedWeeks(int daysBetween,
             int expectedWeeks) {
-        Activity activity = builderActivity(BASE_DATE, BASE_DATE.plusDays(daysBetween));
+        Activity activity = buildActivity(BASE_DATE, BASE_DATE.plusDays(daysBetween));
 
         int result = WorkProgressCalculator.calculateActivityWeeks(activity);
 
@@ -41,7 +41,7 @@ class WorkProgressCalculatorTest {
 
     @Test
     void calculateActivityWeeks_shortSchedule_returnsMinimumWeeks() {
-        Activity activity = builderActivity(BASE_DATE, BASE_DATE.plusDays(MINIMUM_WEEKS));
+        Activity activity = buildActivity(BASE_DATE, BASE_DATE.plusDays(MINIMUM_WEEKS));
 
         int result = WorkProgressCalculator.calculateActivityWeeks(activity);
 
@@ -57,7 +57,7 @@ class WorkProgressCalculatorTest {
 
     @Test
     void calculateActivityWeeks_nullDates_returnsMinimumWeeks() {
-        Activity activity = builderActivity(null, null);
+        Activity activity = buildActivity(null, null);
 
         int result = WorkProgressCalculator.calculateActivityWeeks(activity);
 
@@ -66,7 +66,7 @@ class WorkProgressCalculatorTest {
 
     @Test
     void calculateActivityWeeks_endBeforeStart_returnsMinimumWeeks() {
-        Activity activity = builderActivity(BASE_DATE, BASE_DATE.minusDays(FOURTEEN_DAYS));
+        Activity activity = buildActivity(BASE_DATE, BASE_DATE.minusDays(FOURTEEN_DAYS));
 
         int result = WorkProgressCalculator.calculateActivityWeeks(activity);
 
@@ -80,7 +80,7 @@ class WorkProgressCalculatorTest {
     })
     void calculateWeeklyPlannedAdvance_validSchedule_returnsAdvance(int daysBetween,
             int expectedAdvance) {
-        Activity activity = builderActivity(BASE_DATE, BASE_DATE.plusDays(daysBetween));
+        Activity activity = buildActivity(BASE_DATE, BASE_DATE.plusDays(daysBetween));
 
         int result = WorkProgressCalculator.calculateWeeklyPlannedAdvance(activity);
 
@@ -96,7 +96,7 @@ class WorkProgressCalculatorTest {
 
     @Test
     void calculateWeeklyPlannedAdvance_endBeforeStart_returnsZeroProgress() {
-        Activity activity = builderActivity(BASE_DATE, BASE_DATE.minusDays(FOURTEEN_DAYS));
+        Activity activity = buildActivity(BASE_DATE, BASE_DATE.minusDays(FOURTEEN_DAYS));
 
         int result = WorkProgressCalculator.calculateWeeklyPlannedAdvance(activity);
 
