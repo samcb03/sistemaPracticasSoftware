@@ -119,19 +119,21 @@ public class FinalReport extends Report {
             isEqual = true;
         } else if (object != null && getClass() == object.getClass()) {
             FinalReport other = (FinalReport) object;
-            isEqual = Objects.equals(projectName, other.projectName)
+            
+            isEqual = super.equals(object)
+                && Objects.equals(projectName, other.projectName)
+                && Objects.equals(projectMethodology, other.projectMethodology)
+                && Objects.equals(projectObjective, other.projectObjective)
+                && Objects.equals(affiliatedOrganization, other.affiliatedOrganization)
+                && Objects.equals(totalHours, other.totalHours)
+                && Objects.equals(dateReport, other.dateReport)
                 && Objects.equals(firstActivity, other.firstActivity)
                 && Objects.equals(secondActivity, other.secondActivity)
                 && Objects.equals(firstDeliverable, other.firstDeliverable)
                 && Objects.equals(secondDeliverable, other.secondDeliverable)
                 && Objects.equals(generalObservations, other.generalObservations);
         }
+
         return isEqual;
-    }
-    
-    @Override
-    public int hashCode() {
-        return Objects.hash(projectName, firstActivity, secondActivity, 
-                            firstDeliverable, secondDeliverable, generalObservations);
     }
 }

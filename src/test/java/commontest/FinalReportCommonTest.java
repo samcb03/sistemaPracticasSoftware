@@ -2,25 +2,19 @@ package commontest;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyMap;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.when;
 
-import java.io.InputStream;
 import java.lang.reflect.Field;
+
+import net.sf.jasperreports.engine.JasperPrint;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.MockedStatic;
-import org.mockito.junit.jupiter.MockitoExtension;
-
-import net.sf.jasperreports.engine.JRDataSource;
-import net.sf.jasperreports.engine.JasperFillManager;
-import net.sf.jasperreports.engine.JasperPrint;
+import org.mockito.MockitoAnnotations;
 
 import uv.lis.logic.common.FinalReportCommon;
 import uv.lis.logic.dao.ReportContextDAO;
@@ -29,11 +23,10 @@ import uv.lis.logic.dto.Student;
 import uv.lis.logic.exceptions.OperationException;
 import uv.lis.logic.utils.SessionManager;
 
-@ExtendWith(MockitoExtension.class)
 class FinalReportCommonTest {
 
     private static final String STUDENT_ID = "S23013127";
-    private static final String STUDENT_NAME = "Ana Gomez Ramirez";
+    private static final String STUDENT_NAME  = "Ana Gomez Ramirez";
     private static final String PROFESSOR_NAME = "Alberto Lopez Hernandez";
     private static final String SUBJECT_NRC = "12345";
     private static final String SCHOOL_PERIOD = "Febrero-Julio 2026";
@@ -44,19 +37,21 @@ class FinalReportCommonTest {
     @Mock private ReportContextDAO reportContextDAO;
     @Mock private Student currentStudent;
     @Mock private FinalReport finalReport;
-    @Mock private JasperPrint jasperPrint;
 
     private FinalReportCommon finalReportCommon;
 
     @BeforeEach
     void setUp() throws Exception {
+        MockitoAnnotations.openMocks(this);
+        
         finalReportCommon = new FinalReportCommon();
+
         Field field = FinalReportCommon.class.getDeclaredField("reportContextDAO");
         field.setAccessible(true);
         field.set(finalReportCommon, reportContextDAO);
     }
 
-    private FinalReport builderContext() {
+    private FinalReport buildContext() {
         FinalReport context = new FinalReport();
         context.setStudentName(STUDENT_NAME);
         context.setProfessorName(PROFESSOR_NAME);
@@ -66,21 +61,16 @@ class FinalReportCommonTest {
         return context;
     }
 
-    private FinalReport builderFullReport() {
-        return new FinalReport();
-    }
-
-    private SessionManager mockSessionWithStudent(MockedStatic<SessionManager> mockedSession, Student student) {
+    private void mockSession(MockedStatic<SessionManager> mockedSession, Student student) {
         SessionManager sessionManager = mock(SessionManager.class);
         when(sessionManager.getCurrentStudent()).thenReturn(student);
         mockedSession.when(SessionManager::getInstance).thenReturn(sessionManager);
-        return sessionManager;
     }
 
     @Test
     void generateFinalReport_noStudentInSession_throwsOperationException() throws Exception {
         try (MockedStatic<SessionManager> mockedSession = mockStatic(SessionManager.class)) {
-            mockSessionWithStudent(mockedSession, null);
+            mockSession(mockedSession, null);
 
             assertThrows(OperationException.class,
                 () -> finalReportCommon.generateFinalReport(finalReport));
@@ -94,7 +84,7 @@ class FinalReportCommonTest {
             .thenThrow(new OperationException(CONTEXT_ERROR, null));
 
         try (MockedStatic<SessionManager> mockedSession = mockStatic(SessionManager.class)) {
-            mockSessionWithStudent(mockedSession, currentStudent);
+            mockSession(mockedSession, currentStudent);
 
             assertThrows(OperationException.class,
                 () -> finalReportCommon.generateFinalReport(finalReport));
@@ -103,23 +93,18 @@ class FinalReportCommonTest {
 
     @Test
     void generateFinalReport_validData_returnsJasperPrint() throws Exception {
-        FinalReport report = builderFullReport();
         when(currentStudent.getIdStudent()).thenReturn(STUDENT_ID);
         when(reportContextDAO.getFinalReportContextByStudentId(STUDENT_ID))
-            .thenReturn(builderContext());
+            .thenReturn(buildContext());
         when(reportContextDAO.getTotalReportedHoursByStudentId(STUDENT_ID))
             .thenReturn(TOTAL_HOURS);
 
-        try (MockedStatic<SessionManager> mockedSession = mockStatic(SessionManager.class);
-            MockedStatic<JasperFillManager> mockedFillManager =
-                mockStatic(JasperFillManager.class)) {
+        try (MockedStatic<SessionManager> mockedSession = mockStatic(SessionManager.class)) {
+            mockSession(mockedSession, currentStudent);
 
-            mockSessionWithStudent(mockedSession, currentStudent);
-            mockedFillManager.when(() -> JasperFillManager.fillReport(
-                any(InputStream.class), anyMap(), any(JRDataSource.class)))
-                .thenReturn(jasperPrint);
+            JasperPrint result = finalReportCommon.generateFinalReport(new FinalReport());
 
-            assertNotNull(finalReportCommon.generateFinalReport(report));
+            assertNotNull(result);
         }
     }
 }

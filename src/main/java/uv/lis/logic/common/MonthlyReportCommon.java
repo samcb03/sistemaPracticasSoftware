@@ -68,7 +68,7 @@ public class MonthlyReportCommon {
         return fillReportTemplate(monthlyReport);
     }
 
-    private JasperPrint fillReportTemplate(MonthlyReport monthlyReport) throws JRException, OperationException {
+    public JasperPrint fillReportTemplate(MonthlyReport monthlyReport) throws JRException, OperationException {
         JasperPrint jasperPrint;
 
         try (InputStream templateStream = getClass().getResourceAsStream(TEMPLATE_PATH)) {
