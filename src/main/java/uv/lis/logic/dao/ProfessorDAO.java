@@ -130,7 +130,7 @@ public class ProfessorDAO extends UserDAO implements IProfessorDAO {
         String professorQuery = "INSERT INTO Profesor (idUsuario, numeroPersonal) VALUES (?, ?);";
 
         try (Connection databaseConnection = connectionManager.getConnection();
-             PreparedStatement preparedStatement = databaseConnection.prepareStatement(professorQuery)) {
+            PreparedStatement preparedStatement = databaseConnection.prepareStatement(professorQuery)) {
 
             preparedStatement.setInt(1, professor.getId());
             preparedStatement.setString(2, professor.getPersonnelNumber());
@@ -223,7 +223,7 @@ public class ProfessorDAO extends UserDAO implements IProfessorDAO {
                               + "ON p.idUsuario = u.idUsuario WHERE p.numeroPersonal = ?";
 
         try (Connection databaseConnection = connectionManager.getConnection();
-             PreparedStatement preparedStatement = databaseConnection.prepareStatement(professorQuery)) {
+            PreparedStatement preparedStatement = databaseConnection.prepareStatement(professorQuery)) {
 
             preparedStatement.setString(1, personnelNumber);
 
@@ -280,7 +280,7 @@ public class ProfessorDAO extends UserDAO implements IProfessorDAO {
                               + " WHERE numeroPersonal LIKE ? LIMIT 10";
 
         try (Connection databaseConnection = connectionManager.getConnection();
-             PreparedStatement preparedStatement = databaseConnection.prepareStatement(professorQuery)) {
+            PreparedStatement preparedStatement = databaseConnection.prepareStatement(professorQuery)) {
 
             preparedStatement.setString(1, prefix + "%");
 

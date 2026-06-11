@@ -55,7 +55,7 @@ public class AdvanceDAO implements IAdvanceDAO {
         String advanceQuery = "SELECT * FROM Avance WHERE idProyecto = ?";
 
         try (Connection databaseConnection = connectionManager.getConnection();
-             PreparedStatement preparedStatement = databaseConnection.prepareStatement(advanceQuery)) {
+            PreparedStatement preparedStatement = databaseConnection.prepareStatement(advanceQuery)) {
 
             preparedStatement.setInt(1, projectId);
 
@@ -98,7 +98,7 @@ public class AdvanceDAO implements IAdvanceDAO {
                             + " ORDER BY idReporte DESC LIMIT 1";
 
         try (Connection databaseConnection = connectionManager.getConnection();
-             PreparedStatement preparedStatement = databaseConnection.prepareStatement(advanceQuery)) {
+            PreparedStatement preparedStatement = databaseConnection.prepareStatement(advanceQuery)) {
 
             preparedStatement.setInt(1, projectId);
 

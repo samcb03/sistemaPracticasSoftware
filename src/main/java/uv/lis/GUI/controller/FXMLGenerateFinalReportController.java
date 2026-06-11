@@ -6,12 +6,16 @@ import java.util.Optional;
 import java.util.ResourceBundle;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.control.Button;
+import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
@@ -19,15 +23,10 @@ import javafx.stage.Stage;
 import net.sf.jasperreports.engine.JRException;
 import net.sf.jasperreports.engine.JasperPrint;
 import net.sf.jasperreports.view.JasperViewer;
-import java.util.stream.Collectors;
 
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
-import javafx.scene.control.ComboBox;
-
-import uv.lis.logic.dao.ActivityDAO;
 import uv.lis.GUI.ValidationHandler;
 import uv.lis.logic.common.FinalReportCommon;
+import uv.lis.logic.dao.ActivityDAO;
 import uv.lis.logic.dao.ReportDAO;
 import uv.lis.logic.dto.Activity;
 import uv.lis.logic.dto.ActivityProgress;

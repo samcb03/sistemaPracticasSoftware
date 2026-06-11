@@ -139,7 +139,8 @@ public class FXMLRequestProjectController extends ValidationHandler {
                 if (validateProject.isPresent()) {
                     Project project = validateProject.get();
                     
-                    Optional<String> validationError = requestProjectDAO.validateProjectRequest(studentId, project.getId());
+                    Optional<String> validationError = requestProjectDAO.validateProjectRequest(studentId, 
+                        project.getId());
 
                     handleValidation(validationError, () -> {
                         selectedProjects.put(projectSelected, project.getId());

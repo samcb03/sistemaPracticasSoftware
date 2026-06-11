@@ -130,7 +130,7 @@ public class ProjectSupervisorDAO implements IProjectSupervisorDAO {
                 throw new OperationException("No se pudo registrar al supervisor del proyecto", null);
             }
 
-        } catch (SQLException e){
+        } catch (SQLException e) {
             LOGGER.log(Level.SEVERE, "Error de conexión con la base de datos al registrar", e);
             throw new OperationException("Error al registrar al supervisor del proyecto", e);
             
@@ -147,14 +147,14 @@ public class ProjectSupervisorDAO implements IProjectSupervisorDAO {
                                + "nombre = ?, cargo = ?, correo = ? WHERE idResponsableProyecto = ?;";
 
         try (Connection databaseConnection = connectionManager.getConnection();
-            PreparedStatement preparedStatement = databaseConnection.prepareStatement(supervisorQuery)){
+            PreparedStatement preparedStatement = databaseConnection.prepareStatement(supervisorQuery)) {
             
             preparedStatement.setString(1, projectSupervisor.getName());
             preparedStatement.setString(2, projectSupervisor.getPosition());
             preparedStatement.setString(3, projectSupervisor.getEmail());
             preparedStatement.setInt(4, projectSupervisor.getId());
 
-            if(preparedStatement.executeUpdate() > NO_ROWS_AFFECTED) {
+            if (preparedStatement.executeUpdate() > NO_ROWS_AFFECTED) {
                 isModified = true;
                 LOGGER.log(Level.INFO, "Supervisor modificado exitosamente");
             } else {
@@ -305,7 +305,7 @@ public class ProjectSupervisorDAO implements IProjectSupervisorDAO {
                             + "WHERE rp.nombre = ? "
                             + "AND p.estado = ? "
                             + "LIMIT 1;";
-       try (Connection databaseConnection = connectionManager.getConnection();
+        try (Connection databaseConnection = connectionManager.getConnection();
             PreparedStatement preparedStatement = databaseConnection.prepareStatement(projectQuery)) {
 
             preparedStatement.setString(1, supervisorName);

@@ -282,7 +282,7 @@ public class FXMLManageAffiliatedOrganizationController extends ValidationHandle
 
         if (!confirmed) {
             showError("Inactivación cancelada");
-        } else if(affiliatedOrganizationDAO.hasActiveProjects(organizationName)){
+        } else if (affiliatedOrganizationDAO.hasActiveProjects(organizationName)) {
             showError("La organización cuenta con Proyectos activos");
         } else {
             affiliatedOrganizationDAO.inactivateOrganization(organizationName);

@@ -190,7 +190,7 @@ public class FXMLGenerateAutoevaluation extends ValidationHandler {
     @Override
     protected void clearFields() {
         for (ToggleGroup g : groups) {
-            if(g.getSelectedToggle() != null) {
+            if (g.getSelectedToggle() != null) {
                 g.getSelectedToggle().setSelected(false);
             }
         }

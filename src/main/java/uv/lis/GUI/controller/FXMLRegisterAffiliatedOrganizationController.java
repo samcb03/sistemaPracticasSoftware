@@ -60,7 +60,7 @@ public class FXMLRegisterAffiliatedOrganizationController extends ValidationHand
             validatePositiveInteger(textFieldNumberOfIndirectUsers.getText().trim(), 
                 "El número de usuarios indirectos")
         );
-       Optional<String> firstError = validationStream
+        Optional<String> firstError = validationStream
             .filter(Optional::isPresent)
             .map(Optional::get)
             .findFirst();

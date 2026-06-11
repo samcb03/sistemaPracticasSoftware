@@ -5,6 +5,7 @@ import java.util.ResourceBundle;
 
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
+
 import uv.lis.GUI.WindowHandler;
 
 public class FXMLSubjectManagementController extends WindowHandler{
@@ -31,6 +32,4 @@ public class FXMLSubjectManagementController extends WindowHandler{
         public void goToProfessorMenu() {
             navigateTo("/uv/lis/GUI/view/FXMLProfessorMenu.fxml");
         }
-
-
 }

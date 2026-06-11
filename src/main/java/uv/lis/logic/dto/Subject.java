@@ -20,7 +20,7 @@ public class Subject {
         this.schoolPeriodName = schoolPeriodName;
     }
 
-    public Subject(){
+    public Subject() {
 
     }
 

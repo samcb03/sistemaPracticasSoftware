@@ -254,7 +254,7 @@ public class FXMLManageProjectSupervisorController extends ValidationHandler {
 
         if (!confirmed) {
             showError("Inactivación cancelada");
-        } else if(projectSupervisorDAO.hasProjectsActives(supervisorName)){
+        } else if (projectSupervisorDAO.hasProjectsActives(supervisorName)) {
             showError("El supervisor cuenta con Proyectos activos");
         } else {
             projectSupervisorDAO.inactivateProjectSupervisor(supervisorName);

@@ -109,7 +109,8 @@ class UserDAOTest {
     }
 
     private User builderUser() {
-        return new User(DEFAULT_ID, FIRST_NAME, LAST_NAME, DEFAULT_PASSWORD, DEFAULT_EMAIL, DEFAULT_ROLE_ID, ACTIVE_USER);
+        return new User(DEFAULT_ID, FIRST_NAME, LAST_NAME, DEFAULT_PASSWORD, DEFAULT_EMAIL, DEFAULT_ROLE_ID, 
+            ACTIVE_USER);
     }
 
     private static Stream<Arguments> provideUsersByRole() {

@@ -257,7 +257,7 @@ public class AffiliatedOrganizationDAO implements IAffiliatedOrganizationDAO {
                                            + "WHERE nombreOV = ?";
 
         try (Connection databaseConnection = connectionManager.getConnection();
-             PreparedStatement preparedStatement = databaseConnection.prepareStatement(affiliatedOrganizationQuery)) {
+            PreparedStatement preparedStatement = databaseConnection.prepareStatement(affiliatedOrganizationQuery)) {
 
             preparedStatement.setString(1, organizationName);
 
