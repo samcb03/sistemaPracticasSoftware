@@ -11,7 +11,7 @@ public class User {
     private int roleId;
     private boolean isActive;
 
-    public User(){
+    public User() {
 
     }
 

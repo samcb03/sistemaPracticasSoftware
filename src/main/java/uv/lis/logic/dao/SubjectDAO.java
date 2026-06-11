@@ -198,7 +198,7 @@ public class SubjectDAO implements ISubjectDAO {
         return subjects;
     }
 
-   @Override
+    @Override
     public ArrayList<Student> getEnrolledStudentsBySubject(int nrc) throws OperationException {
         ArrayList<Student> enrolledStudents = new ArrayList<>();
         String subjectQuery = "SELECT a.matricula, u.nombre, u.apellidos "

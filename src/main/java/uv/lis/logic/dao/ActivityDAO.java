@@ -61,7 +61,7 @@ public class ActivityDAO implements IActivityDAO {
         String activityQuery = "SELECT * FROM Actividad WHERE idActividad = ?;";
 
         try (Connection databaseConnection = connectionManager.getConnection();
-             PreparedStatement preparedStatement = databaseConnection.prepareStatement(activityQuery)) {
+            PreparedStatement preparedStatement = databaseConnection.prepareStatement(activityQuery)) {
              
             preparedStatement.setInt(1, idActivity);
             ResultSet resultSet = preparedStatement.executeQuery();
@@ -112,7 +112,7 @@ public class ActivityDAO implements IActivityDAO {
             
             if (preparedStatement.executeUpdate() > NO_ROWS_AFFECTED) {
                 try(ResultSet generatedKeys = preparedStatement.getGeneratedKeys()) {
-                    if(generatedKeys.next()) {
+                    if (generatedKeys.next()) {
                         int generatedId = generatedKeys.getInt(1);
                         activity.setId(generatedId);
 

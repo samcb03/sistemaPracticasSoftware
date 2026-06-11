@@ -239,6 +239,7 @@ public class RequestProjectDAO implements IRequestProjectDAO {
         return applicants;
     }
 
+    @Override
     public String getProjectAssignedToStudent(String idStudent) throws OperationException {
         String projectName = DEFAULT_NO_PROJECT_MESSAGE;
         String requestProjectQuery = "SELECT p.nombre FROM Proyecto p "

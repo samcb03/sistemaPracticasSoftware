@@ -18,7 +18,7 @@ public class FXMLAdministratorMenuController extends WindowHandler  {
     public void initialize(URL location, ResourceBundle resources) {
     }
 
-   @FXML
+    @FXML
     public void goToRegisterProfessor() {
         navigateTo("/uv/lis/GUI/view/FXMLRegisterProfessor.fxml");
     }

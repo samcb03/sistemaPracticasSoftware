@@ -84,13 +84,13 @@ public class SchoolPeriodDAO implements ISchoolPeriodDAO{
                                  + "VALUES(?, ?, ?);";
 
         try (Connection databaseConnection = connectionManager.getConnection();
-            PreparedStatement preparedStatement = databaseConnection.prepareStatement(schoolPeriodQuery)){
+            PreparedStatement preparedStatement = databaseConnection.prepareStatement(schoolPeriodQuery)) {
 
             preparedStatement.setInt(1, schoolPeriod.getId());
             preparedStatement.setDate(2, schoolPeriod.getStartDate());
             preparedStatement.setDate(3, schoolPeriod.getEndDate());
 
-            if (preparedStatement.executeUpdate() > NO_ROWS_AFFECTED){
+            if (preparedStatement.executeUpdate() > NO_ROWS_AFFECTED) {
                 isRegistered = true;
             } else {
                 throw new OperationException("No se pudo registrar el periodo escolar. Intentelo mas tarde", 
@@ -110,7 +110,7 @@ public class SchoolPeriodDAO implements ISchoolPeriodDAO{
                                  + "SET FechaInicio = ? , FechaFin = ? WHERE idPeriodoEscolar = ?;";
 
         try (Connection databaseConnection = connectionManager.getConnection();
-            PreparedStatement preparedStatement = databaseConnection.prepareStatement(schoolPeriodQuery)){
+            PreparedStatement preparedStatement = databaseConnection.prepareStatement(schoolPeriodQuery)) {
 
             preparedStatement.setDate(1, schoolPeriod.getStartDate());
             preparedStatement.setDate(2, schoolPeriod.getEndDate());

@@ -42,7 +42,7 @@ public class FXMLUploadDocuments extends ValidationHandler {
         try {
             ArrayList<String> documentTypes = expedientDAO.getAllDocumentsTypes();
             comboBoxDocuments.setItems(FXCollections.observableArrayList(documentTypes));
-        } catch(Exception e) {
+        } catch (Exception e) {
             showError("Error al cargar documentos");
         }
     }

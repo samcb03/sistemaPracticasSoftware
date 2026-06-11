@@ -6,7 +6,7 @@ public class Professor extends User {
     private String personnelNumber;
     private boolean isCoordinator;
 
-    public Professor(){
+    public Professor() {
         
     }
    

@@ -12,7 +12,7 @@ public class ProjectSupervisor {
     private int organizationInt;
     private String projectName;
 
-    public ProjectSupervisor(){
+    public ProjectSupervisor() {
 
     }
     

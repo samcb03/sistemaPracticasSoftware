@@ -24,7 +24,7 @@ public class StudentDAO extends UserDAO implements IStudentDAO {
     
     private MySQLConnectionManager connectionManager;
 
-    public StudentDAO(){
+    public StudentDAO() {
         this.connectionManager = new MySQLConnectionManager();
     }
     
@@ -75,7 +75,7 @@ public class StudentDAO extends UserDAO implements IStudentDAO {
         String studentQuery = "SELECT idUsuario FROM Alumno WHERE matricula = ?";
 
         try (Connection databaseConnection = connectionManager.getConnection();
-             PreparedStatement preparedStatement = databaseConnection.prepareStatement(studentQuery)) {
+            PreparedStatement preparedStatement = databaseConnection.prepareStatement(studentQuery)) {
             
             preparedStatement.setString(1, studentId);
             
@@ -136,7 +136,7 @@ public class StudentDAO extends UserDAO implements IStudentDAO {
                             + " VALUES (?, ?, ?, ?);";
 
         try (Connection databaseConnection = connectionManager.getConnection();
-             PreparedStatement preparedStatement = databaseConnection.prepareStatement(studentQuery)) {
+            PreparedStatement preparedStatement = databaseConnection.prepareStatement(studentQuery)) {
             
             preparedStatement.setInt(1, student.getId());
             preparedStatement.setString(2, student.getIdStudent());

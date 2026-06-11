@@ -114,7 +114,7 @@ public class ProjectDAO implements IProjectDAO{
             preparedStatement.setInt(7, project.getIdAffiliatedOrganization());
             preparedStatement.setInt(8, project.getIdSupervisor());
 
-            if (preparedStatement.executeUpdate() > NO_ROWS_AFFECTED){
+            if (preparedStatement.executeUpdate() > NO_ROWS_AFFECTED) {
                 try(ResultSet resultSet = preparedStatement.getGeneratedKeys()) {
                     if (resultSet.next()) {
                         int generatedId = resultSet.getInt(1);
@@ -191,8 +191,8 @@ public class ProjectDAO implements IProjectDAO{
             }
 
         } catch (SQLException e) {
-               LOGGER.log(Level.SEVERE, "Error de conexion con la base de datos",e);
-               throw new OperationException("No se pudo inactivar el proyecto. Intentelo más tarde", e);
+            LOGGER.log(Level.SEVERE, "Error de conexion con la base de datos",e);
+            throw new OperationException("No se pudo inactivar el proyecto. Intentelo más tarde", e);
         }
 
         return isInactive;
@@ -204,7 +204,7 @@ public class ProjectDAO implements IProjectDAO{
         ArrayList<String> projectNames = new ArrayList<>();
 
         try (Connection databaseConnection = connectionManager.getConnection();
-             PreparedStatement preparedStatement = databaseConnection.prepareStatement(projectQuery)) {
+            PreparedStatement preparedStatement = databaseConnection.prepareStatement(projectQuery)) {
                 try (ResultSet resultSet = preparedStatement.executeQuery()) {
                     while (resultSet.next()) {
                         projectNames.add(resultSet.getString("nombre"));
@@ -232,12 +232,12 @@ public class ProjectDAO implements IProjectDAO{
                 preparedStatement.setString(1,supervisorName);
 
                 try(ResultSet resultSet = preparedStatement.executeQuery()) {
-                    if(resultSet.next()) {
+                    if (resultSet.next()) {
                         String projectName = resultSet.getString("nombre");
                         project = Optional.of(projectName);
                     }
                 }
-            } catch(SQLException e) {
+            } catch (SQLException e) {
                 LOGGER.log(Level.SEVERE,"Error de conexión a la base de datos", e);
                 throw new OperationException("Error al cargar el nombre de la organización", e);
             }
@@ -252,7 +252,7 @@ public class ProjectDAO implements IProjectDAO{
                             + "AND estado = ?";
  
     try (Connection databaseConnection = connectionManager.getConnection();
-         PreparedStatement preparedStatement = databaseConnection.prepareStatement(projectQuery)) {
+        PreparedStatement preparedStatement = databaseConnection.prepareStatement(projectQuery)) {
  
         preparedStatement.setInt(1, organizationId);
         preparedStatement.setBoolean(2, true);

@@ -14,6 +14,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.stage.Stage;
+
 import uv.lis.logic.utils.SessionManager;
 
 public abstract class WindowHandler implements Initializable {

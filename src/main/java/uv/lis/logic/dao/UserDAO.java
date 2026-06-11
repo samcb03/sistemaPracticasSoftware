@@ -60,7 +60,7 @@ public class UserDAO implements IUserDAO {
 
             if (preparedStatement.executeUpdate() > NO_ROWS_AFFECTED) {
             
-               try (ResultSet resultSet = preparedStatement.getGeneratedKeys()) {
+                try (ResultSet resultSet = preparedStatement.getGeneratedKeys()) {
                     if (!resultSet.next()) { 
                         throw new OperationException("No se pudo obtener el ID generado.", null);
                     }
