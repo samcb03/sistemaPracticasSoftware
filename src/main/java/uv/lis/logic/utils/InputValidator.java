@@ -246,7 +246,8 @@ public final class InputValidator {
      * @return an error message if the value is empty or does not meet the criteria, empty otherwise
      */
     public static Optional<String> validatePassword(String passwordValue, String fieldName) {
-        passwordValue = passwordValue.trim();
+        validateNoTrailingSpace(passwordValue, fieldName);
+        validateNoConsecutiveSpaces(passwordValue, fieldName);
         Optional<String> validationResult;
         if (passwordValue.isEmpty()) {
             validationResult = Optional.of(fieldName + " no puede estar vacía");
@@ -360,9 +361,9 @@ public final class InputValidator {
     public static Optional<String> validateIdStudent(String fieldValue, int requiredLenght, String fieldName) {
         Optional<String> validationResult;
         if (fieldValue.isEmpty() || fieldValue.length() != requiredLenght) {
-            validationResult = Optional.of(fieldName + "debe tener exactamente " + requiredLenght + "caracteres");
+            validationResult = Optional.of(fieldName + "debe tener exactamente " + requiredLenght + " caracteres");
         } else if (!fieldValue.matches(STUDENT_ENROLLMENT)) {
-            validationResult = Optional.of(fieldName + " no sigue el formato establecido empezando con una 'S ");
+            validationResult = Optional.of(fieldName + " no sigue el formato establecido empezando con una S ");
         } else {
             validationResult = Optional.empty();
         }

@@ -42,9 +42,12 @@ public class FXMLLoginController implements Initializable {
     private static final int USER_TYPE_PROFESSOR = 2;
     private static final int USER_TYPE_COORDINATOR = 3;
     private static final int USER_TYPE_ADMINISTRATOR = 4;
+    private static final int MAX_ATTEMPTS = 5;
     private static final String VERIFY_VIEW_FXML = "/uv/lis/GUI/view/FXMLVerifyCode.fxml";
 
     private static final Logger LOGGER = Logger.getLogger(FXMLLoginController.class.getName());
+
+    private int failedAttempts = 0;
     
     @FXML private TextField textFieldEmail;
     @FXML private PasswordField passwordFieldPassword;
@@ -109,9 +112,13 @@ public class FXMLLoginController implements Initializable {
                     user = optionalUser.get();
                     startUserSession(user);
                 } else {
+                    failedAttempts++;
+                    if (failedAttempts >= MAX_ATTEMPTS) {
+                        buttonLogin.setDisable(true);
+                        showError("Demasiados intentos fallidos. Reinicie la aplicación.");
+                    }
                     showError("Credenciales inválidas. Intente de nuevo.");
                 }
-
             } catch (AuthenticateException e) {
                 LOGGER.log(Level.WARNING, "Error al autenticar al usuario: {0}", e.getMessage());
                 showError(e.getMessage());
@@ -127,9 +134,12 @@ public class FXMLLoginController implements Initializable {
         }
     }
 
-    private void completeLogin(User user) {
-        loadSessionByRole(user);
-        navigateToMenus(user.getRoleId());
+   private boolean completeLogin(User user) {
+        boolean loaded = loadSessionByRole(user);
+        if (loaded) {
+            navigateToMenus(user.getRoleId());
+        }
+        return loaded;
     }
 
     private void requestEmailVerification(User user) {
@@ -178,44 +188,50 @@ public class FXMLLoginController implements Initializable {
         return validationError.isEmpty();
     }
 
-    private void loadSessionByRole(User user) {
+    private boolean loadSessionByRole(User user) {
+        boolean isLoaded = false;
         int roleId = user.getRoleId();
         int userId = user.getId();
-            try {
-                switch (roleId) {
-                    case USER_TYPE_STUDENT -> {
-                        Optional<Student> validateStudent = new StudentDAO().getStudentById(userId);
-                        if (validateStudent.isPresent()) {
-                            SessionManager.getInstance().setCurrentStudent(validateStudent.get());
-                        } else {
-                            showError("No se encontraron los datos del estudiante en la base de datos.");
-                        }
+        try {
+            switch (roleId) {
+                case USER_TYPE_STUDENT -> {
+                    Optional<Student> validateStudent = new StudentDAO().getStudentById(userId);
+                    if (validateStudent.isPresent()) {
+                        SessionManager.getInstance().setCurrentStudent(validateStudent.get());
+                        isLoaded = true;
+                    } else {
+                        showError("No se encontraron los datos del estudiante en la base de datos.");
                     }
-                    case USER_TYPE_PROFESSOR -> {
-                        Optional<Professor> validateProfessor = new ProfessorDAO().getProfessorById(userId);
-                        if (validateProfessor.isPresent()) {
-                            SessionManager.getInstance().setCurrentProfessor(validateProfessor.get());
-                        } else {
-                            showError("No se encontraron los datos del profesor en la base de datos.");
-                        }
-                    }
-                    case USER_TYPE_COORDINATOR -> {
-                        Optional<Professor> validateCoordinator = new ProfessorDAO().getProfessorById(userId);
-                        if (validateCoordinator.isPresent()) {
-                            SessionManager.getInstance().setCurrentCoordinator(validateCoordinator.get());
-                        } else {
-                            showError("No se encontraron los datos del coordinador en la base de datos.");
-                        }
-                    }
-                    case USER_TYPE_ADMINISTRATOR -> {
-                        LOGGER.log(Level.INFO, "Inició sesión el administrador");
-                    }
-                    default -> LOGGER.log(Level.WARNING, "Rol desconocido: {0}", roleId);
                 }
+                case USER_TYPE_PROFESSOR -> {
+                    Optional<Professor> validateProfessor = new ProfessorDAO().getProfessorById(userId);
+                    if (validateProfessor.isPresent()) {
+                        SessionManager.getInstance().setCurrentProfessor(validateProfessor.get());
+                        isLoaded = true;
+                    } else {
+                        showError("No se encontraron los datos del profesor en la base de datos.");
+                    }
+                }
+                case USER_TYPE_COORDINATOR -> {
+                    Optional<Professor> validateCoordinator = new ProfessorDAO().getProfessorById(userId);
+                    if (validateCoordinator.isPresent()) {
+                        SessionManager.getInstance().setCurrentCoordinator(validateCoordinator.get());
+                        isLoaded = true;
+                    } else {
+                        showError("No se encontraron los datos del coordinador en la base de datos.");
+                    }
+                }
+                case USER_TYPE_ADMINISTRATOR -> {
+                    LOGGER.log(Level.INFO, "Inició sesión el administrador");
+                    isLoaded = true;
+                }
+                default -> LOGGER.log(Level.WARNING, "Rol desconocido: {0}", roleId);
+            }
         } catch (OperationException e) {
             LOGGER.log(Level.SEVERE, "Error al cargar los datos del usuario para la sesión", e);
             showError(e.getMessage());
         }
+        return isLoaded;
     }
 
     private void showError(String message) {
