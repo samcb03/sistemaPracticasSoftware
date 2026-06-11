@@ -2,7 +2,6 @@
 
 *.class
 
-# Logs
 *.log
 
 *.tmp
@@ -11,8 +10,9 @@
 
 .idea/
 
-# Sistema
 .DS_Store
 Thumbs.db
 
 databaseConfig/database.properties
+
+emailConfig/email.properties

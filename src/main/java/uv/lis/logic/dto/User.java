@@ -10,13 +10,14 @@ public class User {
     private String email;
     private int roleId;
     private boolean isActive;
+    private boolean isEmailAuthenticationActive;
 
     public User() {
 
     }
 
     public User(int id, String firstName, String lastName, String password, String email, int roleId,
-            boolean isActive) {
+            boolean isActive, boolean isEmailAuthenticationActive) {
         this.id = id;
         this.firstName = firstName;
         this.lastName = lastName;
@@ -24,6 +25,7 @@ public class User {
         this.email = email;
         this.roleId = roleId;
         this.isActive = isActive;
+        this.isEmailAuthenticationActive = isEmailAuthenticationActive;
     }
 
     public int getId() {
@@ -49,7 +51,7 @@ public class User {
     public void setLastName(String lastName) {
         this.lastName = lastName;
     }
-    
+
     public String getPassword() {
         return password;
     }
@@ -82,6 +84,14 @@ public class User {
         this.isActive = isActive;
     }
 
+    public boolean isEmailAuthenticationActive() {
+        return isEmailAuthenticationActive;
+    }
+
+    public void setEmailAuthenticationActive(boolean isEmailAuthenticationActive) {
+        this.isEmailAuthenticationActive = isEmailAuthenticationActive;
+    }
+
     @Override
     public boolean equals(Object object) {
     
@@ -99,11 +109,12 @@ public class User {
             && Objects.equals(password, other.password)
             && Objects.equals(email, other.email)
             && Objects.equals(roleId, other.roleId)
-            && Objects.equals(isActive, other.isActive);
+            && Objects.equals(isActive, other.isActive)
+            && Objects.equals(isEmailAuthenticationActive, other.isEmailAuthenticationActive);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, firstName, lastName, password, email, roleId, isActive);
+        return Objects.hash(id, firstName, lastName, password, email, roleId, isActive, isEmailAuthenticationActive);
     }
 }

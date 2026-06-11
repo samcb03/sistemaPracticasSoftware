@@ -1,6 +1,5 @@
 package daotest.test.java.testdao;
 
-
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -63,8 +62,6 @@ class ReportDAOTest {
     private static final String COLUMN_STUDENT_ID = "matricula";
     private static final String COLUMN_PLANNED_HOURS = "tiempoPlaneado";
     private static final String COLUMN_REAL_HOURS = "tiempoReal";
-    private static final String COLUMN_ADVANCE_PCT = "porcentajeAvance";
-    private static final String COLUMN_DELIVERABLE = "ResultadoEntregable";
 
     @Mock private MySQLConnectionManager connectionManager;
     @Mock private Connection databaseConnection;

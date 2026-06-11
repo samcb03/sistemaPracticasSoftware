@@ -19,15 +19,19 @@ import javafx.scene.control.TextField;
 import javafx.scene.control.ToggleButton;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.stage.Modality;
 import javafx.stage.Stage;
-
+import javafx.stage.WindowEvent;
+import uv.lis.logic.common.EmailCommon;
 import uv.lis.logic.dao.ProfessorDAO;
 import uv.lis.logic.dao.StudentDAO;
 import uv.lis.logic.dao.UserDAO;
 import uv.lis.logic.dto.Professor;
 import uv.lis.logic.dto.Student;
 import uv.lis.logic.dto.User;
+import uv.lis.logic.dto.VerificationChallenge;
 import uv.lis.logic.exceptions.AuthenticateException;
+import uv.lis.logic.exceptions.EmailException;
 import uv.lis.logic.exceptions.OperationException;
 import uv.lis.logic.utils.InputValidator;
 import uv.lis.logic.utils.SessionManager;
@@ -38,6 +42,7 @@ public class FXMLLoginController implements Initializable {
     private static final int USER_TYPE_PROFESSOR = 2;
     private static final int USER_TYPE_COORDINATOR = 3;
     private static final int USER_TYPE_ADMINISTRATOR = 4;
+    private static final String VERIFY_VIEW_FXML = "/uv/lis/GUI/view/FXMLVerifyCode.fxml";
 
     private static final Logger LOGGER = Logger.getLogger(FXMLLoginController.class.getName());
     
@@ -50,6 +55,8 @@ public class FXMLLoginController implements Initializable {
 
     private UserDAO userDAO;
     private User user;
+    private EmailCommon emailCommon;
+    private FXMLVerifyCodeController verifyController;
 
     private Image eyeOpen;
     private Image eyeClosed;
@@ -57,6 +64,7 @@ public class FXMLLoginController implements Initializable {
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         this.userDAO = new UserDAO();
+        this.emailCommon = new EmailCommon();
         textFieldPasswordVisible.textProperty().bindBidirectional(passwordFieldPassword.textProperty());
         eyeOpen = new Image(getClass().getResourceAsStream("/uv/lis/GUI/view/images/show-password-icon-eye-symbol" 
             + "-vision-hide-from-watch-icon-secret-view-web-design-element-vector2.png"));
@@ -99,8 +107,7 @@ public class FXMLLoginController implements Initializable {
 
                 if (optionalUser.isPresent()) {
                     user = optionalUser.get();
-                    loadSessionByRole(user);
-                    navigateToMenus(user.getRoleId());
+                    startUserSession(user);
                 } else {
                     showError("Credenciales inválidas. Intente de nuevo.");
                 }
@@ -109,6 +116,54 @@ public class FXMLLoginController implements Initializable {
                 LOGGER.log(Level.WARNING, "Error al autenticar al usuario: {0}", e.getMessage());
                 showError(e.getMessage());
             }
+        }
+    }
+
+    private void startUserSession(User user) {
+        if (user.isEmailAuthenticationActive()) {
+            requestEmailVerification(user);
+        } else {
+            completeLogin(user);
+        }
+    }
+
+    private void completeLogin(User user) {
+        loadSessionByRole(user);
+        navigateToMenus(user.getRoleId());
+    }
+
+    private void requestEmailVerification(User user) {
+        try {
+            VerificationChallenge challenge = emailCommon.sendVerificationCode(user.getEmail());
+            openVerificationWindow(user, challenge);
+        } catch (EmailException e) {
+            LOGGER.log(Level.SEVERE, "Error al enviar el código de verificación", e);
+            showError(e.getMessage());
+        }
+    }
+
+    private void openVerificationWindow(User user, VerificationChallenge challenge) {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource(VERIFY_VIEW_FXML));
+            Parent root = loader.load();
+
+            verifyController = loader.getController();
+            verifyController.initializeData(user, challenge);
+
+            Stage verifyStage = new Stage();
+            verifyStage.setScene(new Scene(root));
+            verifyStage.initModality(Modality.APPLICATION_MODAL);
+            verifyStage.setOnHidden(this::onVerificationClosed);
+            verifyStage.show();
+        } catch (IOException e) {
+            LOGGER.log(Level.SEVERE, "Error al cargar la pantalla de verificación", e);
+            showError("No se pudo abrir la verificación. Intente más tarde");
+        }
+    }
+
+    private void onVerificationClosed(WindowEvent event) {
+        if (verifyController.isVerified()) {
+            completeLogin(user);
         }
     }
 

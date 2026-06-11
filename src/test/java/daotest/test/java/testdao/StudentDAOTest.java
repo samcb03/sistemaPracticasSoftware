@@ -1,6 +1,5 @@
 package daotest.test.java.testdao;
 
-
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -54,6 +53,8 @@ class StudentDAOTest {
     private static final String DEFAULT_EMAIL = null;
     private static final String DEFAULT_GENDER = null;
     private static final Date DEFAULT_BIRTH_DATE = null;
+
+    private static final boolean EMAIL_AUTHENTICATION_ACTIVE = true;
 
     private static final String COLUMN_STUDENT_ID = "matricula";
     private static final String COLUMN_NAME = "nombre";
@@ -115,7 +116,7 @@ class StudentDAOTest {
         return new Student(DEFAULT_ID_USER, FIRST_NAME,
             LAST_NAME, DEFAULT_PASSWORD, DEFAULT_EMAIL,
             DEFAULT_ROLE_ID, INACTIVE_USER, FIRST_STUDENT_ID,
-            DEFAULT_BIRTH_DATE, DEFAULT_HOURS, DEFAULT_GENDER
+            DEFAULT_BIRTH_DATE, DEFAULT_HOURS, DEFAULT_GENDER, EMAIL_AUTHENTICATION_ACTIVE
         );
     }
 
@@ -123,7 +124,7 @@ class StudentDAOTest {
         return new Student(DEFAULT_ID_USER, SECOND_FIRST_NAME,
             SECOND_LAST_NAME, DEFAULT_PASSWORD, DEFAULT_EMAIL,
             DEFAULT_ROLE_ID, INACTIVE_USER, SECOND_STUDENT_ID,
-            DEFAULT_BIRTH_DATE, DEFAULT_HOURS, DEFAULT_GENDER
+            DEFAULT_BIRTH_DATE, DEFAULT_HOURS, DEFAULT_GENDER, EMAIL_AUTHENTICATION_ACTIVE
         );
     }
 
