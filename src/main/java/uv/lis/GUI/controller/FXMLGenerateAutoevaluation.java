@@ -88,6 +88,8 @@ public class FXMLGenerateAutoevaluation extends ValidationHandler {
     private AutoevaluationDAO autoevaluationDAO;
     private Student currentStudent;
 
+    private static int NUMBER_CRITERIA = 10;
+
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         autoevaluationCommon = new AutoevaluationCommon();
@@ -99,7 +101,7 @@ public class FXMLGenerateAutoevaluation extends ValidationHandler {
     }
 
     private void setupToggleGroups() {
-        groups = new ToggleGroup[10]; 
+        groups = new ToggleGroup[NUMBER_CRITERIA]; 
         groups[0] = createGroup(radioButton1_1,  radioButton1_2,  radioButton1_3,  radioButton1_4,  radioButton1_5);
         groups[1] = createGroup(radioButton2_1,  radioButton2_2,  radioButton2_3,  radioButton2_4,  radioButton2_5);
         groups[2] = createGroup(radioButton3_1,  radioButton3_2,  radioButton3_3,  radioButton3_4,  radioButton3_5);
@@ -154,7 +156,7 @@ public class FXMLGenerateAutoevaluation extends ValidationHandler {
 
     private Optional<int[]> collectAnswers() {
         Optional<int[]> result = Optional.empty();
-        int[] answers = new int[10];
+        int[] answers = new int[NUMBER_CRITERIA];
         boolean allAnswered = true;
 
         for (int questionIndex = 0; questionIndex < groups.length; questionIndex++) {

@@ -401,9 +401,9 @@ public class RequestProjectDAO implements IRequestProjectDAO {
     }
 
     private void insertAssignment(Connection databaseConnection, String idStudent, int idProject) throws SQLException {
-        String query = "INSERT INTO Solicita_Proyecto (idProyecto, matricula, estatus) VALUES (?, ?, ?)";
+        String assignmentQuery = "INSERT INTO Solicita_Proyecto (idProyecto, matricula, estatus) VALUES (?, ?, ?)";
 
-        try (PreparedStatement preparedStatement = databaseConnection.prepareStatement(query)) {
+        try (PreparedStatement preparedStatement = databaseConnection.prepareStatement(assignmentQuery)) {
             preparedStatement.setInt(1, idProject);
             preparedStatement.setString(2, idStudent);
             preparedStatement.setInt(3, STATUS_ASSIGNED);

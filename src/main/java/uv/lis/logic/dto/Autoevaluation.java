@@ -22,13 +22,15 @@ public class Autoevaluation {
     private String projectSupervisorName;
     private String positionSupervisor;
 
+    private static int NUMBER_ANSWERS = 10;
+
     public Autoevaluation() {
 
     }
 
     public Autoevaluation(String idStudent, int[] answers) throws IllegalArgumentException {
         this.idStudent = idStudent;
-        if (answers == null || answers.length != 10) {
+        if (answers == null || answers.length != NUMBER_ANSWERS) {
             throw new IllegalArgumentException("Numero incorrecto de respuestas. Se esperaban 10 respuestas.");
         }
             this.productiveParticipation = answers[0];
