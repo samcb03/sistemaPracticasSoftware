@@ -6,7 +6,9 @@ import java.util.ResourceBundle;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import uv.lis.GUI.WindowHandler;
+import uv.lis.logic.dao.ReportContextDAO;
 import uv.lis.logic.dto.Student;
+import uv.lis.logic.exceptions.OperationException;
 import uv.lis.logic.utils.SessionManager;
 
 public class FXMLReportsMenuController extends WindowHandler {
@@ -22,9 +24,11 @@ public class FXMLReportsMenuController extends WindowHandler {
     @FXML private Button buttonGenerateFinalReport;
 
     private Student student;
+    private ReportContextDAO reportContextDAO;
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
+        this.reportContextDAO = new ReportContextDAO();
         this.student = SessionManager.getInstance().getCurrentStudent();
         disableReportOptions();
     }
@@ -45,12 +49,18 @@ public class FXMLReportsMenuController extends WindowHandler {
     }
 
     private void disableReportOptions() {
-        if(student.getCompletedHours() < MIN_HOURS_FOR_PARTIAL_REPORT) {
-            buttonGeneratePartialReport.setDisable(true);
-            buttonGenerateFinalReport.setDisable(true);
-        } 
-        if(student.getCompletedHours() < MIN_HOURS_FOR_FINAL_REPORT) {
-            buttonGenerateFinalReport.setDisable(true);
+        try {
+            String totalHoursText = reportContextDAO.getTotalReportedHoursByStudentId(student.getIdStudent());
+            int totalHours = Integer.parseInt(totalHoursText);
+            if (totalHours < MIN_HOURS_FOR_PARTIAL_REPORT) {
+                buttonGeneratePartialReport.setDisable(true);
+                buttonGenerateFinalReport.setDisable(true);
+            }
+            if (totalHours < MIN_HOURS_FOR_FINAL_REPORT) {
+                buttonGenerateFinalReport.setDisable(true);
+            }
+        } catch (OperationException e) {
+            showError(e.getMessage());
         }
     }
 }
