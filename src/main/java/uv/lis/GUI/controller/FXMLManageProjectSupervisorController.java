@@ -25,7 +25,6 @@ import javafx.scene.control.TextField;
 import javafx.scene.layout.GridPane;
 
 import uv.lis.GUI.ValidationHandler;
-import uv.lis.logic.dao.AffiliatedOrganizationDAO;
 import uv.lis.logic.dao.ProjectSupervisorDAO;
 import uv.lis.logic.dto.ProjectSupervisor;
 import uv.lis.logic.exceptions.OperationException;
@@ -54,14 +53,12 @@ public class FXMLManageProjectSupervisorController extends ValidationHandler {
     @FXML private GridPane  gridPaneProjectSupervisorInfo;
     @FXML private ListView<String> listViewProjects;
     private ContextMenu contextMenuSuggestions;
-    private AffiliatedOrganizationDAO affiliatedOrganizationDAO;
     private ProjectSupervisorDAO projectSupervisorDAO;
     private ProjectSupervisor currentSupervisor;
     private boolean isEditing = false;
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        affiliatedOrganizationDAO = new AffiliatedOrganizationDAO();
         projectSupervisorDAO = new ProjectSupervisorDAO();
         contextMenuSuggestions = new ContextMenu();
 
