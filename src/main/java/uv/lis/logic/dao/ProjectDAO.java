@@ -294,7 +294,7 @@ public class ProjectDAO implements IProjectDAO{
             }
 
         } catch (SQLException e) {
-            LOGGER.log(Level.SEVERE, "Error al obtener el proyecto del alumno con matricula: " + studentId, e);
+            LOGGER.log(Level.SEVERE, "Error al obtener el proyecto del alumno", e);
             throw new OperationException("Error al obtener el proyecto del alumno.", e);
         }
         return projectOptional;

@@ -276,8 +276,8 @@ public class FXMLGenerateMonthlyReportController extends ValidationHandler {
                 advance.setAccumulatedHours(newAccumulated);
                 advanceDAO.registerAdvance(advance);
             } else {
-                LOGGER.log(Level.INFO, "Ya existe un avance registrado para el reporte ID: " 
-                    + context.getIdReport() + ". Se omitirá el registro de avance.");
+                LOGGER.log(Level.INFO, "Ya existe un avance registrado para el reporte ID {0}. "
+                + "Se omitirá el registro de avance.", context.getIdReport());
             }
 
             showSuccess(REPORT_GENERATED_MESSAGE);
