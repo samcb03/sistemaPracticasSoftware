@@ -34,7 +34,7 @@ public final class ClasspathImageRepositoryCommon implements RepositoryService {
 
     @Override
     public void saveResource(String uri, Resource resource) {
-        LOGGER.log(Level.FINE, "Operación de guardado no soportada para {0}", uri);
+        LOGGER.log(Level.WARNING, "Operación de guardado no soportada para {0}", uri);
     }
 
     private InputStreamResource buildImageResource(String uri) {
