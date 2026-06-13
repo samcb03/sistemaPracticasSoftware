@@ -4,6 +4,8 @@ import java.io.File;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.ResourceBundle;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javafx.collections.FXCollections;
 import javafx.event.ActionEvent;
@@ -19,7 +21,9 @@ import uv.lis.logic.dto.Student;
 import uv.lis.logic.exceptions.OperationException;
 import uv.lis.logic.utils.SessionManager;
 
-public class FXMLUploadDocuments extends ValidationHandler {
+public class FXMLUploadDocumentsController extends ValidationHandler {
+
+    private static final Logger LOGGER = Logger.getLogger(FXMLUploadDocumentsController.class.getName());
 
     @FXML private Button buttonUpLoadDocumet;
     @FXML private Button buttonBack;
@@ -42,7 +46,8 @@ public class FXMLUploadDocuments extends ValidationHandler {
         try {
             ArrayList<String> documentTypes = expedientDAO.getAllDocumentsTypes();
             comboBoxDocuments.setItems(FXCollections.observableArrayList(documentTypes));
-        } catch (Exception e) {
+        } catch (OperationException e) {
+            LOGGER.log(Level.SEVERE, "Error al cargar los tipos de documento", e);
             showError("Error al cargar documentos");
         }
     }
@@ -52,26 +57,27 @@ public class FXMLUploadDocuments extends ValidationHandler {
         if (student == null) {
             showError("No hay alumno en sesión.");
         } else {
-        String selectedDocument = comboBoxDocuments.getSelectionModel().getSelectedItem();
+            String selectedDocument = comboBoxDocuments.getSelectionModel().getSelectedItem();
             if (selectedDocument == null) {
                 showError("Seleccione un tipo de documento.");
             } else {
-            FileChooser fileChooser = new FileChooser();
-            fileChooser.setTitle("Seleccionar archivo para " + selectedDocument);
-            fileChooser.getExtensionFilters().addAll(
-                new FileChooser.ExtensionFilter("Archivos PDF", "*.pdf")
-            );
+                FileChooser fileChooser = new FileChooser();
+                fileChooser.setTitle("Seleccionar archivo para " + selectedDocument);
+                fileChooser.getExtensionFilters().addAll(
+                    new FileChooser.ExtensionFilter("Archivos PDF", "*.pdf")
+                );
 
-            File selectedFile = fileChooser.showOpenDialog(buttonUpLoadDocumet.getScene().getWindow());
-            if (selectedFile == null) {
-                showError("No se seleccionó ningún archivo.");
-            }
-            try {
-                expedientDAO.uploadDocument(student.getIdStudent(), selectedDocument, selectedFile);
-                showSuccess("Documento subido exitosamente.");
-                clearFields();
-            } catch (OperationException e) {
-                    showError(e.getMessage());
+                File selectedFile = fileChooser.showOpenDialog(buttonUpLoadDocumet.getScene().getWindow());
+                if (selectedFile == null) {
+                    showError("No se seleccionó ningún archivo.");
+                } else {
+                    try {
+                        expedientDAO.uploadDocument(student.getIdStudent(), selectedDocument, selectedFile);
+                        showSuccess("Documento subido exitosamente.");
+                        clearFields();
+                    } catch (OperationException e) {
+                        showError(e.getMessage());
+                    }
                 }
             }
         }
@@ -87,6 +93,3 @@ public class FXMLUploadDocuments extends ValidationHandler {
         comboBoxDocuments.buttonCellProperty().set(null);
     }
 }
-
-
-
