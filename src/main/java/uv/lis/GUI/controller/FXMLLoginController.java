@@ -206,7 +206,7 @@ public class FXMLLoginController implements Initializable {
         int userId = user.getId();
         try {
             switch (roleId) {
-                case USER_TYPE_STUDENT -> {
+                case USER_TYPE_STUDENT:
                     Optional<Student> validateStudent = new StudentDAO().getStudentById(userId);
                     if (validateStudent.isPresent()) {
                         SessionManager.getInstance().setCurrentStudent(validateStudent.get());
@@ -214,8 +214,8 @@ public class FXMLLoginController implements Initializable {
                     } else {
                         showError("No se encontraron los datos del estudiante en la base de datos.");
                     }
-                }
-                case USER_TYPE_PROFESSOR -> {
+                    break;
+                case USER_TYPE_PROFESSOR: 
                     Optional<Professor> validateProfessor = new ProfessorDAO().getProfessorById(userId);
                     if (validateProfessor.isPresent()) {
                         SessionManager.getInstance().setCurrentProfessor(validateProfessor.get());
@@ -223,8 +223,8 @@ public class FXMLLoginController implements Initializable {
                     } else {
                         showError("No se encontraron los datos del profesor en la base de datos.");
                     }
-                }
-                case USER_TYPE_COORDINATOR -> {
+                    break;
+                case USER_TYPE_COORDINATOR:
                     Optional<Professor> validateCoordinator = new ProfessorDAO().getProfessorById(userId);
                     if (validateCoordinator.isPresent()) {
                         SessionManager.getInstance().setCurrentCoordinator(validateCoordinator.get());
@@ -232,12 +232,14 @@ public class FXMLLoginController implements Initializable {
                     } else {
                         showError("No se encontraron los datos del coordinador en la base de datos.");
                     }
-                }
-                case USER_TYPE_ADMINISTRATOR -> {
+                    break;
+                case USER_TYPE_ADMINISTRATOR:
                     LOGGER.log(Level.INFO, "Inició sesión el administrador");
                     isLoaded = true;
-                }
-                default -> LOGGER.log(Level.WARNING, "Rol desconocido: {0}", roleId);
+                    break;
+                default:
+                    LOGGER.log(Level.WARNING, "Rol desconocido: {0}", roleId);
+                    break;
             }
         } catch (OperationException e) {
             LOGGER.log(Level.SEVERE, "Error al cargar los datos del usuario para la sesión", e);
