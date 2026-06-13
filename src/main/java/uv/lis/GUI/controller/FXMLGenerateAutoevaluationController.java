@@ -3,6 +3,8 @@ package uv.lis.GUI.controller;
 import java.net.URL;
 import java.util.Optional;
 import java.util.ResourceBundle;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
@@ -15,14 +17,17 @@ import net.sf.jasperreports.engine.JasperPrint;
 import net.sf.jasperreports.view.JasperViewer;
 
 import uv.lis.GUI.ValidationHandler;
+import uv.lis.logic.common.AutoevaluationCommon;
 import uv.lis.logic.dao.AutoevaluationDAO;
 import uv.lis.logic.dto.Autoevaluation;
 import uv.lis.logic.dto.Student;
 import uv.lis.logic.exceptions.OperationException;
-import uv.lis.logic.common.AutoevaluationCommon;
 import uv.lis.logic.utils.SessionManager;
 
-public class FXMLGenerateAutoevaluation extends ValidationHandler {
+public class FXMLGenerateAutoevaluationController extends ValidationHandler {
+
+    private static final Logger LOGGER = Logger.getLogger(FXMLGenerateAutoevaluationController.class.getName());
+    private static final int NUMBER_CRITERIA = 10;
 
     @FXML private Label labelStudentName;
     @FXML private Label labelStudentId;
@@ -87,8 +92,6 @@ public class FXMLGenerateAutoevaluation extends ValidationHandler {
     private AutoevaluationCommon autoevaluationCommon;
     private AutoevaluationDAO autoevaluationDAO;
     private Student currentStudent;
-
-    private static int NUMBER_CRITERIA = 10;
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
@@ -181,10 +184,12 @@ public class FXMLGenerateAutoevaluation extends ValidationHandler {
             labelMessage.setStyle("-fx-text-fill: green;");
             labelMessage.setText("Autoevaluación guardada y generada con éxito.");
         } catch (IllegalArgumentException e) {
-            showError("Respuestas inválidas: " + e.getMessage());
+            LOGGER.log(Level.WARNING, "Respuestas inválidas en la autoevaluación", e);
+            showError("Respuestas inválidas");
         } catch (OperationException e) {
             showError(e.getMessage());
         } catch (JRException e) {
+            LOGGER.log(Level.SEVERE, "Error de JasperReports al generar la autoevaluación", e);
             showError("Error técnico al generar el documento PDF.");
         }
     }

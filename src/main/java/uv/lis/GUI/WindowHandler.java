@@ -31,7 +31,7 @@ public abstract class WindowHandler implements Initializable {
             stage.setScene(new Scene(root));
             stage.show();
         } catch (IOException e) {
-            LOGGER.log(Level.SEVERE, "Error al cargar la pantalla: {0} ", fxml);
+            LOGGER.log(Level.SEVERE, "Error al cargar la pantalla", e);
             showError("Error al cargar la pantalla.");
         }
     }
@@ -48,7 +48,8 @@ public abstract class WindowHandler implements Initializable {
             stage.setScene(new Scene(root));
             stage.show();
         } catch (IOException e) {
-            showError("Error al cerrar sesión");    
+            LOGGER.log(Level.SEVERE, "Error al cargar la pantalla de inicio de sesión", e);
+            showError("Error al cerrar sesión");
         }
     }
 
@@ -61,7 +62,7 @@ public abstract class WindowHandler implements Initializable {
             stage.setScene(new Scene(root));
             stage.show();
         } catch (IOException ioException) {
-            LOGGER.log(Level.SEVERE, "Error al cargar la pantalla: {0}", fxml);
+            LOGGER.log(Level.SEVERE, "Error al cargar la pantalla", ioException);
             showError("No se pudo cargar la pantalla. Intente más tarde");
         }
         return loader;

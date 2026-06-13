@@ -79,15 +79,16 @@ public class WeeklyAdvanceGridEditor {
             TextField cell = cellFields[weekIndex][slot];
 
             if (cell != null && !cell.isDisable()) {
-                Optional<Integer> value = parseCellValue(cell.getText());
+                String cellText = cell.getText().trim();
 
-                if (value.isPresent()) {
-                    columnSum += value.get();
+                if (!cellText.isEmpty()) {
                     Optional<String> cellError = InputValidator.validateMaxIntValue(
-                        String.valueOf(value.get()), MAX_ADVANCE, WEEKLY_FIELD_NAME);
+                        cellText, MAX_ADVANCE, WEEKLY_FIELD_NAME);
 
                     if (cellError.isPresent()) {
                         validationError = cellError;
+                    } else {
+                        columnSum += Integer.parseInt(cellText);
                     }
                 }
             }
@@ -169,7 +170,7 @@ public class WeeklyAdvanceGridEditor {
         }
         return cell;
     }
-
+    //FIXME verificar ese comentario y ver si es valido :c
     private Optional<Integer> parseCellValue(String rawValue) {
         Optional<Integer> value = Optional.empty();
 
@@ -177,6 +178,8 @@ public class WeeklyAdvanceGridEditor {
             try {
                 value = Optional.of(Integer.parseInt(rawValue.trim()));
             } catch (NumberFormatException numberFormatException) {
+                // Non-numeric input is already reported to the user in validateColumn;
+                // here an unparseable cell is treated as a cell with no value.
                 value = Optional.empty();
             }
         }
