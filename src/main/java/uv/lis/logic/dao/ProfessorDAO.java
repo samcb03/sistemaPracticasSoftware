@@ -126,30 +126,47 @@ public class ProfessorDAO extends UserDAO implements IProfessorDAO {
     @Override
     public boolean registerProfessor(Professor professor) throws OperationException {
         boolean isRegistered = false;
-        
-        String professorQuery = "INSERT INTO Profesor (idUsuario, numeroPersonal) VALUES (?, ?);";
 
-        try (Connection databaseConnection = connectionManager.getConnection();
-            PreparedStatement preparedStatement = databaseConnection.prepareStatement(professorQuery)) {
+        try (Connection databaseConnection = connectionManager.getConnection()) {
+            databaseConnection.setAutoCommit(false);
 
-            preparedStatement.setInt(1, professor.getId());
-            preparedStatement.setString(2, professor.getPersonnelNumber());
-            
-            if (preparedStatement.executeUpdate() > NO_ROWS_AFFECTED) {
+            try {
+                int generatedUserId = insertUser(professor, databaseConnection);
+                professor.setId(generatedUserId);
+                insertProfessor(professor, databaseConnection);
+                databaseConnection.commit();
                 isRegistered = true;
-                LOGGER.log(Level.INFO, "Profesor {0} registrado exitosamente.",
-                    professor.getPersonnelNumber());
-            } else {
-                throw new OperationException("No se pudo registrar al profesor con número: "
-                    + professor.getPersonnelNumber(), null);
+            } catch (SQLException sqlException) {
+                databaseConnection.rollback();
+                LOGGER.log(Level.SEVERE, "Transacción de registro de profesor cancelada", sqlException);
+                throw new OperationException("Error al registrar el profesor", sqlException);
+            } catch (OperationException operationException) {
+                databaseConnection.rollback();
+                throw operationException;
+            } finally {
+                databaseConnection.setAutoCommit(true);
             }
-
         } catch (SQLException e) {
             LOGGER.log(Level.SEVERE, "Error de conexión con la base de datos al registrar el profesor", e);
             throw new OperationException("Error al registrar el profesor", e);
         }
 
         return isRegistered;
+    }
+
+    private void insertProfessor(Professor professor, Connection databaseConnection)
+            throws SQLException, OperationException {
+        String professorQuery = "INSERT INTO Profesor (idUsuario, numeroPersonal) VALUES (?, ?);";
+
+        try (PreparedStatement preparedStatement = databaseConnection.prepareStatement(professorQuery)) {
+            preparedStatement.setInt(1, professor.getId());
+            preparedStatement.setString(2, professor.getPersonnelNumber());
+
+            if (preparedStatement.executeUpdate() <= NO_ROWS_AFFECTED) {
+                throw new OperationException("No se pudo registrar al profesor con número: "
+                    + professor.getPersonnelNumber(), null);
+            }
+        }
     }
 
     @Override

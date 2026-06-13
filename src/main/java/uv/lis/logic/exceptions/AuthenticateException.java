@@ -10,4 +10,8 @@ public class AuthenticateException extends Exception {
         super(message);
     }
 
+    @Override
+    public String getMessage() {
+        return OperationException.resolveMessage(super.getMessage(), getCause());
+    }
 }

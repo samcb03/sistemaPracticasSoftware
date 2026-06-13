@@ -1,6 +1,5 @@
 package uv.lis.GUI.controller;
 
-import static uv.lis.logic.utils.InputValidator.INVALID_ID;
 import static uv.lis.logic.utils.InputValidator.STUDENT_ENROLLMENT;
 import static uv.lis.logic.utils.InputValidator.STUDENT_ID_LENGTH;
 import static uv.lis.logic.utils.InputValidator.validateBirthDate;
@@ -28,14 +27,13 @@ import javafx.scene.control.TextField;
 
 import uv.lis.GUI.ValidationHandler;
 import uv.lis.logic.dao.StudentDAO;
-import uv.lis.logic.dao.UserDAO;
 import uv.lis.logic.dto.Student;
 import uv.lis.logic.exceptions.OperationException;
 
 public class FXMLRegisterStudentController extends ValidationHandler {
 
     private static final int USER_TYPE_STUDENT = 1;
-    
+
     @FXML private Button buttonBack;
     @FXML private Label labelError;
     @FXML private TextField textFieldFirstName;
@@ -45,13 +43,11 @@ public class FXMLRegisterStudentController extends ValidationHandler {
     @FXML private TextField textFieldStudentId;
     @FXML private DatePicker datePickerBirthDate;
     @FXML private ComboBox<String> comboBoxGender;
-    
-    private UserDAO userDAO;
+
     private StudentDAO studentDAO;
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
-        userDAO = new UserDAO();
         studentDAO = new StudentDAO();
         comboBoxGender.setItems(FXCollections.observableArrayList("Hombre", "Mujer", "Otro"));
         setupControls(labelError, buttonBack);
@@ -89,23 +85,16 @@ public class FXMLRegisterStudentController extends ValidationHandler {
             showError("La matrícula no tiene un formato válido");
         } else {
             try {
-                int generatedUserId = userDAO.registerUser(student);
-
-                if (generatedUserId == INVALID_ID) {
-                    showError("Error al registrar el usuario");
-                } else {
-                    student.setId(generatedUserId);
-                    studentDAO.registerStudent(student);
-
+                if (studentDAO.registerStudent(student)) {
                     showSuccess("Estudiante registrado correctamente");
                     clearFields();
+                } else {
+                    showError("Error al registrar al estudiante");
                 }
             } catch (OperationException operationException) {
                 showError(operationException.getMessage());
             }
         }
-
-        
     }
 
     private Student buildStudent() {
