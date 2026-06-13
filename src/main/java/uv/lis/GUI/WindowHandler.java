@@ -14,7 +14,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.stage.Stage;
-
+import javafx.stage.Window;
 import uv.lis.logic.utils.SessionManager;
 
 public abstract class WindowHandler implements Initializable {
@@ -85,10 +85,10 @@ public abstract class WindowHandler implements Initializable {
     }
 
     private void closeAllOpenStages() {
-        new ArrayList<>(Stage.getWindows()).forEach(window -> {
+        for (Window window : new ArrayList<>(Stage.getWindows())) {
             if (window instanceof Stage) {
-                ((Stage)window).close();
+                ((Stage) window).close();
             }
-        });
+        }
     }
 }
