@@ -30,26 +30,38 @@ public class UserDAO implements IUserDAO {
     public UserDAO(MySQLConnectionManager connectionManager) {
         this.connectionManager = connectionManager;
     }
-
-    @Override 
+    //TODO verificar si es buena practica separar estas dos clases y su manejo de excepciones
+    @Override
     public int registerUser(User user) throws OperationException {
         int generatedId = -1;
+
+        try (Connection databaseConnection = connectionManager.getConnection()) {
+            generatedId = insertUser(user, databaseConnection);
+        } catch (SQLException e) {
+            LOGGER.log(Level.SEVERE, "Error de conexion con la base de datos", e);
+            throw new OperationException("No se pudo registrar al usuario. Intentelo mas tarde", e);
+        }
+
+        return generatedId;
+    }
+
+    protected int insertUser(User user, Connection databaseConnection) throws SQLException, OperationException {
+        int generatedId = -1;
+
+        if (user.getRoleId() == ROL_COORDINATOR && existActiveCoordinator()) {
+            throw new OperationException("Ya existe un coordinador activo en el sistema", null);
+        }
 
         String hashedPassword = PasswordHasher.hashPassword(user.getPassword());
         user.setPassword(hashedPassword);
 
-        String userQuery = "INSERT INTO Usuario" 
+        String userQuery = "INSERT INTO Usuario"
                          + "(nombre, apellidos, contraseña, email, idRol, estado) "
                          + "VALUES (?, ?, ?, ?, ?, ?);";
 
-        try (Connection databaseConnection = connectionManager.getConnection();
-            PreparedStatement preparedStatement = databaseConnection.prepareStatement(userQuery,
-                PreparedStatement.RETURN_GENERATED_KEYS)) {
+        try (PreparedStatement preparedStatement = databaseConnection.prepareStatement(userQuery,
+            PreparedStatement.RETURN_GENERATED_KEYS)) {
 
-            if (user.getRoleId() == ROL_COORDINATOR && existActiveCoordinator()) {
-                throw new OperationException("Ya existe un coordinador activo en el sistema", null);
-            }
- 
             preparedStatement.setString(1, user.getFirstName());
             preparedStatement.setString(2, user.getLastName());
             preparedStatement.setString(3, user.getPassword());
@@ -58,23 +70,17 @@ public class UserDAO implements IUserDAO {
             preparedStatement.setBoolean(6, user.isActive());
 
             if (preparedStatement.executeUpdate() > NO_ROWS_AFFECTED) {
-            
                 try (ResultSet resultSet = preparedStatement.getGeneratedKeys()) {
-                    if (!resultSet.next()) { 
+                    if (!resultSet.next()) {
                         throw new OperationException("No se pudo obtener el ID generado.", null);
                     }
                     generatedId = resultSet.getInt(1);
-                } 
+                }
             } else {
-                throw new OperationException("No se pudo registrar al usuario. Intentelo mas tarde", 
+                throw new OperationException("No se pudo registrar al usuario. Intentelo mas tarde",
                     null);
             }
         }
-        catch (SQLException e) {
-            LOGGER.log(Level.SEVERE, "Error de conexion con la base de datos", e);
-            throw new OperationException("No se pudo registrar al usuario. Intentelo mas tarde", e);
-        }
-
         return generatedId;
     }
 
@@ -110,7 +116,7 @@ public class UserDAO implements IUserDAO {
             }
         } catch (SQLException e) {
             LOGGER.log(Level.SEVERE, "Error al autenticar", e);
-            throw new AuthenticateException("Error al autenticar: " + e.getMessage(), e);
+            throw new AuthenticateException("Error al autenticar", e);
         }
         return validateUser;
     }

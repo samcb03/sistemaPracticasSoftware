@@ -1,11 +1,11 @@
 package uv.lis.GUI.controller;
 
-import static uv.lis.logic.utils.InputValidator.INVALID_ID;
 import static uv.lis.logic.utils.InputValidator.PROFESSOR_ID_LENGTH;
 import static uv.lis.logic.utils.InputValidator.validateEmail;
 import static uv.lis.logic.utils.InputValidator.validateExactLength;
 import static uv.lis.logic.utils.InputValidator.validateText;
 import static uv.lis.logic.utils.InputValidator.validatePassword;
+import static uv.lis.logic.utils.InputValidator.validatePositiveInteger;
 
 import java.net.URL;
 import java.util.Optional;
@@ -20,7 +20,6 @@ import javafx.scene.control.TextField;
 
 import uv.lis.GUI.ValidationHandler;
 import uv.lis.logic.dao.ProfessorDAO;
-import uv.lis.logic.dao.UserDAO;
 import uv.lis.logic.dto.Professor;
 import uv.lis.logic.exceptions.OperationException;
 
@@ -36,12 +35,10 @@ public class FXMLRegisterProfessorController extends ValidationHandler {
     @FXML private PasswordField passwordFieldPassword;
     @FXML private TextField textFieldPersonnelNumber;
 
-    private UserDAO userDAO;
     private ProfessorDAO professorDAO;
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
-        userDAO = new UserDAO();
         professorDAO = new ProfessorDAO();
         setupControls(labelMessage, buttonBack);
     }
@@ -58,8 +55,9 @@ public class FXMLRegisterProfessorController extends ValidationHandler {
             validateText(textFieldLastName.getText(), "El apellido"),
             validateEmail(textFieldEmail.getText().trim(), "El correo electrónico"),
             validatePassword(passwordFieldPassword.getText().trim(), "La contraseña"),
-            validateExactLength(textFieldPersonnelNumber.getText().trim(), PROFESSOR_ID_LENGTH, 
-                "El número de personal")
+            validateExactLength(textFieldPersonnelNumber.getText().trim(), PROFESSOR_ID_LENGTH,
+                "El número de personal"),
+            validatePositiveInteger(textFieldPersonnelNumber.getText().trim(), "El número de personal")
         );
         Optional<String> firstError = validationStream
             .filter(Optional::isPresent)
@@ -71,18 +69,11 @@ public class FXMLRegisterProfessorController extends ValidationHandler {
     private void registerProfessor() {
         Professor professor = buildProfessor();
         try {
-            int generatedUserId = userDAO.registerUser(professor);
-            if (generatedUserId != INVALID_ID) {
-                professor.setId(generatedUserId);
-                boolean professorRegistered = professorDAO.registerProfessor(professor);
-                if (professorRegistered) {
-                    showSuccess("Profesor registrado correctamente");
-                    clearFields();
-                } else {
-                    showError("Error al registrar al profesor");
-                }
+            if (professorDAO.registerProfessor(professor)) {
+                showSuccess("Profesor registrado correctamente");
+                clearFields();
             } else {
-                showError("Error al registrar el usuario");
+                showError("Error al registrar al profesor");
             }
         } catch (OperationException operationException) {
             showError(operationException.getMessage());

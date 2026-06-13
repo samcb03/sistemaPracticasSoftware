@@ -152,8 +152,8 @@ public class SubjectDAO implements ISubjectDAO {
 
     @Override
     public void unassignProfessorFromSubject(String personnelNumber) throws OperationException {
-        String subjectQuery = "DELETE FROM Profesor_Imparte_Experiencia"
-                            + " WHERE numeroPersonal = ?";
+        String subjectQuery = "UPDATE Profesor_Imparte_Experiencia "
+                            + "SET estaActiva = FALSE WHERE numeroPersonal = ?";
 
         try (Connection databaseConnection = connectionManager.getConnection();
             PreparedStatement preparedStatement = databaseConnection.prepareStatement(subjectQuery)) {

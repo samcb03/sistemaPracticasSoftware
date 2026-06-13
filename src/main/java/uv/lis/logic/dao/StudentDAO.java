@@ -4,7 +4,6 @@ import static uv.lis.logic.utils.InputValidator.NO_ROWS_AFFECTED;
 import static uv.lis.logic.utils.InputValidator.STATUS_ASSIGNED;
 
 import java.sql.Connection;
-import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -128,38 +127,54 @@ public class StudentDAO extends UserDAO implements IStudentDAO {
         }
         return students;
     }
-
+    //TODO tmb verificar si esto es una buena practica al tener 3 catch en un solo metodo
     @Override
     public boolean registerStudent(Student student) throws OperationException {
         boolean isRegistered = false;
 
-        String studentQuery = "INSERT INTO Alumno (idUsuario, matricula, fechaNacimiento, genero)" 
-                            + " VALUES (?, ?, ?, ?);";
+        try (Connection databaseConnection = connectionManager.getConnection()) {
+            databaseConnection.setAutoCommit(false);
 
-        try (Connection databaseConnection = connectionManager.getConnection();
-            PreparedStatement preparedStatement = databaseConnection.prepareStatement(studentQuery)) {
-            
-            preparedStatement.setInt(1, student.getId());
-            preparedStatement.setString(2, student.getIdStudent());
-            Date birthDate = student.getBirthDate();;
-
-            preparedStatement.setDate(3, birthDate);
-            preparedStatement.setString(4, student.getGender());
-
-            if (preparedStatement.executeUpdate() > NO_ROWS_AFFECTED) {
+            try {
+                int generatedUserId = insertUser(student, databaseConnection);
+                student.setId(generatedUserId);
+                insertStudent(student, databaseConnection);
+                databaseConnection.commit();
                 isRegistered = true;
-                LOGGER.log(Level.INFO, "Registro de alumno con matricula {0} exitoso.", student.getIdStudent());
-            } else {
+            } catch (SQLException sqlException) {
+                databaseConnection.rollback();
+                LOGGER.log(Level.SEVERE, "Transacción de registro de alumno cancelada", sqlException);
                 throw new OperationException("No se pudo registrar al alumno. Intentelo mas tarde", 
-                    null);
+                    sqlException);
+            } catch (OperationException operationException) {
+                databaseConnection.rollback();
+                throw operationException;
+            } finally {
+                databaseConnection.setAutoCommit(true);
             }
-
         } catch (SQLException e) {
-            LOGGER.log(Level.SEVERE, "Error de conexion con la base de datos",e);
+            LOGGER.log(Level.SEVERE, "Error de conexion con la base de datos", e);
             throw new OperationException("No se pudo registrar al alumno. Intentelo mas tarde", e);
         }
-        
+
         return isRegistered;
+    }
+
+    private void insertStudent(Student student, Connection databaseConnection) throws SQLException, OperationException {
+        String studentQuery = "INSERT INTO Alumno (idUsuario, matricula, fechaNacimiento, genero)"
+                            + " VALUES (?, ?, ?, ?);";
+
+        try (PreparedStatement preparedStatement = databaseConnection.prepareStatement(studentQuery)) {
+            preparedStatement.setInt(1, student.getId());
+            preparedStatement.setString(2, student.getIdStudent());
+            preparedStatement.setDate(3, student.getBirthDate());
+            preparedStatement.setString(4, student.getGender());
+
+            if (preparedStatement.executeUpdate() <= NO_ROWS_AFFECTED) {
+                throw new OperationException("No se pudo registrar al alumno. Intentelo mas tarde",
+                    null);
+            }
+        }
     }
 
     @Override
