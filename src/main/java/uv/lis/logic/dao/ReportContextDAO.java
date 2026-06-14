@@ -287,8 +287,8 @@ public class ReportContextDAO implements IReportContextDAO {
     public boolean hasGeneratedFinalReport(String studentId) throws OperationException {
         boolean exists = false;
         String reportQuery = "SELECT 1 FROM Reporte r "
-                              + "INNER JOIN ReporteFinal rf ON r.idReporte = rf.idReporte "
-                              + "WHERE r.matricula = ? LIMIT 1";
+                           + "INNER JOIN ReporteFinal rf ON r.idReporte = rf.idReporte "
+                           + "WHERE r.matricula = ? LIMIT 1";
 
         try(Connection databaseConnection = connectionManager.getConnection();
             PreparedStatement preparedStatement = databaseConnection.prepareStatement(reportQuery)) {
@@ -300,7 +300,7 @@ public class ReportContextDAO implements IReportContextDAO {
                 }
             } catch (SQLException e) {
                 LOGGER.log(Level.SEVERE, "Error al verificar la existencia del reporte final",e);
-                throw new OperationException("No se pudo verificar la existencia del reporte final",null);
+                throw new OperationException("No se pudo verificar la existencia del reporte final", e);
             }
         return exists;
     }
