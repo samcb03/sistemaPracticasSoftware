@@ -284,6 +284,27 @@ public class ReportContextDAO implements IReportContextDAO {
         return isDuplicate;
     }
 
+    public boolean hasGeneratedFinalReport(String studentId) throws OperationException {
+        boolean exists = false;
+        String reportQuery = "SELECT 1 FROM Reporte r "
+                              + "INNER JOIN ReporteFinal rf ON r.idReporte = rf.idReporte "
+                              + "WHERE r.matricula = ? LIMIT 1";
+
+        try(Connection databaseConnection = connectionManager.getConnection();
+            PreparedStatement preparedStatement = databaseConnection.prepareStatement(reportQuery)) {
+
+                preparedStatement.setString(1, studentId);
+
+                try(ResultSet resultSet = preparedStatement.executeQuery()) {
+                    exists = resultSet.next();
+                }
+            } catch (SQLException e) {
+                LOGGER.log(Level.SEVERE, "Error al verificar la existencia del reporte final",e);
+                throw new OperationException("No se pudo verificar la existencia del reporte final",null);
+            }
+        return exists;
+    }
+
     private String buildContextQuery() {
         String reportContextQuery = "SELECT u.nombre AS nombreAlumno, u.apellidos AS apellidosAlumno, "
                                   + "ee.NRC AS nrc, "
