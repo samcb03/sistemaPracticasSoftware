@@ -35,6 +35,10 @@ public class ReportDAO implements IReportDAO {
     private static final String REGISTER_FINAL_ERROR = "Error al registrar el reporte final";
     private static final String MODIFY_FINAL_ERROR = "Error al modificar el reporte final";
     private static final String REGISTER_MONTHLY_ERROR = "Error al registrar reporte mensual";
+    private static final String CHECK_REPORT_ERROR = "No se pudo verificar el reporte. Inténtelo más tarde";
+    private static final int FINAL_REPORT_TYPE_ID = 2;
+    private static final int MONTHLY_REPORT_TYPE_ID = 3;
+    private static final int PARTIAL_REPORT_TYPE_ID = 4;
     private static final int NO_ADVANCE = 0;
     private static final int WEEK_OFFSET = 1;
     private static final int FIRST_DETAIL = 1;
@@ -225,6 +229,56 @@ public class ReportDAO implements IReportDAO {
             LOGGER.log(Level.SEVERE, DATABASE_CONNECTION_ERROR, e);
             throw new OperationException(DATABASE_CONNECTION_ERROR, e);
         }
+    }
+
+    @Override
+    public boolean hasReportOfType(String idStudent, int idTypeDocument) throws OperationException {
+        boolean hasReport = false;
+        String reportQuery = buildReportExistenceQuery(idTypeDocument);
+
+        if (!reportQuery.isEmpty()) {
+            try (Connection databaseConnection = connectionManager.getConnection();
+                PreparedStatement preparedStatement = databaseConnection.prepareStatement(reportQuery)) {
+
+                preparedStatement.setString(1, idStudent);
+
+                try (ResultSet resultSet = preparedStatement.executeQuery()) {
+                    if (resultSet.next()) {
+                        hasReport = resultSet.getInt(1) > NO_ROWS_AFFECTED;
+                    }
+                }
+            } catch (SQLException e) {
+                LOGGER.log(Level.SEVERE, "Error al verificar la existencia del reporte", e);
+                throw new OperationException(CHECK_REPORT_ERROR, e);
+            }
+        }
+        return hasReport;
+    }
+
+    private String buildReportExistenceQuery(int idTypeDocument) {
+        String reportQuery;
+
+        switch (idTypeDocument) {
+            case FINAL_REPORT_TYPE_ID:
+                reportQuery = "SELECT COUNT(*) FROM Reporte r "
+                            + "INNER JOIN ReporteFinal rf ON r.idReporte = rf.idReporte "
+                            + "WHERE r.matricula = ?";
+                break;
+            case MONTHLY_REPORT_TYPE_ID:
+                reportQuery = "SELECT COUNT(*) FROM Reporte r "
+                            + "INNER JOIN ReporteMensual rm ON r.idReporte = rm.idReporte "
+                            + "WHERE r.matricula = ?";
+                break;
+            case PARTIAL_REPORT_TYPE_ID:
+                reportQuery = "SELECT COUNT(*) FROM Reporte r "
+                            + "INNER JOIN ReporteParcial rp ON r.idReporte = rp.idReporte "
+                            + "WHERE r.matricula = ?";
+                break;
+            default:
+                reportQuery = "";
+                break;
+        }
+        return reportQuery;
     }
 
     private Report mapReport(ResultSet resultSet) throws SQLException {

@@ -92,4 +92,14 @@ public interface IReportDAO {
      * @throws OperationException if the evaluation cannot be saved
      */
     void evaluationReport(Report report) throws OperationException;
+
+    /**
+     * Indicates whether a student has a saved report of the given document type.
+     *
+     * @param idStudent the identifier of the student to verify
+     * @param idTypeDocument the document type identifier of the report to look up
+     * @return true if a report of that type exists for the student, false otherwise
+     * @throws OperationException if the verification cannot be completed
+     */
+    boolean hasReportOfType(String idStudent, int idTypeDocument) throws OperationException;
 }
