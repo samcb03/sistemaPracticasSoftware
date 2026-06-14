@@ -72,4 +72,14 @@ public interface ISubjectDAO {
      * @throws OperationException if the student cannot be enrolled
      */
     boolean assignStudentToSubject(String studentId, int subjectNrc) throws OperationException;
+
+    /**
+     * Checks whether a section is already taken in a given school period.
+     *
+     * @param periodId the identifier of the school period to check
+     * @param section the section to check ('1' or '2')
+     * @return true if the section is already assigned, false otherwise
+     * @throws OperationException if the check cannot be performed
+     */
+    boolean isSectionTakenInPeriod(int periodId, String section) throws OperationException;
 }

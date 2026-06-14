@@ -230,4 +230,29 @@ public class SubjectDAO implements ISubjectDAO {
 
         return enrolledStudents;
     }
+
+    @Override
+    public boolean isSectionTakenInPeriod(int periodId, String section) throws OperationException {
+        boolean isTaken = false;
+        String sectionQuery = "SELECT COUNT(*) FROM ExperienciaEducativa "
+                            + "WHERE idPeriodoEscolar = ? AND seccion = ?";
+ 
+        try (Connection databaseConnection = connectionManager.getConnection();
+            PreparedStatement preparedStatement = databaseConnection.prepareStatement(sectionQuery)) {
+ 
+            preparedStatement.setInt(1, periodId);
+            preparedStatement.setString(2, section);
+ 
+            try (ResultSet resultSet = preparedStatement.executeQuery()) {
+                if (resultSet.next()) {
+                    isTaken = resultSet.getInt(1) > 0;
+                }
+            }
+        } catch (SQLException e) {
+            LOGGER.log(Level.SEVERE, "Error al verificar la sección en el periodo escolar", e);
+            throw new OperationException("No se pudo verificar la disponibilidad de la sección", e);
+        }
+ 
+        return isTaken;
+    }
 }

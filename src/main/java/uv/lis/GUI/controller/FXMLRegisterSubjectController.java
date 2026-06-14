@@ -29,6 +29,8 @@ import uv.lis.logic.exceptions.OperationException;
 public class FXMLRegisterSubjectController extends ValidationHandler {
 
     private static final Logger LOGGER = Logger.getLogger(FXMLRegisterSubjectController.class.getName());
+    private static final String SECTION_TAKEN_ERROR = 
+        "La sección seleccionada ya está asignada en este periodo escolar.";
 
     @FXML private TextField textFieldNRC;
     @FXML private ComboBox<String> comboBoxProfessorName;
@@ -110,10 +112,17 @@ public class FXMLRegisterSubjectController extends ValidationHandler {
 
         subject.ifPresent(newSubject -> {
             try {
-                boolean isRegistered = subjectDAO.registerSubject(newSubject);
-                if (isRegistered) {
-                    showSuccess("Experiencia Educativa registrada con éxito.");
-                    clearFields();
+                boolean isSectionTaken = subjectDAO.isSectionTakenInPeriod(
+                    newSubject.getSchoolPeriodId(), newSubject.getSection()
+                );
+                if (isSectionTaken) {
+                    showError(SECTION_TAKEN_ERROR);
+                } else {
+                    boolean isRegistered = subjectDAO.registerSubject(newSubject);
+                    if (isRegistered) {
+                        showSuccess("Experiencia Educativa registrada con éxito.");
+                        clearFields();
+                    }
                 }
             } catch (OperationException e) {
                 LOGGER.log(Level.SEVERE, "Error al registrar la Experiencia Educativa", e);

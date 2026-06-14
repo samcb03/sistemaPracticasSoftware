@@ -317,4 +317,30 @@ class SubjectDAOTest {
         assertThrows(OperationException.class,
             () -> subjectDAO.getEnrolledStudentsBySubject(EXPECTED_NRC));
     }
+
+    @Test
+    void isSectionTakenInPeriod_sectionAlreadyExists_returnsTrue() throws Exception {
+        mockQueryExecution();
+        when(resultSet.next()).thenReturn(true);
+        when(resultSet.getInt(1)).thenReturn(1);
+
+        assertTrue(subjectDAO.isSectionTakenInPeriod(SCHOOL_PERIOD_ID, "1"));
+    }
+
+    @Test
+    void isSectionTakenInPeriod_sectionNotTaken_returnsFalse() throws Exception {
+        mockQueryExecution();
+        when(resultSet.next()).thenReturn(true);
+        when(resultSet.getInt(1)).thenReturn(0);
+
+        assertFalse(subjectDAO.isSectionTakenInPeriod(SCHOOL_PERIOD_ID, "2"));
+    }
+
+    @Test
+    void isSectionTakenInPeriod_sqlError_throwsOperationException() throws Exception {
+        when(connectionManager.getConnection()).thenThrow(new SQLException(CONNECTION_ERROR));
+
+        assertThrows(OperationException.class,
+            () -> subjectDAO.isSectionTakenInPeriod(SCHOOL_PERIOD_ID, "1"));
+    }
 }
