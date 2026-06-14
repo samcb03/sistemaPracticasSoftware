@@ -1,6 +1,7 @@
 package daotest.test.java.testdao;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.anyInt;
@@ -40,6 +41,12 @@ class ReportDAOTest {
     private static final int REAL_HOURS = 8;
     private static final int REPORTED_HOURS = 40;
     private static final float CALIFICATION = 9.0f;
+
+    private static final int FIRST_COLUMN = 1;
+    private static final int FINAL_REPORT_TYPE_ID = 2;
+    private static final int NON_REPORT_TYPE_ID = 5;
+    private static final int REPORT_COUNT = 1;
+    private static final int NO_REPORT_COUNT = 0;
 
     private static final String CONNECTION_MANAGER_FIELD = "connectionManager";
     private static final String FIRST_DESCRIPTION = "Descripcion test 1";
@@ -354,5 +361,36 @@ class ReportDAOTest {
 
         assertThrows(OperationException.class,
             () -> reportDAO.evaluationReport(builderReport()));
+    }
+
+    @Test
+    void hasReportOfType_reportExists_returnsTrue() throws Exception {
+        mockQueryExecution();
+        when(resultSet.next()).thenReturn(true);
+        when(resultSet.getInt(FIRST_COLUMN)).thenReturn(REPORT_COUNT);
+
+        assertTrue(reportDAO.hasReportOfType(FIRST_STUDENT_ID, FINAL_REPORT_TYPE_ID));
+    }
+
+    @Test
+    void hasReportOfType_noReport_returnsFalse() throws Exception {
+        mockQueryExecution();
+        when(resultSet.next()).thenReturn(true);
+        when(resultSet.getInt(FIRST_COLUMN)).thenReturn(NO_REPORT_COUNT);
+
+        assertFalse(reportDAO.hasReportOfType(FIRST_STUDENT_ID, FINAL_REPORT_TYPE_ID));
+    }
+
+    @Test
+    void hasReportOfType_nonReportType_returnsFalse() throws Exception {
+        assertFalse(reportDAO.hasReportOfType(FIRST_STUDENT_ID, NON_REPORT_TYPE_ID));
+    }
+
+    @Test
+    void hasReportOfType_sqlError_throwsOperationException() throws Exception {
+        when(connectionManager.getConnection()).thenThrow(new SQLException(DATABASE_ERROR_MESSAGE));
+
+        assertThrows(OperationException.class,
+            () -> reportDAO.hasReportOfType(FIRST_STUDENT_ID, FINAL_REPORT_TYPE_ID));
     }
 }

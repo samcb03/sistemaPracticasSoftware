@@ -26,6 +26,8 @@ public class ExpedientDAO implements IExpedientDAO {
 
     private static final int MONTHLY_REPORT_DOCUMENT_TYPE_ID = 3;
     private static final int FINAL_REPORT_DOCUMENT_TYPE_ID = 2;
+    private static final int FIRST_INITIAL_DOCUMENT_TYPE_ID = 5;
+    private static final int NO_MISSING_INITIAL_DOCUMENTS = 0;
 
     private MySQLConnectionManager connectionManager;
     public ExpedientDAO() {
@@ -241,6 +243,37 @@ public class ExpedientDAO implements IExpedientDAO {
             throw new OperationException("Error al verificar el reporte final. Intente más tarde", e);
         }
         return isValidated;
+    }
+
+    @Override
+    public boolean areInitialDocumentsValidated(String idStudent) throws OperationException {
+        boolean areValidated = false;
+        String expedientQuery = "SELECT COUNT(*) AS documentosFaltantes "
+                              + "FROM Tipo_Documento td "
+                              + "WHERE td.idTipoDocumento >= ? "
+                              + "AND NOT EXISTS ("
+                              + "SELECT 1 FROM expediente e "
+                              + "WHERE e.matricula = ? "
+                              + "AND e.idTipoDocumento = td.idTipoDocumento "
+                              + "AND e.estaValidado = TRUE)";
+
+        try (Connection databaseConnection = connectionManager.getConnection();
+            PreparedStatement preparedStatement = databaseConnection.prepareStatement(expedientQuery)) {
+
+            preparedStatement.setInt(1, FIRST_INITIAL_DOCUMENT_TYPE_ID);
+            preparedStatement.setString(2, idStudent);
+
+            try (ResultSet resultSet = preparedStatement.executeQuery()) {
+                if (resultSet.next()) {
+                    int missingDocuments = resultSet.getInt("documentosFaltantes");
+                    areValidated = missingDocuments == NO_MISSING_INITIAL_DOCUMENTS;
+                }
+            }
+        } catch (SQLException e) {
+            LOGGER.log(Level.SEVERE, "Error al verificar la validación de los documentos iniciales", e);
+            throw new OperationException("Error al verificar los documentos iniciales. Intente más tarde", e);
+        }
+        return areValidated;
     }
 
     private Expedient buildExpedientFromResultSet(ResultSet resultSet) throws SQLException {

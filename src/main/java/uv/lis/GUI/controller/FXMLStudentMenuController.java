@@ -18,6 +18,8 @@ import uv.lis.logic.utils.SessionManager;
 public class FXMLStudentMenuController extends ValidationHandler {
 
     private static final String NO_SUBJECT_MESSAGE = "No tiene asignada una experiencia";
+    private static final String PENDING_DOCUMENTS_MESSAGE = 
+        "Debe subir sus documentos iniciales y esperar a que el profesor los valide";
 
     @FXML private Button buttonRequestProject;
     @FXML private Button buttonReports;
@@ -36,14 +38,15 @@ public class FXMLStudentMenuController extends ValidationHandler {
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         this.student = SessionManager.getInstance().getCurrentStudent();
+        setupControls(labelMessage, buttonLogOut);
         try {
             disableActionsWithoutAssignedSubject();
             disableActionsWithoutAssignedProject();
+            disableActionsWithoutValidatedDocuments();
             checkFinalReportValidation();
         } catch (OperationException e) {
             showError(e.getMessage());
         }
-        setupControls(labelMessage, buttonLogOut);
     }
 
     @FXML
@@ -70,7 +73,6 @@ public class FXMLStudentMenuController extends ValidationHandler {
         if (!studentDAO.hasProjectAssigned(studentId)) {
             buttonReports.setDisable(true);
             buttonRegisterActivity.setDisable(true);
-            buttonUploadDocuments.setDisable(true);
         }
     }
 
@@ -89,6 +91,14 @@ public class FXMLStudentMenuController extends ValidationHandler {
         } catch (OperationException e) {
             buttonAutoevaluation.setDisable(true);
             showError("No se pudo verificar el estado del reporte final. Intente más tarde.");
+        }
+    }
+
+    private void disableActionsWithoutValidatedDocuments() throws OperationException {
+        if (!expedientDAO.areInitialDocumentsValidated(student.getIdStudent())) {
+            buttonReports.setDisable(true);
+            buttonRegisterActivity.setDisable(true);
+            showError(PENDING_DOCUMENTS_MESSAGE);
         }
     }
  

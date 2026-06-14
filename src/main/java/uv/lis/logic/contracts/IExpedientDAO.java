@@ -84,4 +84,13 @@ public interface IExpedientDAO {
      * @throws OperationException if the verification cannot be completed
      */
     boolean isFinalReportValidated(String idStudent) throws OperationException;
+
+    /**
+     * Indicates whether every initial document of a student has been validated.
+     *
+     * @param idStudent the identifier of the student to verify
+     * @return true if all the initial documents exist and are validated, false otherwise
+     * @throws OperationException if the verification cannot be completed
+     */
+    boolean areInitialDocumentsValidated(String idStudent) throws OperationException;
 }
