@@ -19,7 +19,7 @@ import net.sf.jasperreports.view.JasperViewer;
 import uv.lis.GUI.ValidationHandler;
 import uv.lis.logic.common.AutoevaluationCommon;
 import uv.lis.logic.dao.AutoevaluationDAO;
-import uv.lis.logic.dao.ReportContextDAO;
+import uv.lis.logic.dao.ExpedientDAO;
 import uv.lis.logic.dto.Autoevaluation;
 import uv.lis.logic.dto.Student;
 import uv.lis.logic.exceptions.OperationException;
@@ -92,14 +92,15 @@ public class FXMLGenerateAutoevaluationController extends ValidationHandler {
     private ToggleGroup[] groups;
     private AutoevaluationCommon autoevaluationCommon;
     private AutoevaluationDAO autoevaluationDAO;
-    private ReportContextDAO reportContextDAO;
+    private ExpedientDAO expedientDAO;
+
     private Student currentStudent;
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         autoevaluationCommon = new AutoevaluationCommon();
         autoevaluationDAO = new AutoevaluationDAO();
-        reportContextDAO = new ReportContextDAO();
+        expedientDAO = new ExpedientDAO();
         currentStudent = SessionManager.getInstance().getCurrentStudent();
         setupControls(labelMessage, buttonBack);
         setupToggleGroups();
@@ -136,7 +137,7 @@ public class FXMLGenerateAutoevaluationController extends ValidationHandler {
             labelStudentId.setText(currentStudent.getIdStudent());
 
             try {
-                boolean hasFinalReport = reportContextDAO.hasGeneratedFinalReport(currentStudent.getIdStudent());
+                boolean hasFinalReport = expedientDAO.isFinalReportValidated(currentStudent.getIdStudent());
 
                 if(!hasFinalReport) {
                     showError("Debes entregar el reporte final antes de realizar la autoevaluación.");

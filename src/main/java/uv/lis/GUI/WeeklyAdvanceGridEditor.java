@@ -170,7 +170,7 @@ public class WeeklyAdvanceGridEditor {
         }
         return cell;
     }
-    //FIXME verificar ese comentario y ver si es valido :c
+    //FIXME verificar ese comentario y ver si es valido
     private Optional<Integer> parseCellValue(String rawValue) {
         Optional<Integer> value = Optional.empty();
 
@@ -178,8 +178,8 @@ public class WeeklyAdvanceGridEditor {
             try {
                 value = Optional.of(Integer.parseInt(rawValue.trim()));
             } catch (NumberFormatException numberFormatException) {
-                // Non-numeric input is already reported to the user in validateColumn;
-                // here an unparseable cell is treated as a cell with no value.
+                /* Non-numeric input is already reported to the user in validateColumn;
+                   here an unparseable cell is treated as a cell with no value. */
                 value = Optional.empty();
             }
         }
