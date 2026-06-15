@@ -301,28 +301,33 @@ public class FXMLManageAffiliatedOrganizationController extends ValidationHandle
     private void setupAutocomplete() {
         textFieldOrganizationName.textProperty().addListener(
             (observable, oldValue, newValue) -> handleAutocompleteChange(newValue));
+        textFieldOrganizationName.focusedProperty().addListener(
+            (observable, wasFocused, isFocused) -> handleFocusChange(isFocused));
+    }
+
+    private void handleFocusChange(boolean isFocused) {
+        if (isFocused) {
+            handleAutocompleteChange(textFieldOrganizationName.getText());
+        }
     }
 
     private void handleAutocompleteChange(String newValue) {
         contextMenuSuggestions.getItems().clear();
+        String searchValue = newValue == null ? "" : newValue.trim();
 
-        if (newValue == null || newValue.trim().isEmpty()) {
-            contextMenuSuggestions.hide();
-        } else {
-            try {
-                ArrayList<String> matches = affiliatedOrganizationDAO
-                    .searchActiveOrganizationsByNamePrefix(newValue.trim());
+        try {
+            ArrayList<String> matches = affiliatedOrganizationDAO
+                .searchActiveOrganizationsByNamePrefix(searchValue);
 
-                if (matches.isEmpty()) {
-                    contextMenuSuggestions.hide();
-                } else {
-                    populateSuggestions(matches);
-                    contextMenuSuggestions.show(textFieldOrganizationName, Side.BOTTOM, 0, 0);
-                }
-            } catch (OperationException e) {
-                LOGGER.log(Level.WARNING, "Error en autocompletado", e);
+            if (matches.isEmpty()) {
                 contextMenuSuggestions.hide();
+            } else {
+                populateSuggestions(matches);
+                contextMenuSuggestions.show(textFieldOrganizationName, Side.BOTTOM, 0, 0);
             }
+        } catch (OperationException e) {
+            LOGGER.log(Level.WARNING, "Error en autocompletado", e);
+            contextMenuSuggestions.hide();
         }
     }
 

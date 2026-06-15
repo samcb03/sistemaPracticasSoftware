@@ -21,6 +21,7 @@ public class AffiliatedOrganizationDAO implements IAffiliatedOrganizationDAO {
 
     private static final Logger LOGGER = Logger.getLogger(AffiliatedOrganizationDAO.class.getName());
     private static final int INACTIVE_STATE = 0;
+    private static final int ACTIVE_STATE = 1;
 
     private MySQLConnectionManager connectionManager;
 
@@ -67,8 +68,8 @@ public class AffiliatedOrganizationDAO implements IAffiliatedOrganizationDAO {
         String affiliatedOrganizationQuery = "INSERT INTO OrganizacionVinculada (nombreOV, "
                                            + "ciudad, estado, calle, numeroDomicilio, codigoPostal, "
                                            + "sector, correo, telefono, numUsuariosIndirectos, "
-                                           + "numUsuariosDirectos) "
-                                           + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);";
+                                           + "numUsuariosDirectos, estadoEnBD) "
+                                           + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);";
 
         try (Connection databaseConnection = connectionManager.getConnection();
             PreparedStatement preparedStatement = databaseConnection.prepareStatement(
@@ -85,6 +86,7 @@ public class AffiliatedOrganizationDAO implements IAffiliatedOrganizationDAO {
             preparedStatement.setString(9, affiliatedOrganization.getPhoneNumber());
             preparedStatement.setInt(10, affiliatedOrganization.getNumberOfIndirectUsers());
             preparedStatement.setInt(11, affiliatedOrganization.getNumberOfDirectUsers());
+            preparedStatement.setInt(12, ACTIVE_STATE);
 
             if (preparedStatement.executeUpdate() > NO_ROWS_AFFECTED) {
                 try (ResultSet generatedKeys = preparedStatement.getGeneratedKeys()) {

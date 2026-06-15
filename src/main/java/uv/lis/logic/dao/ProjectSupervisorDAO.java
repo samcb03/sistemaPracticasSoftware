@@ -203,7 +203,7 @@ public class ProjectSupervisorDAO implements IProjectSupervisorDAO {
     @Override
     public ArrayList<String> searchProjectSupervisorName(String supervisorName) throws OperationException {
         ArrayList<String> projectSupervisorNames = new ArrayList<>();
-        String supervisorQuery = "SELECT nombre FROM ResponsableProyecto WHERE nombre LIKE ? ";
+        String supervisorQuery = "SELECT nombre FROM ResponsableProyecto WHERE nombre LIKE ? LIMIT 10";
 
         try (Connection databaseConnection = connectionManager.getConnection();
             PreparedStatement preparedStatement = databaseConnection.prepareStatement(supervisorQuery)) {

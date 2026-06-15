@@ -234,29 +234,34 @@ public class FXMLManageProfessorController extends ValidationHandler {
     private void setupAutocomplete() {
         textFieldProfessorPersonnelNumber.textProperty().addListener(
             (observable, oldValue, newValue) -> handleAutocompleteChange(newValue));
+        textFieldProfessorPersonnelNumber.focusedProperty().addListener(
+            (observable, wasFocused, isFocused) -> handleFocusChange(isFocused));
+    }
+
+    private void handleFocusChange(boolean isFocused) {
+        if (isFocused) {
+            handleAutocompleteChange(textFieldProfessorPersonnelNumber.getText());
+        }
     }
 
     private void handleAutocompleteChange(String newValue) {
         contextMenuSuggestions.getItems().clear();
+        String searchValue = newValue == null ? "" : newValue.trim();
 
-        if (newValue == null || newValue.trim().isEmpty()) {
-            contextMenuSuggestions.hide();
-        } else {
-            try {
-                ArrayList<String> matches = professorDAO.searchProfessorPersonalNumbers(newValue.trim());
+        try {
+            ArrayList<String> matches = professorDAO.searchProfessorPersonalNumbers(searchValue);
 
-                if (matches.isEmpty()) {
-                    contextMenuSuggestions.hide();
-                } else {
-                    populateSuggestions(matches);
-                    contextMenuSuggestions.show(
-                        textFieldProfessorPersonnelNumber, Side.BOTTOM, 0, 0);
-                }
-            } catch (OperationException operationException) {
-                LOGGER.log(Level.WARNING, "Error al cargar sugerencias", operationException);
-                showError(operationException.getMessage());
+            if (matches.isEmpty()) {
                 contextMenuSuggestions.hide();
+            } else {
+                populateSuggestions(matches);
+                contextMenuSuggestions.show(
+                    textFieldProfessorPersonnelNumber, Side.BOTTOM, 0, 0);
             }
+        } catch (OperationException operationException) {
+            LOGGER.log(Level.WARNING, "Error al cargar sugerencias", operationException);
+            showError(operationException.getMessage());
+            contextMenuSuggestions.hide();
         }
     }
 

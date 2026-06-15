@@ -279,28 +279,33 @@ public class FXMLManageStudentController extends ValidationHandler {
     private void setupAutocomplete() {
         textFieldStudentId.textProperty().addListener((observable, oldValue, newValue)
             -> handleAutocompleteChange(newValue));
+        textFieldStudentId.focusedProperty().addListener((observable, wasFocused, isFocused)
+            -> handleFocusChange(isFocused));
+    }
+
+    private void handleFocusChange(boolean isFocused) {
+        if (isFocused) {
+            handleAutocompleteChange(textFieldStudentId.getText());
+        }
     }
 
     private void handleAutocompleteChange(String newValue) {
         contextMenuSuggestions.getItems().clear();
+        String searchValue = newValue == null ? "" : newValue.trim();
 
-        if (newValue == null || newValue.trim().isEmpty()) {
-            contextMenuSuggestions.hide();
-        } else {
-            try {
-                ArrayList<String> matches = studentDAO.searchStudentIds(newValue.trim());
+        try {
+            ArrayList<String> matches = studentDAO.searchStudentIds(searchValue);
 
-                if (matches.isEmpty()) {
-                    contextMenuSuggestions.hide();
-                } else {
-                    populateSuggestions(matches);
-                    contextMenuSuggestions.show(textFieldStudentId, Side.BOTTOM, 0, 0);
-                }
-            } catch (OperationException operationException) {
-                LOGGER.log(Level.WARNING, "Error al cargar sugerencias", operationException);
-                showError(operationException.getMessage());
+            if (matches.isEmpty()) {
                 contextMenuSuggestions.hide();
+            } else {
+                populateSuggestions(matches);
+                contextMenuSuggestions.show(textFieldStudentId, Side.BOTTOM, 0, 0);
             }
+        } catch (OperationException operationException) {
+            LOGGER.log(Level.WARNING, "Error al cargar sugerencias", operationException);
+            showError(operationException.getMessage());
+            contextMenuSuggestions.hide();
         }
     }
 
