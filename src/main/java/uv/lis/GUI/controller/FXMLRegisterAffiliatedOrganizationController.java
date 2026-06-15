@@ -4,6 +4,8 @@ import static uv.lis.logic.utils.InputValidator.validateEmail;
 import static uv.lis.logic.utils.InputValidator.validateText;
 import static uv.lis.logic.utils.InputValidator.validatePhoneNumber;
 import static uv.lis.logic.utils.InputValidator.validatePositiveInteger;
+import static uv.lis.logic.utils.InputValidator.validatePostalCode;
+import static uv.lis.logic.utils.InputValidator.validateStreet;
 
 import java.net.URL;
 import java.util.Optional;
@@ -28,6 +30,9 @@ public class FXMLRegisterAffiliatedOrganizationController extends ValidationHand
     @FXML private TextField textFieldCity;
     @FXML private TextField textFieldState;
     @FXML private TextField textFieldSector;
+    @FXML private TextField textFieldStreet;
+    @FXML private TextField textFieldStreetNumber;
+    @FXML private TextField textFieldPostalCode;
     @FXML private TextField textFieldEmail;
     @FXML private TextField textFieldPhoneNumber;
     @FXML private TextField textFieldNumberOfDirectUsers;
@@ -53,6 +58,9 @@ public class FXMLRegisterAffiliatedOrganizationController extends ValidationHand
             validateText(textFieldCity.getText(), "La ciudad"),
             validateText(textFieldState.getText(), "El estado"),
             validateText(textFieldSector.getText(), "El sector"),
+            validateStreet(textFieldStreet.getText(), "La calle"),
+            validatePositiveInteger(textFieldStreetNumber.getText().trim(), "El número de calle"),
+            validatePostalCode(textFieldPostalCode.getText(), "El código postal"),
             validateEmail(textFieldEmail.getText().trim(), "El correo electrónico"),
             validatePhoneNumber(textFieldPhoneNumber.getText().trim(), "El número de teléfono"),
             validatePositiveInteger(textFieldNumberOfDirectUsers.getText().trim(), 
@@ -87,6 +95,9 @@ public class FXMLRegisterAffiliatedOrganizationController extends ValidationHand
         organization.setName(textFieldName.getText().trim());
         organization.setCity(textFieldCity.getText().trim());
         organization.setState(textFieldState.getText().trim());
+        organization.setStreet(textFieldStreet.getText().trim());
+        organization.setPostalCode(textFieldPostalCode.getText().trim());
+        organization.setStreetNumber(textFieldStreetNumber.getText().trim());
         organization.setSector(textFieldSector.getText().trim());
         organization.setEmail(textFieldEmail.getText().trim());
         organization.setPhoneNumber(textFieldPhoneNumber.getText().trim());
@@ -101,6 +112,9 @@ public class FXMLRegisterAffiliatedOrganizationController extends ValidationHand
         textFieldCity.clear();
         textFieldState.clear();
         textFieldSector.clear();
+        textFieldStreet.clear();
+        textFieldStreetNumber.clear();
+        textFieldPostalCode.clear();
         textFieldEmail.clear();
         textFieldPhoneNumber.clear();
         textFieldNumberOfDirectUsers.clear();
