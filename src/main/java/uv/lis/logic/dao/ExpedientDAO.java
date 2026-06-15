@@ -1,6 +1,8 @@
 package uv.lis.logic.dao;
 
 import static uv.lis.logic.utils.InputValidator.NO_ROWS_AFFECTED;
+import static uv.lis.logic.utils.InputValidator.STATUS_ASSIGNED;
+import static uv.lis.logic.utils.InputValidator.STATUS_REQUESTED;
 
 import java.io.File;
 import java.sql.Connection;
@@ -176,10 +178,12 @@ public class ExpedientDAO implements IExpedientDAO {
     public List<Expedient> getDocumentsByStudentId(String idStudent) throws OperationException {
         List<Expedient> studentDocuments = new ArrayList<>();
         String expedientQuery = "SELECT e.idExpediente, e.nombre, td.nombreTipoDocumento, e.url, "
-                              + "e.matricula, e.idTipoDocumento, e.estaValidado "
+                              + "e.matricula, e.idTipoDocumento, e.idEstatus, ed.estatus "
                               + "FROM expediente e "
                               + "INNER JOIN Tipo_Documento td "
                               + "ON e.idTipoDocumento = td.idTipoDocumento "
+                              + "INNER JOIN EstatusDocumento ed "
+                              + "ON e.idEstatus = ed.idEstatus "
                               + "WHERE e.matricula = ?";
     
         try (Connection databaseConnection = connectionManager.getConnection();
@@ -202,21 +206,21 @@ public class ExpedientDAO implements IExpedientDAO {
     }
 
     @Override
-    public boolean updateValidationStatus(int idExpedient, boolean isValidated) throws OperationException {
+    public boolean updateDocumentStatus(int idExpedient, int idStatus) throws OperationException {
         boolean isUpdated = false;
-        String expedientQuery = "UPDATE expediente SET estaValidado = ? WHERE idExpediente = ?";
-    
+        String expedientQuery = "UPDATE expediente SET idEstatus = ? WHERE idExpediente = ?";
+
         try (Connection databaseConnection = connectionManager.getConnection();
             PreparedStatement preparedStatement = databaseConnection.prepareStatement(expedientQuery)) {
-    
-            preparedStatement.setBoolean(1, isValidated);
+
+            preparedStatement.setInt(1, idStatus);
             preparedStatement.setInt(2, idExpedient);
-    
+
             int affectedRows = preparedStatement.executeUpdate();
             isUpdated = affectedRows > NO_ROWS_AFFECTED;
         } catch (SQLException e) {
-            LOGGER.log(Level.SEVERE, "Error al actualizar el estado de validación del documento", e);
-            throw new OperationException("No se pudo actualizar el estado del documento. Intente más tarde", e);
+            LOGGER.log(Level.SEVERE, "Error al actualizar el estatus del documento", e);
+            throw new OperationException("No se pudo actualizar el estatus del documento. Intente más tarde", e);
         }
         return isUpdated;
     }
@@ -224,7 +228,7 @@ public class ExpedientDAO implements IExpedientDAO {
     @Override
     public boolean isFinalReportValidated(String idStudent) throws OperationException {
         boolean isValidated = false;
-        String expedientQuery = "SELECT estaValidado FROM expediente "
+        String expedientQuery = "SELECT idEstatus FROM expediente "
                               + "WHERE matricula = ? AND idTipoDocumento = ? LIMIT 1";
  
         try (Connection databaseConnection = connectionManager.getConnection();
@@ -235,7 +239,7 @@ public class ExpedientDAO implements IExpedientDAO {
  
             try (ResultSet resultSet = preparedStatement.executeQuery()) {
                 if (resultSet.next()) {
-                    isValidated = resultSet.getBoolean("estaValidado");
+                    isValidated = resultSet.getInt("idEstatus") == STATUS_ASSIGNED;
                 }
             }
         } catch (SQLException e) {
@@ -255,13 +259,14 @@ public class ExpedientDAO implements IExpedientDAO {
                               + "SELECT 1 FROM expediente e "
                               + "WHERE e.matricula = ? "
                               + "AND e.idTipoDocumento = td.idTipoDocumento "
-                              + "AND e.estaValidado = TRUE)";
+                              + "AND e.idEstatus = ?)";
 
         try (Connection databaseConnection = connectionManager.getConnection();
             PreparedStatement preparedStatement = databaseConnection.prepareStatement(expedientQuery)) {
 
             preparedStatement.setInt(1, FIRST_INITIAL_DOCUMENT_TYPE_ID);
             preparedStatement.setString(2, idStudent);
+            preparedStatement.setInt(3, STATUS_ASSIGNED);
 
             try (ResultSet resultSet = preparedStatement.executeQuery()) {
                 if (resultSet.next()) {
@@ -276,6 +281,31 @@ public class ExpedientDAO implements IExpedientDAO {
         return areValidated;
     }
 
+    @Override
+    public boolean isDocumentTypeValidated(String idStudent, int idTypeDocument) throws OperationException {
+        boolean isValidated = false;
+        String expedientQuery = "SELECT COUNT(*) FROM expediente "
+                              + "WHERE matricula = ? AND idTipoDocumento = ? AND idEstatus = ?";
+
+        try (Connection databaseConnection = connectionManager.getConnection();
+            PreparedStatement preparedStatement = databaseConnection.prepareStatement(expedientQuery)) {
+
+            preparedStatement.setString(1, idStudent);
+            preparedStatement.setInt(2, idTypeDocument);
+            preparedStatement.setInt(3, STATUS_ASSIGNED);
+
+            try (ResultSet resultSet = preparedStatement.executeQuery()) {
+                if (resultSet.next()) {
+                    isValidated = resultSet.getInt(1) > 0;
+                }
+            }
+        } catch (SQLException e) {
+            LOGGER.log(Level.SEVERE, "Error al verificar si el documento ya está validado", e);
+            throw new OperationException("Error al verificar el estatus del documento. Intente más tarde", e);
+        }
+        return isValidated;
+    }
+
     private Expedient buildExpedientFromResultSet(ResultSet resultSet) throws SQLException {
         Expedient expedient = new Expedient(
             resultSet.getString("nombre"),
@@ -285,7 +315,8 @@ public class ExpedientDAO implements IExpedientDAO {
             resultSet.getInt("idTipoDocumento")
         );
         expedient.setId(resultSet.getInt("idExpediente"));
-        expedient.setIsValidated(resultSet.getBoolean("estaValidado"));
+        expedient.setIdStatus(resultSet.getInt("idEstatus"));
+        expedient.setStatusName(resultSet.getString("estatus"));
         return expedient;
     }
 
@@ -314,7 +345,7 @@ public class ExpedientDAO implements IExpedientDAO {
 
     private boolean replaceDocument(Expedient expedient) throws OperationException {
         boolean isReplaced = false;
-        String expedientQuery = "UPDATE expediente SET nombre = ?, url = ?, estaValidado = ? "
+        String expedientQuery = "UPDATE expediente SET nombre = ?, url = ?, idEstatus = ? "
                               + "WHERE matricula = ? AND idTipoDocumento = ?";
 
         try (Connection databaseConnection = connectionManager.getConnection();
@@ -322,7 +353,7 @@ public class ExpedientDAO implements IExpedientDAO {
 
             preparedStatement.setString(1, expedient.getName());
             preparedStatement.setString(2, expedient.getUrl());
-            preparedStatement.setBoolean(3, false);
+            preparedStatement.setInt(3, STATUS_REQUESTED);
             preparedStatement.setString(4, expedient.getIdStudent());
             preparedStatement.setInt(5, expedient.getIdTypeDocument());
 

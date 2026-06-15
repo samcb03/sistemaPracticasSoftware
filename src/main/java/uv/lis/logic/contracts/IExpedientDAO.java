@@ -67,14 +67,14 @@ public interface IExpedientDAO {
     List<Expedient> getDocumentsByStudentId(String idStudent) throws OperationException;
 
     /**
-     * Updates the validation status of an expedient document.
+     * Updates the status of an expedient document.
      *
      * @param idExpedient the identifier of the expedient document to update
-     * @param isValidated the new validation status of the document
+     * @param idStatus the new status identifier from the document status catalog
      * @return true if the status was updated, false otherwise
      * @throws OperationException if the status cannot be updated
      */
-    boolean updateValidationStatus(int idExpedient, boolean isValidated) throws OperationException;
+    boolean updateDocumentStatus(int idExpedient, int idStatus) throws OperationException;
 
     /**
      * Indicates whether a student's final report has been validated by the professor.
@@ -93,4 +93,14 @@ public interface IExpedientDAO {
      * @throws OperationException if the verification cannot be completed
      */
     boolean areInitialDocumentsValidated(String idStudent) throws OperationException;
+
+    /**
+     * Indicates whether a student already has a validated document of a given type.
+     *
+     * @param idStudent the identifier of the student to verify
+     * @param idTypeDocument the document type identifier to verify
+     * @return true if a validated document of that type exists, false otherwise
+     * @throws OperationException if the verification cannot be completed
+     */
+    boolean isDocumentTypeValidated(String idStudent, int idTypeDocument) throws OperationException;
 }

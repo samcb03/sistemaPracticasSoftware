@@ -10,6 +10,10 @@ import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 
+import static uv.lis.logic.utils.InputValidator.STATUS_REQUESTED;
+import static uv.lis.logic.utils.InputValidator.STATUS_REJECTED;
+import static uv.lis.logic.utils.InputValidator.STATUS_ASSIGNED;
+
 import java.lang.reflect.Field;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -35,6 +39,8 @@ class ExpedientDAOTest {
     private static final int NO_ROWS_AFFECTED = 0;
     private static final int DOCUMENT_TYPE_ID = 3;
     private static final int MINUS_ONE = -1;
+
+    private static final String STATUS_PENDING_NAME = "Pendiente";
 
     private static final String STUDENT_ID = "S23013127";
     private static final String DOCUMENT_NAME = "documento.pdf";
@@ -78,11 +84,12 @@ class ExpedientDAOTest {
         when(resultSet.next()).thenReturn(true, false);
         when(resultSet.getInt("idExpediente")).thenReturn(FIRST_EXPEDIENT_ID);
         when(resultSet.getString("nombre")).thenReturn(DOCUMENT_NAME);
-        when(resultSet.getString("tipoDocumento")).thenReturn(DOCUMENT_TYPE);
+        when(resultSet.getString("nombreTipoDocumento")).thenReturn(DOCUMENT_TYPE);
         when(resultSet.getString("url")).thenReturn(DOCUMENT_URL);
         when(resultSet.getString("matricula")).thenReturn(STUDENT_ID);
         when(resultSet.getInt("idTipoDocumento")).thenReturn(DOCUMENT_TYPE_ID);
-        when(resultSet.getBoolean("estaValidado")).thenReturn(false);
+        when(resultSet.getInt("idEstatus")).thenReturn(STATUS_REQUESTED);
+        when(resultSet.getString("estatus")).thenReturn(STATUS_PENDING_NAME);
     }
 
     private Expedient builderExpedient() {
@@ -186,27 +193,35 @@ class ExpedientDAOTest {
     }
 
     @Test
-    void updateValidationStatus_successful_returnsTrue() throws Exception {
+    void updateDocumentStatus_validateSuccessful_returnsTrue() throws Exception {
         mockQueryExecution();
         when(preparedStatement.executeUpdate()).thenReturn(ROWS_AFFECTED);
 
-        assertTrue(expedientDAO.updateValidationStatus(EXPEDIENT_ID, true));
+        assertTrue(expedientDAO.updateDocumentStatus(EXPEDIENT_ID, STATUS_ASSIGNED));
     }
 
     @Test
-    void updateValidationStatus_noRowsAffected_returnsFalse() throws Exception {
+    void updateDocumentStatus_rejectSuccessful_returnsTrue() throws Exception {
+        mockQueryExecution();
+        when(preparedStatement.executeUpdate()).thenReturn(ROWS_AFFECTED);
+
+        assertTrue(expedientDAO.updateDocumentStatus(EXPEDIENT_ID, STATUS_REJECTED));
+    }
+
+    @Test
+    void updateDocumentStatus_noRowsAffected_returnsFalse() throws Exception {
         mockQueryExecution();
         when(preparedStatement.executeUpdate()).thenReturn(NO_ROWS_AFFECTED);
 
-        assertFalse(expedientDAO.updateValidationStatus(EXPEDIENT_ID, true));
+        assertFalse(expedientDAO.updateDocumentStatus(EXPEDIENT_ID, STATUS_ASSIGNED));
     }
 
     @Test
-    void updateValidationStatus_sqlError_throwsOperationException() throws Exception {
+    void updateDocumentStatus_sqlError_throwsOperationException() throws Exception {
         when(connectionManager.getConnection()).thenThrow(new SQLException(DATABASE_ERROR_MESSAGE));
 
         assertThrows(OperationException.class,
-            () -> expedientDAO.updateValidationStatus(EXPEDIENT_ID, true));
+            () -> expedientDAO.updateDocumentStatus(EXPEDIENT_ID, STATUS_REJECTED));
     }
 
     @Test
@@ -237,7 +252,7 @@ class ExpedientDAOTest {
     void isFinalReportValidated_reportValidated_returnsTrue() throws Exception {
         mockQueryExecution();
         when(resultSet.next()).thenReturn(true);
-        when(resultSet.getBoolean("estaValidado")).thenReturn(true);
+        when(resultSet.getInt("idEstatus")).thenReturn(STATUS_ASSIGNED);
  
         assertTrue(expedientDAO.isFinalReportValidated(STUDENT_ID));
     }
@@ -246,7 +261,7 @@ class ExpedientDAOTest {
     void isFinalReportValidated_reportNotValidated_returnsFalse() throws Exception {
         mockQueryExecution();
         when(resultSet.next()).thenReturn(true);
-        when(resultSet.getBoolean("estaValidado")).thenReturn(false);
+        when(resultSet.getInt("idEstatus")).thenReturn(STATUS_REQUESTED);
  
         assertFalse(expedientDAO.isFinalReportValidated(STUDENT_ID));
     }
@@ -265,5 +280,31 @@ class ExpedientDAOTest {
  
         assertThrows(OperationException.class,
             () -> expedientDAO.isFinalReportValidated(STUDENT_ID));
+    }
+
+    @Test
+    void isDocumentTypeValidated_documentValidated_returnsTrue() throws Exception {
+        mockQueryExecution();
+        when(resultSet.next()).thenReturn(true);
+        when(resultSet.getInt(1)).thenReturn(ROWS_AFFECTED);
+
+        assertTrue(expedientDAO.isDocumentTypeValidated(STUDENT_ID, DOCUMENT_TYPE_ID));
+    }
+
+    @Test
+    void isDocumentTypeValidated_documentNotValidated_returnsFalse() throws Exception {
+        mockQueryExecution();
+        when(resultSet.next()).thenReturn(true);
+        when(resultSet.getInt(1)).thenReturn(NO_ROWS_AFFECTED);
+
+        assertFalse(expedientDAO.isDocumentTypeValidated(STUDENT_ID, DOCUMENT_TYPE_ID));
+    }
+
+    @Test
+    void isDocumentTypeValidated_sqlError_throwsOperationException() throws Exception {
+        when(connectionManager.getConnection()).thenThrow(new SQLException(DATABASE_ERROR_MESSAGE));
+
+        assertThrows(OperationException.class,
+            () -> expedientDAO.isDocumentTypeValidated(STUDENT_ID, DOCUMENT_TYPE_ID));
     }
 }
