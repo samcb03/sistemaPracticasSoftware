@@ -1,5 +1,8 @@
 package uv.lis.logic.dto;
 
+import static uv.lis.logic.utils.InputValidator.STATUS_ASSIGNED;
+import static uv.lis.logic.utils.InputValidator.STATUS_REQUESTED;
+
 import java.util.Objects;
 
 public class Expedient {
@@ -10,7 +13,8 @@ public class Expedient {
     private String url;
     private String idStudent;
     private int idTypeDocument;
-    private boolean isValidated;
+    private int idStatus;
+    private String statusName;
 
     public Expedient() {
     }
@@ -21,7 +25,7 @@ public class Expedient {
         this.url = url;
         this.idStudent = idStudent;
         this.idTypeDocument = idTypeDocument;
-        this.isValidated = false;
+        this.idStatus = STATUS_REQUESTED;
     }
 
     public int getId() {
@@ -72,12 +76,24 @@ public class Expedient {
         this.idTypeDocument = idTypeDocument;
     }
 
-    public boolean getIsValidated() {
-        return isValidated;
+    public int getIdStatus() {
+        return idStatus;
     }
 
-    public void setIsValidated(boolean isValidated) {
-        this.isValidated = isValidated;
+    public void setIdStatus(int idStatus) {
+        this.idStatus = idStatus;
+    }
+
+    public String getStatusName() {
+        return statusName;
+    }
+
+    public void setStatusName(String statusName) {
+        this.statusName = statusName;
+    }
+
+    public boolean isValidated() {
+        return idStatus == STATUS_ASSIGNED;
     }
 
     @Override

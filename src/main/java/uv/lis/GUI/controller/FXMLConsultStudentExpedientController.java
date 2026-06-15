@@ -1,5 +1,8 @@
 package uv.lis.GUI.controller;
 
+import static uv.lis.logic.utils.InputValidator.STATUS_ASSIGNED;
+import static uv.lis.logic.utils.InputValidator.STATUS_REJECTED;
+
 import java.awt.Desktop;
 import java.io.File;
 import java.io.IOException;
@@ -16,7 +19,6 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
-import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.TableColumn;
@@ -24,7 +26,7 @@ import javafx.scene.control.TableView;
 
 import uv.lis.GUI.ValidationHandler;
 import uv.lis.GUI.cell.ActionTableCell;
-import uv.lis.GUI.cell.ValidationTableCell;
+import uv.lis.GUI.cell.DocumentReviewTableCell;
 import uv.lis.logic.dao.ExpedientDAO;
 import uv.lis.logic.dto.Expedient;
 import uv.lis.logic.exceptions.OperationException;
@@ -44,8 +46,13 @@ public class FXMLConsultStudentExpedientController extends ValidationHandler {
     private static final int FIRST_INITIAL_DOCUMENT_TYPE_ID = 5;
 
     private static final String TOTAL_FORMAT = "Total: %d documento(s)";
-    private static final String VALIDATION_SUCCESS_MESSAGE = "Estado de validación actualizado correctamente";
-    private static final String VALIDATION_FAILURE_MESSAGE = "No se pudo actualizar el estado de validación";
+    private static final String REVIEW_SUCCESS_MESSAGE = "Estatus del documento actualizado correctamente";
+    private static final String REVIEW_FAILURE_MESSAGE = "No se pudo actualizar el estatus del documento";
+    private static final String CONFIRM_VALIDATE_MESSAGE = "¿Desea validar este documento?";
+    private static final String CONFIRM_REJECT_MESSAGE = "¿Desea rechazar este documento?";
+    private static final String CONFIRM_TITLE = "Confirmación";
+    private static final String ALREADY_VALIDATED_MESSAGE =
+        "El documento ya está validado y no puede cambiar de estado.";
 
     @FXML private Label labelStudentId;
     @FXML private Label labelTotal;
@@ -55,7 +62,8 @@ public class FXMLConsultStudentExpedientController extends ValidationHandler {
     @FXML private TableView<Expedient> tableViewArchives;
     @FXML private TableColumn<Expedient, String> columnName;
     @FXML private TableColumn<Expedient, String> columnDocumentType;
-    @FXML private TableColumn<Expedient, Void> columnValidated;
+    @FXML private TableColumn<Expedient, String> columnStatus;
+    @FXML private TableColumn<Expedient, Void> columnReview;
     @FXML private TableColumn<Expedient, Void> columnAction;
 
     private ExpedientDAO expedientDAO;
@@ -94,39 +102,62 @@ public class FXMLConsultStudentExpedientController extends ValidationHandler {
             -> new SimpleStringProperty(cellData.getValue().getName()));
         columnDocumentType.setCellValueFactory(cellData
             -> new SimpleStringProperty(cellData.getValue().getTypeDocument()));
-        columnValidated.setCellFactory(column
-            -> new ValidationTableCell(this::handleValidationToggle));
+        columnStatus.setCellValueFactory(cellData
+            -> new SimpleStringProperty(cellData.getValue().getStatusName()));
+        columnReview.setCellFactory(column
+            -> new DocumentReviewTableCell(this::reviewDocument));
         columnAction.setCellFactory(column
             -> new ActionTableCell(this::openDocument));
     }
 
-    private void handleValidationToggle(Expedient expedient, CheckBox checkBox) {
-        boolean newStatus = checkBox.isSelected();
-
-        try {
-            boolean isUpdated = expedientDAO.updateValidationStatus(expedient.getId(), newStatus);
-
-            if (!isUpdated) {
-                revertCheckBox(checkBox, newStatus, VALIDATION_FAILURE_MESSAGE);
-            } else {
-                confirmValidationChange(expedient, newStatus);
-            }
-        } catch (OperationException e) {
-            LOGGER.log(Level.SEVERE, "Error al actualizar el estado de validación del documento", e);
-            revertCheckBox(checkBox, newStatus, e.getMessage());
+    private void reviewDocument(Expedient expedient, int idStatus) {
+        if (expedient.isValidated()) {
+            showError(ALREADY_VALIDATED_MESSAGE);
+        } else {
+            confirmAndApplyReview(expedient, idStatus);
         }
     }
 
-    private void confirmValidationChange(Expedient expedient, boolean newStatus) {
-        expedient.setIsValidated(newStatus);
-        showSuccess(VALIDATION_SUCCESS_MESSAGE);
-        LOGGER.log(Level.INFO, "Documento con id {0} marcado como validado: {1}", 
-            new Object[] { expedient.getId(), newStatus });
+    private void confirmAndApplyReview(Expedient expedient, int idStatus) {
+        boolean isRejection = idStatus == STATUS_REJECTED;
+        String confirmationMessage = isRejection ? CONFIRM_REJECT_MESSAGE : CONFIRM_VALIDATE_MESSAGE;
+
+        if (showConfirmation(CONFIRM_TITLE, confirmationMessage)) {
+            applyReview(expedient, idStatus);
+        }
     }
 
-    private void revertCheckBox(CheckBox checkBox, boolean appliedStatus, String errorMessage) {
-        checkBox.setSelected(!appliedStatus);
-        showError(errorMessage);
+    private void applyReview(Expedient expedient, int idStatus) {
+        try {
+            boolean isUpdated = expedientDAO.updateDocumentStatus(expedient.getId(), idStatus);
+
+            if (isUpdated) {
+                confirmReviewChange(expedient, idStatus);
+            } else {
+                showError(REVIEW_FAILURE_MESSAGE);
+            }
+        } catch (OperationException e) {
+            LOGGER.log(Level.SEVERE, "Error al actualizar el estatus del documento", e);
+            showError(e.getMessage());
+        }
+    }
+
+    private void confirmReviewChange(Expedient expedient, int idStatus) {
+        expedient.setIdStatus(idStatus);
+        expedient.setStatusName(resolveStatusName(idStatus));
+        tableViewArchives.refresh();
+        showSuccess(REVIEW_SUCCESS_MESSAGE);
+        LOGGER.log(Level.INFO, "Documento con id {0} actualizado al estatus {1}",
+            new Object[] { expedient.getId(), idStatus });
+    }
+
+    private String resolveStatusName(int idStatus) {
+        String statusName = "Rechazado";
+
+        if (idStatus == STATUS_ASSIGNED) {
+            statusName = "Validado";
+        }
+        return statusName;
     }
 
     private void applyCurrentFilter() {
@@ -223,7 +254,8 @@ public class FXMLConsultStudentExpedientController extends ValidationHandler {
             LOGGER.log(Level.WARNING, "Ruta de documento inválida", illegalArgumentException);
             showError("La ruta del documento no es válida");
         } catch (UnsupportedOperationException unsupportedOperationException) {
-            LOGGER.log(Level.WARNING, "La acción de abrir documentos no está soportada", unsupportedOperationException);
+            LOGGER.log(Level.WARNING, "La acción de abrir documentos no está soportada",
+                unsupportedOperationException);
             showError("Esta acción no está soportada en el sistema");
         } catch (SecurityException securityException) {
             LOGGER.log(Level.WARNING, "Permisos insuficientes para abrir el documento", securityException);

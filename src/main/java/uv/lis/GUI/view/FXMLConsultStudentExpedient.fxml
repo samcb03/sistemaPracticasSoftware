@@ -46,10 +46,11 @@
 
                 <TableView fx:id="tableViewArchives" layoutX="25.0" layoutY="90.0" prefHeight="260.0" prefWidth="510.0">
                     <columns>
-                        <TableColumn fx:id="columnName" prefWidth="200.0" text="Nombre" />
-                        <TableColumn fx:id="columnDocumentType" prefWidth="150.0" text="Tipo de Documento" />
-                        <TableColumn fx:id="columnValidated" prefWidth="80.0" text="Validado" />
-                        <TableColumn fx:id="columnAction" prefWidth="80.0" text="Acción" />
+                        <TableColumn fx:id="columnName" prefWidth="109.5999755859375" text="Nombre" />
+                        <TableColumn fx:id="columnDocumentType" prefWidth="132.7999267578125" text="Tipo de Documento" />
+                        <TableColumn fx:id="columnStatus" prefWidth="89.60003662109375" text="Estado" />
+                        <TableColumn fx:id="columnReview" prefWidth="109.5999755859375" text="Revisión" />
+                        <TableColumn fx:id="columnAction" prefWidth="70.0" text="Acción" />
                     </columns>
                 </TableView>
 
