@@ -42,8 +42,8 @@ public class FXMLStudentMenuController extends ValidationHandler {
         try {
             disableActionsWithoutAssignedSubject();
             disableActionsWithoutAssignedProject();
-            disableActionsWithoutValidatedDocuments();
             checkFinalReportValidation();
+            disableActionsWithoutValidatedDocuments();
         } catch (OperationException e) {
             showError(e.getMessage());
         }

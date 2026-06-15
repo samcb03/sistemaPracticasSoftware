@@ -9,12 +9,13 @@ import java.util.ResourceBundle;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.control.Button;
+import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
-import javafx.scene.control.TextField;
 import javafx.stage.Stage;
 import net.sf.jasperreports.engine.JRException;
 import net.sf.jasperreports.engine.JasperPrint;
@@ -39,15 +40,11 @@ public class FXMLGenerateMonthlyReportController extends ValidationHandler {
     private static final String NO_STUDENT_IN_SESSION_MESSAGE = "No hay alumno en sesión";
     private static final String REPORT_GENERATED_MESSAGE = "Reporte generado correctamente.";
     private static final String REPORT_GENERATION_ERROR = "Error al generar el reporte.";
-    private static final String ACTIVITY_FIELD_LABEL = "Actividad ";
-    private static final String OBSERVATION_FIELD_LABEL = "Observación ";
     private static final String REPORT_VIEWER_TITLE = "Reporte Mensual";
     private static final String EMPTY_TEXT = "";
     private static final String REPORT_BLOCK = "7";
 
     private static final int MAX_ACTIVITY_INPUTS = 7;
-    private static final int INITIAL_REPORTED_HOURS = 0;
-    private static final int ROW_NUMBER_OFFSET = 1;
     private static final int MONTH_JANUARY = 1;
     private static final int MONTH_FEBRUARY = 2;
     private static final int MONTH_MARCH = 3;
@@ -60,8 +57,14 @@ public class FXMLGenerateMonthlyReportController extends ValidationHandler {
     private static final int MONTH_OCTOBER = 10;
     private static final int MONTH_NOVEMBER = 11;
     private static final int MONTH_DECEMBER = 12;
-    private static final int MONTH_UNKNOWN = 0;
+    private static final int MONTH_UNKNOWN = -1;
+    private static final int INITIAL_REPORTED_HOURS = 0;
     private static final int MAX_ACCUMULATED_HOURS = 420;
+
+    private static final List<String> MONTH_NAMES = List.of(
+        "enero", "febrero", "marzo", "abril", "mayo", "junio",
+        "julio", "agosto", "septiembre", "octubre", "noviembre", "diciembre"
+    );
 
     private static final Map<String, Integer> MONTH_NUMBERS_BY_NAME = Map.ofEntries(
         Map.entry("enero", MONTH_JANUARY),
@@ -82,7 +85,6 @@ public class FXMLGenerateMonthlyReportController extends ValidationHandler {
     @FXML private Label labelCoordinatorName;
     @FXML private Label labelProfessorName;
     @FXML private Label labelMessage;
-    @FXML private Label labelMonth;
     @FXML private Label labelReportedHours;
     @FXML private Label labelAccumulatedHours;
     @FXML private Label labelSection;
@@ -92,25 +94,24 @@ public class FXMLGenerateMonthlyReportController extends ValidationHandler {
     @FXML private Button buttonGenerate;
     @FXML private Button buttonRegisterActivity;
     @FXML private Button buttonBack;
+    @FXML private Label labelActivity1;
+    @FXML private Label labelActivity2;
+    @FXML private Label labelActivity3;
+    @FXML private Label labelActivity4;
+    @FXML private Label labelActivity5;
+    @FXML private Label labelActivity6;
+    @FXML private Label labelActivity7;
+    @FXML private Label labelObservation1;
+    @FXML private Label labelObservation2;
+    @FXML private Label labelObservation3;
+    @FXML private Label labelObservation4;
+    @FXML private Label labelObservation5;
+    @FXML private Label labelObservation6;
+    @FXML private Label labelObservation7;
+    @FXML private ComboBox<String> comboBoxMonth;
 
-    @FXML private TextField textFieldActivity1;
-    @FXML private TextField textFieldActivity2;
-    @FXML private TextField textFieldActivity3;
-    @FXML private TextField textFieldActivity4;
-    @FXML private TextField textFieldActivity5;
-    @FXML private TextField textFieldActivity6;
-    @FXML private TextField textFieldActivity7;
-
-    @FXML private TextField textFieldObservation1;
-    @FXML private TextField textFieldObservation2;
-    @FXML private TextField textFieldObservation3;
-    @FXML private TextField textFieldObservation4;
-    @FXML private TextField textFieldObservation5;
-    @FXML private TextField textFieldObservation6;
-    @FXML private TextField textFieldObservation7;
-
-    private TextField[] activityFields;
-    private TextField[] observationFields;
+    private Label[] activityFields;
+    private Label[] observationFields;
 
     private MonthlyReportCommon monthlyReportCommon;
     private Student currentStudent;
@@ -129,13 +130,26 @@ public class FXMLGenerateMonthlyReportController extends ValidationHandler {
         initializeFieldArrays();
         labelBlock.setText(REPORT_BLOCK);
         loadStudentData();
-        loadRegisteredActivities();
+
+        comboBoxMonth.setItems(FXCollections.observableArrayList(MONTH_NAMES));
+        comboBoxMonth.getSelectionModel().selectedItemProperty().addListener(
+            (obs, oldMonth, newMonth) -> {
+            if (newMonth != null) {
+                loadRegisteredActivities();
+            }
+        }
+        );
     }
 
     @FXML
     public void validateMonthlyReport() {
         String studentId = currentStudent.getIdStudent();
-        String currentMonth = labelMonth.getText();
+        Optional<String> selectedMonth = getSelectedMonth();
+
+        if (selectedMonth.isEmpty()) {
+            showError("Seleccione un mes antes de generar el reporte.");
+        } else {
+        String currentMonth = selectedMonth.get();
 
         String accumulatedText = labelAccumulatedHours.getText();
             if(!accumulatedText.isEmpty() && Integer.parseInt(accumulatedText) >= MAX_ACCUMULATED_HOURS) {
@@ -146,52 +160,30 @@ public class FXMLGenerateMonthlyReportController extends ValidationHandler {
             boolean duplicated = false;
                 try {
                     duplicated = reportContextDAO.hasReportAlreadyBeenGenerated(studentId, currentMonth);
+
+                    if (duplicated) {
+                        showError("Ya se ha generado un reporte para el mes de " + currentMonth);
+                    } else {
+                        generateMonthlyReport();
+                    }
                 } catch (OperationException e) {
                     showError("Error al verificar reporte mensual: " + e.getMessage());
                 }
-
-                if (duplicated) {
-                    showError("Ya se ha generado un reporte para el mes de " + currentMonth);
-                } else {
-                    Optional<String> validationError = validateFields();
-                    handleValidation(validationError, this::generateMonthlyReport);
             }
         }
     }
 
     private void initializeFieldArrays() {
-        activityFields = new TextField[] {
-            textFieldActivity1, textFieldActivity2, textFieldActivity3,
-            textFieldActivity4, textFieldActivity5, textFieldActivity6,
-            textFieldActivity7
+        activityFields = new Label[] {
+            labelActivity1, labelActivity2, labelActivity3,
+            labelActivity4, labelActivity5, labelActivity6,
+            labelActivity7
         };
-        observationFields = new TextField[] {
-            textFieldObservation1, textFieldObservation2, textFieldObservation3,
-            textFieldObservation4, textFieldObservation5, textFieldObservation6,
-            textFieldObservation7
+        observationFields = new Label[] {
+            labelObservation1, labelObservation2, labelObservation3,
+            labelObservation4, labelObservation5, labelObservation6,
+            labelObservation7
         };
-    }
-
-    private Optional<String> validateFields() {
-        Optional<String> validationResult = Optional.empty();
-
-        for (int i = 0; i < MAX_ACTIVITY_INPUTS && validationResult.isEmpty(); i++) {
-            validationResult = validateActivityRow(i);
-        }
-        return validationResult;
-    }
-
-    private Optional<String> validateActivityRow(int index) {
-        int rowNumber = index + ROW_NUMBER_OFFSET;
-        String activityText = activityFields[index].getText().trim();
-        String observationText = observationFields[index].getText().trim();
-
-        Optional<String> activityValidation = InputValidator.validateText(activityText, ACTIVITY_FIELD_LABEL 
-            + rowNumber);
-        Optional<String> observationValidation = InputValidator.validateText(
-            observationText, OBSERVATION_FIELD_LABEL + rowNumber);
-
-        return activityValidation.or(() -> observationValidation);
     }
 
     private void loadStudentData() {
@@ -217,7 +209,7 @@ public class FXMLGenerateMonthlyReportController extends ValidationHandler {
         try {
             MonthlyReport context = reportContextDAO.getMonthlyReportData(currentStudent.getIdStudent());
             
-            int month = convertMonthNameToNumber(context.getMonth());
+            int month = convertMonthNameToNumber(getSelectedMonth().get());
             int year = LocalDate.now().getYear(); 
 
             List<Activity> registered = reportContextDAO.getRecordedActivitiesByMonth(
@@ -247,7 +239,6 @@ public class FXMLGenerateMonthlyReportController extends ValidationHandler {
         labelStudentName.setText(context.getStudentName());
         labelCoordinatorName.setText(context.getCoordinatorName());
         labelProfessorName.setText(context.getProfessorName());
-        labelMonth.setText(context.getMonth());
         labelSection.setText(context.getSection());
         labelSubject.setText(context.getNrcSubject());
         labelNumberReport.setText(String.valueOf(context.getReportNumber()));
@@ -258,10 +249,11 @@ public class FXMLGenerateMonthlyReportController extends ValidationHandler {
         try {
             MonthlyReport context = reportContextDAO.getMonthlyReportData(currentStudent.getIdStudent());
 
-            int month = convertMonthNameToNumber(context.getMonth());
+            String selectedMonth = getSelectedMonth().get();
+            int month = convertMonthNameToNumber(selectedMonth);
             int year = LocalDate.now().getYear();
 
-            MonthlyReport report = buildReport();
+            MonthlyReport report = buildReport(getSelectedMonth().get());
             JasperPrint jasperPrint = monthlyReportCommon.generateMonthlyReport(report);
 
             int previousAccumulated = advanceDAO.getAccumulatedHoursByProject(context.getIdProject());
@@ -300,10 +292,11 @@ public class FXMLGenerateMonthlyReportController extends ValidationHandler {
         viewer.setVisible(true);
     }
 
-    private MonthlyReport buildReport() {
+    private MonthlyReport buildReport(String selectedMonth) {
         MonthlyReport report = new MonthlyReport();
         report.setStudentName(currentStudent.getFirstName() + " " + currentStudent.getLastName());
         report.setStudentId(currentStudent.getIdStudent());
+        report.setMonth(selectedMonth);
         report.setBlock(REPORT_BLOCK);
         report.setSection(labelSection.getText());
 
@@ -332,6 +325,14 @@ public class FXMLGenerateMonthlyReportController extends ValidationHandler {
         return monthNumber;
     }
 
+    private Optional<String> getSelectedMonth() {
+        String selected = comboBoxMonth.getSelectionModel().getSelectedItem();
+        if (selected == null || selected.isBlank()) {
+            return Optional.empty();
+        }
+        return Optional.of(selected);
+    }
+
     @FXML
     public void goToRegisterActivity(javafx.event.ActionEvent event) {
         FXMLLoader loader = this.navigateToWithLoader("/uv/lis/GUI/view/FXMLRegisterActivity.fxml");
@@ -343,11 +344,11 @@ public class FXMLGenerateMonthlyReportController extends ValidationHandler {
 
     @Override
     protected void clearFields() {
-        for (TextField field : activityFields) {
-            field.clear();
+        for (Label label : activityFields) {
+            label.setText(EMPTY_TEXT);;
         }
-        for (TextField field : observationFields) {
-            field.clear();
+        for (Label label : observationFields) {
+            label.setText(EMPTY_TEXT);;
         }
         labelMessage.setText(EMPTY_TEXT);
     }

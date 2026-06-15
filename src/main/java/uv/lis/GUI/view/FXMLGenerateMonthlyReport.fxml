@@ -2,9 +2,9 @@
 
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.Separator?>
-<?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.ColumnConstraints?>
 <?import javafx.scene.layout.GridPane?>
@@ -13,32 +13,38 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane prefHeight="750.0" prefWidth="950.0" xmlns="http://javafx.com/javafx/26" xmlns:fx="http://javafx.com/fxml/1" fx:controller="uv.lis.GUI.controller.FXMLGenerateMonthlyReportController">
+<AnchorPane prefHeight="750.0" prefWidth="950.0"
+   xmlns="http://javafx.com/javafx/21"
+   xmlns:fx="http://javafx.com/fxml/1"
+   fx:controller="uv.lis.GUI.controller.FXMLGenerateMonthlyReportController">
    <children>
-      <VBox alignment="TOP_CENTER" spacing="15.0" AnchorPane.bottomAnchor="20.0" AnchorPane.leftAnchor="20.0" AnchorPane.rightAnchor="20.0" AnchorPane.topAnchor="20.0">
-         <children>
-            <Label text="Generar Reporte Mensual">
-               <font>
-                  <Font name="System Bold" size="24.0" />
-               </font>
-            </Label>
-            
-            <Separator prefWidth="200.0" />
 
-            <GridPane hgap="15.0" vgap="10.0">
-              <columnConstraints>
-                <ColumnConstraints halignment="RIGHT" hgrow="SOMETIMES" maxWidth="150.0" minWidth="10.0" prefWidth="120.0" />
-                <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="250.0" />
+      <Label layoutX="0.0" layoutY="0.0" prefHeight="20.0" prefWidth="950.0"
+         style="-fx-background-color: #a8c8e8; -fx-border-color: BLACK;"
+         text="Generar Reporte Mensual" />
+
+      <Label layoutX="370.0" layoutY="30.0" text="Generar Reporte Mensual">
+         <font><Font name="System Bold" size="20.0" /></font>
+      </Label>
+
+      <AnchorPane layoutX="40.0" layoutY="70.0" prefHeight="660.0" prefWidth="870.0"
+         style="-fx-background-color: #cce4f7; -fx-background-radius: 20; -fx-border-radius: 20;">
+         <children>
+
+            <GridPane hgap="15.0" layoutX="20.0" layoutY="20.0" prefWidth="830.0" vgap="10.0">
+               <columnConstraints>
                   <ColumnConstraints halignment="RIGHT" hgrow="SOMETIMES" maxWidth="150.0" minWidth="10.0" prefWidth="120.0" />
                   <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="250.0" />
-              </columnConstraints>
-              <rowConstraints>
-                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                  <ColumnConstraints halignment="RIGHT" hgrow="SOMETIMES" maxWidth="150.0" minWidth="10.0" prefWidth="120.0" />
+                  <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="250.0" />
+               </columnConstraints>
+               <rowConstraints>
                   <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
                   <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-              </rowConstraints>
+                  <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                  <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                  <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+               </rowConstraints>
                <children>
                   <Label text="Alumno:" textFill="GREY">
                      <font><Font name="System Bold" size="14.0" /></font>
@@ -46,14 +52,14 @@
                   <Label fx:id="labelStudentName" text="[Nombre Alumno]" GridPane.columnIndex="1">
                      <font><Font size="14.0" /></font>
                   </Label>
-                  
+
                   <Label text="Coordinador:" textFill="GREY" GridPane.rowIndex="1">
                      <font><Font name="System Bold" size="14.0" /></font>
                   </Label>
                   <Label fx:id="labelCoordinatorName" text="[Nombre Coordinador]" GridPane.columnIndex="1" GridPane.rowIndex="1">
                      <font><Font size="14.0" /></font>
                   </Label>
-                  
+
                   <Label text="Profesor:" textFill="GREY" GridPane.rowIndex="2">
                      <font><Font name="System Bold" size="14.0" /></font>
                   </Label>
@@ -64,9 +70,8 @@
                   <Label text="Mes:" textFill="GREY" GridPane.rowIndex="3">
                      <font><Font name="System Bold" size="14.0" /></font>
                   </Label>
-                  <Label fx:id="labelMonth" text="[Mes]" GridPane.columnIndex="1" GridPane.rowIndex="3">
-                     <font><Font size="14.0" /></font>
-                  </Label>
+                  <ComboBox fx:id="comboBoxMonth" promptText="Seleccione un mes" prefWidth="200.0"
+                     GridPane.columnIndex="1" GridPane.rowIndex="3" />
 
                   <Label text="Horas Reportadas:" textFill="GREY" GridPane.rowIndex="4">
                      <font><Font name="System Bold" size="14.0" /></font>
@@ -110,29 +115,26 @@
                      <font><Font size="14.0" /></font>
                   </Label>
                </children>
-               <VBox.margin>
-                  <Insets left="20.0" right="20.0" />
-               </VBox.margin>
             </GridPane>
 
-            <Separator prefWidth="200.0" />
+            <Separator layoutX="20.0" layoutY="195.0" prefWidth="830.0" />
 
-            <GridPane hgap="10.0" vgap="10.0" VBox.vgrow="ALWAYS">
-              <columnConstraints>
-                <ColumnConstraints halignment="CENTER" hgrow="SOMETIMES" maxWidth="100.0" minWidth="10.0" prefWidth="80.0" />
-                <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="350.0" />
-                  <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="350.0" />
-              </columnConstraints>
-              <rowConstraints>
+            <GridPane hgap="10.0" layoutX="20.0" layoutY="210.0" prefWidth="830.0" vgap="10.0">
+               <columnConstraints>
+                  <ColumnConstraints halignment="CENTER" hgrow="SOMETIMES" maxWidth="100.0" minWidth="10.0" prefWidth="80.0" />
+                  <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="370.0" />
+                  <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="370.0" />
+               </columnConstraints>
+               <rowConstraints>
                   <RowConstraints minHeight="10.0" prefHeight="30.0" valignment="CENTER" vgrow="SOMETIMES" />
-                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
                   <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
                   <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
                   <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
                   <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-              </rowConstraints>
+                  <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                  <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                  <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+               </rowConstraints>
                <children>
                   <Label text="Periodo">
                      <font><Font name="System Bold" size="14.0" /></font>
@@ -145,63 +147,61 @@
                   </Label>
 
                   <Label text="Semana 1" GridPane.rowIndex="1" />
-                  <TextField fx:id="textFieldActivity1" promptText="Descripción de la actividad" GridPane.columnIndex="1" GridPane.rowIndex="1" />
-                  <TextField fx:id="textFieldObservation1" promptText="Observaciones (opcional si la act. está vacía)" GridPane.columnIndex="2" GridPane.rowIndex="1" />
+                  <Label fx:id="labelActivity1" text="" wrapText="true" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+                  <Label fx:id="labelObservation1" text="" wrapText="true" GridPane.columnIndex="2" GridPane.rowIndex="1" />
 
                   <Label text="Semana 2" GridPane.rowIndex="2" />
-                  <TextField fx:id="textFieldActivity2" promptText="Descripción de la actividad" GridPane.columnIndex="1" GridPane.rowIndex="2" />
-                  <TextField fx:id="textFieldObservation2" promptText="Observaciones" GridPane.columnIndex="2" GridPane.rowIndex="2" />
+                  <Label fx:id="labelActivity2" text="" wrapText="true" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+                  <Label fx:id="labelObservation2" text="" wrapText="true" GridPane.columnIndex="2" GridPane.rowIndex="2" />
 
                   <Label text="Semana 3" GridPane.rowIndex="3" />
-                  <TextField fx:id="textFieldActivity3" promptText="Descripción de la actividad" GridPane.columnIndex="1" GridPane.rowIndex="3" />
-                  <TextField fx:id="textFieldObservation3" promptText="Observaciones" GridPane.columnIndex="2" GridPane.rowIndex="3" />
+                  <Label fx:id="labelActivity3" text="" wrapText="true" GridPane.columnIndex="1" GridPane.rowIndex="3" />
+                  <Label fx:id="labelObservation3" text="" wrapText="true" GridPane.columnIndex="2" GridPane.rowIndex="3" />
 
                   <Label text="Semana 4" GridPane.rowIndex="4" />
-                  <TextField fx:id="textFieldActivity4" promptText="Descripción de la actividad" GridPane.columnIndex="1" GridPane.rowIndex="4" />
-                  <TextField fx:id="textFieldObservation4" promptText="Observaciones" GridPane.columnIndex="2" GridPane.rowIndex="4" />
+                  <Label fx:id="labelActivity4" text="" wrapText="true" GridPane.columnIndex="1" GridPane.rowIndex="4" />
+                  <Label fx:id="labelObservation4" text="" wrapText="true" GridPane.columnIndex="2" GridPane.rowIndex="4" />
 
                   <Label text="Semana 5" GridPane.rowIndex="5" />
-                  <TextField fx:id="textFieldActivity5" promptText="Descripción de la actividad" GridPane.columnIndex="1" GridPane.rowIndex="5" />
-                  <TextField fx:id="textFieldObservation5" promptText="Observaciones" GridPane.columnIndex="2" GridPane.rowIndex="5" />
+                  <Label fx:id="labelActivity5" text="" wrapText="true" GridPane.columnIndex="1" GridPane.rowIndex="5" />
+                  <Label fx:id="labelObservation5" text="" wrapText="true" GridPane.columnIndex="2" GridPane.rowIndex="5" />
 
                   <Label text="Semana 6" GridPane.rowIndex="6" />
-                  <TextField fx:id="textFieldActivity6" promptText="Descripción de la actividad" GridPane.columnIndex="1" GridPane.rowIndex="6" />
-                  <TextField fx:id="textFieldObservation6" promptText="Observaciones" GridPane.columnIndex="2" GridPane.rowIndex="6" />
+                  <Label fx:id="labelActivity6" text="" wrapText="true" GridPane.columnIndex="1" GridPane.rowIndex="6" />
+                  <Label fx:id="labelObservation6" text="" wrapText="true" GridPane.columnIndex="2" GridPane.rowIndex="6" />
 
                   <Label text="Semana 7" GridPane.rowIndex="7" />
-                  <TextField fx:id="textFieldActivity7" promptText="Descripción de la actividad" GridPane.columnIndex="1" GridPane.rowIndex="7" />
-                  <TextField fx:id="textFieldObservation7" promptText="Observaciones" GridPane.columnIndex="2" GridPane.rowIndex="7" />
+                  <Label fx:id="labelActivity7" text="" wrapText="true" GridPane.columnIndex="1" GridPane.rowIndex="7" />
+                  <Label fx:id="labelObservation7" text="" wrapText="true" GridPane.columnIndex="2" GridPane.rowIndex="7" />
                </children>
-               <VBox.margin>
-                  <Insets bottom="10.0" left="20.0" right="20.0" top="10.0" />
-               </VBox.margin>
             </GridPane>
 
-            <Separator prefWidth="200.0" />
+            <Separator layoutX="20.0" layoutY="510.0" prefWidth="830.0" />
 
-            <HBox alignment="CENTER_RIGHT" prefHeight="50.0" prefWidth="200.0" spacing="20.0">
+            <HBox alignment="CENTER_RIGHT" layoutX="20.0" layoutY="525.0" prefWidth="830.0" spacing="20.0">
                <children>
                   <Label fx:id="labelMessage" textFill="#d31414" HBox.hgrow="ALWAYS">
-                     <font>
-                        <Font name="System Bold" size="14.0" />
-                     </font>
-                     <HBox.margin>
-                        <Insets right="30.0" />
-                     </HBox.margin>
+                     <font><Font name="System Bold" size="14.0" /></font>
                   </Label>
-                  <Button fx:id="buttonBack" mnemonicParsing="false" onAction="#goBack" prefHeight="35.0" prefWidth="120.0" style="-fx-background-color: #E0E0E0;" text="Cancelar">
+                  <Button fx:id="buttonBack" mnemonicParsing="false" onAction="#goBack"
+                     prefHeight="35.0" prefWidth="120.0"
+                     style="-fx-background-color: #E0E0E0;" text="Cancelar">
                      <font><Font size="14.0" /></font>
                   </Button>
-                  <Button fx:id="buttonRegisterActivity" mnemonicParsing="false" onAction="#goToRegisterActivity" prefHeight="38.0" prefWidth="130.0" text="Registrar Actividad" textAlignment="CENTER" />
-                  <Button fx:id="buttonGenerate" mnemonicParsing="false" onAction="#validateMonthlyReport" prefHeight="35.0" prefWidth="150.0" style="-fx-background-color: #4CAF50; -fx-text-fill: white;" text="Generar Reporte">
+                  <Button fx:id="buttonRegisterActivity" mnemonicParsing="false"
+                     onAction="#goToRegisterActivity"
+                     prefHeight="35.0" prefWidth="150.0" text="Registrar Actividad" />
+                  <Button fx:id="buttonGenerate" mnemonicParsing="false"
+                     onAction="#validateMonthlyReport"
+                     prefHeight="35.0" prefWidth="150.0"
+                     style="-fx-background-color: #4CAF50; -fx-text-fill: white;"
+                     text="Generar Reporte">
                      <font><Font name="System Bold" size="14.0" /></font>
                   </Button>
                </children>
-               <padding>
-                  <Insets left="20.0" right="20.0" />
-               </padding>
             </HBox>
+
          </children>
-      </VBox>
+      </AnchorPane>
    </children>
 </AnchorPane>
