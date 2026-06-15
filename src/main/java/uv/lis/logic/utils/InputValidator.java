@@ -31,6 +31,7 @@ public final class InputValidator {
     private static final int MINIMUM_AGE = 18;
     private static final int MAX_PROJECT_CAPACITY = 2;
     private static final int MAX_PAST_MONTHS = 6;
+    public static final int POSTAL_CODE_LENGTH = 5;
     public static final String LETTERS_ONLY_REGEX = "^[\\p{L}\\s]+$";
     public static final String LEADING_SPACE_REGEX = "^\\s.*";
     public static final String TRAILING_SPACE_REGEX = ".*\\s$";
@@ -513,5 +514,46 @@ public final class InputValidator {
             }
         }
         return validationResult;
+    }
+
+        /**
+     * Verifies that a street field is not empty, does not exceed the allowed length,
+     * and does not contain leading, trailing, or consecutive spaces.
+     *
+     * @param streetValue the value to evaluate
+     *
+     * @param fieldName the field label used in the error message
+     *
+     * @return the first error found, or empty if all rules pass
+     */
+    public static Optional<String> validateStreet(String streetValue, String fieldName) {
+        return Stream.of(
+                InputValidator.validateNotEmpty(streetValue, fieldName),
+                InputValidator.validateMaxLength(streetValue, MAX_TEXT_LENGTH, fieldName),
+                InputValidator.validateNoLeadingSpace(streetValue, fieldName),
+                InputValidator.validateNoTrailingSpace(streetValue, fieldName),
+                InputValidator.validateNoConsecutiveSpaces(streetValue, fieldName))
+            .filter(Optional::isPresent)
+            .findFirst()
+            .orElse(Optional.empty());
+    }
+
+    /**
+     * Verifies that a postal code is not empty and contains exactly the required number of digits.
+     *
+     * @param postalCodeValue the value to evaluate
+     *
+     * @param fieldName the field label used in the error message
+     *
+     * @return an error message if the value is empty or does not match the required length, empty otherwise
+     */
+    public static Optional<String> validatePostalCode(String postalCodeValue, String fieldName) {
+        return Stream.of(
+                InputValidator.validateNotEmpty(postalCodeValue, fieldName),
+                InputValidator.validateExactLength(postalCodeValue, POSTAL_CODE_LENGTH, fieldName))
+
+            .filter(Optional::isPresent)
+            .findFirst()
+            .orElse(Optional.empty());
     }
 }
