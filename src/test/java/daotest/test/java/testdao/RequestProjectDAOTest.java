@@ -6,8 +6,10 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uv.lis.logic.utils.InputValidator.NO_ROWS_AFFECTED;
+import static uv.lis.logic.utils.InputValidator.STATUS_ASSIGNED;
 
 import java.lang.reflect.Field;
 import java.sql.Connection;
@@ -30,11 +32,12 @@ import uv.lis.logic.exceptions.OperationException;
 
 class RequestProjectDAOTest {
 
-    private static final int FIRST_PROJECT_ID     = 9;
-    private static final int ROWS_AFFECTED        = 1;  
-    private static final int REQUEST_COUNT_ZERO   = 0;
-    private static final int CAPACITY_AVAILABLE   = 5;
-    private static final int CAPACITY_FULL        = 3;
+    private static final int FIRST_PROJECT_ID = 9;
+    private static final int THIRD_PARAMETER = 3;
+    private static final int ROWS_AFFECTED = 1;  
+    private static final int REQUEST_COUNT_ZERO = 0;
+    private static final int CAPACITY_AVAILABLE = 5;
+    private static final int CAPACITY_FULL = 3;
 
     private static final String FIRST_STUDENT_ID = "S23013127";
     private static final String FIRST_STUDENT_NAME = "Ana";
@@ -298,6 +301,16 @@ class RequestProjectDAOTest {
         when(resultSet.next()).thenReturn(false);
 
         assertTrue(requestProjectDAO.getApplicantsByProjectId(FIRST_PROJECT_ID).isEmpty());
+    }
+
+    @Test
+    void getApplicantsByProjectId_excludesAssigned_appliesAssignedFilter() throws Exception {
+        mockQueryExecution();
+        when(resultSet.next()).thenReturn(false);
+
+        requestProjectDAO.getApplicantsByProjectId(FIRST_PROJECT_ID);
+
+        verify(preparedStatement).setInt(THIRD_PARAMETER, STATUS_ASSIGNED);
     }
 
     @Test

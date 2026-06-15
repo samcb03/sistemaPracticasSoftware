@@ -23,6 +23,7 @@ import uv.lis.logic.dao.AffiliatedOrganizationDAO;
 import uv.lis.logic.dao.NotificationDAO;
 import uv.lis.logic.dao.ProjectDAO;
 import uv.lis.logic.dao.RequestProjectDAO;
+import uv.lis.logic.dao.StudentDAO;
 import uv.lis.logic.dto.AffiliatedOrganization;
 import uv.lis.logic.dto.Notification;
 import uv.lis.logic.dto.Professor;
@@ -52,6 +53,7 @@ public class FXMLAssignationProjectController extends ValidationHandler {
 
     private RequestProjectDAO requestProjectDAO;
     private ProjectDAO projectDAO;
+    private StudentDAO studentDAO;
     private AffiliatedOrganizationDAO affiliatedOrganizationDAO;
     private NotificationDAO notificationDAO;
     private Professor coordinator;
@@ -68,6 +70,7 @@ public class FXMLAssignationProjectController extends ValidationHandler {
     public void initialize(URL location, ResourceBundle resources) {
         requestProjectDAO = new RequestProjectDAO();
         projectDAO = new ProjectDAO();
+        studentDAO = new StudentDAO();
         affiliatedOrganizationDAO = new AffiliatedOrganizationDAO();
         notificationDAO = new NotificationDAO();
 
@@ -210,19 +213,27 @@ public class FXMLAssignationProjectController extends ValidationHandler {
     }
 
     private boolean executeAssignment(Project project, String idStudent, String reason) throws OperationException {
-        boolean isAssigned = requestProjectDAO.hasAvailableCapacity(project.getId());
+        boolean isAssigned = false;
 
-        if (!isAssigned) {
+        if (studentDAO.hasProjectAssigned(idStudent)) {
+            showError("El alumno ya tiene un proyecto asignado.");
+        } else if (!requestProjectDAO.hasAvailableCapacity(project.getId())) {
             showError("El proyecto ya no tiene cupo disponible.");
         } else {
-            isAssigned = isAlternativeMode  
-                ? requestProjectDAO.assignStudentToProjectAlternative(idStudent, project.getId())
-                : requestProjectDAO.assignStudentToProject(idStudent, project.getId());
+            isAssigned = applyAssignment(project, idStudent, reason);
+        }
 
-            if (isAssigned) {
-                showSuccess("Asignación exitosa para " + idStudent);
-                notifyAssignedStudent(idStudent, project.getName(), reason);
-            }
+        return isAssigned;
+    }
+
+    private boolean applyAssignment(Project project, String idStudent, String reason) throws OperationException {
+        boolean isAssigned = isAlternativeMode
+            ? requestProjectDAO.assignStudentToProjectAlternative(idStudent, project.getId())
+            : requestProjectDAO.assignStudentToProject(idStudent, project.getId());
+
+        if (isAssigned) {
+            showSuccess("Asignación exitosa para " + idStudent);
+            notifyAssignedStudent(idStudent, project.getName(), reason);
         }
 
         return isAssigned;
