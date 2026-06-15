@@ -7,6 +7,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.SQLIntegrityConstraintViolationException;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -90,9 +91,9 @@ public class ActivityDAO implements IActivityDAO {
     @Override
     public boolean registerActivity(Activity activity) throws OperationException {
         boolean isRegistered = false;
-    
-        String activityQuery = "INSERT INTO Actividad(nombreActividad, descripcionActividad, FechaInicio, " 
-                             + "FechaFin, idProyecto,horasReportadas) " 
+
+        String activityQuery = "INSERT INTO Actividad(nombreActividad, descripcionActividad, FechaInicio, "
+                             + "FechaFin, idProyecto, horasReportadas) "
                              + "VALUES(?, ?, ?, ?, ?, ?);";
 
         if (activity == null) {
@@ -108,22 +109,24 @@ public class ActivityDAO implements IActivityDAO {
             preparedStatement.setObject(3, activity.getStartDate());
             preparedStatement.setObject(4, activity.getEndDate());
             preparedStatement.setInt(5, activity.getProjectId());
-            preparedStatement.setInt(6,activity.getHoursReported());
-            
+            preparedStatement.setInt(6, activity.getHoursReported());
+
             if (preparedStatement.executeUpdate() > NO_ROWS_AFFECTED) {
-                try(ResultSet generatedKeys = preparedStatement.getGeneratedKeys()) {
+                try (ResultSet generatedKeys = preparedStatement.getGeneratedKeys()) {
                     if (generatedKeys.next()) {
                         int generatedId = generatedKeys.getInt(1);
                         activity.setId(generatedId);
-
                     }
                 }
                 isRegistered = true;
-                LOGGER.log(Level.INFO, "Registro de actividad exitosa");    
+                LOGGER.log(Level.INFO, "Registro de actividad exitosa");
             } else {
                 LOGGER.log(Level.WARNING, "No se pudo registrar la actividad.");
-                throw new OperationException("No se pudo registrar la actividad.", null); 
+                throw new OperationException("No se pudo registrar la actividad.", null);
             }
+        } catch (SQLIntegrityConstraintViolationException e) {
+            LOGGER.log(Level.WARNING, "Intento de registrar una actividad duplicada", e);
+            throw new OperationException("Ya existe una actividad con ese nombre.", e);
         } catch (SQLException e) {
             LOGGER.log(Level.SEVERE, "Error de conexion con la base de datos", e);
             throw new OperationException("Error al registrar la actividad", e);
