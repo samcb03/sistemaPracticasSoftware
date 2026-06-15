@@ -99,6 +99,4 @@ public interface IReportContextDAO {
      * @throws OperationException if the verification cannot be completed
      */
     boolean hasReportAlreadyBeenGenerated(String studentId, String month) throws OperationException;
-
-    boolean  hasGeneratedFinalReport(String studentId) throws OperationException;
 }
