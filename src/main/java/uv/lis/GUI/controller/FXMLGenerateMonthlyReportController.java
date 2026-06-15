@@ -30,7 +30,6 @@ import uv.lis.logic.dto.Advance;
 import uv.lis.logic.dto.MonthlyReport;
 import uv.lis.logic.dto.Student;
 import uv.lis.logic.exceptions.OperationException;
-import uv.lis.logic.utils.InputValidator;
 import uv.lis.logic.utils.SessionManager;
 
 public class FXMLGenerateMonthlyReportController extends ValidationHandler {
