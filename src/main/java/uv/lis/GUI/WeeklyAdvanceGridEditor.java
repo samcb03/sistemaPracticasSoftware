@@ -170,7 +170,7 @@ public class WeeklyAdvanceGridEditor {
         }
         return cell;
     }
-    //FIXME verificar ese comentario y ver si es valido
+    //FIXME verificar si esa excepcion realmente es posible que llegue, tomando en cuenta las validaciones del programa
     private Optional<Integer> parseCellValue(String rawValue) {
         Optional<Integer> value = Optional.empty();
 
