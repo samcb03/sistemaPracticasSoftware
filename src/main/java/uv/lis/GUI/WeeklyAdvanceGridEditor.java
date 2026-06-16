@@ -170,18 +170,12 @@ public class WeeklyAdvanceGridEditor {
         }
         return cell;
     }
-    //FIXME verificar si esa excepcion realmente es posible que llegue, tomando en cuenta las validaciones del programa
+    
     private Optional<Integer> parseCellValue(String rawValue) {
         Optional<Integer> value = Optional.empty();
 
         if (rawValue != null && !rawValue.isBlank()) {
-            try {
-                value = Optional.of(Integer.parseInt(rawValue.trim()));
-            } catch (NumberFormatException numberFormatException) {
-                /* Non-numeric input is already reported to the user in validateColumn;
-                   here an unparseable cell is treated as a cell with no value. */
-                value = Optional.empty();
-            }
+            value = Optional.of(Integer.parseInt(rawValue.trim()));
         }
         return value;
     }
