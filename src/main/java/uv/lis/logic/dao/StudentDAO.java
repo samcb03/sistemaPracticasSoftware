@@ -127,7 +127,7 @@ public class StudentDAO extends UserDAO implements IStudentDAO {
         }
         return students;
     }
-    //FIXME insertar usuario deberia lanzar una sqlException para solo cachar esa
+
     @Override
     public boolean registerStudent(Student student) throws OperationException {
         boolean isRegistered = false;
@@ -136,16 +136,8 @@ public class StudentDAO extends UserDAO implements IStudentDAO {
             databaseConnection.setAutoCommit(false);
 
             try {
-                int generatedUserId = insertUser(student, databaseConnection);
-                student.setId(generatedUserId);
-                insertStudent(student, databaseConnection);
-                databaseConnection.commit();
+                persistStudentRegistration(student, databaseConnection);
                 isRegistered = true;
-            } catch (SQLException sqlException) {
-                databaseConnection.rollback();
-                LOGGER.log(Level.SEVERE, "Transacción de registro de alumno cancelada", sqlException);
-                throw new OperationException("No se pudo registrar al alumno. Intentelo mas tarde", 
-                    sqlException);
             } catch (OperationException operationException) {
                 databaseConnection.rollback();
                 throw operationException;
@@ -160,6 +152,18 @@ public class StudentDAO extends UserDAO implements IStudentDAO {
         return isRegistered;
     }
 
+    private void persistStudentRegistration(Student student, Connection databaseConnection) throws OperationException {
+        try {
+            int generatedUserId = registerUser(student);
+            student.setId(generatedUserId);
+            insertStudent(student, databaseConnection);
+            databaseConnection.commit();
+        } catch (SQLException e) {
+            LOGGER.log(Level.SEVERE, "Transacción de registro de alumno cancelada", e);
+            throw new OperationException("Error al guardar la informacion dell alumno. Intentelo mas tarde", e);
+        }
+    }
+
     private void insertStudent(Student student, Connection databaseConnection) throws SQLException, OperationException {
         String studentQuery = "INSERT INTO Alumno (idUsuario, matricula, fechaNacimiento, genero)"
                             + " VALUES (?, ?, ?, ?);";
@@ -171,8 +175,7 @@ public class StudentDAO extends UserDAO implements IStudentDAO {
             preparedStatement.setString(4, student.getGender());
 
             if (preparedStatement.executeUpdate() <= NO_ROWS_AFFECTED) {
-                throw new OperationException("No se pudo registrar al alumno. Intentelo mas tarde",
-                    null);
+                throw new OperationException("El registro del alumno no afectó ninguna fila", null);
             }
         }
     }

@@ -6,6 +6,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.SQLIntegrityConstraintViolationException;
 import java.util.Optional;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -30,13 +31,16 @@ public class UserDAO implements IUserDAO {
     public UserDAO(MySQLConnectionManager connectionManager) {
         this.connectionManager = connectionManager;
     }
-    //TODO verificar si es buena practica separar estas dos clases y su manejo de excepciones
+
     @Override
     public int registerUser(User user) throws OperationException {
         int generatedId = -1;
 
         try (Connection databaseConnection = connectionManager.getConnection()) {
             generatedId = insertUser(user, databaseConnection);
+        } catch (SQLIntegrityConstraintViolationException e) {
+            LOGGER.log(Level.WARNING, "Intento de registrar un usuario duplicado", e);
+            throw new OperationException("Ya existe un usuario registrado con ese correo.", e);
         } catch (SQLException e) {
             LOGGER.log(Level.SEVERE, "Error de conexion con la base de datos", e);
             throw new OperationException("No se pudo registrar al usuario. Intentelo mas tarde", e);
@@ -45,7 +49,7 @@ public class UserDAO implements IUserDAO {
         return generatedId;
     }
 
-    protected int insertUser(User user, Connection databaseConnection) throws SQLException, OperationException {
+    private int insertUser(User user, Connection databaseConnection) throws SQLException, OperationException {
         int generatedId = -1;
 
         if (user.getRoleId() == ROL_COORDINATOR && existActiveCoordinator()) {
