@@ -5,7 +5,8 @@ import static uv.lis.logic.utils.InputValidator.validateText;
 import static uv.lis.logic.utils.InputValidator.validatePhoneNumber;
 import static uv.lis.logic.utils.InputValidator.validatePositiveInteger;
 import static uv.lis.logic.utils.InputValidator.validatePostalCode;
-import static uv.lis.logic.utils.InputValidator.validateStreet;
+import static uv.lis.logic.utils.InputValidator.validateRegister;
+import static uv.lis.logic.utils.InputValidator.validateAddressNumber;
 
 import java.net.URL;
 import java.util.Optional;
@@ -51,15 +52,15 @@ public class FXMLRegisterAffiliatedOrganizationController extends ValidationHand
         Optional<String> firstValidationError = getFirstValidationError();
         handleValidation(firstValidationError, this::registerAffiliatedOrganization);
     }
-
+    
     private Optional<String> getFirstValidationError() {
         Stream<Optional<String>> validationStream = Stream.of(
-            validateText(textFieldName.getText(), "El nombre"),
+            validateRegister(textFieldName.getText(), "El nombre"),
             validateText(textFieldCity.getText(), "La ciudad"),
             validateText(textFieldState.getText(), "El estado"),
             validateText(textFieldSector.getText(), "El sector"),
-            validateStreet(textFieldStreet.getText(), "La calle"),
-            validatePositiveInteger(textFieldStreetNumber.getText().trim(), "El número de calle"),
+            validateText(textFieldStreet.getText(), "La calle"),
+            validateAddressNumber(textFieldStreetNumber.getText().trim(), "El número de calle"),
             validatePostalCode(textFieldPostalCode.getText(), "El código postal"),
             validateEmail(textFieldEmail.getText().trim(), "El correo electrónico"),
             validatePhoneNumber(textFieldPhoneNumber.getText().trim(), "El número de teléfono"),

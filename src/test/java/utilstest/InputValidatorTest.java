@@ -245,4 +245,39 @@ class InputValidatorTest {
 
         assertEquals(hasError, result);
     }
+
+    @ParameterizedTest
+    @CsvSource({
+        "Calle Hidalgo, false",
+        "Av. 5 de Mayo, false",
+        "Colonia Sur-Norte, false",
+        "'', true",
+        "' Calle', true",
+        "'Calle ', true",
+        "'Calle  Hidalgo', true",
+        "Calle@#!, true"
+    })
+    void validateRegister_variousInputs_returnsExpectedResult(String value, boolean hasError) {
+        boolean result = InputValidator.validateRegister(value, FIELD_NAME).isPresent();
+
+        assertEquals(hasError, result);
+    }
+
+    @ParameterizedTest
+    @CsvSource({
+        "23, false",
+        "23-B, false",
+        "S/N, false",
+        "12 A, false",
+        "'', true",
+        "' 23', true",
+        "'23 ', true",
+        "'23  B', true",
+        "23@!, true"
+    })
+    void validateAddressNumber_variousInputs_returnsExpectedResult(String value, boolean hasError) {
+        boolean result = InputValidator.validateAddressNumber(value, FIELD_NAME).isPresent();
+
+        assertEquals(hasError, result);
+    }
 }

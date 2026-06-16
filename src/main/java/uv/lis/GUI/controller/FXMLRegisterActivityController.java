@@ -3,6 +3,7 @@ package uv.lis.GUI.controller;
 import static uv.lis.logic.utils.InputValidator.validateEndDate;
 import static uv.lis.logic.utils.InputValidator.validatePositiveInteger;
 import static uv.lis.logic.utils.InputValidator.validateRecentStartDate;
+import static uv.lis.logic.utils.InputValidator.validateRegister;
 import static uv.lis.logic.utils.InputValidator.validateText;
 
 import java.net.URL;
@@ -69,7 +70,7 @@ public class FXMLRegisterActivityController extends ValidationHandler {
 
     private Optional<String> getFirstValidationError() {
         Stream<Optional<String>> validationStream = Stream.of(
-            validateText(textFieldActivity.getText(), ACTIVITY_NAME_FIELD),
+            validateRegister(textFieldActivity.getText(), ACTIVITY_NAME_FIELD),
             validateText(textFieldDescription.getText(), DESCRIPTION_FIELD),
             validateRecentStartDate(datePickerStartDate.getValue(), START_DATE_FIELD),
             validateEndDate(datePickerStartDate.getValue(), datePickerFinalDate.getValue(), END_DATE_FIELD),
