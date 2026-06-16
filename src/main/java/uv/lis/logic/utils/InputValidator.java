@@ -44,6 +44,8 @@ public final class InputValidator {
         = "^(?=.*[A-Z])(?=.*\\d)(?=.*[!@#$%^&*()_+=\\[\\]{};':\"|,.<>/?-]).{8,}$";
     public static final String REPEAT_LETTERS_REGEX = "(?i)^.*([\\p{L}])\\1{2,}.*$";
     public static final String STUDENT_ENROLLMENT = "^[Ss]\\d{8}$";
+    public static final String REGISTER_REGEX = "^[\\p{L}0-9\\s.,-]+$";
+    public static final String ADDRESS_NUMBER_REGEX = "^[a-zA-Z0-9\\s/#-]+$";
 
     /**
      * Verifies that a field is not null or blank.
@@ -516,28 +518,6 @@ public final class InputValidator {
         return validationResult;
     }
 
-        /**
-     * Verifies that a street field is not empty, does not exceed the allowed length,
-     * and does not contain leading, trailing, or consecutive spaces.
-     *
-     * @param streetValue the value to evaluate
-     *
-     * @param fieldName the field label used in the error message
-     *
-     * @return the first error found, or empty if all rules pass
-     */
-    public static Optional<String> validateStreet(String streetValue, String fieldName) {
-        return Stream.of(
-                InputValidator.validateNotEmpty(streetValue, fieldName),
-                InputValidator.validateMaxLength(streetValue, MAX_TEXT_LENGTH, fieldName),
-                InputValidator.validateNoLeadingSpace(streetValue, fieldName),
-                InputValidator.validateNoTrailingSpace(streetValue, fieldName),
-                InputValidator.validateNoConsecutiveSpaces(streetValue, fieldName))
-            .filter(Optional::isPresent)
-            .findFirst()
-            .orElse(Optional.empty());
-    }
-
     /**
      * Verifies that a postal code is not empty and contains exactly the required number of digits.
      *
@@ -550,10 +530,45 @@ public final class InputValidator {
     public static Optional<String> validatePostalCode(String postalCodeValue, String fieldName) {
         return Stream.of(
                 InputValidator.validateNotEmpty(postalCodeValue, fieldName),
+                InputValidator.validatePositiveInteger(postalCodeValue, fieldName),
                 InputValidator.validateExactLength(postalCodeValue, POSTAL_CODE_LENGTH, fieldName))
-
             .filter(Optional::isPresent)
             .findFirst()
             .orElse(Optional.empty());
+    }
+
+    public static Optional<String> validateRegister(String registerValue, String fieldName) {
+        Optional<String> validateRegister = Optional.empty();
+        if(!registerValue.matches(REGISTER_REGEX)) {
+            validateRegister = Optional.of(fieldName + " no acepta carácteres especiales");
+        } else {
+            return Stream.of(
+                InputValidator.validateNotEmpty(registerValue, fieldName),
+                InputValidator.validateNoConsecutiveRepeatedLetters(registerValue, fieldName),
+                InputValidator.validateNoConsecutiveSpaces(registerValue, fieldName),
+                InputValidator.validateNoTrailingSpace(registerValue, fieldName),
+                InputValidator.validateNoLeadingSpace(registerValue, fieldName))
+            .filter(Optional::isPresent)
+            .findFirst()
+            .orElse(Optional.empty());
+        }
+        return validateRegister;
+    }
+    
+    public static Optional<String> validateAddressNumber(String addressNumber, String fieldName) {
+        Optional<String> validateAddressNumber = Optional.empty();
+        if(!addressNumber.matches(ADDRESS_NUMBER_REGEX)) {
+            validateAddressNumber = Optional.of(fieldName + " no acepta carácteres especial");
+        } else {
+            return Stream.of(
+                InputValidator.validateNotEmpty(addressNumber, fieldName),
+                InputValidator.validateNoConsecutiveSpaces(addressNumber, fieldName),
+                InputValidator.validateNoTrailingSpace(addressNumber, fieldName),
+                InputValidator.validateNoLeadingSpace(addressNumber, fieldName))
+            .filter(Optional::isPresent)
+            .findFirst()
+            .orElse(Optional.empty());
+        }
+        return validateAddressNumber;
     }
 }
