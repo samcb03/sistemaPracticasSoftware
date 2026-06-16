@@ -131,15 +131,8 @@ public class ProfessorDAO extends UserDAO implements IProfessorDAO {
             databaseConnection.setAutoCommit(false);
 
             try {
-                int generatedUserId = insertUser(professor, databaseConnection);
-                professor.setId(generatedUserId);
-                insertProfessor(professor, databaseConnection);
-                databaseConnection.commit();
+                persistProfessorRegistration(professor, databaseConnection);
                 isRegistered = true;
-            } catch (SQLException sqlException) {
-                databaseConnection.rollback();
-                LOGGER.log(Level.SEVERE, "Transacción de registro de profesor cancelada", sqlException);
-                throw new OperationException("Error al registrar el profesor", sqlException);
             } catch (OperationException operationException) {
                 databaseConnection.rollback();
                 throw operationException;
@@ -152,6 +145,19 @@ public class ProfessorDAO extends UserDAO implements IProfessorDAO {
         }
 
         return isRegistered;
+    }
+
+    private void persistProfessorRegistration(Professor professor, Connection databaseConnection) 
+        throws OperationException {
+        try {
+            int generatedUserId = registerUser(professor);
+            professor.setId(generatedUserId);
+            insertProfessor(professor, databaseConnection);
+            databaseConnection.commit();
+        } catch (SQLException e) {
+            LOGGER.log(Level.SEVERE, "Transacción de registro de alumno cancelada", e);
+            throw new OperationException("Error al guardar la informacion dell alumno. Intentelo mas tarde", e);
+        }
     }
 
     private void insertProfessor(Professor professor, Connection databaseConnection)
