@@ -127,7 +127,7 @@ public class StudentDAO extends UserDAO implements IStudentDAO {
         }
         return students;
     }
-    //TODO tmb verificar si esto es una buena practica al tener 3 catch en un solo metodo
+    //FIXME insertar usuario deberia lanzar una sqlException para solo cachar esa
     @Override
     public boolean registerStudent(Student student) throws OperationException {
         boolean isRegistered = false;
