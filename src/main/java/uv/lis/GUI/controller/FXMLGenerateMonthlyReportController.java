@@ -270,7 +270,7 @@ public class FXMLGenerateMonthlyReportController extends ValidationHandler {
                 advanceDAO.registerAdvance(advance);
             } else {
                 LOGGER.log(Level.INFO, "Ya existe un avance registrado para el reporte ID {0}. "
-                + "Se omitirá el registro de avance.", context.getIdReport());
+                    + "Se omitirá el registro de avance.", context.getIdReport());
             }
 
             showSuccess(REPORT_GENERATED_MESSAGE);

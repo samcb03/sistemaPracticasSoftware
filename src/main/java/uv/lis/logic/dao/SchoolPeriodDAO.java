@@ -76,7 +76,7 @@ public class SchoolPeriodDAO implements ISchoolPeriodDAO{
 
         return validatePeriodId;
     }
-
+    //FIXME nunca se usa este metodo en realidad
     @Override
     public boolean registerSchoolPeriod(SchoolPeriod schoolPeriod) throws OperationException {
         boolean isRegistered = false;

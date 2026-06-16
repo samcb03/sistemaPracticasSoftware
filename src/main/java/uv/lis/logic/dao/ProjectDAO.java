@@ -7,6 +7,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.SQLIntegrityConstraintViolationException;
 import java.util.ArrayList;
 import java.util.Optional;
 import java.util.logging.Level;
@@ -129,10 +130,12 @@ public class ProjectDAO implements IProjectDAO{
                     null);
             }
 
-        } catch (SQLException e) {
+        } catch (SQLIntegrityConstraintViolationException e) {
+            LOGGER.log(Level.WARNING, "Intento de registrar un proyecot duplicado", e);
+            throw new OperationException("Ya existe un proyecto con esta informacion.", e);
+        }catch (SQLException e) {
             LOGGER.log(Level.SEVERE, "Error de conexion con la base de datos",e);
             throw new OperationException("No se pudo registrar el proyecto. Intentelo más tarde", e);
-
         }
         return isRegistered;
     }

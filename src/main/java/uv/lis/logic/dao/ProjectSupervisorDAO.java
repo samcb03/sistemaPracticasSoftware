@@ -6,6 +6,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.SQLIntegrityConstraintViolationException;
 import java.util.ArrayList;
 import java.util.Optional;
 import java.util.logging.Level;
@@ -130,10 +131,12 @@ public class ProjectSupervisorDAO implements IProjectSupervisorDAO {
                 throw new OperationException("No se pudo registrar al supervisor del proyecto", null);
             }
 
+        } catch (SQLIntegrityConstraintViolationException e) {
+            LOGGER.log(Level.WARNING, "Intento de registrar un responsable tecnico duplicado", e);
+            throw new OperationException("Ya existe un responsable con ese correo en esta organizacion.", e);
         } catch (SQLException e) {
             LOGGER.log(Level.SEVERE, "Error de conexión con la base de datos al registrar", e);
             throw new OperationException("Error al registrar al supervisor del proyecto", e);
-            
         }
 
         return isRegistered;

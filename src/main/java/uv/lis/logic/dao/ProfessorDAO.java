@@ -8,6 +8,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.SQLIntegrityConstraintViolationException;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.Optional;
@@ -154,6 +155,9 @@ public class ProfessorDAO extends UserDAO implements IProfessorDAO {
             professor.setId(generatedUserId);
             insertProfessor(professor, databaseConnection);
             databaseConnection.commit();
+        } catch (SQLIntegrityConstraintViolationException e) {
+            LOGGER.log(Level.WARNING, "Intento de registrar un profesor duplicado", e);
+            throw new OperationException("Ya existe un profesor con ese número de personal.", e);
         } catch (SQLException e) {
             LOGGER.log(Level.SEVERE, "Transacción de registro de alumno cancelada", e);
             throw new OperationException("Error al guardar la informacion dell alumno. Intentelo mas tarde", e);
