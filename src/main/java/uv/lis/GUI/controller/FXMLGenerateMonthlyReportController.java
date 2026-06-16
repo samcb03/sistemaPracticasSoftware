@@ -244,6 +244,8 @@ public class FXMLGenerateMonthlyReportController extends ValidationHandler {
         schoolPeriod = context.getPeriod();
     }
 
+    //FIXME Validar que los reportes se generen en la última semana de los meses
+
     private void generateMonthlyReport() {
         try {
             MonthlyReport context = reportContextDAO.getMonthlyReportData(currentStudent.getIdStudent());
