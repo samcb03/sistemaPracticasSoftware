@@ -9,6 +9,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.SQLIntegrityConstraintViolationException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
@@ -64,6 +65,9 @@ public class ExpedientDAO implements IExpedientDAO {
                     }
                 }
             }
+        } catch (SQLIntegrityConstraintViolationException e) {
+            LOGGER.log(Level.WARNING, "Intento de guardar un documento duplicado en el expediente", e);
+            throw new OperationException("El alumno ya cuenta con un documento de ese tipo registrado.", e);
         } catch (SQLException e) {
             LOGGER.log(Level.SEVERE, "Error al guardar el documento en el expediente", e);
             throw new OperationException("Error al guardar el documento en el expediente.", e);
@@ -377,8 +381,7 @@ public class ExpedientDAO implements IExpedientDAO {
     }
 
     private boolean replaceOrInsertDocument(Expedient expedient) throws OperationException {
-        Optional<String> previousUrl =
-            getDocumentUrl(expedient.getIdStudent(), expedient.getIdTypeDocument());
+        Optional<String> previousUrl = getDocumentUrl(expedient.getIdStudent(), expedient.getIdTypeDocument());
         boolean isSaved;
 
         if (previousUrl.isPresent()) {

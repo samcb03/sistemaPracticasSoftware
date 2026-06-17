@@ -6,6 +6,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.SQLIntegrityConstraintViolationException;
 import java.util.ArrayList;
 import java.util.Optional;
 import java.util.logging.Level;
@@ -76,7 +77,7 @@ public class SchoolPeriodDAO implements ISchoolPeriodDAO{
 
         return validatePeriodId;
     }
-    //FIXME nunca se usa este metodo en realidad
+
     @Override
     public boolean registerSchoolPeriod(SchoolPeriod schoolPeriod) throws OperationException {
         boolean isRegistered = false;
@@ -96,6 +97,10 @@ public class SchoolPeriodDAO implements ISchoolPeriodDAO{
                 throw new OperationException("No se pudo registrar el periodo escolar. Intentelo mas tarde", 
                     null);
             }
+        } catch (SQLIntegrityConstraintViolationException e) {
+            LOGGER.log(Level.WARNING, "Intento de registrar un periodo escolar duplicado con ID {0}", 
+                schoolPeriod.getId());
+            throw new OperationException("Ya existe un periodo escolar registrado con ese identificador.", e);
         } catch (SQLException e) {
             LOGGER.log(Level.SEVERE, "Error de conexion con la base de datos",e);
             throw new OperationException("Error al registrar el periodo escolar", e);
