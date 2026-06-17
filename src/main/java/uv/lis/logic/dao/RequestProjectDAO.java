@@ -10,6 +10,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.SQLIntegrityConstraintViolationException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -163,6 +164,9 @@ public class RequestProjectDAO implements IRequestProjectDAO {
             if (preparedStatement.executeUpdate() > NO_ROWS_AFFECTED) {
                 isRegistered = true;
             }
+        } catch (SQLIntegrityConstraintViolationException e) {
+            LOGGER.log(Level.WARNING, "Intento de registrar una solicitud de proyecto duplicada", e);
+            throw new OperationException("Ya existe una solicitud registrada para ese proyecto.", e);
         } catch (SQLException e) {
             LOGGER.log(Level.SEVERE, "Error al registrar solicitud de proyecto", e);
             throw new OperationException("Error al registrar solicitud", e);
@@ -420,7 +424,7 @@ public class RequestProjectDAO implements IRequestProjectDAO {
         ensureStudentNotAlreadyAssigned(databaseConnection, idStudent);
         insertAssignment(databaseConnection, idStudent, idProject);
     }
-
+    //FIXME rediseñar clases ya que el que tenga tantos catch no esta permitido
     private boolean runAssignmentInTransaction(String idStudent, int idProject, boolean isAlternative) 
         throws OperationException {
         boolean isAssigned = false;
@@ -436,6 +440,11 @@ public class RequestProjectDAO implements IRequestProjectDAO {
                 }
                 databaseConnection.commit();
                 isAssigned = true;
+            } catch (SQLIntegrityConstraintViolationException sqlException) {
+                databaseConnection.rollback();
+                LOGGER.log(Level.WARNING, "Intento de asignar un proyecto duplicado al alumno", sqlException);
+                throw new OperationException("El alumno ya tiene una asignación para ese proyecto.", 
+                    sqlException);
             } catch (SQLException sqlException) {
                 databaseConnection.rollback();
                 LOGGER.log(Level.SEVERE, "Transacción de asignación cancelada", sqlException);
