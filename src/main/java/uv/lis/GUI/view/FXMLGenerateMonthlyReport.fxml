@@ -1,34 +1,25 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.ComboBox?>
 <?import javafx.scene.control.Label?>
-<?import javafx.scene.control.Separator?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.ColumnConstraints?>
 <?import javafx.scene.layout.GridPane?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.RowConstraints?>
-<?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane prefHeight="750.0" prefWidth="950.0"
-   xmlns="http://javafx.com/javafx/21"
-   xmlns:fx="http://javafx.com/fxml/1"
-   fx:controller="uv.lis.GUI.controller.FXMLGenerateMonthlyReportController">
+<AnchorPane prefHeight="750.0" prefWidth="950.0" xmlns="http://javafx.com/javafx/26" xmlns:fx="http://javafx.com/fxml/1" fx:controller="uv.lis.GUI.controller.FXMLGenerateMonthlyReportController">
    <children>
 
-      <Label layoutX="0.0" layoutY="0.0" prefHeight="20.0" prefWidth="950.0"
-         style="-fx-background-color: #a8c8e8; -fx-border-color: BLACK;"
-         text="Generar Reporte Mensual" />
+      <Label layoutX="0.0" layoutY="0.0" prefHeight="20.0" prefWidth="950.0" style="-fx-background-color: #a8c8e8; -fx-border-color: BLACK;" text="Generar Reporte Mensual" />
 
       <Label layoutX="370.0" layoutY="30.0" text="Generar Reporte Mensual">
          <font><Font name="System Bold" size="20.0" /></font>
       </Label>
 
-      <AnchorPane layoutX="40.0" layoutY="70.0" prefHeight="660.0" prefWidth="870.0"
-         style="-fx-background-color: #cce4f7; -fx-background-radius: 20; -fx-border-radius: 20;">
+      <AnchorPane layoutX="40.0" layoutY="70.0" prefHeight="660.0" prefWidth="870.0" style="-fx-background-color: #cce4f7; -fx-background-radius: 20; -fx-border-radius: 20;">
          <children>
 
             <GridPane hgap="15.0" layoutX="20.0" layoutY="20.0" prefWidth="830.0" vgap="10.0">
@@ -39,6 +30,7 @@
                   <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="250.0" />
                </columnConstraints>
                <rowConstraints>
+                  <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
                   <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
                   <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
                   <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
@@ -70,13 +62,12 @@
                   <Label text="Mes:" textFill="GREY" GridPane.rowIndex="3">
                      <font><Font name="System Bold" size="14.0" /></font>
                   </Label>
-                  <ComboBox fx:id="comboBoxMonth" promptText="Seleccione un mes" prefWidth="200.0"
-                     GridPane.columnIndex="1" GridPane.rowIndex="3" />
+                  <ComboBox fx:id="comboBoxMonth" prefWidth="200.0" promptText="Seleccione un mes" GridPane.columnIndex="1" GridPane.rowIndex="3" />
 
-                  <Label text="Horas Reportadas:" textFill="GREY" GridPane.rowIndex="4">
+                  <Label text="Horas Reportadas:" textFill="GREY" GridPane.rowIndex="5">
                      <font><Font name="System Bold" size="14.0" /></font>
                   </Label>
-                  <Label fx:id="labelReportedHours" text="[Horas]" GridPane.columnIndex="1" GridPane.rowIndex="4">
+                  <Label fx:id="labelReportedHours" text="[Horas]" GridPane.columnIndex="1" GridPane.rowIndex="5">
                      <font><Font size="14.0" /></font>
                   </Label>
 
@@ -94,10 +85,10 @@
                      <font><Font size="14.0" /></font>
                   </Label>
 
-                  <Label text="Bloque:" textFill="GREY" GridPane.columnIndex="2" GridPane.rowIndex="4">
+                  <Label text="Bloque:" textFill="GREY" GridPane.columnIndex="2" GridPane.rowIndex="5">
                      <font><Font name="System Bold" size="14.0" /></font>
                   </Label>
-                  <Label fx:id="labelBlock" text="7" GridPane.columnIndex="3" GridPane.rowIndex="4">
+                  <Label fx:id="labelBlock" text="7" GridPane.columnIndex="3" GridPane.rowIndex="5">
                      <font><Font size="14.0" /></font>
                   </Label>
 
@@ -116,8 +107,6 @@
                   </Label>
                </children>
             </GridPane>
-
-            <Separator layoutX="20.0" layoutY="195.0" prefWidth="830.0" />
 
             <GridPane hgap="10.0" layoutX="20.0" layoutY="210.0" prefWidth="830.0" vgap="10.0">
                <columnConstraints>
@@ -176,26 +165,16 @@
                </children>
             </GridPane>
 
-            <Separator layoutX="20.0" layoutY="510.0" prefWidth="830.0" />
-
             <HBox alignment="CENTER_RIGHT" layoutX="20.0" layoutY="525.0" prefWidth="830.0" spacing="20.0">
                <children>
                   <Label fx:id="labelMessage" textFill="#d31414" HBox.hgrow="ALWAYS">
                      <font><Font name="System Bold" size="14.0" /></font>
                   </Label>
-                  <Button fx:id="buttonBack" mnemonicParsing="false" onAction="#goBack"
-                     prefHeight="35.0" prefWidth="120.0"
-                     style="-fx-background-color: #E0E0E0;" text="Cancelar">
+                  <Button fx:id="buttonBack" mnemonicParsing="false" onAction="#goBack" prefHeight="35.0" prefWidth="120.0" style="-fx-background-color: #E0E0E0;" text="Cancelar">
                      <font><Font size="14.0" /></font>
                   </Button>
-                  <Button fx:id="buttonRegisterActivity" mnemonicParsing="false"
-                     onAction="#goToRegisterActivity"
-                     prefHeight="35.0" prefWidth="150.0" text="Registrar Actividad" />
-                  <Button fx:id="buttonGenerate" mnemonicParsing="false"
-                     onAction="#validateMonthlyReport"
-                     prefHeight="35.0" prefWidth="150.0"
-                     style="-fx-background-color: #4CAF50; -fx-text-fill: white;"
-                     text="Generar Reporte">
+                  <Button fx:id="buttonRegisterActivity" mnemonicParsing="false" onAction="#goToRegisterActivity" prefHeight="35.0" prefWidth="150.0" text="Registrar Actividad" />
+                  <Button fx:id="buttonGenerate" mnemonicParsing="false" onAction="#validateMonthlyReport" prefHeight="35.0" prefWidth="150.0" style="-fx-background-color: #4CAF50; -fx-text-fill: white;" text="Generar Reporte">
                      <font><Font name="System Bold" size="14.0" /></font>
                   </Button>
                </children>

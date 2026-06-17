@@ -577,4 +577,26 @@ public class ReportDAO implements IReportDAO {
             databaseConnection.rollback();
         }
     }
+
+    @Override
+    public int countMonthlyReportsByStudent(String studentId) throws OperationException {
+        int count = 0;
+        String reportQuery = "SELECT COUNT(*) FROM Reporte r "
+                            + "INNER JOIN ReporteMensual rm ON r.idReporte = rm.idReporte "
+                            + "WHERE r.matricula = ?";
+        try(Connection databaseConnection = connectionManager.getConnection();
+            PreparedStatement preparedStatement = databaseConnection.prepareStatement(reportQuery)) {
+                preparedStatement.setString(1, studentId);
+
+            try(ResultSet resultSet = preparedStatement.executeQuery()) {
+                if(resultSet.next()) {
+                    count = resultSet.getInt(1);
+                }
+            }
+        } catch(SQLException e) {
+            LOGGER.log(Level.SEVERE, "Error al contar reportes mensuales del alumno", e);
+            throw new OperationException(CHECK_REPORT_ERROR, e);
+        }
+        return count;
+    }
 }

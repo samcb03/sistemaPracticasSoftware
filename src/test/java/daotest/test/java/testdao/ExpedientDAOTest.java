@@ -307,4 +307,30 @@ class ExpedientDAOTest {
         assertThrows(OperationException.class,
             () -> expedientDAO.isDocumentTypeValidated(STUDENT_ID, DOCUMENT_TYPE_ID));
     }
+
+    @Test
+    void countDocumentsByStudentAndType_documentsExist_returnsCount() throws Exception {
+        mockQueryExecution();
+        when(resultSet.next()).thenReturn(true);
+        when(resultSet.getInt(1)).thenReturn(ROWS_AFFECTED);
+
+        assertEquals(ROWS_AFFECTED, expedientDAO.countDocumentsByStudentAndType(STUDENT_ID, DOCUMENT_TYPE_ID));
+    }
+
+    @Test
+    void countDocumentsByStudentAndType_noDocuments_returnsZero() throws Exception {
+        mockQueryExecution();
+        when(resultSet.next()).thenReturn(true);
+        when(resultSet.getInt(1)).thenReturn(NO_ROWS_AFFECTED);
+
+        assertEquals(NO_ROWS_AFFECTED, expedientDAO.countDocumentsByStudentAndType(STUDENT_ID, DOCUMENT_TYPE_ID));
+    }
+
+    @Test
+    void countDocumentsByStudentAndType_sqlError_throwsOperationException() throws Exception {
+        when(connectionManager.getConnection()).thenThrow(new SQLException(DATABASE_ERROR_MESSAGE));
+
+        assertThrows(OperationException.class,
+            () -> expedientDAO.countDocumentsByStudentAndType(STUDENT_ID, DOCUMENT_TYPE_ID));
+    }
 }
