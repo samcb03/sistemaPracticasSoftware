@@ -301,10 +301,8 @@ public class RequestProjectDAO implements IRequestProjectDAO {
         return assignedStudents;
     }
 
-    private void executeAssignmentTransaction(Connection databaseConnection, String idStudent,  
-        int idProject) throws SQLException, OperationException {
-        ensureStudentNotAlreadyAssigned(databaseConnection, idStudent);
-        hasAvailableCapacity(idProject);
+    private void applyExistingRequest(Connection databaseConnection, String idStudent, int idProject) 
+        throws SQLException {
         assignRequest(databaseConnection, idStudent, idProject);
         cleanPendingRequests(databaseConnection, idStudent);
     }
@@ -418,40 +416,26 @@ public class RequestProjectDAO implements IRequestProjectDAO {
             preparedStatement.executeUpdate();
         }
     }
-    
-    private void executeAlternativeAssignment(Connection databaseConnection, String idStudent, int idProject) 
-        throws SQLException, OperationException {
-        ensureStudentNotAlreadyAssigned(databaseConnection, idStudent);
-        insertAssignment(databaseConnection, idStudent, idProject);
-    }
-    //FIXME rediseñar clases ya que el que tenga tantos catch no esta permitido
+    //TODO preguntar si esto es mejor hacerlo asi por separado, o si es mejor hacerlo con dos catch
     private boolean runAssignmentInTransaction(String idStudent, int idProject, boolean isAlternative) 
         throws OperationException {
         boolean isAssigned = false;
 
         try (Connection databaseConnection = connectionManager.getConnection()) {
             databaseConnection.setAutoCommit(false);
+            ensureStudentNotAlreadyAssigned(databaseConnection, idStudent);
 
             try {
                 if (isAlternative) {
-                    executeAlternativeAssignment(databaseConnection, idStudent, idProject);
+                    insertAssignment(databaseConnection, idStudent, idProject);
                 } else {
-                    executeAssignmentTransaction(databaseConnection, idStudent, idProject);
+                    applyExistingRequest(databaseConnection, idStudent, idProject);
                 }
                 databaseConnection.commit();
                 isAssigned = true;
-            } catch (SQLIntegrityConstraintViolationException sqlException) {
-                databaseConnection.rollback();
-                LOGGER.log(Level.WARNING, "Intento de asignar un proyecto duplicado al alumno", sqlException);
-                throw new OperationException("El alumno ya tiene una asignación para ese proyecto.", 
-                    sqlException);
             } catch (SQLException sqlException) {
                 databaseConnection.rollback();
-                LOGGER.log(Level.SEVERE, "Transacción de asignación cancelada", sqlException);
-                throw new OperationException("Error al ejecutar la transacción de asignación", sqlException);
-            } catch (OperationException operationException) {
-                databaseConnection.rollback();
-                throw operationException;
+                throw translateAssignmentFailure(sqlException);
             } finally {
                 databaseConnection.setAutoCommit(true);
             }
@@ -461,5 +445,21 @@ public class RequestProjectDAO implements IRequestProjectDAO {
         }
 
         return isAssigned;
+    }
+
+    private OperationException translateAssignmentFailure(SQLException sqlException) {
+        OperationException assignmentFailure;
+
+        if (sqlException instanceof SQLIntegrityConstraintViolationException) {
+            LOGGER.log(Level.WARNING, "Intento de asignar un proyecto duplicado al alumno", sqlException);
+            assignmentFailure = new OperationException(
+                "El alumno ya tiene un proyecto asignado.", sqlException);
+        } else {
+            LOGGER.log(Level.SEVERE, "Transacción de asignación cancelada", sqlException);
+            assignmentFailure = new OperationException(
+                "Error al ejecutar la transacción de asignación", sqlException);
+        }
+
+        return assignmentFailure;
     }
 }
