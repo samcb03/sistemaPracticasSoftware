@@ -103,4 +103,14 @@ public interface IExpedientDAO {
      * @throws OperationException if the verification cannot be completed
      */
     boolean isDocumentTypeValidated(String idStudent, int idTypeDocument) throws OperationException;
+
+    /**
+     * Counts the number of documents a student has uploaded of a given type.
+     *
+     * @param studentId the identifier of the student to verify
+     * @param typeId the document type identifier to count
+     * @return the number of documents uploaded of that type
+     * @throws OperationException if the count cannot be retrieved
+     */
+    int countDocumentsByStudentAndType(String studentId, int typeId) throws OperationException;
 }

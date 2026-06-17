@@ -393,4 +393,30 @@ class ReportDAOTest {
         assertThrows(OperationException.class,
             () -> reportDAO.hasReportOfType(FIRST_STUDENT_ID, FINAL_REPORT_TYPE_ID));
     }
+
+    @Test
+    void countMonthlyReportsByStudent_reportsExist_returnsCount() throws Exception {
+        mockQueryExecution();
+        when(resultSet.next()).thenReturn(true);
+        when(resultSet.getInt(FIRST_COLUMN)).thenReturn(REPORT_COUNT);
+
+        assertEquals(REPORT_COUNT, reportDAO.countMonthlyReportsByStudent(FIRST_STUDENT_ID));
+    }
+
+    @Test
+    void countMonthlyReportsByStudent_noReports_returnsZero() throws Exception {
+        mockQueryExecution();
+        when(resultSet.next()).thenReturn(true);
+        when(resultSet.getInt(FIRST_COLUMN)).thenReturn(NO_REPORT_COUNT);
+
+        assertEquals(NO_REPORT_COUNT, reportDAO.countMonthlyReportsByStudent(FIRST_STUDENT_ID));
+    }
+
+    @Test
+    void countMonthlyReportsByStudent_sqlError_throwsOperationException() throws Exception {
+        when(connectionManager.getConnection()).thenThrow(new SQLException(DATABASE_ERROR_MESSAGE));
+
+        assertThrows(OperationException.class,
+            () -> reportDAO.countMonthlyReportsByStudent(FIRST_STUDENT_ID));
+    }
 }

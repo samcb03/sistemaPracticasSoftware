@@ -102,4 +102,13 @@ public interface IReportDAO {
      * @throws OperationException if the verification cannot be completed
      */
     boolean hasReportOfType(String idStudent, int idTypeDocument) throws OperationException;
+
+    /**
+     * Counts the number of monthly reports registered for a student.
+     *
+     * @param studentId the identifier of the student to verify
+     * @return the number of monthly reports registered for the student
+     * @throws OperationException if the count cannot be retrieved
+     */
+    int countMonthlyReportsByStudent(String studentId) throws OperationException;
 }

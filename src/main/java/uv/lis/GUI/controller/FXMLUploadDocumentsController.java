@@ -41,6 +41,7 @@ public class FXMLUploadDocumentsController extends ValidationHandler {
     private static final int AUTOEVALUATION_TYPE_ID = 1;
     private static final int PARTIAL_REPORT_TYPE_ID = 4;
     private static final int ACCEPTANCE_LETTER_TYPE_ID = 9;
+    private static final int MONTHLY_REPORT_TYPE = 3;
 
     private static final String NO_STUDENT_MESSAGE = "No hay alumno en sesión.";
     private static final String NO_TYPE_MESSAGE = "Seleccione un tipo de documento.";
@@ -161,7 +162,8 @@ public class FXMLUploadDocumentsController extends ValidationHandler {
 
         if (typeId.isPresent()) {
             int idTypeDocument = typeId.get();
-            if (expedientDAO.isDocumentTypeValidated(studentId, idTypeDocument)) {
+            boolean isMonthlyReport = (idTypeDocument == MONTHLY_REPORT_TYPE);
+            if (!isMonthlyReport && expedientDAO.isDocumentTypeValidated(studentId, idTypeDocument)) {
                 restriction = Optional.of(ALREADY_VALIDATED_MESSAGE);
             } else if (idTypeDocument == ACCEPTANCE_LETTER_TYPE_ID
                 && !studentDAO.hasProjectAssigned(studentId)) {
@@ -184,6 +186,10 @@ public class FXMLUploadDocumentsController extends ValidationHandler {
 
         if (idTypeDocument == AUTOEVALUATION_TYPE_ID) {
             exists = autoevaluationDAO.existsByStudent(studentId);
+        } else if(idTypeDocument == MONTHLY_REPORT_TYPE) {
+            int generate = reportDAO.countMonthlyReportsByStudent(studentId);
+            int uploaded = expedientDAO.countDocumentsByStudentAndType(studentId, MONTHLY_REPORT_TYPE);
+            exists = generate > uploaded;
         } else {
             exists = reportDAO.hasReportOfType(studentId, idTypeDocument);
         }

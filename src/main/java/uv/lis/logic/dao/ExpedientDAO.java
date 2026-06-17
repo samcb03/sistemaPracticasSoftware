@@ -394,4 +394,29 @@ public class ExpedientDAO implements IExpedientDAO {
         }
         return isSaved;
     }
+
+
+    @Override
+    public int countDocumentsByStudentAndType(String studentId, int typeId) throws OperationException {
+        int count = 0;
+        String query = "SELECT COUNT(*) FROM Expediente "
+                    + "WHERE matricula = ? AND idTipoDocumento = ?";
+
+        try (Connection databaseConnection = connectionManager.getConnection();
+            PreparedStatement preparedStatement = databaseConnection.prepareStatement(query)) {
+
+            preparedStatement.setString(1, studentId);
+            preparedStatement.setInt(2, typeId);
+
+            try (ResultSet resultSet = preparedStatement.executeQuery()) {
+                if (resultSet.next()) {
+                    count = resultSet.getInt(1);
+                }
+            }
+        } catch (SQLException e) {
+            LOGGER.log(Level.SEVERE, "Error al contar documentos por tipo", e);
+            throw new OperationException("Error al verificar documentos subidos", e);
+        }
+        return count;
+    }
 }

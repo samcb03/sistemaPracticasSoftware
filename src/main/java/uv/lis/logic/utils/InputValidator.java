@@ -537,6 +537,17 @@ public final class InputValidator {
             .orElse(Optional.empty());
     }
 
+    /**
+     * Verifies that a registration field is not empty, contains only letters,
+     * digits, spaces, periods, commas, and hyphens, and does not contain
+     * leading, trailing, or consecutive spaces, or repeated letters.
+     *
+     * @param registerValue the value to evaluate
+     *
+     * @param fieldName the field label used in the error message
+     *
+     * @return the first error found, or empty if all rules pass
+     */
     public static Optional<String> validateRegister(String registerValue, String fieldName) {
         Optional<String> validateRegister = Optional.empty();
         if(!registerValue.matches(REGISTER_REGEX)) {
@@ -554,7 +565,19 @@ public final class InputValidator {
         }
         return validateRegister;
     }
-    
+
+    /**
+     * Verifies that an address number is not empty, contains only letters,
+     * digits, spaces, slashes, hyphens, and pound signs, and does not contain
+     * leading, trailing, or consecutive spaces.
+     *
+     * @param addressNumber the value to evaluate
+     *
+     * @param fieldName the field label used in the error message
+     *
+     * @return the first error found, or empty if all rules pass
+     */
+
     public static Optional<String> validateAddressNumber(String addressNumber, String fieldName) {
         Optional<String> validateAddressNumber = Optional.empty();
         if(!addressNumber.matches(ADDRESS_NUMBER_REGEX)) {
