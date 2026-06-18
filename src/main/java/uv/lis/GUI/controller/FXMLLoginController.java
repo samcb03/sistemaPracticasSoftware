@@ -59,6 +59,8 @@ public class FXMLLoginController implements Initializable {
     @FXML private Button buttonLogin;
 
     private UserDAO userDAO;
+    private StudentDAO studentDAO;
+    private ProfessorDAO professorDAO;
     private User user;
     private EmailCommon emailCommon;
     private FXMLVerifyCodeController verifyController;
@@ -69,6 +71,8 @@ public class FXMLLoginController implements Initializable {
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         this.userDAO = new UserDAO();
+        this.studentDAO = new StudentDAO();
+        this.professorDAO = new ProfessorDAO();
         this.emailCommon = new EmailCommon();
         textFieldPasswordVisible.textProperty().bindBidirectional(passwordFieldPassword.textProperty());
         eyeOpen = new Image(getClass().getResourceAsStream("/uv/lis/GUI/view/images/show-password-icon-eye-symbol" 
@@ -207,31 +211,13 @@ public class FXMLLoginController implements Initializable {
         try {
             switch (roleId) {
                 case USER_TYPE_STUDENT:
-                    Optional<Student> validateStudent = new StudentDAO().getStudentById(userId);
-                    if (validateStudent.isPresent()) {
-                        SessionManager.getInstance().setCurrentStudent(validateStudent.get());
-                        isLoaded = true;
-                    } else {
-                        showError("No se encontraron los datos del estudiante en la base de datos.");
-                    }
+                    isLoaded = loadStudentSession(userId);
                     break;
-                case USER_TYPE_PROFESSOR: 
-                    Optional<Professor> validateProfessor = new ProfessorDAO().getProfessorById(userId);
-                    if (validateProfessor.isPresent()) {
-                        SessionManager.getInstance().setCurrentProfessor(validateProfessor.get());
-                        isLoaded = true;
-                    } else {
-                        showError("No se encontraron los datos del profesor en la base de datos.");
-                    }
+                case USER_TYPE_PROFESSOR:
+                    isLoaded = loadProfessorSession(userId);
                     break;
                 case USER_TYPE_COORDINATOR:
-                    Optional<Professor> validateCoordinator = new ProfessorDAO().getProfessorById(userId);
-                    if (validateCoordinator.isPresent()) {
-                        SessionManager.getInstance().setCurrentCoordinator(validateCoordinator.get());
-                        isLoaded = true;
-                    } else {
-                        showError("No se encontraron los datos del coordinador en la base de datos.");
-                    }
+                    isLoaded = loadCoordinatorSession(userId);
                     break;
                 case USER_TYPE_ADMINISTRATOR:
                     LOGGER.log(Level.INFO, "Inició sesión el administrador");
@@ -244,6 +230,42 @@ public class FXMLLoginController implements Initializable {
         } catch (OperationException e) {
             LOGGER.log(Level.SEVERE, "Error al cargar los datos del usuario para la sesión", e);
             showError(e.getMessage());
+        }
+        return isLoaded;
+    }
+
+    private boolean loadStudentSession(int userId) throws OperationException {
+        boolean isLoaded = false;
+        Optional<Student> validateStudent = studentDAO.getStudentById(userId);
+        if (validateStudent.isPresent()) {
+            SessionManager.getInstance().setCurrentStudent(validateStudent.get());
+            isLoaded = true;
+        } else {
+            showError("No se encontraron los datos del estudiante en la base de datos.");
+        }
+        return isLoaded;
+    }
+
+    private boolean loadProfessorSession(int userId) throws OperationException {
+        boolean isLoaded = false;
+        Optional<Professor> validateProfessor = professorDAO.getProfessorById(userId);
+        if (validateProfessor.isPresent()) {
+            SessionManager.getInstance().setCurrentProfessor(validateProfessor.get());
+            isLoaded = true;
+        } else {
+            showError("No se encontraron los datos del profesor en la base de datos.");
+        }
+        return isLoaded;
+    }
+
+    private boolean loadCoordinatorSession(int userId) throws OperationException {
+        boolean isLoaded = false;
+        Optional<Professor> validateCoordinator = professorDAO.getProfessorById(userId);
+        if (validateCoordinator.isPresent()) {
+            SessionManager.getInstance().setCurrentCoordinator(validateCoordinator.get());
+            isLoaded = true;
+        } else {
+            showError("No se encontraron los datos del coordinador en la base de datos.");
         }
         return isLoaded;
     }
