@@ -1,5 +1,7 @@
 package uv.lis.GUI.controller;
 
+
+import static uv.lis.logic.utils.InputValidator.MAX_HOURS_PER_ACTIVITY;
 import java.net.URL;
 import java.time.LocalDate;
 import java.util.List;
@@ -148,15 +150,20 @@ public class FXMLGenerateMonthlyReportController extends ValidationHandler {
         if (selectedMonth.isEmpty()) {
             showError("Seleccione un mes antes de generar el reporte.");
         } else {
-        String currentMonth = selectedMonth.get();
+            String currentMonth = selectedMonth.get();
+            String accumulatedText = labelAccumulatedHours.getText();
+            String reportedText = labelReportedHours.getText();
+            int accumulatedHours = Integer.parseInt(accumulatedText);
+            int hoursReported = Integer.parseInt(reportedText);
 
-        String accumulatedText = labelAccumulatedHours.getText();
-            if(!accumulatedText.isEmpty() && Integer.parseInt(accumulatedText) >= MAX_ACCUMULATED_HOURS) {
+            if(!accumulatedText.isEmpty() && accumulatedHours >= MAX_ACCUMULATED_HOURS) {
                 showError("Has alcanzado el límite de 420 horas acumuladas. "
                         + "No es posible generar más reportes.");
+            } else if (!reportedText.isEmpty() && hoursReported > MAX_HOURS_PER_ACTIVITY) {
+                showError("Las horas reportadas no pueden exceder las " 
+                    + MAX_HOURS_PER_ACTIVITY + " horas");
             } else {
-
-            boolean duplicated = false;
+                boolean duplicated = false;
                 try {
                     duplicated = reportContextDAO.hasReportAlreadyBeenGenerated(studentId, currentMonth);
 
