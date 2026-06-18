@@ -34,6 +34,7 @@ public final class InputValidator {
     private static final int MAX_PAST_MONTHS = 6;
     private static final int FALL_TERM_YEAR_OFFSET = 1;
     public static final int POSTAL_CODE_LENGTH = 5;
+    public static final int MAX_HOURS_PER_ACTIVITY = 70;
     public static final String PERIOD_TERM_FALL = "01";
     public static final String PERIOD_TERM_SPRING = "51";
     public static final String LETTERS_ONLY_REGEX = "^[\\p{L}\\s]+$";
