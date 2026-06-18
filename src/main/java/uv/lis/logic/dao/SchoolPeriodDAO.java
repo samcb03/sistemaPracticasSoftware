@@ -81,13 +81,13 @@ public class SchoolPeriodDAO implements ISchoolPeriodDAO{
     @Override
     public boolean registerSchoolPeriod(SchoolPeriod schoolPeriod) throws OperationException {
         boolean isRegistered = false;
-        String schoolPeriodQuery = "INSERT INTO PeriodoEscolar(idPeriodoEscolar, FechaInicio, FechaFin) " 
+        String schoolPeriodQuery = "INSERT INTO PeriodoEscolar(nombre, FechaInicio, FechaFin) " 
                                  + "VALUES(?, ?, ?);";
 
         try (Connection databaseConnection = connectionManager.getConnection();
             PreparedStatement preparedStatement = databaseConnection.prepareStatement(schoolPeriodQuery)) {
 
-            preparedStatement.setInt(1, schoolPeriod.getId());
+            preparedStatement.setString(1, schoolPeriod.getName());
             preparedStatement.setDate(2, schoolPeriod.getStartDate());
             preparedStatement.setDate(3, schoolPeriod.getEndDate());
 
@@ -98,9 +98,9 @@ public class SchoolPeriodDAO implements ISchoolPeriodDAO{
                     null);
             }
         } catch (SQLIntegrityConstraintViolationException e) {
-            LOGGER.log(Level.WARNING, "Intento de registrar un periodo escolar duplicado con ID {0}", 
-                schoolPeriod.getId());
-            throw new OperationException("Ya existe un periodo escolar registrado con ese identificador.", e);
+            LOGGER.log(Level.WARNING, "Intento de registrar un periodo escolar duplicado con nombre {0}", 
+                schoolPeriod.getName());
+            throw new OperationException("Ya existe un periodo escolar registrado con ese código.", e);
         } catch (SQLException e) {
             LOGGER.log(Level.SEVERE, "Error de conexion con la base de datos",e);
             throw new OperationException("Error al registrar el periodo escolar", e);
