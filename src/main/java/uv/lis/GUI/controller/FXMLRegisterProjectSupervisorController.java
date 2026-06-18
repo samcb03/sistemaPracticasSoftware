@@ -55,7 +55,7 @@ public class FXMLRegisterProjectSupervisorController extends ValidationHandler {
     @FXML
     public void validateFields() {
         Optional<String> firstValidationError = getFirstValidationError();
-        handleValidation(firstValidationError, this::registerProjectSupervisor);
+        handleValidation(firstValidationError, this::performRegistration);
     }
 
     private Optional<String> getFirstValidationError() {
@@ -72,7 +72,7 @@ public class FXMLRegisterProjectSupervisorController extends ValidationHandler {
         return firstError;
     }
 
-    private void registerProjectSupervisor() {
+    private void performRegistration() {
         ProjectSupervisor projectSupervisor = buildProjectSupervisor();
         try {
             boolean registered = projectSupervisorDAO.registerProjectSupervisor(projectSupervisor);

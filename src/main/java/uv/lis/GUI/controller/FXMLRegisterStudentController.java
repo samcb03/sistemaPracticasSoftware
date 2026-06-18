@@ -56,7 +56,7 @@ public class FXMLRegisterStudentController extends ValidationHandler {
     @FXML
     public void validateFields() {
         Optional<String> firstValidationError = getFirstValidationError();
-        handleValidation(firstValidationError, this::registerStudent);
+        handleValidation(firstValidationError, this::performRegistration);
     }
 
     private Optional<String> getFirstValidationError() {
@@ -78,7 +78,7 @@ public class FXMLRegisterStudentController extends ValidationHandler {
         return firstError;
     }
 
-    private void registerStudent() {
+    private void performRegistration() {
         Student student = buildStudent();
 
         if (!student.getIdStudent().matches(STUDENT_ENROLLMENT)) {

@@ -46,7 +46,7 @@ public class FXMLRegisterProfessorController extends ValidationHandler {
     @FXML
     public void validateFields() {
         Optional<String> firstValidationError = getFirstValidationError();
-        handleValidation(firstValidationError, this::registerProfessor);
+        handleValidation(firstValidationError, this::performRegistration);
     }
 
     private Optional<String> getFirstValidationError() {
@@ -66,7 +66,7 @@ public class FXMLRegisterProfessorController extends ValidationHandler {
         return firstError;
     }
 
-    private void registerProfessor() {
+    private void performRegistration() {
         Professor professor = buildProfessor();
         try {
             if (professorDAO.registerProfessor(professor)) {

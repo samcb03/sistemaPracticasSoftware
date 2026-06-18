@@ -90,7 +90,7 @@ public class FXMLRegisterSubjectController extends ValidationHandler {
     @FXML
     public void validateFields() {
         Optional<String> firstValidationError = getFirstValidationError();
-        handleValidation(firstValidationError, this::registerSubject);
+        handleValidation(firstValidationError, this::performRegistration);
     }
 
     private Optional<String> getFirstValidationError() {
@@ -107,7 +107,7 @@ public class FXMLRegisterSubjectController extends ValidationHandler {
         return firstError;
     }
 
-    private void registerSubject() {
+    private void performRegistration() {
         Optional<Subject> subject = buildSubject();
 
         subject.ifPresent(newSubject -> {

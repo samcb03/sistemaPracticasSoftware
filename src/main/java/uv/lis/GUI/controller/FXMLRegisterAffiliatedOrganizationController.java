@@ -50,7 +50,7 @@ public class FXMLRegisterAffiliatedOrganizationController extends ValidationHand
     @FXML
     public void validateFields() {
         Optional<String> firstValidationError = getFirstValidationError();
-        handleValidation(firstValidationError, this::registerAffiliatedOrganization);
+        handleValidation(firstValidationError, this::performRegistration);
     }
     
     private Optional<String> getFirstValidationError() {
@@ -76,7 +76,7 @@ public class FXMLRegisterAffiliatedOrganizationController extends ValidationHand
         return firstError;
     }
 
-    private void registerAffiliatedOrganization() {
+    private void performRegistration() {
         AffiliatedOrganization organization = buildOrganization();
         try {
             boolean registrationSuccessful = affiliatedOrganizationDAO.registerOrganization(organization);
