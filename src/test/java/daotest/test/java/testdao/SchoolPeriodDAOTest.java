@@ -13,6 +13,7 @@ import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.SQLIntegrityConstraintViolationException;
 import java.util.List;
 import java.util.Optional;
 
@@ -37,6 +38,7 @@ class SchoolPeriodDAOTest {
     private static final String FIRST_PERIOD_NAME = "Febrero-Julio 2026";
     private static final String SECOND_PERIOD_NAME = "Agosto 2026-Enero 2027";
     private static final String INVALID_PERIOD_NAME = "No Existe";
+    private static final String PERIOD_CODE = "202701";
     private static final String START_DATE = "2025-01-20";
     private static final String END_DATE = "2025-06-20";
     private static final String DATABASE_ERROR_MESSAGE = "Fallo";
@@ -77,6 +79,7 @@ class SchoolPeriodDAOTest {
     private SchoolPeriod builderSchoolPeriod() {
         SchoolPeriod schoolPeriod = new SchoolPeriod();
         schoolPeriod.setId(VALID_PERIOD_ID);
+        schoolPeriod.setName(PERIOD_CODE);
         schoolPeriod.setStartDate(Date.valueOf(START_DATE));
         schoolPeriod.setEndDate(Date.valueOf(END_DATE));
         return schoolPeriod;
@@ -155,6 +158,16 @@ class SchoolPeriodDAOTest {
         when(connectionManager.getConnection()).thenThrow(new SQLException(DATABASE_ERROR_MESSAGE));
 
         assertThrows(OperationException.class,
+            () -> schoolPeriodDAO.registerSchoolPeriod(builderSchoolPeriod()));
+    }
+
+    @Test
+    void registerSchoolPeriod_duplicateCode_throwsOperationException() throws Exception {
+        when(databaseConnection.prepareStatement(anyString())).thenReturn(preparedStatement);
+        when(preparedStatement.executeUpdate())
+            .thenThrow(new SQLIntegrityConstraintViolationException(DATABASE_ERROR_MESSAGE));
+
+        assertThrows(OperationException.class, 
             () -> schoolPeriodDAO.registerSchoolPeriod(builderSchoolPeriod()));
     }
 

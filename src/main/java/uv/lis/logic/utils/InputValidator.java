@@ -2,6 +2,7 @@ package uv.lis.logic.utils;
 
 
 import java.time.LocalDate;
+import java.time.Month;
 import java.time.Period;
 import java.util.Optional;
 import java.util.stream.Stream;
@@ -31,7 +32,10 @@ public final class InputValidator {
     private static final int MINIMUM_AGE = 18;
     private static final int MAX_PROJECT_CAPACITY = 2;
     private static final int MAX_PAST_MONTHS = 6;
+    private static final int FALL_TERM_YEAR_OFFSET = 1;
     public static final int POSTAL_CODE_LENGTH = 5;
+    public static final String PERIOD_TERM_FALL = "01";
+    public static final String PERIOD_TERM_SPRING = "51";
     public static final String LETTERS_ONLY_REGEX = "^[\\p{L}\\s]+$";
     public static final String LEADING_SPACE_REGEX = "^\\s.*";
     public static final String TRAILING_SPACE_REGEX = ".*\\s$";
@@ -469,6 +473,72 @@ public final class InputValidator {
             validationResult = Optional.empty();
         }
         return validationResult;
+    }
+
+    /**
+     * Verifies that the start date matches the month required by the period term:
+     * August for term 01 and February for term 51.
+     *
+     * @param term the selected period term (01 or 51)
+     *
+     * @param startDate the date to evaluate
+     *
+     * @param fieldName the field label used in the error message
+     *
+     * @return an error message if the start month does not match the term, empty otherwise
+     */
+    public static Optional<String> validatePeriodStartDate(String term, LocalDate startDate, String fieldName) {
+        Optional<String> validationResult;
+        if (startDate == null) {
+            validationResult = Optional.of("Seleccione una fecha de inicio");
+        } else if (PERIOD_TERM_FALL.equals(term) && startDate.getMonth() != Month.AUGUST) {
+            validationResult = Optional.of(fieldName + " debe iniciar en agosto para el periodo 01");
+        } else if (PERIOD_TERM_SPRING.equals(term) && startDate.getMonth() != Month.FEBRUARY) {
+            validationResult = Optional.of(fieldName + " debe iniciar en febrero para el periodo 51");
+        } else {
+            validationResult = Optional.empty();
+        }
+        return validationResult;
+    }
+
+    /**
+     * Verifies that the end date matches the term: January of the following year for
+     * term 01, and July of the same year for term 51.
+     *
+     * @param term the selected period term (01 or 51)
+     *
+     * @param startDate the reference start date
+     *
+     * @param endDate the date to evaluate
+     *
+     * @return an error message if the end date does not match the term, empty otherwise
+     */
+    public static Optional<String> validatePeriodEndDate(String term, LocalDate startDate, LocalDate endDate) {
+        Optional<String> validationResult;
+        if (endDate == null) {
+            validationResult = Optional.of("Seleccione una fecha de finalización");
+        } else if (startDate == null) {
+            validationResult = Optional.of("Seleccione primero la fecha de inicio");
+        } else if (PERIOD_TERM_FALL.equals(term) && !isFallTermEnd(startDate, endDate)) {
+            validationResult = Optional.of("El periodo 01 debe terminar en enero del año siguiente");
+        } else if (PERIOD_TERM_SPRING.equals(term) && !isSpringTermEnd(startDate, endDate)) {
+            validationResult = Optional.of("El periodo 51 debe terminar en julio del mismo año");
+        } else {
+            validationResult = Optional.empty();
+        }
+        return validationResult;
+    }
+
+    private static boolean isFallTermEnd(LocalDate startDate, LocalDate endDate) {
+        boolean isValidEnd = endDate.getMonth() == Month.JANUARY
+            && endDate.getYear() == startDate.getYear() + FALL_TERM_YEAR_OFFSET;
+        return isValidEnd;
+    }
+
+    private static boolean isSpringTermEnd(LocalDate startDate, LocalDate endDate) {
+        boolean isValidEnd = endDate.getMonth() == Month.JULY
+            && endDate.getYear() == startDate.getYear();
+        return isValidEnd;
     }
 
     /**

@@ -12,6 +12,7 @@ public class FXMLAdministratorMenuController extends WindowHandler  {
 
     @FXML private Button buttonRegisterProfessor;
     @FXML private Button buttonConsultProfessor;
+    @FXML private Button buttonRegisterSchoolPeriod;
     @FXML private Button buttonLogOut;
 
     @Override
@@ -26,6 +27,11 @@ public class FXMLAdministratorMenuController extends WindowHandler  {
     @FXML
     public void goToConsultProfessor() {
         navigateTo("/uv/lis/GUI/view/FXMLManageProfessor.fxml");
+    }
+
+    @FXML
+    public void goToRegisterSchoolPeriod() {
+        navigateTo("/uv/lis/GUI/view/FXMLRegisterSchoolPeriod.fxml");
     }
 
 }

@@ -6,12 +6,13 @@ import java.util.Map;
 public class OperationException extends Exception {
 
     private static final int SQL_STATE_CLASS_LENGTH = 2;
+    //TODO al momento de haber un registro duplicado, siempre manda el mensaje del SQLState 22, ver si es mejor este general o usar las excepciones
     private static final Map<String, String> SQL_STATE_MESSAGES = Map.of(
         "08", "Error de conexion con la base de datos. Intente mas tarde",
         "28", "Acceso denegado a la base de datos.",
         "42", "Configuración o permisos incorrectos. Contacte al administrador",
         "22", "Uno de los campos excede la longitud o el formato permitido",
-        "23", "Ya existe un registro con esos datos o se viola una restricción de integridad");
+        "23", "Ya existe un registro con esos datos");
 
     public OperationException(String message, Throwable cause) {
         super(message, cause);
