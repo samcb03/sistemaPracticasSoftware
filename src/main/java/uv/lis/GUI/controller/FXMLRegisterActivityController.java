@@ -65,7 +65,7 @@ public class FXMLRegisterActivityController extends ValidationHandler {
     @FXML
     public void validateFields() {
         Optional<String> validationError = getFirstValidationError();
-        handleValidation(validationError, this::registerActivity);
+        handleValidation(validationError, this::performRegistration);
     }
 
     private Optional<String> getFirstValidationError() {
@@ -116,7 +116,7 @@ public class FXMLRegisterActivityController extends ValidationHandler {
         datePickerFinalDate.setDisable(true);
     }
 
-    private void registerActivity() {
+    private void performRegistration() {
         try {
             Activity activity = buildActivity();
             boolean registrationSuccessful = activityDAO.registerActivity(activity);
