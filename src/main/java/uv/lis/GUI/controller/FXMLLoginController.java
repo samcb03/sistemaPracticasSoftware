@@ -45,6 +45,7 @@ public class FXMLLoginController implements Initializable {
     private static final int MAX_ATTEMPTS = 5;
     private static final String MESSAGE_INVALID_CREDENTIALS = "Credenciales inválidas. Intentos restantes: ";
     private static final String MESSAGE_TOO_MANY_ATTEMPTS =  "Demasiados intentos fallidos. Reinicie la aplicación.";
+    private static final String MESSAGE_USER_DATA_NOT_FOUND = "No se encontraron los datos.";
     private static final String VERIFY_VIEW_FXML = "/uv/lis/GUI/view/FXMLVerifyCode.fxml";
 
     private static final Logger LOGGER = Logger.getLogger(FXMLLoginController.class.getName());
@@ -241,7 +242,7 @@ public class FXMLLoginController implements Initializable {
             SessionManager.getInstance().setCurrentStudent(validateStudent.get());
             isLoaded = true;
         } else {
-            showError("No se encontraron los datos del estudiante en la base de datos.");
+            showError(MESSAGE_USER_DATA_NOT_FOUND);
         }
         return isLoaded;
     }
@@ -253,7 +254,7 @@ public class FXMLLoginController implements Initializable {
             SessionManager.getInstance().setCurrentProfessor(validateProfessor.get());
             isLoaded = true;
         } else {
-            showError("No se encontraron los datos del profesor en la base de datos.");
+            showError(MESSAGE_USER_DATA_NOT_FOUND);
         }
         return isLoaded;
     }
@@ -265,7 +266,7 @@ public class FXMLLoginController implements Initializable {
             SessionManager.getInstance().setCurrentCoordinator(validateCoordinator.get());
             isLoaded = true;
         } else {
-            showError("No se encontraron los datos del coordinador en la base de datos.");
+            showError(MESSAGE_USER_DATA_NOT_FOUND);
         }
         return isLoaded;
     }
