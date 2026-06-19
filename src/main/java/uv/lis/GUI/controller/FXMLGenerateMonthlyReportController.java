@@ -44,6 +44,8 @@ public class FXMLGenerateMonthlyReportController extends ValidationHandler {
     private static final String REPORT_VIEWER_TITLE = "Reporte Mensual";
     private static final String EMPTY_TEXT = "";
     private static final String REPORT_BLOCK = "7";
+    private static final String FIRST_PERIOD_SUFFIX = "51";
+    private static final String SECOND_PERIOD_SUFFIX = "01";
 
     private static final int MAX_ACTIVITY_INPUTS = 7;
     private static final int MONTH_JANUARY = 1;
@@ -62,9 +64,13 @@ public class FXMLGenerateMonthlyReportController extends ValidationHandler {
     private static final int INITIAL_REPORTED_HOURS = 0;
     private static final int MAX_ACCUMULATED_HOURS = 420;
 
-    private static final List<String> MONTH_NAMES = List.of(
-        "enero", "febrero", "marzo", "abril", "mayo", "junio",
-        "julio", "agosto", "septiembre", "octubre", "noviembre", "diciembre"
+    private static final List<String> MONTH_NAMES_FIRST_PERIOD = List.of(
+        "Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio",
+        "Julio"
+    );
+
+    private static final List<String> MONTH_NAMES_SECOND_PERIOD = List.of(
+        "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"
     );
 
     private static final Map<String, Integer> MONTH_NUMBERS_BY_NAME = Map.ofEntries(
@@ -132,7 +138,6 @@ public class FXMLGenerateMonthlyReportController extends ValidationHandler {
         labelBlock.setText(REPORT_BLOCK);
         loadStudentData();
 
-        comboBoxMonth.setItems(FXCollections.observableArrayList(MONTH_NAMES));
         comboBoxMonth.getSelectionModel().selectedItemProperty().addListener(
             (obs, oldMonth, newMonth) -> {
             if (newMonth != null) {
@@ -241,6 +246,20 @@ public class FXMLGenerateMonthlyReportController extends ValidationHandler {
         }
     }
 
+    private void loadAvailableMonth() {
+        List<String> availableMonths;
+
+        if(schoolPeriod !=null && schoolPeriod.endsWith(FIRST_PERIOD_SUFFIX)) {
+            availableMonths = MONTH_NAMES_FIRST_PERIOD;
+        } else if(schoolPeriod !=null && schoolPeriod.endsWith(SECOND_PERIOD_SUFFIX)) {
+            availableMonths = MONTH_NAMES_SECOND_PERIOD;
+        } else {
+            availableMonths = List.of();
+            LOGGER.log(Level.WARNING, "El periodo escolar no es válido: {0}", schoolPeriod);
+        }
+        comboBoxMonth.setItems(FXCollections.observableArrayList(availableMonths));
+    }
+
     private void populateContextLabels(MonthlyReport context) {
         labelStudentName.setText(context.getStudentName());
         labelCoordinatorName.setText(context.getCoordinatorName());
@@ -249,6 +268,7 @@ public class FXMLGenerateMonthlyReportController extends ValidationHandler {
         labelSubject.setText(context.getNrcSubject());
         labelNumberReport.setText(String.valueOf(context.getReportNumber()));
         schoolPeriod = context.getPeriod();
+        loadAvailableMonth();
     }
 
     //FIXME Validar que los reportes se generen en la última semana de los meses
