@@ -15,6 +15,7 @@ import java.util.Optional;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
@@ -57,7 +58,7 @@ public class FXMLLoginControllerTest extends ApplicationTest {
 
     private static final String VALID_EMAIL = "cbsam575@gmail.com";
     private static final String VALID_PASSWORD = "Leumas_03oal";
-    private static final String INVALID_EMAIL = "cbsam575gmail.com";
+    private static final String INVALID_EMAIL = "cbsam575.com";
     private static final String INVALID_PASSWORD = "hola123";
     private static final String EMPTY_VALUE = "";
 
@@ -83,12 +84,8 @@ public class FXMLLoginControllerTest extends ApplicationTest {
         "Credenciales inválidas. Intentos restantes: 4";
     private static final String EXPECTED_TOO_MANY_ATTEMPTS_MESSAGE =
         "Demasiados intentos fallidos. Reinicie la aplicación.";
-    private static final String EXPECTED_STUDENT_NOT_FOUND_MESSAGE =
-        "No se encontraron los datos del estudiante en la base de datos.";
-    private static final String EXPECTED_PROFESSOR_NOT_FOUND_MESSAGE =
-        "No se encontraron los datos del profesor en la base de datos.";
-    private static final String EXPECTED_COORDINATOR_NOT_FOUND_MESSAGE =
-        "No se encontraron los datos del coordinador en la base de datos.";
+    private static final String EXPECTED_USER_DATA_NOT_FOUND_MESSAGE =
+        "No se encontraron los datos.";
     private static final String AUTHENTICATION_ERROR_MESSAGE = "Error de autenticación de prueba";
     private static final String OPERATION_ERROR_MESSAGE = "Error de operación de prueba";
     private static final String EMAIL_ERROR_MESSAGE = "Error de envío de correo de prueba";
@@ -190,7 +187,19 @@ public class FXMLLoginControllerTest extends ApplicationTest {
     }
 
     @Test
-    void handleLogin_authenticateException_showsExceptionMessage() throws AuthenticateException {
+    void handleLogin_maxFailedAttempts_disablesLoginButton() throws Exception {
+        when(userDAOMock.authenticate(anyString(), anyString())).thenReturn(Optional.empty());
+        typeCredentials(VALID_EMAIL, VALID_PASSWORD);
+
+        for (int attempt = 0; attempt < ATTEMPTS_UNTIL_BLOCK; attempt++) {
+            clickLogin();
+        }
+
+        assertTrue(isLoginButtonDisabled());
+    }
+
+    @Test
+    void handleLogin_authenticateException_showsExceptionMessage() throws Exception {
         AuthenticateException authenticateException = new AuthenticateException(AUTHENTICATION_ERROR_MESSAGE);
         when(userDAOMock.authenticate(anyString(), anyString())).thenThrow(authenticateException);
 
@@ -209,7 +218,7 @@ public class FXMLLoginControllerTest extends ApplicationTest {
         typeCredentials(VALID_EMAIL, VALID_PASSWORD);
         clickLogin();
 
-        assertEquals(EXPECTED_STUDENT_NOT_FOUND_MESSAGE, errorLabelText());
+        assertEquals(EXPECTED_USER_DATA_NOT_FOUND_MESSAGE, errorLabelText());
     }
 
     @Test
@@ -221,7 +230,7 @@ public class FXMLLoginControllerTest extends ApplicationTest {
         typeCredentials(VALID_EMAIL, VALID_PASSWORD);
         clickLogin();
 
-        assertEquals(EXPECTED_PROFESSOR_NOT_FOUND_MESSAGE, errorLabelText());
+        assertEquals(EXPECTED_USER_DATA_NOT_FOUND_MESSAGE, errorLabelText());
     }
 
     @Test
@@ -233,7 +242,7 @@ public class FXMLLoginControllerTest extends ApplicationTest {
         typeCredentials(VALID_EMAIL, VALID_PASSWORD);
         clickLogin();
 
-        assertEquals(EXPECTED_COORDINATOR_NOT_FOUND_MESSAGE, errorLabelText());
+        assertEquals(EXPECTED_USER_DATA_NOT_FOUND_MESSAGE, errorLabelText());
     }
 
     @Test
@@ -263,7 +272,7 @@ public class FXMLLoginControllerTest extends ApplicationTest {
     }
 
     @Test
-    void handleLogin_administratorSuccess_navigatesToAdminMenu() throws AuthenticateException {
+    void handleLogin_administratorSuccess_navigatesToAdminMenu() throws Exception {
         User administratorUser = buildUserMock(ADMINISTRATOR_ROLE_ID, EMAIL_AUTHENTICATION_DISABLED);
         when(userDAOMock.authenticate(anyString(), anyString())).thenReturn(Optional.of(administratorUser));
 
@@ -333,17 +342,18 @@ public class FXMLLoginControllerTest extends ApplicationTest {
     }
 
     private String errorLabelText() {
-        String errorMessage = lookup(ERROR_LABEL_SELECTOR).queryAs(Label.class).getText();
-        return errorMessage;
+        return lookup(ERROR_LABEL_SELECTOR).queryAs(Label.class).getText();
+    }
+
+    private boolean isLoginButtonDisabled() {
+        return lookup(LOGIN_BUTTON_SELECTOR).queryAs(Button.class).isDisabled();
     }
 
     private boolean isPlainPasswordVisible() {
-        boolean isVisible = lookup(PLAIN_PASSWORD_FIELD_SELECTOR).queryAs(TextField.class).isVisible();
-        return isVisible;
+        return lookup(PLAIN_PASSWORD_FIELD_SELECTOR).queryAs(TextField.class).isVisible();
     }
 
     private boolean isNodePresent(String selector) {
-        boolean isPresent = lookup(selector).tryQuery().isPresent();
-        return isPresent;
+        return lookup(selector).tryQuery().isPresent();
     }
 }
