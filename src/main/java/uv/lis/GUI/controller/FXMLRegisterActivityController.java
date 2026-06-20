@@ -1,6 +1,5 @@
 package uv.lis.GUI.controller;
 
-
 import static uv.lis.logic.utils.InputValidator.validateEndDate;
 import static uv.lis.logic.utils.InputValidator.validatePositiveInteger;
 import static uv.lis.logic.utils.InputValidator.validateRecentStartDate;
@@ -38,7 +37,6 @@ public class FXMLRegisterActivityController extends ValidationHandler {
     private static final String START_DATE_FIELD = "La fecha de inicio";
     private static final String END_DATE_FIELD = "La fecha de finalización";
     private static final String HOURS_FIELD = "Las horas";
-    private static final int MAX_HOURS_PER_DAY = 8;
     private static final int COUNT_NEXT_DAY = 1;
 
     @FXML private Button buttonRegister;
