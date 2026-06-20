@@ -194,7 +194,7 @@ public class FXMLLoginControllerTest extends ApplicationTest {
     }
 
     @Test
-    void handleLogin_authenticateException_showsExceptionMessage() throws Exception {
+    void handleLogin_authenticateException_showsAuthenticateExceptionMessage() throws Exception {
         AuthenticateException authenticateException = new AuthenticateException(AUTHENTICATION_ERROR_MESSAGE);
         when(userDAOMock.authenticate(anyString(), anyString())).thenThrow(authenticateException);
 
@@ -241,7 +241,7 @@ public class FXMLLoginControllerTest extends ApplicationTest {
     }
 
     @Test
-    void handleLogin_sessionLoadThrowsOperationException_showsExceptionMessage() throws Exception {
+    void handleLogin_sessionLoadThrowsOperationException_showsOperationExceptionMessage() throws Exception {
         User studentUser = buildUserMock(STUDENT_ROLE_ID, EMAIL_AUTHENTICATION_DISABLED);
         OperationException operationException = new OperationException(OPERATION_ERROR_MESSAGE, null);
         when(userDAOMock.authenticate(anyString(), anyString())).thenReturn(Optional.of(studentUser));
