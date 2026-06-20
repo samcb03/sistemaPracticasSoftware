@@ -1,7 +1,8 @@
 package uv.lis.GUI.controller;
 
 
-import static uv.lis.logic.utils.InputValidator.MAX_HOURS_PER_ACTIVITY;
+import static uv.lis.logic.utils.InputValidator.MAX_HOURS_PER_PARTIAL_REPORT;
+
 import java.net.URL;
 import java.time.LocalDate;
 import java.util.List;
@@ -41,7 +42,15 @@ public class FXMLGenerateMonthlyReportController extends ValidationHandler {
     private static final String NO_STUDENT_IN_SESSION_MESSAGE = "No hay alumno en sesión";
     private static final String REPORT_GENERATED_MESSAGE = "Reporte generado correctamente.";
     private static final String REPORT_GENERATION_ERROR = "Error al generar el reporte.";
+    private static final String VALIDATED_REPORT_MESSAGE = "Error al verificar reporte mensual";
+    private static final String LOAD_ACTIVITIES = "Error al cargar actividades";
     private static final String REPORT_VIEWER_TITLE = "Reporte Mensual";
+    private static final String MINIMUN_ACTIVITY_MESSAGE = "El reporte debe contener mínimo una actividad";
+    private static final String LIMITED_HOURS_REPORT ="Has alcanzado el límite de 420 horas acumuladas. " 
+                                                    + "No es posible generar más reportes";
+    private static final String PARTIAL_HOURS_LIMITED = "Las horas reportadas no pueden exceder las " 
+                                                    + MAX_HOURS_PER_PARTIAL_REPORT + " horas";
+    private static final String DUPLICATED_REPORT_MESSAGE = "Ya se ha generado un reporte para el mes de ";
     private static final String EMPTY_TEXT = "";
     private static final String REPORT_BLOCK = "7";
     private static final String FIRST_PERIOD_SUFFIX = "51";
@@ -161,24 +170,23 @@ public class FXMLGenerateMonthlyReportController extends ValidationHandler {
             int accumulatedHours = Integer.parseInt(accumulatedText);
             int hoursReported = Integer.parseInt(reportedText);
 
-            if(!accumulatedText.isEmpty() && accumulatedHours >= MAX_ACCUMULATED_HOURS) {
-                showError("Has alcanzado el límite de 420 horas acumuladas. "
-                        + "No es posible generar más reportes.");
-            } else if (!reportedText.isEmpty() && hoursReported > MAX_HOURS_PER_ACTIVITY) {
-                showError("Las horas reportadas no pueden exceder las " 
-                    + MAX_HOURS_PER_ACTIVITY + " horas");
+            if(!hasAtLeastOneActivity()) {
+                showError(MINIMUN_ACTIVITY_MESSAGE);
+            } else if(!accumulatedText.isEmpty() && accumulatedHours >= MAX_ACCUMULATED_HOURS) {
+                showError(LIMITED_HOURS_REPORT);
+            } else if (!reportedText.isEmpty() && hoursReported >= MAX_HOURS_PER_PARTIAL_REPORT) {
+                showError(PARTIAL_HOURS_LIMITED);
             } else {
                 boolean duplicated = false;
                 try {
                     duplicated = reportContextDAO.hasReportAlreadyBeenGenerated(studentId, currentMonth);
-
                     if (duplicated) {
-                        showError("Ya se ha generado un reporte para el mes de " + currentMonth);
+                        showError(DUPLICATED_REPORT_MESSAGE + currentMonth);
                     } else {
                         generateMonthlyReport();
                     }
                 } catch (OperationException e) {
-                    showError("Error al verificar reporte mensual: " + e.getMessage());
+                    showError(VALIDATED_REPORT_MESSAGE);
                 }
             }
         }
@@ -217,32 +225,36 @@ public class FXMLGenerateMonthlyReportController extends ValidationHandler {
     }
 
     private void loadRegisteredActivities() {
-        try {
-            MonthlyReport context = reportContextDAO.getMonthlyReportData(currentStudent.getIdStudent());
-            
-            int month = convertMonthNameToNumber(getSelectedMonth().get());
-            int year = LocalDate.now().getYear(); 
-
-            List<Activity> registered = reportContextDAO.getRecordedActivitiesByMonth(
-                context.getIdProject(), month, year);
+        Optional<String> selectedMonth = getSelectedMonth();
+        
+        if(selectedMonth.isPresent()) {
+            try {
+                MonthlyReport context = reportContextDAO.getMonthlyReportData(currentStudent.getIdStudent());
                 
-            clearFields(); 
+                int month = convertMonthNameToNumber(getSelectedMonth().get());
+                int year = LocalDate.now().getYear(); 
 
-            for (int i = 0; i < registered.size() && i < activityFields.length; i++) {
-                activityFields[i].setText(registered.get(i).getName());
-                observationFields[i].setText(registered.get(i).getDescription());
+                List<Activity> registered = reportContextDAO.getRecordedActivitiesByMonth(
+                    context.getIdProject(), month, year);
+                    
+                clearFields(); 
+
+                for (int i = 0; i < registered.size() && i < activityFields.length; i++) {
+                    activityFields[i].setText(registered.get(i).getName());
+                    observationFields[i].setText(registered.get(i).getDescription());
+                }
+                int totalHours = reportContextDAO.getSumOfReportedHours(context.getIdProject(), month, year);
+                labelReportedHours.setText(String.valueOf(totalHours));
+
+                int previouslyAccumulatedHours = advanceDAO.getAccumulatedHoursByProject(context.getIdProject());
+                int displayedReportedHours = previouslyAccumulatedHours + totalHours;
+                labelAccumulatedHours.setText(String.valueOf(displayedReportedHours));
+                buttonRegisterActivity.setDisable(registered.size() >= MAX_ACTIVITY_INPUTS);
+
+            } catch (OperationException e) {
+                LOGGER.log(Level.SEVERE,LOAD_ACTIVITIES, e);
+                showError(LOAD_ACTIVITIES);
             }
-            int totalHours = reportContextDAO.getSumOfReportedHours(context.getIdProject(), month, year);
-            labelReportedHours.setText(String.valueOf(totalHours));
-
-            int previouslyAccumulatedHours = advanceDAO.getAccumulatedHoursByProject(context.getIdProject());
-            int displayedReportedHours = previouslyAccumulatedHours + totalHours;
-            labelAccumulatedHours.setText(String.valueOf(displayedReportedHours));
-            buttonRegisterActivity.setDisable(registered.size() >= MAX_ACTIVITY_INPUTS);
-
-        } catch (OperationException e) {
-            LOGGER.log(Level.SEVERE, "Error al cargar actividades", e);
-            showError("Error al cargar actividades: " + e.getMessage());
         }
     }
 
@@ -271,8 +283,6 @@ public class FXMLGenerateMonthlyReportController extends ValidationHandler {
         loadAvailableMonth();
     }
 
-    //FIXME Validar que los reportes se generen en la última semana de los meses
-
     private void generateMonthlyReport() {
         try {
             MonthlyReport context = reportContextDAO.getMonthlyReportData(currentStudent.getIdStudent());
@@ -295,6 +305,7 @@ public class FXMLGenerateMonthlyReportController extends ValidationHandler {
                 advance.setWeekNumber(context.getReportNumber());
                 advance.setAccumulatedHours(newAccumulated);
                 advanceDAO.registerAdvance(advance);
+
             } else {
                 LOGGER.log(Level.INFO, "Ya existe un avance registrado para el reporte ID {0}. "
                     + "Se omitirá el registro de avance.", context.getIdReport());
@@ -368,6 +379,16 @@ public class FXMLGenerateMonthlyReportController extends ValidationHandler {
             Stage registerStage = (Stage) ((Parent) loader.getRoot()).getScene().getWindow();
             registerStage.setOnHidden(e -> loadRegisteredActivities());
         }
+    }
+
+    private boolean hasAtLeastOneActivity() {
+        boolean hasActivity = false;
+        for (Label activityField : activityFields) {
+            if (!activityField.getText().trim().isEmpty()) {
+                hasActivity = true;
+            }
+        }
+        return hasActivity;
     }
 
     @Override

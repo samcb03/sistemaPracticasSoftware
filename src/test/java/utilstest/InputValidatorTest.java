@@ -280,4 +280,22 @@ class InputValidatorTest {
 
         assertEquals(hasError, result);
     }
+
+    @ParameterizedTest
+    @CsvSource({
+        "10, 0, false",
+        "10, -3, false",
+        "'', 5, true",
+        "abc, 5, true",
+        "41, 5, true",
+        "40, 5, false",
+        "8, 1, false"
+    })
+    void validateMaxHoursForDuration_variousInputs_returnsExpectedResult(String hoursValue,
+            long durationInDays, boolean hasError) {
+        boolean result =
+            InputValidator.validateMaxHoursForDuration(hoursValue, durationInDays, FIELD_NAME).isPresent();
+
+        assertEquals(hasError, result);
+    }
 }

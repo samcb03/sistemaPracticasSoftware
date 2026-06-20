@@ -34,7 +34,8 @@ public final class InputValidator {
     private static final int MAX_PAST_MONTHS = 6;
     private static final int FALL_TERM_YEAR_OFFSET = 1;
     public static final int POSTAL_CODE_LENGTH = 5;
-    public static final int MAX_HOURS_PER_ACTIVITY = 70;
+    public static final int MAX_HOURS_PER_PARTIAL_REPORT = 210;
+    public static final int MAX_HOURS_PER_DAY = 8;
     public static final String PERIOD_TERM_FALL = "01";
     public static final String PERIOD_TERM_SPRING = "51";
     public static final String LETTERS_ONLY_REGEX = "^[\\p{L}\\s]+$";
@@ -664,5 +665,30 @@ public final class InputValidator {
             .orElse(Optional.empty());
         }
         return validateAddressNumber;
+    }
+
+    /**
+     * Verifies that the reported hours do not exceed the maximum allowed for the
+     * activity's duration, calculated as the number of days the activity spans
+     * multiplied by the daily hour limit.
+     *
+     * @param hoursValue the reported hours to evaluate
+     *
+     * @param durationInDays the number of days the activity spans (0 if not yet known)
+     *
+     * @param fieldName the field label used in the error message
+     *
+     * @return an error message if the hours exceed the allowed maximum for the duration, empty otherwise
+     */
+    public static Optional<String> validateMaxHoursForDuration(String hoursValue, long durationInDays, 
+        String fieldName) {
+            Optional<String> validationResult;
+            if(durationInDays <= 0) {
+                validationResult = Optional.empty();
+            } else {
+                int maxAllowedHours =(int) durationInDays * MAX_HOURS_PER_DAY;
+                validationResult = validateMaxIntValue(hoursValue, maxAllowedHours, fieldName);
+            }
+        return validationResult;
     }
 }

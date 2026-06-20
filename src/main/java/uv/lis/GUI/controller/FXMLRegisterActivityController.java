@@ -1,10 +1,12 @@
 package uv.lis.GUI.controller;
 
+
 import static uv.lis.logic.utils.InputValidator.validateEndDate;
 import static uv.lis.logic.utils.InputValidator.validatePositiveInteger;
 import static uv.lis.logic.utils.InputValidator.validateRecentStartDate;
 import static uv.lis.logic.utils.InputValidator.validateRegister;
 import static uv.lis.logic.utils.InputValidator.validateText;
+import static uv.lis.logic.utils.InputValidator.validateMaxHoursForDuration;
 
 import java.net.URL;
 import java.util.Optional;
@@ -16,6 +18,9 @@ import javafx.scene.control.Button;
 import javafx.scene.control.DatePicker;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
+
+import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
 
 import uv.lis.GUI.ValidationHandler;
 import uv.lis.logic.dao.ActivityDAO;
@@ -33,6 +38,8 @@ public class FXMLRegisterActivityController extends ValidationHandler {
     private static final String START_DATE_FIELD = "La fecha de inicio";
     private static final String END_DATE_FIELD = "La fecha de finalización";
     private static final String HOURS_FIELD = "Las horas";
+    private static final int MAX_HOURS_PER_DAY = 8;
+    private static final int COUNT_NEXT_DAY = 1;
 
     @FXML private Button buttonRegister;
     @FXML private Button buttonBack;
@@ -69,12 +76,14 @@ public class FXMLRegisterActivityController extends ValidationHandler {
     }
 
     private Optional<String> getFirstValidationError() {
+        long durationInDays = calculateDurationInDays(datePickerStartDate.getValue(), datePickerFinalDate.getValue());
         Stream<Optional<String>> validationStream = Stream.of(
             validateRegister(textFieldActivity.getText(), ACTIVITY_NAME_FIELD),
             validateText(textFieldDescription.getText(), DESCRIPTION_FIELD),
             validateRecentStartDate(datePickerStartDate.getValue(), START_DATE_FIELD),
             validateEndDate(datePickerStartDate.getValue(), datePickerFinalDate.getValue(), END_DATE_FIELD),
-            validatePositiveInteger(textFieldHours.getText().trim(), HOURS_FIELD)
+            validatePositiveInteger(textFieldHours.getText().trim(), HOURS_FIELD),
+            validateMaxHoursForDuration(textFieldHours.getText().trim(), durationInDays, HOURS_FIELD)
         );
         Optional<String> firstError = validationStream
             .filter(Optional::isPresent)
@@ -114,6 +123,17 @@ public class FXMLRegisterActivityController extends ValidationHandler {
         textFieldHours.setDisable(true);
         datePickerStartDate.setDisable(true);
         datePickerFinalDate.setDisable(true);
+    }
+
+    private long calculateDurationInDays(LocalDate startDate, LocalDate endDate) {
+        long durationInDays = 0;
+        if(startDate != null || endDate != null) {
+            showError("Tiene que elegir una fecha");
+            if(!endDate.isBefore(startDate)) {
+                durationInDays = ChronoUnit.DAYS.between(startDate, endDate) + COUNT_NEXT_DAY;
+            }
+        }
+        return durationInDays;
     }
 
     private void performRegistration() {
