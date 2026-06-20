@@ -72,20 +72,15 @@ public class FXMLLoginControllerTest extends ApplicationTest {
     private static final boolean EMAIL_AUTHENTICATION_ENABLED = true;
     private static final boolean EMAIL_AUTHENTICATION_DISABLED = false;
 
-    private static final String EXPECTED_EMPTY_EMAIL_MESSAGE =
-        "El correo electrónico no puede estar vacío";
-    private static final String EXPECTED_INVALID_EMAIL_MESSAGE =
-        "El correo electrónico no tiene un formato válido";
-    private static final String EXPECTED_EMPTY_PASSWORD_MESSAGE =
-        "La contraseña no puede estar vacía";
+    private static final String EXPECTED_EMPTY_EMAIL_MESSAGE = "El correo electrónico no puede estar vacío";
+    private static final String EXPECTED_INVALID_EMAIL_MESSAGE = "El correo electrónico no tiene un formato válido";
+    private static final String EXPECTED_EMPTY_PASSWORD_MESSAGE = "La contraseña no puede estar vacía";
     private static final String EXPECTED_INVALID_PASSWORD_MESSAGE =
         "La contraseña debe tener una mayúscula, un carácter especial y un número";
-    private static final String EXPECTED_FIRST_REMAINING_MESSAGE =
-        "Credenciales inválidas. Intentos restantes: 4";
+    private static final String EXPECTED_FIRST_REMAINING_MESSAGE = "Credenciales inválidas. Intentos restantes: 4";
     private static final String EXPECTED_TOO_MANY_ATTEMPTS_MESSAGE =
         "Demasiados intentos fallidos. Reinicie la aplicación.";
-    private static final String EXPECTED_USER_DATA_NOT_FOUND_MESSAGE =
-        "No se encontraron los datos.";
+    private static final String EXPECTED_USER_DATA_NOT_FOUND_MESSAGE = "No se encontraron los datos.";
     private static final String AUTHENTICATION_ERROR_MESSAGE = "Error de autenticación de prueba";
     private static final String OPERATION_ERROR_MESSAGE = "Error de operación de prueba";
     private static final String EMAIL_ERROR_MESSAGE = "Error de envío de correo de prueba";

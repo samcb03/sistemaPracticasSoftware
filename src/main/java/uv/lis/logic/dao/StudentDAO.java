@@ -7,7 +7,6 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.SQLIntegrityConstraintViolationException;
 import java.util.ArrayList;
 import java.util.Optional;
 import java.util.logging.Level;
@@ -159,9 +158,6 @@ public class StudentDAO extends UserDAO implements IStudentDAO {
             student.setId(generatedUserId);
             insertStudent(student, databaseConnection);
             databaseConnection.commit();
-        } catch (SQLIntegrityConstraintViolationException e) {
-            LOGGER.log(Level.WARNING, "Intento de registrar un alumno duplicado", e);
-            throw new OperationException("Ya existe un alumno con esa matrícula.", e);
         } catch (SQLException e) {
             LOGGER.log(Level.SEVERE, "Transacción de registro de alumno cancelada", e);
             throw new OperationException("Error al guardar la informacion dell alumno. Intentelo mas tarde", e);

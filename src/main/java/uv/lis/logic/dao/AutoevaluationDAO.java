@@ -6,7 +6,6 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.SQLIntegrityConstraintViolationException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -112,10 +111,6 @@ public class AutoevaluationDAO implements IAutoevaluationDAO {
                 throw new OperationException("No se pudo registrar la autoevaluación para el alumno: " 
                     + autoevaluation.getIdStudent(), null);
             }   
-        } catch (SQLIntegrityConstraintViolationException e) {
-            LOGGER.log(Level.WARNING, "Intento de registrar una autoevaluacion duplicada para el alumno {0}", 
-                autoevaluation.getIdStudent());
-            throw new OperationException("El alumno ya cuenta con una autoevaluación registrada.", e);
         } catch (SQLException e) {
             LOGGER.log(Level.SEVERE, "Error al registrar autoevaluación", e);
             throw new OperationException("Error al registrar la autoevaluación", e);

@@ -6,7 +6,6 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.SQLIntegrityConstraintViolationException;
 import java.util.ArrayList;
 import java.util.Optional;
 import java.util.logging.Level;
@@ -105,9 +104,6 @@ public class AffiliatedOrganizationDAO implements IAffiliatedOrganizationDAO {
                     "No se pudo registrar la organización vinculada con nombre: " + affiliatedOrganization.getName(), 
                         null);
             }
-        } catch (SQLIntegrityConstraintViolationException e) {
-            LOGGER.log(Level.WARNING, "Intento de registrar una organizacion duplicada", e);
-            throw new OperationException("Ya existe una organizacion con ese nombre.", e);
         } catch (SQLException e) {
             LOGGER.log(Level.SEVERE, "Error de conexion con la base de datos", e);
             throw new OperationException("No se pudo registrar la Organizacion. Intentelo mas tarde", e);

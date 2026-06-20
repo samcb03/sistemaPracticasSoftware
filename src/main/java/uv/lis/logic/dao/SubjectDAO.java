@@ -6,7 +6,6 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.SQLIntegrityConstraintViolationException;
 import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -72,10 +71,6 @@ public class SubjectDAO implements ISubjectDAO {
                 }
 
             }
-        } catch (SQLIntegrityConstraintViolationException e) {
-            LOGGER.log(Level.WARNING, "Intento de registrar una Experiencia Educativa duplicada con NRC {0}", 
-                subject.getNrc());
-            throw new OperationException("Ya existe una Experiencia Educativa registrada con ese NRC.", e);
         } catch (SQLException e) {
             LOGGER.log(Level.SEVERE, "Error de conexión al registrar la Experiencia Educativa", e);
             throw new OperationException("No se pudo registrar la Experiencia Educativa. Intentelo mas tarde", 
@@ -125,9 +120,6 @@ public class SubjectDAO implements ISubjectDAO {
             if (preparedStatement.executeUpdate() > NO_ROWS_AFFECTED) {
                 isAssigned = true;
             }
-        } catch (SQLIntegrityConstraintViolationException e) {
-            LOGGER.log(Level.WARNING, "Intento de asignar un alumno duplicado a la experiencia educativa", e);
-            throw new OperationException("El alumno ya está asignado a esa experiencia educativa.", e);
         } catch (SQLException e) {
             LOGGER.log(Level.SEVERE, "Error al asignar alumno a la experiencia educativa", e);
             throw new OperationException("No se pudo asignar el alumno a la experiencia educativa", e);

@@ -7,7 +7,6 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.SQLIntegrityConstraintViolationException;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -124,9 +123,6 @@ public class ActivityDAO implements IActivityDAO {
                 LOGGER.log(Level.WARNING, "No se pudo registrar la actividad.");
                 throw new OperationException("No se pudo registrar la actividad.", null);
             }
-        } catch (SQLIntegrityConstraintViolationException e) {
-            LOGGER.log(Level.WARNING, "Intento de registrar una actividad duplicada", e);
-            throw new OperationException("Ya existe una actividad con ese nombre.", e);
         } catch (SQLException e) {
             LOGGER.log(Level.SEVERE, "Error de conexion con la base de datos", e);
             throw new OperationException("Error al registrar la actividad", e);
