@@ -46,7 +46,7 @@ public class FXMLManageProfessorControllerTest extends ApplicationTest {
 
     private static final int PROFESSOR_ID = 4;
     private static final int VALID_USER_ID = 10;
-    private static final String VALID_PERSONNEL = "12345";
+    private static final String VALID_PERSONNEL = "33621";
     private static final String VALID_FIRST_NAME = "Juan";
     private static final String VALID_LAST_NAME = "Perez";
     private static final String EMPTY_FIRST_NAME = "";

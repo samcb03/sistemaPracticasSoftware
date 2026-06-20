@@ -62,9 +62,7 @@ public class FXMLManageStudentControllerTest extends ApplicationTest {
     private static final String VALID_LAST_NAME = "Lopez";
     private static final String VALID_GENDER = "Mujer";
     private static final String VALID_BIRTH_DATE = "2000-01-01";
-    private static final String EMPTY_NRC = "";
-    private static final String EMPTY_PROJECT = "";
-    private static final String EMPTY_FIRST_NAME = "";
+    private static final String EMPTY_VALUE = "";
 
     private static final String EXPECTED_NOT_FOUND_MESSAGE = "No se encontró al alumno con esa matrícula";
     private static final String EXPECTED_UPDATE_SUCCESS_MESSAGE = "Alumno actualizado correctamente";
@@ -161,7 +159,7 @@ public class FXMLManageStudentControllerTest extends ApplicationTest {
 
         performSearch();
         enterEditMode();
-        interact(() -> lookup(NAME_FIELD_SELECTOR).queryAs(TextField.class).setText(EMPTY_FIRST_NAME));
+        interact(() -> lookup(NAME_FIELD_SELECTOR).queryAs(TextField.class).setText(EMPTY_VALUE));
         clickSave();
 
         assertEquals(EXPECTED_EMPTY_NAME_MESSAGE, messageText());
@@ -194,8 +192,8 @@ public class FXMLManageStudentControllerTest extends ApplicationTest {
         when(studentDAOMock.getIdUserByStudentId(anyString())).thenReturn(Optional.of(VALID_USER_ID));
         when(studentDAOMock.getStudentById(anyInt())).thenReturn(Optional.of(buildStudent()));
         when(studentDAOMock.isStudentInactive(anyString())).thenReturn(false);
-        when(subjectDAOMock.getSubjectNRCByStudentID(anyString())).thenReturn(EMPTY_NRC);
-        when(requestProjectDAOMock.getProjectAssignedToStudent(anyString())).thenReturn(EMPTY_PROJECT);
+        when(subjectDAOMock.getSubjectNRCByStudentID(anyString())).thenReturn(EMPTY_VALUE);
+        when(requestProjectDAOMock.getProjectAssignedToStudent(anyString())).thenReturn(EMPTY_VALUE);
         when(activityDAOMock.getActivitiesByStudentId(anyString())).thenReturn(new ArrayList<Activity>());
     }
 
