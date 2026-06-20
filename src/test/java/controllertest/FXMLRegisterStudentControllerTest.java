@@ -7,10 +7,13 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.lang.reflect.Field;
+import java.time.LocalDate;
 
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.control.ComboBox;
+import javafx.scene.control.DatePicker;
 import javafx.scene.control.Label;
 import javafx.stage.Stage;
 
@@ -20,44 +23,49 @@ import org.mockito.ArgumentCaptor;
 import org.testfx.framework.junit5.ApplicationTest;
 import org.testfx.util.WaitForAsyncUtils;
 
-import uv.lis.GUI.controller.FXMLRegisterProfessorController;
-import uv.lis.logic.dao.ProfessorDAO;
-import uv.lis.logic.dto.Professor;
+import uv.lis.GUI.controller.FXMLRegisterStudentController;
+import uv.lis.logic.dao.StudentDAO;
+import uv.lis.logic.dto.Student;
 import uv.lis.logic.exceptions.OperationException;
 
-public class FXMLRegisterProfessorControllerTest extends ApplicationTest {
+public class FXMLRegisterStudentControllerTest extends ApplicationTest {
 
-    private static final String REGISTER_VIEW_FXML = "/uv/lis/GUI/view/FXMLRegisterProfessor.fxml";
-    private static final String PROFESSOR_DAO_FIELD = "professorDAO";
+    private static final String REGISTER_VIEW_FXML = "/uv/lis/GUI/view/FXMLRegisterStudent.fxml";
+    private static final String STUDENT_DAO_FIELD = "studentDAO";
 
     private static final String FIRST_NAME_FIELD_SELECTOR = "#textFieldFirstName";
     private static final String LAST_NAME_FIELD_SELECTOR = "#textFieldLastName";
     private static final String EMAIL_FIELD_SELECTOR = "#textFieldEmail";
     private static final String PASSWORD_FIELD_SELECTOR = "#passwordFieldPassword";
-    private static final String PERSONNEL_NUMBER_FIELD_SELECTOR = "#textFieldPersonnelNumber";
+    private static final String STUDENT_ID_FIELD_SELECTOR = "#textFieldStudentId";
+    private static final String BIRTH_DATE_PICKER_SELECTOR = "#datePickerBirthDate";
+    private static final String GENDER_COMBO_SELECTOR = "#comboBoxGender";
     private static final String REGISTER_BUTTON_SELECTOR = "#buttonRegister";
-    private static final String MESSAGE_LABEL_SELECTOR = "#labelMessage";
+    private static final String MESSAGE_LABEL_SELECTOR = "#labelError";
 
     private static final String VALID_FIRST_NAME = "Juan";
     private static final String VALID_LAST_NAME = "Perez";
     private static final String VALID_EMAIL = "juan.perez@gmail.com";
     private static final String VALID_PASSWORD = "Passw0rd!";
-    private static final String VALID_PERSONNEL_NUMBER = "12345";
+    private static final String VALID_STUDENT_ID = "S12345678";
+    private static final String VALID_GENDER = "Hombre";
+    private static final LocalDate VALID_BIRTH_DATE = LocalDate.of(2000, 1, 1);
     private static final String INVALID_EMAIL = "juan@gmail";
 
     private static final String FIELD_SEPARATOR = "|";
-    private static final String EXPECTED_PROFESSOR_DATA =
+    private static final String EXPECTED_STUDENT_DATA =
         VALID_FIRST_NAME + FIELD_SEPARATOR + VALID_LAST_NAME + FIELD_SEPARATOR + VALID_EMAIL
-        + FIELD_SEPARATOR + VALID_PASSWORD + FIELD_SEPARATOR + VALID_PERSONNEL_NUMBER;
+        + FIELD_SEPARATOR + VALID_PASSWORD + FIELD_SEPARATOR + VALID_STUDENT_ID
+        + FIELD_SEPARATOR + VALID_GENDER;
 
-    private static final String EXPECTED_SUCCESS_MESSAGE = "Profesor registrado correctamente";
-    private static final String EXPECTED_FAILURE_MESSAGE = "Error al registrar al profesor";
+    private static final String EXPECTED_SUCCESS_MESSAGE = "Estudiante registrado correctamente";
+    private static final String EXPECTED_FAILURE_MESSAGE = "Error al registrar al estudiante";
     private static final String EXPECTED_INVALID_EMAIL_MESSAGE =
         "El correo electrónico no tiene un formato válido";
     private static final String DUPLICATE_ERROR_MESSAGE = "Error de operación de prueba";
 
-    private FXMLRegisterProfessorController registerController;
-    private ProfessorDAO professorDAOMock;
+    private FXMLRegisterStudentController registerController;
+    private StudentDAO studentDAOMock;
 
     @Override
     public void start(Stage stage) throws Exception {
@@ -71,13 +79,13 @@ public class FXMLRegisterProfessorControllerTest extends ApplicationTest {
 
     @BeforeEach
     void setUpMock() throws Exception {
-        professorDAOMock = mock(ProfessorDAO.class);
-        injectProfessorDAO(professorDAOMock);
+        studentDAOMock = mock(StudentDAO.class);
+        injectStudentDAO(studentDAOMock);
     }
 
     @Test
     void validateFields_validData_showsSuccessMessage() throws Exception {
-        when(professorDAOMock.registerProfessor(any())).thenReturn(true);
+        when(studentDAOMock.registerStudent(any())).thenReturn(true);
 
         fillForm(VALID_EMAIL);
         clickRegister();
@@ -87,19 +95,19 @@ public class FXMLRegisterProfessorControllerTest extends ApplicationTest {
 
     @Test
     void validateFields_validData_sendsEnteredDataToDAO() throws Exception {
-        ArgumentCaptor<Professor> professorCaptor = ArgumentCaptor.forClass(Professor.class);
-        when(professorDAOMock.registerProfessor(any())).thenReturn(true);
+        ArgumentCaptor<Student> studentCaptor = ArgumentCaptor.forClass(Student.class);
+        when(studentDAOMock.registerStudent(any())).thenReturn(true);
 
         fillForm(VALID_EMAIL);
         clickRegister();
 
-        verify(professorDAOMock).registerProfessor(professorCaptor.capture());
-        assertEquals(EXPECTED_PROFESSOR_DATA, professorData(professorCaptor.getValue()));
+        verify(studentDAOMock).registerStudent(studentCaptor.capture());
+        assertEquals(EXPECTED_STUDENT_DATA, studentData(studentCaptor.getValue()));
     }
 
     @Test
     void validateFields_registrationFails_showsOperationExceptionMessage() throws Exception {
-        when(professorDAOMock.registerProfessor(any())).thenReturn(false);
+        when(studentDAOMock.registerStudent(any())).thenReturn(false);
 
         fillForm(VALID_EMAIL);
         clickRegister();
@@ -110,7 +118,7 @@ public class FXMLRegisterProfessorControllerTest extends ApplicationTest {
     @Test
     void validateFields_duplicateRecord_showsOperationExceptionMessage() throws Exception {
         OperationException operationException = new OperationException(DUPLICATE_ERROR_MESSAGE, null);
-        when(professorDAOMock.registerProfessor(any())).thenThrow(operationException);
+        when(studentDAOMock.registerStudent(any())).thenThrow(operationException);
 
         fillForm(VALID_EMAIL);
         clickRegister();
@@ -127,11 +135,11 @@ public class FXMLRegisterProfessorControllerTest extends ApplicationTest {
         assertEquals(EXPECTED_INVALID_EMAIL_MESSAGE, messageText());
     }
 
-    private void injectProfessorDAO(ProfessorDAO professorDAOInstance) throws Exception {
-        Field professorDAOField =
-            FXMLRegisterProfessorController.class.getDeclaredField(PROFESSOR_DAO_FIELD);
-        professorDAOField.setAccessible(true);
-        professorDAOField.set(registerController, professorDAOInstance);
+    private void injectStudentDAO(StudentDAO studentDAOInstance) throws Exception {
+        Field studentDAOField =
+            FXMLRegisterStudentController.class.getDeclaredField(STUDENT_DAO_FIELD);
+        studentDAOField.setAccessible(true);
+        studentDAOField.set(registerController, studentDAOInstance);
     }
 
     private void fillForm(String email) {
@@ -139,7 +147,15 @@ public class FXMLRegisterProfessorControllerTest extends ApplicationTest {
         clickOn(LAST_NAME_FIELD_SELECTOR).write(VALID_LAST_NAME);
         clickOn(EMAIL_FIELD_SELECTOR).write(email);
         clickOn(PASSWORD_FIELD_SELECTOR).write(VALID_PASSWORD);
-        clickOn(PERSONNEL_NUMBER_FIELD_SELECTOR).write(VALID_PERSONNEL_NUMBER);
+        clickOn(STUDENT_ID_FIELD_SELECTOR).write(VALID_STUDENT_ID);
+        interact(() -> lookup(BIRTH_DATE_PICKER_SELECTOR).queryAs(DatePicker.class).setValue(VALID_BIRTH_DATE));
+        interact(() -> setComboBoxValue(GENDER_COMBO_SELECTOR, VALID_GENDER));
+    }
+
+    @SuppressWarnings("unchecked")
+    private void setComboBoxValue(String selector, String value) {
+        ComboBox<String> comboBox = lookup(selector).queryAs(ComboBox.class);
+        comboBox.setValue(value);
     }
 
     private void clickRegister() {
@@ -152,10 +168,10 @@ public class FXMLRegisterProfessorControllerTest extends ApplicationTest {
         return message;
     }
 
-    private String professorData(Professor professor) {
-        String data = professor.getFirstName() + FIELD_SEPARATOR + professor.getLastName() + FIELD_SEPARATOR
-            + professor.getEmail() + FIELD_SEPARATOR + professor.getPassword() + FIELD_SEPARATOR
-            + professor.getPersonnelNumber();
+    private String studentData(Student student) {
+        String data = student.getFirstName() + FIELD_SEPARATOR + student.getLastName() + FIELD_SEPARATOR
+            + student.getEmail() + FIELD_SEPARATOR + student.getPassword() + FIELD_SEPARATOR
+            + student.getIdStudent() + FIELD_SEPARATOR + student.getGender();
         return data;
     }
 }
