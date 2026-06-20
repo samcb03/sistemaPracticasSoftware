@@ -170,8 +170,8 @@ public class FXMLAssignationProjectController extends ValidationHandler {
     public void assignStudent() {
         String selectedProject = comboBoxProjects.getValue();
         String selectedRow = isAlternativeMode
-        ? listViewStudentsWithoutProject.getSelectionModel().getSelectedItem()
-        : listViewApplicants.getSelectionModel().getSelectedItem();
+            ? listViewStudentsWithoutProject.getSelectionModel().getSelectedItem()
+            : listViewApplicants.getSelectionModel().getSelectedItem();
         String reason = textAreaReason.getText();
 
         Optional<String> validationError = validateAssignmentInput(selectedProject, selectedRow, reason);

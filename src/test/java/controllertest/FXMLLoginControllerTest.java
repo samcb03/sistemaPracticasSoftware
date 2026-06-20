@@ -160,7 +160,7 @@ public class FXMLLoginControllerTest extends ApplicationTest {
     }
 
     @Test
-    void handleLogin_wrongCredentials_showsRemainingAttemptsMessage() throws Exception {
+    void handleLogin_wrongCredentials_showsRemainingAttemptsMessage() throws AuthenticateException {
         when(userDAOMock.authenticate(anyString(), anyString())).thenReturn(Optional.empty());
 
         typeCredentials(VALID_EMAIL, VALID_PASSWORD);
@@ -170,7 +170,7 @@ public class FXMLLoginControllerTest extends ApplicationTest {
     }
 
     @Test
-    void handleLogin_maxFailedAttempts_showsTooManyAttemptsMessage() throws Exception {
+    void handleLogin_maxFailedAttempts_showsTooManyAttemptsMessage() throws AuthenticateException {
         when(userDAOMock.authenticate(anyString(), anyString())).thenReturn(Optional.empty());
         typeCredentials(VALID_EMAIL, VALID_PASSWORD);
 
@@ -182,7 +182,7 @@ public class FXMLLoginControllerTest extends ApplicationTest {
     }
 
     @Test
-    void handleLogin_maxFailedAttempts_disablesLoginButton() throws Exception {
+    void handleLogin_maxFailedAttempts_disablesLoginButton() throws AuthenticateException {
         when(userDAOMock.authenticate(anyString(), anyString())).thenReturn(Optional.empty());
         typeCredentials(VALID_EMAIL, VALID_PASSWORD);
 
@@ -194,7 +194,7 @@ public class FXMLLoginControllerTest extends ApplicationTest {
     }
 
     @Test
-    void handleLogin_authenticateException_showsAuthenticateExceptionMessage() throws Exception {
+    void handleLogin_authenticateException_showsAuthenticateExceptionMessage() throws AuthenticateException {
         AuthenticateException authenticateException = new AuthenticateException(AUTHENTICATION_ERROR_MESSAGE);
         when(userDAOMock.authenticate(anyString(), anyString())).thenThrow(authenticateException);
 
@@ -267,7 +267,7 @@ public class FXMLLoginControllerTest extends ApplicationTest {
     }
 
     @Test
-    void handleLogin_administratorSuccess_navigatesToAdminMenu() throws Exception {
+    void handleLogin_administratorSuccess_navigatesToAdminMenu() throws AuthenticateException {
         User administratorUser = buildUserMock(ADMINISTRATOR_ROLE_ID, EMAIL_AUTHENTICATION_DISABLED);
         when(userDAOMock.authenticate(anyString(), anyString())).thenReturn(Optional.of(administratorUser));
 

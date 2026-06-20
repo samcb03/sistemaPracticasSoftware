@@ -84,7 +84,7 @@ public class FXMLRegisterStudentControllerTest extends ApplicationTest {
     }
 
     @Test
-    void validateFields_validData_showsSuccessMessage() throws Exception {
+    void validateFields_validData_showsSuccessMessage() throws OperationException {
         when(studentDAOMock.registerStudent(any())).thenReturn(true);
 
         fillForm(VALID_EMAIL);
@@ -94,7 +94,7 @@ public class FXMLRegisterStudentControllerTest extends ApplicationTest {
     }
 
     @Test
-    void validateFields_validData_sendsEnteredDataToDAO() throws Exception {
+    void validateFields_validData_sendsEnteredDataToDAO() throws OperationException {
         ArgumentCaptor<Student> studentCaptor = ArgumentCaptor.forClass(Student.class);
         when(studentDAOMock.registerStudent(any())).thenReturn(true);
 
@@ -106,7 +106,7 @@ public class FXMLRegisterStudentControllerTest extends ApplicationTest {
     }
 
     @Test
-    void validateFields_registrationFails_showsOperationExceptionMessage() throws Exception {
+    void validateFields_registrationFails_showsOperationExceptionMessage() throws OperationException {
         when(studentDAOMock.registerStudent(any())).thenReturn(false);
 
         fillForm(VALID_EMAIL);
@@ -116,7 +116,7 @@ public class FXMLRegisterStudentControllerTest extends ApplicationTest {
     }
 
     @Test
-    void validateFields_duplicateRecord_showsOperationExceptionMessage() throws Exception {
+    void validateFields_duplicateRecord_showsOperationExceptionMessage() throws OperationException {
         OperationException operationException = new OperationException(DUPLICATE_ERROR_MESSAGE, null);
         when(studentDAOMock.registerStudent(any())).thenThrow(operationException);
 

@@ -71,7 +71,7 @@ public class FXMLRegisterSchoolPeriodControllerTest extends ApplicationTest {
     }
 
     @Test
-    void validateFields_validData_showsSuccessMessage() throws Exception {
+    void validateFields_validData_showsSuccessMessage() throws OperationException {
         when(schoolPeriodDAOMock.registerSchoolPeriod(any())).thenReturn(true);
 
         fillForm(VALID_START_DATE);
@@ -81,7 +81,7 @@ public class FXMLRegisterSchoolPeriodControllerTest extends ApplicationTest {
     }
 
     @Test
-    void validateFields_validData_sendsGeneratedPeriodCodeToDAO() throws Exception {
+    void validateFields_validData_sendsGeneratedPeriodCodeToDAO() throws OperationException {
         ArgumentCaptor<SchoolPeriod> periodCaptor = ArgumentCaptor.forClass(SchoolPeriod.class);
         when(schoolPeriodDAOMock.registerSchoolPeriod(any())).thenReturn(true);
 
@@ -93,7 +93,7 @@ public class FXMLRegisterSchoolPeriodControllerTest extends ApplicationTest {
     }
 
     @Test
-    void validateFields_registrationFails_showsOperationExceptionMessage() throws Exception {
+    void validateFields_registrationFails_showsOperationExceptionMessage() throws OperationException {
         when(schoolPeriodDAOMock.registerSchoolPeriod(any())).thenReturn(false);
 
         fillForm(VALID_START_DATE);
@@ -103,7 +103,7 @@ public class FXMLRegisterSchoolPeriodControllerTest extends ApplicationTest {
     }
 
     @Test
-    void validateFields_duplicateRecord_showsOperationExceptionMessage() throws Exception {
+    void validateFields_duplicateRecord_showsOperationExceptionMessage() throws OperationException {
         OperationException operationException = new OperationException(DUPLICATE_ERROR_MESSAGE, null);
         when(schoolPeriodDAOMock.registerSchoolPeriod(any())).thenThrow(operationException);
 
