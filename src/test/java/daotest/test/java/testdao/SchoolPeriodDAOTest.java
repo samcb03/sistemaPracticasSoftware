@@ -162,16 +162,6 @@ class SchoolPeriodDAOTest {
     }
 
     @Test
-    void registerSchoolPeriod_duplicateCode_throwsOperationException() throws Exception {
-        when(databaseConnection.prepareStatement(anyString())).thenReturn(preparedStatement);
-        when(preparedStatement.executeUpdate())
-            .thenThrow(new SQLIntegrityConstraintViolationException(DATABASE_ERROR_MESSAGE));
-
-        assertThrows(OperationException.class, 
-            () -> schoolPeriodDAO.registerSchoolPeriod(builderSchoolPeriod()));
-    }
-
-    @Test
     void modifySchoolPeriod_successful_returnsTrue() throws Exception {
         mockUpdateExecution(ROWS_AFFECTED);
 

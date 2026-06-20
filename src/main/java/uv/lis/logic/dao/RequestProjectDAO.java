@@ -10,7 +10,6 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.SQLIntegrityConstraintViolationException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -164,9 +163,6 @@ public class RequestProjectDAO implements IRequestProjectDAO {
             if (preparedStatement.executeUpdate() > NO_ROWS_AFFECTED) {
                 isRegistered = true;
             }
-        } catch (SQLIntegrityConstraintViolationException e) {
-            LOGGER.log(Level.WARNING, "Intento de registrar una solicitud de proyecto duplicada", e);
-            throw new OperationException("Ya existe una solicitud registrada para ese proyecto.", e);
         } catch (SQLException e) {
             LOGGER.log(Level.SEVERE, "Error al registrar solicitud de proyecto", e);
             throw new OperationException("Error al registrar solicitud", e);
@@ -416,7 +412,7 @@ public class RequestProjectDAO implements IRequestProjectDAO {
             preparedStatement.executeUpdate();
         }
     }
-    //TODO preguntar si esto es mejor hacerlo asi por separado, o si es mejor hacerlo con dos catch
+
     private boolean runAssignmentInTransaction(String idStudent, int idProject, boolean isAlternative) 
         throws OperationException {
         boolean isAssigned = false;
@@ -435,7 +431,8 @@ public class RequestProjectDAO implements IRequestProjectDAO {
                 isAssigned = true;
             } catch (SQLException sqlException) {
                 databaseConnection.rollback();
-                throw translateAssignmentFailure(sqlException);
+                LOGGER.log(Level.SEVERE, "Transacción de asignación cancelada", sqlException);
+                throw new OperationException("Error al ejecutar la transacción de asignación", sqlException);
             } finally {
                 databaseConnection.setAutoCommit(true);
             }
@@ -445,21 +442,5 @@ public class RequestProjectDAO implements IRequestProjectDAO {
         }
 
         return isAssigned;
-    }
-
-    private OperationException translateAssignmentFailure(SQLException sqlException) {
-        OperationException assignmentFailure;
-
-        if (sqlException instanceof SQLIntegrityConstraintViolationException) {
-            LOGGER.log(Level.WARNING, "Intento de asignar un proyecto duplicado al alumno", sqlException);
-            assignmentFailure = new OperationException(
-                "El alumno ya tiene un proyecto asignado.", sqlException);
-        } else {
-            LOGGER.log(Level.SEVERE, "Transacción de asignación cancelada", sqlException);
-            assignmentFailure = new OperationException(
-                "Error al ejecutar la transacción de asignación", sqlException);
-        }
-
-        return assignmentFailure;
     }
 }
