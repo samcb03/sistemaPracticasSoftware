@@ -42,8 +42,8 @@ public class FXMLConsultStudentExpedientControllerTest extends ApplicationTest {
     private static final String FILTER_REPORTS = "Reportes";
     private static final String FILTER_INITIAL_DOCUMENTS = "Documentos iniciales";
 
-    private static final String VALID_STUDENT_ID = "S12345678";
-    private static final String DOCUMENT_NAME = "documento.pdf";
+    private static final String VALID_STUDENT_ID = "S24013305";
+    private static final String DOCUMENT_NAME = "reporte.pdf";
     private static final String DOCUMENT_TYPE = "Reporte";
     private static final String DOCUMENT_URL = "/ruta/documento.pdf";
 
