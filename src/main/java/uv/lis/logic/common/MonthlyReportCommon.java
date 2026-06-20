@@ -93,7 +93,6 @@ public class MonthlyReportCommon {
         MonthlyReport context = reportContextDAO.getMonthlyReportData(studentId);
         report.setStudentName(context.getStudentName());
         report.setCoordinatorName(context.getCoordinatorName());
-        report.setMonth(context.getMonth());
         report.setReportNumber(context.getReportNumber());
         report.setSection(context.getSection());
         report.setPeriod(context.getPeriod());
