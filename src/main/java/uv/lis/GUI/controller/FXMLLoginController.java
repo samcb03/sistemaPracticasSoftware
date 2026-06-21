@@ -22,6 +22,7 @@ import javafx.scene.image.ImageView;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
+
 import uv.lis.logic.common.EmailCommon;
 import uv.lis.logic.dao.ProfessorDAO;
 import uv.lis.logic.dao.StudentDAO;
