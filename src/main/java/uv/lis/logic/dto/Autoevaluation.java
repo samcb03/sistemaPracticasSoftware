@@ -22,7 +22,7 @@ public class Autoevaluation {
     private String projectSupervisorName;
     private String positionSupervisor;
 
-    private static int NUMBER_ANSWERS = 10;
+    private static final int NUMBER_ANSWERS = 10;
 
     public Autoevaluation() {
 
