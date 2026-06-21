@@ -15,6 +15,7 @@ import java.util.logging.Logger;
 import uv.lis.dataaccess.MySQLConnectionManager;
 import uv.lis.logic.contracts.IProjectDAO;
 import uv.lis.logic.dto.Project;
+import uv.lis.logic.dto.ProjectSummary;
 import uv.lis.logic.exceptions.OperationException;
 
 public class ProjectDAO implements IProjectDAO{
@@ -333,6 +334,52 @@ public class ProjectDAO implements IProjectDAO{
             throw new OperationException("Error al obtener los proyectos disponibles", e);
         }
         return projectsAvailable;
+    }
+
+
+    @Override
+    public Optional<ProjectSummary> getDetailsProjectByStudentId(String studentId) throws OperationException {
+        Optional<ProjectSummary> projectOptional = Optional.empty();
+        String projectQuery = "SELECT p.nombre, p.metodologiaProyecto, "
+                            + "p.objetivo, p.descripcion, "
+                            + "o.nombreOV AS nombreOrganizacion, "
+                            + "uProf.nombre AS nombreProfesor, uProf.apellidos AS apellidosProfesor "
+                            + "FROM Proyecto p "
+                            + "INNER JOIN Solicita_Proyecto sp ON p.idProyecto = sp.idProyecto "
+                            + "INNER JOIN OrganizacionVinculada o ON p.idOrganizacionVinculada = o.idOrganizacionVinculada "
+                            + "INNER JOIN Alumno_Esta_EE aee ON sp.matricula = aee.matricula "
+                            + "INNER JOIN ExperienciaEducativa ee ON aee.NRC = ee.NRC "
+                            + "INNER JOIN Profesor_Imparte_Experiencia pie ON ee.NRC = pie.NRC AND pie.estaActiva = TRUE "
+                            + "INNER JOIN Profesor prof ON pie.numeroPersonal = prof.numeroPersonal "
+                            + "INNER JOIN Usuario uProf ON prof.idUsuario = uProf.idUsuario "
+                            + "WHERE sp.matricula = ? "
+                            + "AND sp.estatus = 2";
+
+        try (Connection databaseConnection = connectionManager.getConnection();
+            PreparedStatement preparedStatement = databaseConnection.prepareStatement(projectQuery)) {
+
+            preparedStatement.setString(1, studentId);
+
+            try (ResultSet resultSet = preparedStatement.executeQuery()) {
+                if (resultSet.next()) {
+                    ProjectSummary project = new ProjectSummary();
+                    project.setProjectName(resultSet.getString("nombre"));
+                    project.setProfessorName(resultSet.getString("nombreProfesor")
+                    + " " + resultSet.getString("apellidosProfesor"));
+                    project.setMethodology(resultSet.getString("metodologiaProyecto"));
+                    project.setObjective(resultSet.getString("objetivo"));
+                    project.setDescription(resultSet.getString("descripcion"));
+                    project.setOrganizationName(resultSet.getString("nombreOrganizacion"));
+
+                    projectOptional = Optional.of(project);
+                }
+            }
+
+        } catch (SQLException e) {
+            LOGGER.log(Level.SEVERE, "Error al obtener el proyecto del alumno", e);
+            throw new OperationException("Error al obtener el proyecto del alumno.", e);
+        }
+        return projectOptional;
     }
 
 }

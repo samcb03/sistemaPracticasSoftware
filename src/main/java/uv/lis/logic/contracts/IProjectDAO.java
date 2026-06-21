@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Optional;
 
 import uv.lis.logic.dto.Project;
+import uv.lis.logic.dto.ProjectSummary;
 import uv.lis.logic.exceptions.OperationException;
 
 /**
@@ -98,4 +99,13 @@ public interface IProjectDAO {
      * @throws OperationException if the projects cannot be retrieved
      */
     ArrayList<Project> getAllProjectsWithCapacity() throws OperationException;
+
+    /**
+     * Retrieves the project summary details assigned to a student.
+     *
+     * @param studentId the identifier of the student to look up
+     * @return the project summary if the student has one assigned, empty otherwise
+     * @throws OperationException if the project summary cannot be retrieved
+     */
+    Optional<ProjectSummary> getDetailsProjectByStudentId(String studentId) throws OperationException;
 }

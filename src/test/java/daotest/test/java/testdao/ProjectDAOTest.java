@@ -27,6 +27,7 @@ import org.mockito.MockitoAnnotations;
 import uv.lis.dataaccess.MySQLConnectionManager;
 import uv.lis.logic.dao.ProjectDAO;
 import uv.lis.logic.dto.Project;
+import uv.lis.logic.dto.ProjectSummary;
 import uv.lis.logic.exceptions.OperationException;
 
 class ProjectDAOTest {
@@ -50,6 +51,8 @@ class ProjectDAOTest {
     private static final String SECOND_OBJECTIVE = "Obj B";
     private static final String ORGANIZATION_NAME = "UV";
     private static final String SUPERVISOR_NAME = "Luis Martinez";
+    private static final String PROFESSOR_FIRST_NAME = "Luis";
+    private static final String PROFESSOR_LAST_NAME = "Martinez";
     private static final String STUDENT_ID = "S23013127";
     private static final String CONNECTION_ERROR = "Fallo";
     private static final String CONNECTION_MANAGER_FIELD = "connectionManager";
@@ -62,6 +65,8 @@ class ProjectDAOTest {
     private static final String COLUMN_DESCRIPTION = "descripcion";
     private static final String COLUMN_ORGANIZATION_NAME = "nombreOrganizacion";
     private static final String COLUMN_STATUS = "estado";
+    private static final String COLUMN_PROFESSOR_NAME = "nombreProfesor";
+    private static final String COLUMN_PROFESSOR_LAST_NAME = "apellidosProfesor";
 
     @Mock private MySQLConnectionManager connectionManager;
     @Mock private Connection databaseConnection;
@@ -141,6 +146,17 @@ class ProjectDAOTest {
         project.setName(SECOND_NAME);
         project.setCapacity(CAPACITY);
         project.setAffiliatedOrganizationName(ORGANIZATION_NAME);
+        return project;
+    }
+
+    private ProjectSummary builderProjectSummary() {
+        ProjectSummary project = new ProjectSummary();
+        project.setProjectName(PROJECT_NAME);
+        project.setProfessorName(PROFESSOR_FIRST_NAME + " " + PROFESSOR_LAST_NAME);
+        project.setMethodology(METHODOLOGY);
+        project.setObjective(OBJECTIVE);
+        project.setDescription(PROJECT_DESCRIPTION);
+        project.setOrganizationName(ORGANIZATION_NAME);
         return project;
     }
 
@@ -453,5 +469,39 @@ class ProjectDAOTest {
         when(connectionManager.getConnection()).thenThrow(new SQLException(CONNECTION_ERROR));
 
         assertThrows(OperationException.class, () -> projectDAO.getAllProjectsWithCapacity());
+    }
+
+    @Test
+    void getDetailsProjectByStudentId_found_returnsProjectSummary() throws Exception {
+        when(databaseConnection.prepareStatement(anyString())).thenReturn(preparedStatement);
+        when(preparedStatement.executeQuery()).thenReturn(resultSet);
+        when(resultSet.next()).thenReturn(true);
+        when(resultSet.getString(COLUMN_NAME)).thenReturn(PROJECT_NAME);
+        when(resultSet.getString(COLUMN_PROFESSOR_NAME)).thenReturn(PROFESSOR_FIRST_NAME);
+        when(resultSet.getString(COLUMN_PROFESSOR_LAST_NAME)).thenReturn(PROFESSOR_LAST_NAME);
+        when(resultSet.getString(COLUMN_METHODOLOGY)).thenReturn(METHODOLOGY);
+        when(resultSet.getString(COLUMN_OBJECTIVE)).thenReturn(OBJECTIVE);
+        when(resultSet.getString(COLUMN_DESCRIPTION)).thenReturn(PROJECT_DESCRIPTION);
+        when(resultSet.getString(COLUMN_ORGANIZATION_NAME)).thenReturn(ORGANIZATION_NAME);
+
+        assertEquals(Optional.of(builderProjectSummary()),
+            projectDAO.getDetailsProjectByStudentId(STUDENT_ID));
+    }
+
+    @Test
+    void getDetailsProjectByStudentId_notFound_returnsEmpty() throws Exception {
+        when(databaseConnection.prepareStatement(anyString())).thenReturn(preparedStatement);
+        when(preparedStatement.executeQuery()).thenReturn(resultSet);
+        when(resultSet.next()).thenReturn(false);
+
+        assertFalse(projectDAO.getDetailsProjectByStudentId(STUDENT_ID).isPresent());
+    }
+
+    @Test
+    void getDetailsProjectByStudentId_sqlError_throwsOperationException() throws Exception {
+        when(connectionManager.getConnection()).thenThrow(new SQLException(CONNECTION_ERROR));
+
+        assertThrows(OperationException.class,
+            () -> projectDAO.getDetailsProjectByStudentId(STUDENT_ID));
     }
 }
