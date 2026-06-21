@@ -55,7 +55,7 @@ public class FXMLStudentMenuController extends ValidationHandler {
     }
 
     private void disableActionsWithoutAssignedSubject() throws OperationException {
-        String subjectNRC = subjectDAO.getSubjectNRCByStudentID(student.getIdStudent());
+        String subjectNRC = subjectDAO.getSubjectNrcByStudentID(student.getIdStudent());
         if (NO_SUBJECT_MESSAGE.equals(subjectNRC)) {
             buttonRequestProject.setDisable(true);
             buttonReports.setDisable(true);

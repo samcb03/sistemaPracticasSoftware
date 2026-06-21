@@ -48,7 +48,7 @@ public class FXMLAssignStudentSubjectController extends ValidationHandler {
 
     private void loadSubjects() {
         try {
-            ArrayList<String> subjects = subjectDAO.getAllSubjectsNRCName();
+            ArrayList<String> subjects = subjectDAO.getAllSubjectsNrcName();
             comboBoxSubjects.setItems(FXCollections.observableArrayList(subjects));
         } catch (OperationException e) {
             showError(e.getMessage());

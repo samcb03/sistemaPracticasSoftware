@@ -49,8 +49,8 @@ public class SubjectDAO implements ISubjectDAO {
                 databaseConnection.prepareStatement(professorSubjectQuery)) {
 
                 subjectStatement.setInt(1, subject.getNrc());
-                subjectStatement.setString(2, subject.getSUBJECT_NAME());
-                subjectStatement.setString(3, subject.getCAREER());
+                subjectStatement.setString(2, Subject.getSubjectName());
+                subjectStatement.setString(3, Subject.getCareer());
                 subjectStatement.setInt(4, subject.getSchoolPeriodId());
                 subjectStatement.setString(5, subject.getSection());
                 int subjectRows = subjectStatement.executeUpdate();
@@ -81,7 +81,7 @@ public class SubjectDAO implements ISubjectDAO {
     }
     
     @Override
-    public ArrayList<String> getAllSubjectsNRCName() throws OperationException {
+    public ArrayList<String> getAllSubjectsNrcName() throws OperationException {
         ArrayList<String> subjects = new ArrayList<>();
         String subjectQuery = "SELECT ee.NRC, ee.nombreExperiencia "
                             + "FROM ExperienciaEducativa ee "
@@ -128,7 +128,7 @@ public class SubjectDAO implements ISubjectDAO {
     }
 
     @Override
-    public String getSubjectNRCByStudentID(String studentID) throws OperationException {
+    public String getSubjectNrcByStudentID(String studentID) throws OperationException {
         String subjectNRC = "No tiene asignada una experiencia";
         String subjectQuery = "SELECT ee.NRC FROM ExperienciaEducativa ee "
                             + "JOIN alumno_esta_ee aee ON ee.NRC = aee.NRC "

@@ -58,10 +58,6 @@ public class Subject {
         this.nrc = nrc;
     }
 
-    public String getSUBJECT_NAME() {
-        return SUBJECT_NAME;
-    }
-
     public String getCAREER() {
         return CAREER;
     }

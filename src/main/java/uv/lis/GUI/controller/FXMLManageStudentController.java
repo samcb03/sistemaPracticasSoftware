@@ -142,7 +142,7 @@ public class FXMLManageStudentController extends ValidationHandler {
     }
 
     private void loadStudentAcademicInformation(String studentId) throws OperationException {
-        String assignedNrc = subjectDAO.getSubjectNRCByStudentID(studentId);
+        String assignedNrc = subjectDAO.getSubjectNrcByStudentID(studentId);
         labelSubject.setText(assignedNrc);
         labelProject.setText(requestProjectDAO.getProjectAssignedToStudent(studentId));
         labelIsInactive.setText(studentDAO.isStudentInactive(studentId) ? LABEL_INACTIVE : LABEL_ACTIVE);

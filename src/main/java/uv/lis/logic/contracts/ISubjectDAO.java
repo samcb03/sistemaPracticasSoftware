@@ -26,7 +26,7 @@ public interface ISubjectDAO {
      * @return the list of subject NRC and names, empty if there are none
      * @throws OperationException if the subjects cannot be retrieved
      */
-    ArrayList<String> getAllSubjectsNRCName() throws OperationException;
+    ArrayList<String> getAllSubjectsNrcName() throws OperationException;
 
     /**
      * Retrieves the NRC of the subject a student is enrolled in.
@@ -35,7 +35,7 @@ public interface ISubjectDAO {
      * @return the NRC of the subject the student is enrolled in
      * @throws OperationException if the NRC cannot be retrieved
      */
-    String getSubjectNRCByStudentID(String studentID) throws OperationException;
+    String getSubjectNrcByStudentID(String studentID) throws OperationException;
 
     /**
      * Removes the subject assignment of a professor.

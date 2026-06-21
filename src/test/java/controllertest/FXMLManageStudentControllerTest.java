@@ -192,7 +192,7 @@ public class FXMLManageStudentControllerTest extends ApplicationTest {
         when(studentDAOMock.getIdUserByStudentId(anyString())).thenReturn(Optional.of(VALID_USER_ID));
         when(studentDAOMock.getStudentById(anyInt())).thenReturn(Optional.of(buildStudent()));
         when(studentDAOMock.isStudentInactive(anyString())).thenReturn(false);
-        when(subjectDAOMock.getSubjectNRCByStudentID(anyString())).thenReturn(EMPTY_VALUE);
+        when(subjectDAOMock.getSubjectNrcByStudentID(anyString())).thenReturn(EMPTY_VALUE);
         when(requestProjectDAOMock.getProjectAssignedToStudent(anyString())).thenReturn(EMPTY_VALUE);
         when(activityDAOMock.getActivitiesByStudentId(anyString())).thenReturn(new ArrayList<Activity>());
     }
