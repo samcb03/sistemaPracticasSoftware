@@ -600,13 +600,15 @@ public final class InputValidator {
      * @return an error message if the value is empty or does not match the required length, empty otherwise
      */
     public static Optional<String> validatePostalCode(String postalCodeValue, String fieldName) {
-        return Stream.of(
+        Optional<String> validatePostalCode = Optional.empty();
+        validatePostalCode = Stream.of(
                 InputValidator.validateNotEmpty(postalCodeValue, fieldName),
                 InputValidator.validatePositiveInteger(postalCodeValue, fieldName),
                 InputValidator.validateExactLength(postalCodeValue, POSTAL_CODE_LENGTH, fieldName))
             .filter(Optional::isPresent)
             .findFirst()
             .orElse(Optional.empty());
+        return validatePostalCode;
     }
 
     /**
@@ -622,10 +624,10 @@ public final class InputValidator {
      */
     public static Optional<String> validateRegister(String registerValue, String fieldName) {
         Optional<String> validateRegister = Optional.empty();
-        if(!registerValue.matches(REGISTER_REGEX)) {
+        if (!registerValue.matches(REGISTER_REGEX)) {
             validateRegister = Optional.of(fieldName + " no acepta carácteres especiales");
         } else {
-            return Stream.of(
+            validateRegister = Stream.of(
                 InputValidator.validateNotEmpty(registerValue, fieldName),
                 InputValidator.validateNoConsecutiveRepeatedLetters(registerValue, fieldName),
                 InputValidator.validateNoConsecutiveSpaces(registerValue, fieldName),
@@ -652,10 +654,10 @@ public final class InputValidator {
 
     public static Optional<String> validateAddressNumber(String addressNumber, String fieldName) {
         Optional<String> validateAddressNumber = Optional.empty();
-        if(!addressNumber.matches(ADDRESS_NUMBER_REGEX)) {
+        if (!addressNumber.matches(ADDRESS_NUMBER_REGEX)) {
             validateAddressNumber = Optional.of(fieldName + " no acepta carácteres especial");
         } else {
-            return Stream.of(
+            validateAddressNumber = Stream.of(
                 InputValidator.validateNotEmpty(addressNumber, fieldName),
                 InputValidator.validateNoConsecutiveSpaces(addressNumber, fieldName),
                 InputValidator.validateNoTrailingSpace(addressNumber, fieldName),
@@ -683,7 +685,7 @@ public final class InputValidator {
     public static Optional<String> validateMaxHoursForDuration(String hoursValue, long durationInDays, 
         String fieldName) {
             Optional<String> validationResult;
-            if(durationInDays <= 0) {
+            if (durationInDays <= 0) {
                 validationResult = Optional.empty();
             } else {
                 int maxAllowedHours =(int) durationInDays * MAX_HOURS_PER_DAY;

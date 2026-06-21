@@ -363,13 +363,16 @@ public class FXMLGenerateMonthlyReportController extends ValidationHandler {
         int monthNumber = MONTH_NUMBERS_BY_NAME.getOrDefault(monthName.toLowerCase(), MONTH_UNKNOWN);
         return monthNumber;
     }
-
+    
     private Optional<String> getSelectedMonth() {
+        Optional<String> selectedMonth;
         String selected = comboBoxMonth.getSelectionModel().getSelectedItem();
         if (selected == null || selected.isBlank()) {
-            return Optional.empty();
+            selectedMonth = Optional.empty();
+        } else {
+            selectedMonth = Optional.of(selected);
         }
-        return Optional.of(selected);
+        return selectedMonth;
     }
 
     @FXML
