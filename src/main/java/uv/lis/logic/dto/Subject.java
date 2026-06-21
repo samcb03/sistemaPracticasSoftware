@@ -4,6 +4,7 @@ import java.util.Objects;
 
 public class Subject {
     private final static String CAREER = "Ingenieria de Software";
+
     private final static String SUBJECT_NAME = "Practicas Profesionales";
     private String name;
     private int nrc;
@@ -12,16 +13,25 @@ public class Subject {
     private String schoolPeriodName;
     private String section;
 
+    public Subject() {
+    }
+
+    public Subject(String name, int nrc, String professorPersonnelNumber, int schoolPeriodId, String schoolPeriodName,
+            String section) {
+        this.name = name;
+        this.nrc = nrc;
+        this.professorPersonnelNumber = professorPersonnelNumber;
+        this.schoolPeriodId = schoolPeriodId;
+        this.schoolPeriodName = schoolPeriodName;
+        this.section = section;
+    }
+
     public String getSchoolPeriodName() {
         return schoolPeriodName;
     }
 
     public void setSchoolPeriodName(String schoolPeriodName) {
         this.schoolPeriodName = schoolPeriodName;
-    }
-
-    public Subject() {
-
     }
 
     public static String getCareer() {
@@ -38,11 +48,6 @@ public class Subject {
 
     public void setName(String name) {
         this.name = name;
-    }
-
-    public Subject(int nrc, int schoolPeriodId) {
-        this.nrc = nrc;
-        this.schoolPeriodId = schoolPeriodId;
     }
 
     public int getNrc() {

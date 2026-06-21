@@ -371,14 +371,48 @@ class ProjectDAOTest {
     }
 
     @Test
-    void getProjectNamesByOrganizationId_withResults_setsCorrectParameters() throws Exception {
+    void getProjectNamesByOrganizationId_withResults_setsOrganizationIdParameter() throws Exception {
         when(databaseConnection.prepareStatement(anyString())).thenReturn(preparedStatement);
         when(preparedStatement.executeQuery()).thenReturn(resultSet);
         when(resultSet.next()).thenReturn(false);
 
         projectDAO.getProjectNamesByOrganizationId(ORGANIZATION_ID);
+
         verify(preparedStatement).setInt(1, ORGANIZATION_ID);
+    }
+
+    @Test
+    void getProjectNamesByOrganizationId_withResults_setsActiveStatusParameter() throws Exception {
+        when(databaseConnection.prepareStatement(anyString())).thenReturn(preparedStatement);
+        when(preparedStatement.executeQuery()).thenReturn(resultSet);
+        when(resultSet.next()).thenReturn(false);
+
+        projectDAO.getProjectNamesByOrganizationId(ORGANIZATION_ID);
+
         verify(preparedStatement).setBoolean(2, true);
+    }
+    
+
+    @Test
+    void getAllProjectsWithCapacity_withResults_setsActiveStatusParameter() throws Exception {
+        when(databaseConnection.prepareStatement(anyString())).thenReturn(preparedStatement);
+        when(preparedStatement.executeQuery()).thenReturn(resultSet);
+        when(resultSet.next()).thenReturn(false);
+
+        projectDAO.getAllProjectsWithCapacity();
+
+        verify(preparedStatement).setBoolean(1, true);
+    }
+
+    @Test
+    void getAllProjectsWithCapacity_withResults_setsAssignedStatusParameter() throws Exception {
+        when(databaseConnection.prepareStatement(anyString())).thenReturn(preparedStatement);
+        when(preparedStatement.executeQuery()).thenReturn(resultSet);
+        when(resultSet.next()).thenReturn(false);
+
+        projectDAO.getAllProjectsWithCapacity();
+
+        verify(preparedStatement).setInt(2, STATUS_ASSIGNED);
     }
 
     @Test
