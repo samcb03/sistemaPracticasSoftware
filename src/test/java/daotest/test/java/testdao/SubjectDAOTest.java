@@ -179,27 +179,27 @@ class SubjectDAOTest {
     }
 
     @Test
-    void getAllSubjectsNRCName_withResults_returnsPopulatedList() throws Exception {
+    void getAllSubjectsNrcName_withResults_returnsPopulatedList() throws Exception {
         mockQueryExecution();
         mockResultSetAllSubjects();
 
-        assertEquals(EXPECTED_LIST_SIZE, subjectDAO.getAllSubjectsNRCName().size());
+        assertEquals(EXPECTED_LIST_SIZE, subjectDAO.getAllSubjectsNrcName().size());
     }
 
     @Test
-    void getAllSubjectsNRCName_emptyResultSet_returnsEmptyList() throws Exception {
+    void getAllSubjectsNrcName_emptyResultSet_returnsEmptyList() throws Exception {
         mockQueryExecution();
         when(resultSet.next()).thenReturn(false);
 
-        assertTrue(subjectDAO.getAllSubjectsNRCName().isEmpty());
+        assertTrue(subjectDAO.getAllSubjectsNrcName().isEmpty());
     }
 
     @Test
-    void getAllSubjectsNRCName_sqlError_throwsOperationException() throws Exception {
+    void getAllSubjectsNrcName_sqlError_throwsOperationException() throws Exception {
         when(connectionManager.getConnection()).thenThrow(new SQLException(CONNECTION_ERROR));
 
         assertThrows(OperationException.class,
-            () -> subjectDAO.getAllSubjectsNRCName());
+            () -> subjectDAO.getAllSubjectsNrcName());
     }
 
     @Test
@@ -225,30 +225,30 @@ class SubjectDAOTest {
     }
 
     @Test
-    void getSubjectNRCByStudentID_found_returnsNRC() throws Exception {
+    void getSubjectNrcByStudentID_found_returnsNRC() throws Exception {
         mockQueryExecution();
         when(resultSet.next()).thenReturn(true);
         when(resultSet.getString(COLUMN_NRC_UPPER)).thenReturn(String.valueOf(EXPECTED_NRC));
 
         assertEquals(String.valueOf(EXPECTED_NRC),
-            subjectDAO.getSubjectNRCByStudentID(VALID_STUDENT_ID));
+            subjectDAO.getSubjectNrcByStudentID(VALID_STUDENT_ID));
     }
 
     @Test
-    void getSubjectNRCByStudentID_notFound_returnsDefaultMessage() throws Exception {
+    void getSubjectNrcByStudentID_notFound_returnsDefaultMessage() throws Exception {
         mockQueryExecution();
         when(resultSet.next()).thenReturn(false);
 
         assertEquals(NO_SUBJECT_MESSAGE,
-            subjectDAO.getSubjectNRCByStudentID(INVALID_STUDENT_ID));
+            subjectDAO.getSubjectNrcByStudentID(INVALID_STUDENT_ID));
     }
 
     @Test
-    void getSubjectNRCByStudentID_sqlError_throwsOperationException() throws Exception {
+    void getSubjectNrcByStudentID_sqlError_throwsOperationException() throws Exception {
         when(connectionManager.getConnection()).thenThrow(new SQLException(CONNECTION_ERROR));
 
         assertThrows(OperationException.class,
-            () -> subjectDAO.getSubjectNRCByStudentID(VALID_STUDENT_ID));
+            () -> subjectDAO.getSubjectNrcByStudentID(VALID_STUDENT_ID));
     }
 
     @Test
