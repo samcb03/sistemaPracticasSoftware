@@ -20,6 +20,7 @@ public class FXMLStudentMenuController extends ValidationHandler {
     private static final String NO_SUBJECT_MESSAGE = "No tiene asignada una experiencia";
     private static final String PENDING_DOCUMENTS_MESSAGE = 
         "Debe subir sus documentos iniciales y esperar a que el profesor los valide";
+    private static final int AUTOEVALUATION_DOCUMENT_TYPE = 1;
 
     @FXML private Button buttonRequestProject;
     @FXML private Button buttonReports;
@@ -40,12 +41,19 @@ public class FXMLStudentMenuController extends ValidationHandler {
         this.student = SessionManager.getInstance().getCurrentStudent();
         setupControls(labelMessage, buttonLogOut);
         try {
+            boolean isAutoevaluationValidated = expedientDAO.isDocumentTypeValidated(
+                student.getIdStudent(),AUTOEVALUATION_DOCUMENT_TYPE);
+            
+            if(isAutoevaluationValidated) {
+                navigateTo("/uv/lis/GUI/view/FXMLFinishWindow.fxml");
+            } else {
             disableActionsWithoutAssignedSubject();
             disableActionsWithoutAssignedProject();
             checkFinalReportValidation();
             disableActionsWithoutValidatedDocuments();
+            }
         } catch (OperationException e) {
-            showError(e.getMessage());
+            showError("No se pudo inicializar");
         }
     }
 
@@ -115,6 +123,20 @@ public class FXMLStudentMenuController extends ValidationHandler {
     @FXML
     public void goToNotifications() {
         navigateTo("/uv/lis/GUI/view/FXMLNotifications.fxml");
+    }
+
+    @FXML 
+    public void goToFinishWindows() {
+        try {
+            boolean validatedAutoevaluation = expedientDAO.isDocumentTypeValidated(student.getIdStudent(), AUTOEVALUATION_DOCUMENT_TYPE);
+            if(validatedAutoevaluation) {
+                navigateTo("/uv/lis/GUI/view/FXMLFinishWindow.fxml");
+            } else {
+                showError("Debe completar y validar la autoevaluación");
+            }
+        } catch(OperationException e) {
+            showError("No se pudo cargar la pantalla final");
+        }
     }
 
     @Override

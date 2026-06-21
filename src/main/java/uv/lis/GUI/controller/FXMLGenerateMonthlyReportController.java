@@ -226,7 +226,7 @@ public class FXMLGenerateMonthlyReportController extends ValidationHandler {
 
     private void loadRegisteredActivities() {
         Optional<String> selectedMonth = getSelectedMonth();
-        
+
         if(selectedMonth.isPresent()) {
             try {
                 MonthlyReport context = reportContextDAO.getMonthlyReportData(currentStudent.getIdStudent());
@@ -247,8 +247,7 @@ public class FXMLGenerateMonthlyReportController extends ValidationHandler {
                 labelReportedHours.setText(String.valueOf(totalHours));
 
                 int previouslyAccumulatedHours = advanceDAO.getAccumulatedHoursByProject(context.getIdProject());
-                int displayedReportedHours = previouslyAccumulatedHours + totalHours;
-                labelAccumulatedHours.setText(String.valueOf(displayedReportedHours));
+                labelAccumulatedHours.setText(String.valueOf(previouslyAccumulatedHours));
                 buttonRegisterActivity.setDisable(registered.size() >= MAX_ACTIVITY_INPUTS);
 
             } catch (OperationException e) {
@@ -284,44 +283,50 @@ public class FXMLGenerateMonthlyReportController extends ValidationHandler {
     }
 
     private void generateMonthlyReport() {
-        try {
-            MonthlyReport context = reportContextDAO.getMonthlyReportData(currentStudent.getIdStudent());
+        Optional<String> selectedMonthOpt = getSelectedMonth();
+        if(selectedMonthOpt.isEmpty()) {
+            showError("Seleccione un mes antes de generar el reporte");
+        } else {
+            try {
 
-            String selectedMonth = getSelectedMonth().get();
-            int month = convertMonthNameToNumber(selectedMonth);
-            int year = LocalDate.now().getYear();
+                String selectedMonth = selectedMonthOpt.get();
+                int month = convertMonthNameToNumber(selectedMonth);
+                int year = LocalDate.now().getYear();
 
-            MonthlyReport report = buildReport(getSelectedMonth().get());
-            JasperPrint jasperPrint = monthlyReportCommon.generateMonthlyReport(report);
+                MonthlyReport context = reportContextDAO.getMonthlyReportData(currentStudent.getIdStudent());
+                MonthlyReport report = buildReport(selectedMonth);
 
-            int previousAccumulated = advanceDAO.getAccumulatedHoursByProject(context.getIdProject());
-            int currentReported = reportContextDAO.getSumOfReportedHours(context.getIdProject(), month, year);
-            int newAccumulated = previousAccumulated + currentReported;
+                JasperPrint jasperPrint = monthlyReportCommon.generateMonthlyReport(report);
 
-            if (!advanceDAO.existsAdvanceForReport(context.getIdReport())) {
-                Advance advance = new Advance();
-                advance.setProjectId(context.getIdProject());
-                advance.setReportId(context.getIdReport());
-                advance.setWeekNumber(context.getReportNumber());
-                advance.setAccumulatedHours(newAccumulated);
-                advanceDAO.registerAdvance(advance);
+                int previousAccumulated = advanceDAO.getAccumulatedHoursByProject(context.getIdProject());
+                int currentReported = reportContextDAO.getSumOfReportedHours(context.getIdProject(), month, year);
+                int newAccumulated = previousAccumulated + currentReported;
 
-            } else {
-                LOGGER.log(Level.INFO, "Ya existe un avance registrado para el reporte ID {0}. "
-                    + "Se omitirá el registro de avance.", context.getIdReport());
+                if (!advanceDAO.existsAdvanceForReport(context.getIdReport())) {
+                    Advance advance = new Advance();
+                    advance.setProjectId(context.getIdProject());
+                    advance.setReportId(report.getId());
+                    advance.setWeekNumber(context.getReportNumber());
+                    advance.setAccumulatedHours(newAccumulated);
+                    advanceDAO.registerAdvance(advance);
+
+                } else {
+                    LOGGER.log(Level.INFO, "Ya existe un avance registrado para el reporte ID {0}. "
+                        + "Se omitirá el registro de avance.", context.getIdReport());
+                }
+
+                showSuccess(REPORT_GENERATED_MESSAGE);
+                displayReport(jasperPrint);
+                clearFields();
+                loadRegisteredActivities();
+
+            } catch (OperationException operationException) {
+                LOGGER.log(Level.SEVERE, "Error de operación al generar el reporte mensual", operationException);
+                showError(operationException.getMessage());
+            } catch (JRException jasperException) {
+                LOGGER.log(Level.SEVERE, "Error de JasperReports al generar el reporte mensual", jasperException);
+                showError(REPORT_GENERATION_ERROR);
             }
-
-            showSuccess(REPORT_GENERATED_MESSAGE);
-            displayReport(jasperPrint);
-            clearFields();
-            loadRegisteredActivities();
-
-        } catch (OperationException operationException) {
-            LOGGER.log(Level.SEVERE, "Error de operación al generar el reporte mensual", operationException);
-            showError(operationException.getMessage());
-        } catch (JRException jasperException) {
-            LOGGER.log(Level.SEVERE, "Error de JasperReports al generar el reporte mensual", jasperException);
-            showError(REPORT_GENERATION_ERROR);
         }
     }
 
