@@ -44,6 +44,7 @@ public class FXMLLoginController implements Initializable {
     private static final int USER_TYPE_COORDINATOR = 3;
     private static final int USER_TYPE_ADMINISTRATOR = 4;
     private static final int MAX_ATTEMPTS = 5;
+    private static final int IMAGE_FIT_HEIGHT = 20;
     private static final String MESSAGE_INVALID_CREDENTIALS = "Credenciales inválidas. Intentos restantes: ";
     private static final String MESSAGE_TOO_MANY_ATTEMPTS =  "Demasiados intentos fallidos. Reinicie la aplicación.";
     private static final String MESSAGE_USER_DATA_NOT_FOUND = "No se encontraron los datos.";
@@ -100,8 +101,8 @@ public class FXMLLoginController implements Initializable {
 
     private ImageView createIcon(Image image) {
         ImageView imageView = new ImageView(image);
-        imageView.setFitHeight(20.0);
-        imageView.setFitWidth(20.0);
+        imageView.setFitHeight(IMAGE_FIT_HEIGHT);
+        imageView.setFitWidth(IMAGE_FIT_HEIGHT);
         imageView.setPickOnBounds(true);
         imageView.setPreserveRatio(true);
         return imageView;
