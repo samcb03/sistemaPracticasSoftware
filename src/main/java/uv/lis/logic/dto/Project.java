@@ -97,9 +97,11 @@ public class Project {
     public void setAffiliatedOrganization(AffiliatedOrganization affiliatedOrganization) {
         this.affiliatedOrganization = affiliatedOrganization;
     }
+
     public String getIdStudent() {
         return idStudent;
     }
+
     public void setIdStudent(String idStudent) {
         this.idStudent = idStudent;
     }
@@ -164,6 +166,6 @@ public class Project {
     @Override
     public int hashCode() {
         return Objects.hash(id, name, methodology, capacity, objective, 
-                            description, activities, affiliatedOrganization, idStudent);
+            description, activities, affiliatedOrganization, idStudent);
     }
 }

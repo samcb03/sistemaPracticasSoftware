@@ -9,6 +9,17 @@ public class Advance {
     private int weekNumber;
     private int accumulatedHours;
 
+    public Advance() {
+
+    }
+
+    public Advance(int projectId, int reportId, int weekNumber, int accumulatedHours) {
+        this.projectId = projectId;
+        this.reportId = reportId;
+        this.weekNumber = weekNumber;
+        this.accumulatedHours = accumulatedHours;
+    }
+
     public int getProjectId() {
         return projectId;
     }
