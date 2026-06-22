@@ -54,21 +54,23 @@ public class FXMLShowProjectDetailControllerTest extends ApplicationTest {
     private static final String TEXTFIELD_OBJECTIVE_SELECTOR = "#textFieldObjective";
     private static final String TEXTFIELD_CAPACITY_SELECTOR = "#textFieldCapacity";
     private static final String TEXTFIELD_METHODOLOGY_SELECTOR = "#textFieldMethodology";
-    //FIXME estas pruebas si funcionan, pero revo nos dijo que usemos datos reales para las pruebas, estos datos son invalidos
     private static final int VALID_PROJECT_ID = 1;
-    private static final String VALID_PROJECT_NAME = "Proyecto Test";
-    private static final String VALID_PROJECT_DESCRIPTION = "Descripción del proyecto de prueba";
-    private static final String VALID_PROJECT_OBJECTIVE = "Objetivo del proyecto de prueba";
-    private static final String VALID_PROJECT_METHODOLOGY = "Metodología de prueba";
-    private static final int VALID_PROJECT_CAPACITY = 3;
-    private static final String VALID_ORGANIZATION_NAME = "Organización Test";
+    private static final String VALID_PROJECT_NAME = "Sistema de Gestión de Inventario para PYMES";
+    private static final String VALID_PROJECT_DESCRIPTION = "Aplicación web con backend en Java Spring Boot y" 
+        + " base de datos MySQL para reducir errores en el conteo de almacén";
+    private static final String VALID_PROJECT_OBJECTIVE = "Desarrollar una plataforma web para el control" 
+        + " automático de existencias en tiempo real";
+    private static final String VALID_PROJECT_METHODOLOGY = "Scrum";
+    private static final int VALID_PROJECT_CAPACITY = 2;
+    private static final String INVALID_PROJECT_CAPACITY = "abc";
+    private static final String VALID_ORGANIZATION_NAME = "Universidad Veracruzana";
     private static final int VALID_ORGANIZATION_ID = 10;
 
     private static final String UPDATED_PROJECT_NAME = "Proyecto Actualizado";
     private static final String UPDATED_PROJECT_DESCRIPTION = "Descripción actualizada";
     private static final String UPDATED_PROJECT_OBJECTIVE = "Objetivo actualizado";
     private static final String UPDATED_PROJECT_METHODOLOGY = "Metodología actualizada";
-    private static final String UPDATED_PROJECT_CAPACITY = "5"; //FIXME el maximo de capacidad es 2
+    private static final String UPDATED_PROJECT_CAPACITY = "2"; 
 
     private static final String EXPECTED_SUCCESS_UPDATE_MESSAGE = "Proyecto actualizado correctamente";
     private static final String EXPECTED_NO_CHANGES_MESSAGE = "No se realizaron cambios en el proyecto";
@@ -81,27 +83,19 @@ public class FXMLShowProjectDetailControllerTest extends ApplicationTest {
     private FXMLShowProjectDetailController controller;
     private ProjectDAO projectDAOMock;
     private RequestProjectDAO requestProjectDAOMock;
-    //FIXME otro void con return
+
     @Override
-    public void start(Stage stage) throws IOException {
-        primaryStage = stage;
-
-        projectDAOMock = mock(ProjectDAO.class);
-        requestProjectDAOMock = mock(RequestProjectDAO.class);
-
+    public void start(Stage stage) {
         FXMLLoader loader = new FXMLLoader(getClass().getResource(SHOW_PROJECT_DETAIL_VIEW_FXML));
-        loader.setControllerFactory(controllerClass -> {
-            FXMLShowProjectDetailController newController = new FXMLShowProjectDetailController();
-            injectField(PROJECT_DAO_FIELD, projectDAOMock, newController);
-            injectField(REQUEST_PROJECT_DAO_FIELD, requestProjectDAOMock, newController);
-            return newController;
-        });
 
-        Parent root = loader.load();
-        controller = loader.getController();
-
-        stage.setScene(new Scene(root));
-        stage.show();
+        try {
+            Parent root = loader.load();
+            controller = loader.getController();
+            stage.setScene(new Scene(root));
+            stage.show();
+        } catch (IOException ioException) {
+            throw new RuntimeException(ioException);
+        }
     }
 
     @BeforeEach
@@ -120,7 +114,7 @@ public class FXMLShowProjectDetailControllerTest extends ApplicationTest {
             clearLabelMessage();
         });
         WaitForAsyncUtils.waitForFxEvents();
-    }
+}
 
     @AfterEach
     void closeSecondaryWindows() {
@@ -240,7 +234,7 @@ public class FXMLShowProjectDetailControllerTest extends ApplicationTest {
         fillTextField(TEXTFIELD_OBJECTIVE_SELECTOR, VALID_PROJECT_OBJECTIVE);
         fillTextField(TEXTFIELD_METHODOLOGY_SELECTOR, VALID_PROJECT_METHODOLOGY);
         clearTextField(TEXTFIELD_CAPACITY_SELECTOR);
-        fillTextField(TEXTFIELD_CAPACITY_SELECTOR, "abc");
+        fillTextField(TEXTFIELD_CAPACITY_SELECTOR, INVALID_PROJECT_CAPACITY);
 
         clickOn(BUTTON_SAVE_SELECTOR);
         WaitForAsyncUtils.waitForFxEvents();
