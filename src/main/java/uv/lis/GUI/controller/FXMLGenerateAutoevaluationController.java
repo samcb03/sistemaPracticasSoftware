@@ -133,6 +133,7 @@ public class FXMLGenerateAutoevaluationController extends ValidationHandler {
 
     private void loadAutomaticData() { 
         if (currentStudent != null) {
+            buttonGenerate.setDisable(false);
             labelStudentName.setText(currentStudent.getFirstName() + " " + currentStudent.getLastName());
             labelStudentId.setText(currentStudent.getIdStudent());
 
