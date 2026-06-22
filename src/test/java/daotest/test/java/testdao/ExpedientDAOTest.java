@@ -1,6 +1,5 @@
 package daotest.test.java.testdao;
 
-
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
@@ -39,6 +38,7 @@ class ExpedientDAOTest {
     private static final int NO_ROWS_AFFECTED = 0;
     private static final int DOCUMENT_TYPE_ID = 3;
     private static final int MINUS_ONE = -1;
+    private static final int NRC = 12345;
 
     private static final String STATUS_PENDING_NAME = "Pendiente";
 
@@ -47,6 +47,7 @@ class ExpedientDAOTest {
     private static final String DOCUMENT_TYPE = "Carta de presentación";
     private static final String DOCUMENT_URL = "/ruta/documento.pdf";
     private static final String DOCUMENT_TYPE_COLUMN = "nombreTipoDocumento";
+    private static final String STUDENT_ID_COLUMN = "matricula";
     private static final String DATABASE_ERROR_MESSAGE = "Fallo";
 
     @Mock private MySQLConnectionManager connectionManager;
@@ -332,5 +333,55 @@ class ExpedientDAOTest {
 
         assertThrows(OperationException.class,
             () -> expedientDAO.countDocumentsByStudentAndType(STUDENT_ID, DOCUMENT_TYPE_ID));
+    }
+
+    @Test
+    void getStudentIdsWithInitialDocuments_documentsExist_returnsNonEmptyList() throws Exception {
+        mockQueryExecution();
+        when(resultSet.next()).thenReturn(true, false);
+        when(resultSet.getString(STUDENT_ID_COLUMN)).thenReturn(STUDENT_ID);
+
+        assertFalse(expedientDAO.getStudentIdsWithInitialDocuments(NRC).isEmpty());
+    }
+
+    @Test
+    void getStudentIdsWithInitialDocuments_noDocuments_returnsEmptyList() throws Exception {
+        mockQueryExecution();
+        when(resultSet.next()).thenReturn(false);
+
+        assertTrue(expedientDAO.getStudentIdsWithInitialDocuments(NRC).isEmpty());
+    }
+
+    @Test
+    void getStudentIdsWithInitialDocuments_sqlError_throwsOperationException() throws Exception {
+        when(connectionManager.getConnection()).thenThrow(new SQLException(DATABASE_ERROR_MESSAGE));
+
+        assertThrows(OperationException.class,
+            () -> expedientDAO.getStudentIdsWithInitialDocuments(NRC));
+    }
+
+    @Test
+    void getStudentIdsWithDocumentType_documentsExist_returnsNonEmptyList() throws Exception {
+        mockQueryExecution();
+        when(resultSet.next()).thenReturn(true, false);
+        when(resultSet.getString(STUDENT_ID_COLUMN)).thenReturn(STUDENT_ID);
+
+        assertFalse(expedientDAO.getStudentIdsWithDocumentType(NRC, DOCUMENT_TYPE_ID).isEmpty());
+    }
+
+    @Test
+    void getStudentIdsWithDocumentType_noDocuments_returnsEmptyList() throws Exception {
+        mockQueryExecution();
+        when(resultSet.next()).thenReturn(false);
+
+        assertTrue(expedientDAO.getStudentIdsWithDocumentType(NRC, DOCUMENT_TYPE_ID).isEmpty());
+    }
+
+    @Test
+    void getStudentIdsWithDocumentType_sqlError_throwsOperationException() throws Exception {
+        when(connectionManager.getConnection()).thenThrow(new SQLException(DATABASE_ERROR_MESSAGE));
+
+        assertThrows(OperationException.class,
+            () -> expedientDAO.getStudentIdsWithDocumentType(NRC, DOCUMENT_TYPE_ID));
     }
 }
