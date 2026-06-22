@@ -64,9 +64,9 @@ public class FXMLGenerateAutoevaluationControllerTest extends ApplicationTest {
     private static final String VALID_STUDENT_ID = "S24013322";
     private static final String VALID_STUDENT_NAME = "Denisse";
     private static final String VALID_STUDENT_LASTNAME = "Reyes";
-    private static final String VALID_ORGANIZATION = "Organización Test";
-    private static final String VALID_PROJECT = "Proyecto Test";
-    private static final String VALID_SUPERVISOR = "Supervisor Test";
+    private static final String VALID_ORGANIZATION = "Universidad Veracruzana";
+    private static final String VALID_PROJECT = "Optimización de redes neuronales convolucionales";
+    private static final String VALID_SUPERVISOR = "Paola";
 
     private static final String EXPECTED_NOT_ALL_ANSWERED_MESSAGE = "Por favor, responda todas las preguntas" 
         + " antes de generar.";
@@ -79,55 +79,39 @@ public class FXMLGenerateAutoevaluationControllerTest extends ApplicationTest {
     private ExpedientDAO expedientDAOMock;
     private static final Logger LOGGER = Logger.getLogger(
     FXMLGenerateAutoevaluationControllerTest.class.getName());
-    //FIXME este metodo tiene un return aunque se declara como void
+
     @Override
-    public void start(Stage stage) throws IOException {
+    public void start(Stage stage) {
         primaryStage = stage;
         SessionManager.getInstance().setCurrentStudent(buildStudent());
 
-        autoevaluationCommonMock = mock(AutoevaluationCommon.class);
-        autoevaluationDAOMock = mock(AutoevaluationDAO.class);
-        expedientDAOMock = mock(ExpedientDAO.class);
-
         try {
-            when(expedientDAOMock.isFinalReportValidated(anyString())).thenReturn(true);
-            when(autoevaluationDAOMock.getAutoevaluationData(anyString()))
-                .thenReturn(buildAutoevaluation());
-        } catch (OperationException operationException) {
-            throw new IOException(operationException);
+            FXMLLoader loader = new FXMLLoader(getClass().getResource(AUTOEVALUATION_VIEW_FXML));
+            Parent root = loader.load();
+            autoevaluationController = loader.getController();
+            stage.setScene(new Scene(root));
+            stage.show();
+        } catch (IOException ioException) {
+            throw new RuntimeException(ioException);
         }
-
-        FXMLLoader loader = new FXMLLoader(getClass().getResource(AUTOEVALUATION_VIEW_FXML));
-        loader.setControllerFactory(controllerClass -> {
-            FXMLGenerateAutoevaluationController controller = new FXMLGenerateAutoevaluationController();
-            injectField(AUTOEVALUATION_COMMON_FIELD, autoevaluationCommonMock, controller);
-            injectField(AUTOEVALUATION_DAO_FIELD, autoevaluationDAOMock, controller);
-            injectField(EXPEDIENT_DAO_FIELD, expedientDAOMock, controller);
-            return controller;
-        });
-
-        Parent root = loader.load();
-        autoevaluationController = loader.getController();
-
-        stage.setScene(new Scene(root));
-        stage.show();
     }
 
     @BeforeEach
-    void setUpMocks() throws OperationException, ReflectiveOperationException {
+    void setUpMocks() throws OperationException {
         autoevaluationCommonMock = mock(AutoevaluationCommon.class);
         autoevaluationDAOMock = mock(AutoevaluationDAO.class);
         expedientDAOMock = mock(ExpedientDAO.class);
- 
+
         when(expedientDAOMock.isFinalReportValidated(anyString())).thenReturn(true);
         when(autoevaluationDAOMock.getAutoevaluationData(anyString()))
             .thenReturn(buildAutoevaluation());
- 
+
         injectField(AUTOEVALUATION_COMMON_FIELD, autoevaluationCommonMock, autoevaluationController);
         injectField(AUTOEVALUATION_DAO_FIELD, autoevaluationDAOMock, autoevaluationController);
         injectField(EXPEDIENT_DAO_FIELD, expedientDAOMock, autoevaluationController);
-        invokeLoadAutomaticData(autoevaluationController);
-        invokeClearFields(autoevaluationController);
+
+        interact(() -> clearLabelMessage());
+        WaitForAsyncUtils.waitForFxEvents();
     }
 
     @AfterEach
@@ -222,20 +206,6 @@ public class FXMLGenerateAutoevaluationControllerTest extends ApplicationTest {
         }
     }
 
-    private void invokeLoadAutomaticData(FXMLGenerateAutoevaluationController controller)
-            throws ReflectiveOperationException {
-        var method = FXMLGenerateAutoevaluationController.class.getDeclaredMethod("loadAutomaticData");
-        method.setAccessible(true);
-        interact(() -> {
-            try {
-                method.invoke(controller);
-            } catch (ReflectiveOperationException e) {
-                LOGGER.log(Level.SEVERE, "Error al re-invocar loadAutomaticData", e);
-            }
-        });
-        WaitForAsyncUtils.waitForFxEvents();
-    }
-
     private void fillAllQuestions() {
         clickOn(RADIO_1_1);
         clickOn(RADIO_2_1);
@@ -252,24 +222,14 @@ public class FXMLGenerateAutoevaluationControllerTest extends ApplicationTest {
         clickOn(RADIO_9_1);
         clickOn(RADIO_10_1);
     }
-    
-    private void invokeClearFields(FXMLGenerateAutoevaluationController controller)
-            throws ReflectiveOperationException {
-        var method = FXMLGenerateAutoevaluationController.class.getDeclaredMethod("clearFields");
-        method.setAccessible(true);
-        interact(() -> {
-            try {
-                method.invoke(controller);
-            } catch (ReflectiveOperationException e) {
-                LOGGER.log(Level.SEVERE, "Error al re-invocar clearFields", e);
-            }
-        });
-        WaitForAsyncUtils.waitForFxEvents();
-    }
 
     private void clickGenerate() {
         clickOn(GENERATE_BUTTON_SELECTOR);
         WaitForAsyncUtils.waitForFxEvents();
+    }
+
+    private void clearLabelMessage() {
+        lookup(MESSAGE_LABEL_SELECTOR).queryAs(Label.class).setText("");
     }
 
     private String messageText() {
