@@ -57,7 +57,7 @@ public class FXMLUploadDocumentsController extends ValidationHandler {
     private static final String ALREADY_VALIDATED_MESSAGE =
         "Este documento ya fue validado y no puede subirse nuevamente.";
 
-    @FXML private Button buttonUpLoadDocumet;
+    @FXML private Button buttonUpLoadDocument;
     @FXML private Button buttonBack;
     @FXML private Label labelError;
     @FXML private ComboBox<String> comboBoxDocuments;
@@ -202,7 +202,7 @@ public class FXMLUploadDocumentsController extends ValidationHandler {
         fileChooser.getExtensionFilters().add(
             new FileChooser.ExtensionFilter("Archivos PDF", "*.pdf"));
 
-        File selectedFile = fileChooser.showOpenDialog(buttonUpLoadDocumet.getScene().getWindow());
+        File selectedFile = fileChooser.showOpenDialog(buttonUpLoadDocument.getScene().getWindow());
         if (selectedFile == null) {
             showError(NO_FILE_MESSAGE);
         } else {
@@ -272,7 +272,7 @@ public class FXMLUploadDocumentsController extends ValidationHandler {
         comboBoxDocuments.setPromptText("Seleccione un documento");
         labelError.setText("");
         labelError.setVisible(false);
-        buttonUpLoadDocumet.setDisable(false);
+        buttonUpLoadDocument.setDisable(false);
         comboBoxDocuments.buttonCellProperty().set(null);
     }
 }
