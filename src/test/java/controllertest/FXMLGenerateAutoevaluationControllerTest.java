@@ -127,9 +127,7 @@ public class FXMLGenerateAutoevaluationControllerTest extends ApplicationTest {
         injectField(AUTOEVALUATION_DAO_FIELD, autoevaluationDAOMock, autoevaluationController);
         injectField(EXPEDIENT_DAO_FIELD, expedientDAOMock, autoevaluationController);
         invokeLoadAutomaticData(autoevaluationController);
- 
-        interact(() -> clearAllFields());
-        WaitForAsyncUtils.waitForFxEvents();
+        invokeClearFields(autoevaluationController);
     }
 
     @AfterEach
@@ -255,8 +253,18 @@ public class FXMLGenerateAutoevaluationControllerTest extends ApplicationTest {
         clickOn(RADIO_10_1);
     }
     
-    private void clearAllFields() {
-        lookup(MESSAGE_LABEL_SELECTOR).queryAs(Label.class).setText("");
+    private void invokeClearFields(FXMLGenerateAutoevaluationController controller)
+            throws ReflectiveOperationException {
+        var method = FXMLGenerateAutoevaluationController.class.getDeclaredMethod("clearFields");
+        method.setAccessible(true);
+        interact(() -> {
+            try {
+                method.invoke(controller);
+            } catch (ReflectiveOperationException e) {
+                LOGGER.log(Level.SEVERE, "Error al re-invocar clearFields", e);
+            }
+        });
+        WaitForAsyncUtils.waitForFxEvents();
     }
 
     private void clickGenerate() {
