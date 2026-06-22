@@ -66,16 +66,16 @@ public class FXMLShowProjectDetailControllerTest extends ApplicationTest {
     private static final String VALID_ORGANIZATION_NAME = "Universidad Veracruzana";
     private static final int VALID_ORGANIZATION_ID = 10;
 
-    private static final String UPDATED_PROJECT_NAME = "Proyecto Actualizado";
-    private static final String UPDATED_PROJECT_DESCRIPTION = "Descripción actualizada";
-    private static final String UPDATED_PROJECT_OBJECTIVE = "Objetivo actualizado";
-    private static final String UPDATED_PROJECT_METHODOLOGY = "Metodología actualizada";
-    private static final String UPDATED_PROJECT_CAPACITY = "2"; 
+    private static final String UPDATED_PROJECT_NAME = "Eminus";
+    private static final String UPDATED_PROJECT_DESCRIPTION = "Mejorar la experiencia de usuario de eminus";
+    private static final String UPDATED_PROJECT_OBJECTIVE = "Mejorar la experiencia de usuario de eminus";
+    private static final String UPDATED_PROJECT_METHODOLOGY = "ICONIX";
+    private static final String UPDATED_PROJECT_CAPACITY = "1"; 
 
     private static final String EXPECTED_SUCCESS_UPDATE_MESSAGE = "Proyecto actualizado correctamente";
     private static final String EXPECTED_NO_CHANGES_MESSAGE = "No se realizaron cambios en el proyecto";
     private static final String EXPECTED_INACTIVATE_WITH_STUDENTS_MESSAGE =
-            "No se puede inactivar el proyecto porque tiene alumnos asignados";
+        "No se puede inactivar el proyecto porque tiene alumnos asignados";
     private static final String EXPECTED_OPERATION_ERROR_MESSAGE = "Error de operación de prueba";
     private static final String EXPECTED_NAME_VALIDATION_MESSAGE = "El nombre del proyecto";
 
