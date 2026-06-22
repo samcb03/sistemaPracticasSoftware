@@ -22,6 +22,7 @@ import javafx.stage.Stage;
 import javafx.stage.Window;
 
 import net.sf.jasperreports.engine.JasperPrint;
+import net.sf.jasperreports.engine.base.JRBasePrintPage;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -284,7 +285,7 @@ public class FXMLGenerateFinalReportControllerTest extends ApplicationTest {
         jasperPrint.setName("TestReport");
         jasperPrint.setPageWidth(595);
         jasperPrint.setPageHeight(842);
-        jasperPrint.addPage(new net.sf.jasperreports.engine.base.JRBasePrintPage());
+        jasperPrint.addPage(new JRBasePrintPage());
 
         when(finalReportCommonMock.generateFinalReport(any())).thenReturn(jasperPrint);
         when(reportDAOMock.registerFinalReport(any())).thenReturn(true);
