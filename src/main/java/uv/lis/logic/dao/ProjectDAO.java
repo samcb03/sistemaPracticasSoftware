@@ -251,24 +251,24 @@ public class ProjectDAO implements IProjectDAO{
                             + "WHERE idOrganizacionVinculada = ? "
                             + "AND estado = ?";
  
-    try (Connection databaseConnection = connectionManager.getConnection();
-        PreparedStatement preparedStatement = databaseConnection.prepareStatement(projectQuery)) {
- 
-        preparedStatement.setInt(1, organizationId);
-        preparedStatement.setBoolean(2, true);
- 
-        try (ResultSet resultSet = preparedStatement.executeQuery()) {
-            while (resultSet.next()) {
-                projectNames.add(resultSet.getString("nombre"));
+        try (Connection databaseConnection = connectionManager.getConnection();
+            PreparedStatement preparedStatement = databaseConnection.prepareStatement(projectQuery)) {
+    
+            preparedStatement.setInt(1, organizationId);
+            preparedStatement.setBoolean(2, true);
+    
+            try (ResultSet resultSet = preparedStatement.executeQuery()) {
+                while (resultSet.next()) {
+                    projectNames.add(resultSet.getString("nombre"));
+                }
             }
+    
+        } catch (SQLException e) {
+            LOGGER.log(Level.SEVERE, "Error al obtener proyectos por organización", e);
+            throw new OperationException("Error al obtener los proyectos de la organización.", e);
         }
- 
-    } catch (SQLException e) {
-        LOGGER.log(Level.SEVERE, "Error al obtener proyectos por organización", e);
-        throw new OperationException("Error al obtener los proyectos de la organización.", e);
-    }
- 
-    return projectNames;
+    
+        return projectNames;
     }
 
     @Override
@@ -346,11 +346,11 @@ public class ProjectDAO implements IProjectDAO{
                             + "uProf.nombre AS nombreProfesor, uProf.apellidos AS apellidosProfesor "
                             + "FROM Proyecto p "
                             + "INNER JOIN Solicita_Proyecto sp ON p.idProyecto = sp.idProyecto "
-                            + "INNER JOIN OrganizacionVinculada o ON p.idOrganizacionVinculada = o.idOrganizacionVinculada "
-                            + "INNER JOIN Alumno_Esta_EE aee ON sp.matricula = aee.matricula "
+                            + "INNER JOIN OrganizacionVinculada o ON p.idOrganizacionVinculada =  "
+                            + "o.idOrganizacionVinculada INNER JOIN Alumno_Esta_EE aee ON sp.matricula = aee.matricula "
                             + "INNER JOIN ExperienciaEducativa ee ON aee.NRC = ee.NRC "
-                            + "INNER JOIN Profesor_Imparte_Experiencia pie ON ee.NRC = pie.NRC AND pie.estaActiva = TRUE "
-                            + "INNER JOIN Profesor prof ON pie.numeroPersonal = prof.numeroPersonal "
+                            + "INNER JOIN Profesor_Imparte_Experiencia pie ON ee.NRC = pie.NRC AND pie.estaActiva = "
+                            + "TRUE INNER JOIN Profesor prof ON pie.numeroPersonal = prof.numeroPersonal "
                             + "INNER JOIN Usuario uProf ON prof.idUsuario = uProf.idUsuario "
                             + "WHERE sp.matricula = ? "
                             + "AND sp.estatus = 2";
@@ -376,8 +376,8 @@ public class ProjectDAO implements IProjectDAO{
             }
 
         } catch (SQLException e) {
-            LOGGER.log(Level.SEVERE, "Error al obtener el proyecto del alumno", e);
-            throw new OperationException("Error al obtener el proyecto del alumno.", e);
+            LOGGER.log(Level.SEVERE, "Error al obtener detalles del proyecto", e);
+            throw new OperationException("Error al obtener detalles del proyecto.", e);
         }
         return projectOptional;
     }

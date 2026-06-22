@@ -1,6 +1,5 @@
 package controllertest;
 
-
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -26,13 +25,13 @@ import org.junit.jupiter.api.Test;
 import org.testfx.framework.junit5.ApplicationTest;
 import org.testfx.util.WaitForAsyncUtils;
 
-
 import javafx.fxml.FXMLLoader;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Label;
 import javafx.stage.Stage;
+
 import uv.lis.GUI.controller.FXMLGenerateAutoevaluationController;
 import uv.lis.logic.common.AutoevaluationCommon;
 import uv.lis.logic.dao.AutoevaluationDAO;
@@ -69,7 +68,8 @@ public class FXMLGenerateAutoevaluationControllerTest extends ApplicationTest {
     private static final String VALID_PROJECT = "Proyecto Test";
     private static final String VALID_SUPERVISOR = "Supervisor Test";
 
-    private static final String EXPECTED_NOT_ALL_ANSWERED_MESSAGE = "Por favor, responda todas las preguntas antes de generar.";
+    private static final String EXPECTED_NOT_ALL_ANSWERED_MESSAGE = "Por favor, responda todas las preguntas" 
+        + " antes de generar.";
     private static final String EXPECTED_JR_ERROR_MESSAGE = "Error técnico al generar el documento PDF.";
 
     private Stage primaryStage;
@@ -79,7 +79,7 @@ public class FXMLGenerateAutoevaluationControllerTest extends ApplicationTest {
     private ExpedientDAO expedientDAOMock;
     private static final Logger LOGGER = Logger.getLogger(
     FXMLGenerateAutoevaluationControllerTest.class.getName());
-
+    //FIXME este metodo tiene un return aunque se declara como void
     @Override
     public void start(Stage stage) throws IOException {
         primaryStage = stage;
@@ -99,8 +99,7 @@ public class FXMLGenerateAutoevaluationControllerTest extends ApplicationTest {
 
         FXMLLoader loader = new FXMLLoader(getClass().getResource(AUTOEVALUATION_VIEW_FXML));
         loader.setControllerFactory(controllerClass -> {
-            FXMLGenerateAutoevaluationController controller =
-                new FXMLGenerateAutoevaluationController();
+            FXMLGenerateAutoevaluationController controller = new FXMLGenerateAutoevaluationController();
             injectField(AUTOEVALUATION_COMMON_FIELD, autoevaluationCommonMock, controller);
             injectField(AUTOEVALUATION_DAO_FIELD, autoevaluationDAOMock, controller);
             injectField(EXPEDIENT_DAO_FIELD, expedientDAOMock, controller);
@@ -141,8 +140,7 @@ public class FXMLGenerateAutoevaluationControllerTest extends ApplicationTest {
         WaitForAsyncUtils.waitForFxEvents();
 
         EventQueue.invokeLater(() ->
-            Arrays.stream(java.awt.Window.getWindows())
-                .forEach(java.awt.Window::dispose));
+            Arrays.stream(java.awt.Window.getWindows()).forEach(java.awt.Window::dispose));
     }
 
     @Test

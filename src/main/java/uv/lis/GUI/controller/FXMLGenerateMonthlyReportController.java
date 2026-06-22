@@ -1,6 +1,5 @@
 package uv.lis.GUI.controller;
 
-
 import static uv.lis.logic.utils.InputValidator.MAX_HOURS_PER_PARTIAL_REPORT;
 
 import java.net.URL;
@@ -42,14 +41,13 @@ public class FXMLGenerateMonthlyReportController extends ValidationHandler {
     private static final String NO_STUDENT_IN_SESSION_MESSAGE = "No hay alumno en sesión";
     private static final String REPORT_GENERATED_MESSAGE = "Reporte generado correctamente.";
     private static final String REPORT_GENERATION_ERROR = "Error al generar el reporte.";
-    private static final String VALIDATED_REPORT_MESSAGE = "Error al verificar reporte mensual";
     private static final String LOAD_ACTIVITIES = "Error al cargar actividades";
     private static final String REPORT_VIEWER_TITLE = "Reporte Mensual";
     private static final String MINIMUN_ACTIVITY_MESSAGE = "El reporte debe contener mínimo una actividad";
     private static final String LIMITED_HOURS_REPORT ="Has alcanzado el límite de 420 horas acumuladas. " 
-                                                    + "No es posible generar más reportes";
+        + "No es posible generar más reportes";
     private static final String PARTIAL_HOURS_LIMITED = "Las horas reportadas no pueden exceder las " 
-                                                    + MAX_HOURS_PER_PARTIAL_REPORT + " horas";
+        + MAX_HOURS_PER_PARTIAL_REPORT + " horas";
     private static final String DUPLICATED_REPORT_MESSAGE = "Ya se ha generado un reporte para el mes de ";
     private static final String EMPTY_TEXT = "";
     private static final String REPORT_BLOCK = "7";
@@ -186,7 +184,7 @@ public class FXMLGenerateMonthlyReportController extends ValidationHandler {
                         generateMonthlyReport();
                     }
                 } catch (OperationException e) {
-                    showError(VALIDATED_REPORT_MESSAGE);
+                    showError(e.getMessage());
                 }
             }
         }
@@ -234,8 +232,8 @@ public class FXMLGenerateMonthlyReportController extends ValidationHandler {
                 int month = convertMonthNameToNumber(getSelectedMonth().get());
                 int year = LocalDate.now().getYear(); 
 
-                List<Activity> registered = reportContextDAO.getRecordedActivitiesByMonth(
-                    context.getIdProject(), month, year);
+                List<Activity> registered = reportContextDAO.getRecordedActivitiesByMonth(context.getIdProject(), 
+                    month, year);
                     
                 clearFields(); 
 
@@ -252,7 +250,7 @@ public class FXMLGenerateMonthlyReportController extends ValidationHandler {
 
             } catch (OperationException e) {
                 LOGGER.log(Level.SEVERE,LOAD_ACTIVITIES, e);
-                showError(LOAD_ACTIVITIES);
+                showError(e.getMessage());
             }
         }
     }

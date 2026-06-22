@@ -14,7 +14,6 @@ import java.io.IOException;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -41,7 +40,7 @@ import uv.lis.logic.exceptions.OperationException;
 public class FXMLShowProjectDetailControllerTest extends ApplicationTest {
 
     private static final String SHOW_PROJECT_DETAIL_VIEW_FXML =
-            "/uv/lis/GUI/view/FXMLShowProjectDetail.fxml";
+        "/uv/lis/GUI/view/FXMLShowProjectDetail.fxml";
     private static final String PROJECT_DAO_FIELD = "projectDAO";
     private static final String REQUEST_PROJECT_DAO_FIELD = "requestProjectDAO";
 
@@ -55,7 +54,7 @@ public class FXMLShowProjectDetailControllerTest extends ApplicationTest {
     private static final String TEXTFIELD_OBJECTIVE_SELECTOR = "#textFieldObjective";
     private static final String TEXTFIELD_CAPACITY_SELECTOR = "#textFieldCapacity";
     private static final String TEXTFIELD_METHODOLOGY_SELECTOR = "#textFieldMethodology";
-
+    //FIXME estas pruebas si funcionan, pero revo nos dijo que usemos datos reales para las pruebas, estos datos son invalidos
     private static final int VALID_PROJECT_ID = 1;
     private static final String VALID_PROJECT_NAME = "Proyecto Test";
     private static final String VALID_PROJECT_DESCRIPTION = "Descripción del proyecto de prueba";
@@ -69,10 +68,9 @@ public class FXMLShowProjectDetailControllerTest extends ApplicationTest {
     private static final String UPDATED_PROJECT_DESCRIPTION = "Descripción actualizada";
     private static final String UPDATED_PROJECT_OBJECTIVE = "Objetivo actualizado";
     private static final String UPDATED_PROJECT_METHODOLOGY = "Metodología actualizada";
-    private static final String UPDATED_PROJECT_CAPACITY = "5";
+    private static final String UPDATED_PROJECT_CAPACITY = "5"; //FIXME el maximo de capacidad es 2
 
     private static final String EXPECTED_SUCCESS_UPDATE_MESSAGE = "Proyecto actualizado correctamente";
-    private static final String EXPECTED_SUCCESS_INACTIVATE_MESSAGE = "Proyecto inactivado correctamente";
     private static final String EXPECTED_NO_CHANGES_MESSAGE = "No se realizaron cambios en el proyecto";
     private static final String EXPECTED_INACTIVATE_WITH_STUDENTS_MESSAGE =
             "No se puede inactivar el proyecto porque tiene alumnos asignados";
@@ -83,7 +81,7 @@ public class FXMLShowProjectDetailControllerTest extends ApplicationTest {
     private FXMLShowProjectDetailController controller;
     private ProjectDAO projectDAOMock;
     private RequestProjectDAO requestProjectDAOMock;
-
+    //FIXME otro void con return
     @Override
     public void start(Stage stage) throws IOException {
         primaryStage = stage;
@@ -112,7 +110,7 @@ public class FXMLShowProjectDetailControllerTest extends ApplicationTest {
         requestProjectDAOMock = mock(RequestProjectDAO.class);
 
         when(requestProjectDAOMock.getAssignedStudentsByProjectId(anyInt()))
-                .thenReturn(new ArrayList<>());
+            .thenReturn(new ArrayList<>());
 
         injectField(PROJECT_DAO_FIELD, projectDAOMock, controller);
         injectField(REQUEST_PROJECT_DAO_FIELD, requestProjectDAOMock, controller);
@@ -127,8 +125,8 @@ public class FXMLShowProjectDetailControllerTest extends ApplicationTest {
     @AfterEach
     void closeSecondaryWindows() {
         interact(() -> List.copyOf(listWindows()).stream()
-                .filter(window -> window != primaryStage)
-                .forEach(Window::hide));
+            .filter(window -> window != primaryStage)
+            .forEach(Window::hide));
         WaitForAsyncUtils.waitForFxEvents();
     }
 
@@ -160,27 +158,22 @@ public class FXMLShowProjectDetailControllerTest extends ApplicationTest {
     }
 
     @Test
-    void initializeData_projectWithStudents_studentsAreLoadedInListView()
-            throws OperationException {
+    void initializeData_projectWithStudents_studentsAreLoadedInListView() throws OperationException {
         ArrayList<Student> assignedStudents = new ArrayList<>();
         assignedStudents.add(buildStudent());
-        when(requestProjectDAOMock.getAssignedStudentsByProjectId(anyInt()))
-                .thenReturn(assignedStudents);
+        when(requestProjectDAOMock.getAssignedStudentsByProjectId(anyInt())).thenReturn(assignedStudents);
 
         interact(() -> controller.initializeData(buildActiveProject()));
         WaitForAsyncUtils.waitForFxEvents();
 
-        assertEquals(1, lookup("#listViewStudent")
-                .queryListView().getItems().size());
+        assertEquals(1, lookup("#listViewStudent").queryListView().getItems().size());
     }
 
     @Test
-    void initializeData_daoThrowsOperationException_showsErrorMessage()
-            throws OperationException {
+    void initializeData_daoThrowsOperationException_showsErrorMessage() throws OperationException {
         OperationException operationException =
-                new OperationException(EXPECTED_OPERATION_ERROR_MESSAGE, null);
-        when(requestProjectDAOMock.getAssignedStudentsByProjectId(anyInt()))
-                .thenThrow(operationException);
+            new OperationException(EXPECTED_OPERATION_ERROR_MESSAGE, null);
+        when(requestProjectDAOMock.getAssignedStudentsByProjectId(anyInt())).thenThrow(operationException);
 
         interact(() -> controller.initializeData(buildActiveProject()));
         WaitForAsyncUtils.waitForFxEvents();
@@ -314,7 +307,7 @@ public class FXMLShowProjectDetailControllerTest extends ApplicationTest {
     @Test
     void saveProject_daoThrowsOperationException_showsErrorMessage() throws OperationException {
         OperationException operationException =
-                new OperationException(EXPECTED_OPERATION_ERROR_MESSAGE, null);
+            new OperationException(EXPECTED_OPERATION_ERROR_MESSAGE, null);
         when(projectDAOMock.modifyProject(any(Project.class))).thenThrow(operationException);
 
         clickOn(BUTTON_MODIFY_SELECTOR);
@@ -328,12 +321,10 @@ public class FXMLShowProjectDetailControllerTest extends ApplicationTest {
     }
 
     @Test
-    void handleInactivateProject_projectHasAssignedStudents_showsErrorMessage()
-            throws OperationException {
+    void handleInactivateProject_projectHasAssignedStudents_showsErrorMessage() throws OperationException {
         ArrayList<Student> assignedStudents = new ArrayList<>();
         assignedStudents.add(buildStudent());
-        when(requestProjectDAOMock.getAssignedStudentsByProjectId(anyInt()))
-                .thenReturn(assignedStudents);
+        when(requestProjectDAOMock.getAssignedStudentsByProjectId(anyInt())).thenReturn(assignedStudents);
 
         interact(() -> controller.initializeData(buildActiveProject()));
         WaitForAsyncUtils.waitForFxEvents();
@@ -346,12 +337,10 @@ public class FXMLShowProjectDetailControllerTest extends ApplicationTest {
     }
 
     @Test
-    void handleInactivateProject_projectHasAssignedStudents_doesNotCallInactivateDAO()
-            throws OperationException {
+    void handleInactivateProject_projectHasAssignedStudents_doesNotCallInactivateDAO() throws OperationException {
         ArrayList<Student> assignedStudents = new ArrayList<>();
         assignedStudents.add(buildStudent());
-        when(requestProjectDAOMock.getAssignedStudentsByProjectId(anyInt()))
-                .thenReturn(assignedStudents);
+        when(requestProjectDAOMock.getAssignedStudentsByProjectId(anyInt())).thenReturn(assignedStudents);
 
         interact(() -> controller.initializeData(buildActiveProject()));
         WaitForAsyncUtils.waitForFxEvents();

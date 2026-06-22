@@ -134,8 +134,7 @@ public class FXMLGenerateFinalReportControllerTest extends ApplicationTest {
         WaitForAsyncUtils.waitForFxEvents();
 
         java.awt.EventQueue.invokeLater(() ->
-        Arrays.stream(java.awt.Window.getWindows())
-            .forEach(java.awt.Window::dispose));
+            Arrays.stream(java.awt.Window.getWindows()).forEach(java.awt.Window::dispose));
 
     }
 

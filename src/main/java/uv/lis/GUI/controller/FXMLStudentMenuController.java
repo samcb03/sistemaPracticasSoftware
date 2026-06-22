@@ -53,7 +53,7 @@ public class FXMLStudentMenuController extends ValidationHandler {
             disableActionsWithoutValidatedDocuments();
             }
         } catch (OperationException e) {
-            showError("No se pudo inicializar");
+            showError(e.getMessage());
         }
     }
 
@@ -98,7 +98,7 @@ public class FXMLStudentMenuController extends ValidationHandler {
             }
         } catch (OperationException e) {
             buttonAutoevaluation.setDisable(true);
-            showError("No se pudo verificar el estado del reporte final. Intente más tarde.");
+            showError(e.getMessage());
         }
     }
 
@@ -128,14 +128,15 @@ public class FXMLStudentMenuController extends ValidationHandler {
     @FXML 
     public void goToFinishWindows() {
         try {
-            boolean validatedAutoevaluation = expedientDAO.isDocumentTypeValidated(student.getIdStudent(), AUTOEVALUATION_DOCUMENT_TYPE);
+            boolean validatedAutoevaluation = expedientDAO.isDocumentTypeValidated(student.getIdStudent(), 
+                AUTOEVALUATION_DOCUMENT_TYPE);
             if(validatedAutoevaluation) {
                 navigateTo("/uv/lis/GUI/view/FXMLFinishWindow.fxml");
             } else {
                 showError("Debe completar y validar la autoevaluación");
             }
         } catch(OperationException e) {
-            showError("No se pudo cargar la pantalla final");
+            showError(e.getMessage());
         }
     }
 

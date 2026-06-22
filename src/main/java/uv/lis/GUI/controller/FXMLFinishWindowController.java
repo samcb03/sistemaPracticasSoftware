@@ -75,7 +75,7 @@ public class FXMLFinishWindowController extends ValidationHandler {
                 }
             } catch (OperationException e) {
                 LOGGER.log(Level.SEVERE, LOAD_ERROR_MESSAGE, e);
-                showError(LOAD_ERROR_MESSAGE);
+                showError(e.getMessage());
             }
         }
     }
