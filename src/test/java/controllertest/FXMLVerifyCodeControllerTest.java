@@ -113,7 +113,7 @@ public class FXMLVerifyCodeControllerTest extends ApplicationTest {
         when(emailCommonMock.verifyCode(any(), any())).thenReturn(true);
 
         Stage stage = (Stage) lookup(VERIFY_BUTTON_SELECTOR).queryAs(
-                javafx.scene.control.Button.class).getScene().getWindow();
+            javafx.scene.control.Button.class).getScene().getWindow();
 
         clickOn(CODE_FIELD_SELECTOR).write(VALID_CODE);
         clickOn(VERIFY_BUTTON_SELECTOR);
@@ -123,8 +123,7 @@ public class FXMLVerifyCodeControllerTest extends ApplicationTest {
     }
 
     @Test
-    void handleVerify_validCodeCheckboxUnchecked_doesNotCallUpdateDAO()
-            throws OperationException {
+    void handleVerify_validCodeCheckboxUnchecked_doesNotCallUpdateDAO() throws OperationException {
         when(emailCommonMock.verifyCode(any(), any())).thenReturn(true);
 
         clickOn(CODE_FIELD_SELECTOR).write(VALID_CODE);
@@ -147,13 +146,12 @@ public class FXMLVerifyCodeControllerTest extends ApplicationTest {
     }
 
     @Test
-    void handleVerify_checkboxCheckedDaoThrowsException_doesNotPropagateError()
-            throws OperationException {
+    void handleVerify_checkboxCheckedDaoThrowsException_doesNotPropagateError() throws OperationException {
         when(emailCommonMock.verifyCode(any(), any())).thenReturn(true);
         OperationException operationException =
-                new OperationException(EXPECTED_DAO_ERROR_MESSAGE, null);
+            new OperationException(EXPECTED_DAO_ERROR_MESSAGE, null);
         when(userDAOMock.updateEmailAuthenticationPreference(anyInt(), anyBoolean()))
-                .thenThrow(operationException);
+            .thenThrow(operationException);
 
         clickOn(CHECKBOX_SELECTOR);
         clickOn(CODE_FIELD_SELECTOR).write(VALID_CODE);
