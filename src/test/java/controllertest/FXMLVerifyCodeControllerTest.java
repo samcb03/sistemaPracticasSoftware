@@ -47,6 +47,9 @@ public class FXMLVerifyCodeControllerTest extends ApplicationTest {
 
     private static final int VALID_USER_ID = 1;
 
+    private static final boolean EMAIL_AUTHENTICATION_DISABLED = false;
+    private static final boolean EMAIL_AUTHENTICATION_ENABLED = true;
+
     private static final String EXPECTED_EMPTY_CODE_MESSAGE = "El código";
     private static final String EXPECTED_INVALID_CODE_MESSAGE =
         "Código incorrecto o expirado. Intente de nuevo.";
@@ -123,7 +126,7 @@ public class FXMLVerifyCodeControllerTest extends ApplicationTest {
     }
 
     @Test
-    void handleVerify_validCodeCheckboxUnchecked_doesNotCallUpdateDAO() throws OperationException {
+    void handleVerify_validCode_doesNotCallUpdateDAO() throws OperationException {
         when(emailCommonMock.verifyCode(any(), any())).thenReturn(true);
 
         clickOn(CODE_FIELD_SELECTOR).write(VALID_CODE);
@@ -134,31 +137,35 @@ public class FXMLVerifyCodeControllerTest extends ApplicationTest {
     }
 
     @Test
-    void handleVerify_validCodeCheckboxChecked_callsUpdateDAO() throws OperationException {
-        when(emailCommonMock.verifyCode(any(), any())).thenReturn(true);
-
+    void handleToggleEmailAuthentication_checkboxSelected_disablesPreference() throws OperationException {
         clickOn(CHECKBOX_SELECTOR);
-        clickOn(CODE_FIELD_SELECTOR).write(VALID_CODE);
-        clickOn(VERIFY_BUTTON_SELECTOR);
         WaitForAsyncUtils.waitForFxEvents();
 
-        verify(userDAOMock).updateEmailAuthenticationPreference(anyInt(), anyBoolean());
+        verify(userDAOMock)
+            .updateEmailAuthenticationPreference(VALID_USER_ID, EMAIL_AUTHENTICATION_DISABLED);
     }
 
     @Test
-    void handleVerify_checkboxCheckedDaoThrowsException_doesNotPropagateError() throws OperationException {
-        when(emailCommonMock.verifyCode(any(), any())).thenReturn(true);
+    void handleToggleEmailAuthentication_checkboxDeselected_enablesPreference() throws OperationException {
+        clickOn(CHECKBOX_SELECTOR);
+        clickOn(CHECKBOX_SELECTOR);
+        WaitForAsyncUtils.waitForFxEvents();
+
+        verify(userDAOMock)
+            .updateEmailAuthenticationPreference(VALID_USER_ID, EMAIL_AUTHENTICATION_ENABLED);
+    }
+
+    @Test
+    void handleToggleEmailAuthentication_daoThrowsException_showsErrorMessage() throws OperationException {
         OperationException operationException =
             new OperationException(EXPECTED_DAO_ERROR_MESSAGE, null);
         when(userDAOMock.updateEmailAuthenticationPreference(anyInt(), anyBoolean()))
             .thenThrow(operationException);
 
         clickOn(CHECKBOX_SELECTOR);
-        clickOn(CODE_FIELD_SELECTOR).write(VALID_CODE);
-        clickOn(VERIFY_BUTTON_SELECTOR);
         WaitForAsyncUtils.waitForFxEvents();
 
-        assertTrue(verifyCodeController.isVerified());
+        assertEquals(EXPECTED_DAO_ERROR_MESSAGE, messageText());
     }
 
     private User builderUser() {

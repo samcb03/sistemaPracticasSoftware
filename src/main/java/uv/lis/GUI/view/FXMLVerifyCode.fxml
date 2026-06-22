@@ -47,6 +47,7 @@
             </TextField>
 
             <CheckBox fx:id="checkBoxDisableEmailAuthentication"
+                onAction="#handleToggleEmailAuthentication"
                 text="No volver a solicitar autenticación por correo"
                 style="-fx-font-size: 12; -fx-text-fill: #555550;">
                 <VBox.margin><Insets bottom="16" /></VBox.margin>

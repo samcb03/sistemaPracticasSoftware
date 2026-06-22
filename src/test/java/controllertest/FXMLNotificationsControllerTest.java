@@ -1,6 +1,5 @@
 package controllertest;
 
-
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.anyInt;
@@ -117,8 +116,7 @@ public class FXMLNotificationsControllerTest extends ApplicationTest {
 
     @Test
     void loadNotifications_emptyList_showsNoNotificationsMessage() throws OperationException {
-        when(notificationDAOMock.getNotificationsByStudentId(anyString()))
-            .thenReturn(new ArrayList<>());
+        when(notificationDAOMock.getNotificationsByStudentId(anyString())).thenReturn(new ArrayList<>());
 
         invokeMethod(LOAD_NOTIFICATIONS_METHOD);
 
@@ -129,8 +127,7 @@ public class FXMLNotificationsControllerTest extends ApplicationTest {
     void loadNotifications_withNotifications_populatesListView() throws OperationException {
         ArrayList<Notification> notifications = new ArrayList<>();
         notifications.add(buildUnreadNotification());
-        when(notificationDAOMock.getNotificationsByStudentId(anyString()))
-            .thenReturn(notifications);
+        when(notificationDAOMock.getNotificationsByStudentId(anyString())).thenReturn(notifications);
 
         invokeMethod(LOAD_NOTIFICATIONS_METHOD);
 
@@ -141,8 +138,7 @@ public class FXMLNotificationsControllerTest extends ApplicationTest {
     void loadNotifications_withNotifications_clearsMessage() throws OperationException {
         ArrayList<Notification> notifications = new ArrayList<>();
         notifications.add(buildUnreadNotification());
-        when(notificationDAOMock.getNotificationsByStudentId(anyString()))
-            .thenReturn(notifications);
+        when(notificationDAOMock.getNotificationsByStudentId(anyString())).thenReturn(notifications);
 
         invokeMethod(LOAD_NOTIFICATIONS_METHOD);
 
@@ -154,8 +150,7 @@ public class FXMLNotificationsControllerTest extends ApplicationTest {
             throws OperationException {
         OperationException operationException =
             new OperationException(EXPECTED_OPERATION_ERROR_MESSAGE, null);
-        when(notificationDAOMock.getNotificationsByStudentId(anyString()))
-            .thenThrow(operationException);
+        when(notificationDAOMock.getNotificationsByStudentId(anyString())).thenThrow(operationException);
 
         invokeMethod(LOAD_NOTIFICATIONS_METHOD);
 
@@ -189,8 +184,7 @@ public class FXMLNotificationsControllerTest extends ApplicationTest {
     }
 
     @Test
-    void selectNotification_alreadyReadNotification_doesNotCallMarkAsRead()
-            throws OperationException {
+    void selectNotification_alreadyReadNotification_doesNotCallMarkAsRead() throws OperationException {
         interact(() -> listView().setItems(
             FXCollections.observableArrayList(buildReadNotification())));
         WaitForAsyncUtils.waitForFxEvents();
@@ -202,8 +196,7 @@ public class FXMLNotificationsControllerTest extends ApplicationTest {
     }
 
     @Test
-    void selectNotification_markAsReadThrowsOperationException_showsErrorMessage()
-            throws OperationException {
+    void selectNotification_markAsReadThrowsOperationException_showsErrorMessage() throws OperationException {
         OperationException operationException =
             new OperationException(EXPECTED_OPERATION_ERROR_MESSAGE, null);
         when(notificationDAOMock.markNotificationAsRead(anyInt()))
