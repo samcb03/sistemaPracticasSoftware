@@ -74,7 +74,7 @@ public class FXMLVerifyCodeControllerTest extends ApplicationTest {
         injectField(USER_DAO_FIELD, userDAOMock);
         injectField(EMAIL_COMMON_FIELD, emailCommonMock);
 
-        interact(() -> verifyCodeController.initializeData(buildUser(), buildChallenge()));
+        interact(() -> verifyCodeController.initializeData(builderUser(), builderChallenge()));
         WaitForAsyncUtils.waitForFxEvents();
     }
 
@@ -163,13 +163,13 @@ public class FXMLVerifyCodeControllerTest extends ApplicationTest {
         assertTrue(verifyCodeController.isVerified());
     }
 
-    private User buildUser() {
+    private User builderUser() {
         User user = new User();
         user.setId(VALID_USER_ID);
         return user;
     }
 
-    private VerificationChallenge buildChallenge() {
+    private VerificationChallenge builderChallenge() {
         return new VerificationChallenge();
     }
 
