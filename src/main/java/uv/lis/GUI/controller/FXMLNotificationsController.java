@@ -39,6 +39,10 @@ public class FXMLNotificationsController extends ValidationHandler {
         setupNotificationCells();
         setupSelectionListener();
 
+        checkStudentAndLoad();
+    }
+
+    private void checkStudentAndLoad() {
         if (student == null) {
             showError(NO_STUDENT_IN_SESSION_MESSAGE);
         } else {
