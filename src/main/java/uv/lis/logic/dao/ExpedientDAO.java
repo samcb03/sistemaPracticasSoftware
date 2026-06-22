@@ -306,6 +306,58 @@ public class ExpedientDAO implements IExpedientDAO {
         return isValidated;
     }
 
+    @Override
+    public List<String> getStudentIdsWithInitialDocuments(int nrc) throws OperationException {
+        List<String> studentIds = new ArrayList<>();
+        String expedientQuery = "SELECT DISTINCT e.matricula "
+                              + "FROM expediente e "
+                              + "INNER JOIN Alumno_Esta_EE aee ON e.matricula = aee.matricula "
+                              + "WHERE aee.NRC = ? AND e.idTipoDocumento >= ?";
+
+        try (Connection databaseConnection = connectionManager.getConnection();
+            PreparedStatement preparedStatement = databaseConnection.prepareStatement(expedientQuery)) {
+
+            preparedStatement.setInt(1, nrc);
+            preparedStatement.setInt(2, FIRST_INITIAL_DOCUMENT_TYPE_ID);
+
+            try (ResultSet resultSet = preparedStatement.executeQuery()) {
+                while (resultSet.next()) {
+                    studentIds.add(resultSet.getString("matricula"));
+                }
+            }
+        } catch (SQLException e) {
+            LOGGER.log(Level.SEVERE, "Error al obtener los alumnos con documentos iniciales subidos", e);
+            throw new OperationException("Error al filtrar los alumnos por documentos. Intente más tarde", e);
+        }
+        return studentIds;
+    }
+
+    @Override
+    public List<String> getStudentIdsWithDocumentType(int nrc, int idTypeDocument) throws OperationException {
+        List<String> studentIds = new ArrayList<>();
+        String expedientQuery = "SELECT DISTINCT e.matricula "
+                              + "FROM expediente e "
+                              + "INNER JOIN Alumno_Esta_EE aee ON e.matricula = aee.matricula "
+                              + "WHERE aee.NRC = ? AND e.idTipoDocumento = ?";
+
+        try (Connection databaseConnection = connectionManager.getConnection();
+            PreparedStatement preparedStatement = databaseConnection.prepareStatement(expedientQuery)) {
+
+            preparedStatement.setInt(1, nrc);
+            preparedStatement.setInt(2, idTypeDocument);
+
+            try (ResultSet resultSet = preparedStatement.executeQuery()) {
+                while (resultSet.next()) {
+                    studentIds.add(resultSet.getString("matricula"));
+                }
+            }
+        } catch (SQLException e) {
+            LOGGER.log(Level.SEVERE, "Error al obtener los alumnos por tipo de documento subido", e);
+            throw new OperationException("Error al filtrar los alumnos por documentos. Intente más tarde", e);
+        }
+        return studentIds;
+    }
+
     private Expedient buildExpedientFromResultSet(ResultSet resultSet) throws SQLException {
         Expedient expedient = new Expedient(
             resultSet.getString("nombre"),

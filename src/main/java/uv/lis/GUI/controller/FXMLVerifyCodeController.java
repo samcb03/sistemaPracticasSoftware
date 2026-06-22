@@ -23,13 +23,10 @@ import uv.lis.logic.utils.InputValidator;
 
 public class FXMLVerifyCodeController extends ValidationHandler {
 
-    private static final Logger LOGGER =
-        Logger.getLogger(FXMLVerifyCodeController.class.getName());
+    private static final Logger LOGGER = Logger.getLogger(FXMLVerifyCodeController.class.getName());
 
-    private static final boolean EMAIL_AUTHENTICATION_DISABLED = false;
     private static final String CODE_FIELD_NAME = "El código";
-    private static final String INVALID_CODE_MESSAGE =
-        "Código incorrecto o expirado. Intente de nuevo.";
+    private static final String INVALID_CODE_MESSAGE = "Código incorrecto o expirado. Intente de nuevo.";
 
     @FXML private TextField textFieldCode;
     @FXML private CheckBox checkBoxDisableEmailAuthentication;
@@ -73,23 +70,23 @@ public class FXMLVerifyCodeController extends ValidationHandler {
         }
     }
 
+    @FXML
+    private void handleToggleEmailAuthentication() {
+        boolean isEmailAuthenticationActive = !checkBoxDisableEmailAuthentication.isSelected();
+
+        try {
+            userDAO.updateEmailAuthenticationPreference(user.getId(), isEmailAuthenticationActive);
+        } catch (OperationException e) {
+            LOGGER.log(Level.SEVERE, "Error al actualizar la preferencia de autenticación", e);
+            showError(e.getMessage());
+        }
+    }
+
     private void confirmVerification() {
-        applyEmailAuthenticationPreference();
         isVerified = true;
 
         Stage stage = (Stage) buttonVerify.getScene().getWindow();
         stage.close();
-    }
-
-    private void applyEmailAuthenticationPreference() {
-        if (checkBoxDisableEmailAuthentication.isSelected()) {
-            try {
-                userDAO.updateEmailAuthenticationPreference(user.getId(), EMAIL_AUTHENTICATION_DISABLED);
-            } catch (OperationException e) {
-                LOGGER.log(Level.SEVERE, "Error al actualizar la preferencia de autenticación", e);
-                e.getMessage();
-            }
-        }
     }
 
     @Override

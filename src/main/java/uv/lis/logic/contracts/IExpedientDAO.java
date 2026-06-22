@@ -113,4 +113,25 @@ public interface IExpedientDAO {
      * @throws OperationException if the count cannot be retrieved
      */
     int countDocumentsByStudentAndType(String studentId, int typeId) throws OperationException;
+
+    /**
+     * Retrieves the identifiers of the students enrolled in an educational experience
+     * who have uploaded at least one initial document.
+     *
+     * @param nrc the identifier of the educational experience to filter by
+     * @return the list of student identifiers, empty if there are none
+     * @throws OperationException if the student identifiers cannot be retrieved
+     */
+    List<String> getStudentIdsWithInitialDocuments(int nrc) throws OperationException;
+
+    /**
+     * Retrieves the identifiers of the students enrolled in an educational experience
+     * who have uploaded at least one document of a given type.
+     *
+     * @param nrc the identifier of the educational experience to filter by
+     * @param idTypeDocument the document type identifier to filter by
+     * @return the list of student identifiers, empty if there are none
+     * @throws OperationException if the student identifiers cannot be retrieved
+     */
+    List<String> getStudentIdsWithDocumentType(int nrc, int idTypeDocument) throws OperationException;
 }
