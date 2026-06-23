@@ -29,6 +29,7 @@ public class ExpedientDAO implements IExpedientDAO {
     private static final int MONTHLY_REPORT_DOCUMENT_TYPE_ID = 3;
     private static final int FINAL_REPORT_DOCUMENT_TYPE_ID = 2;
     private static final int FIRST_INITIAL_DOCUMENT_TYPE_ID = 5;
+    private static final int LAST_INITIAL_DOCUMENT_TYPE_ID = 11;
     private static final int NO_MISSING_INITIAL_DOCUMENTS = 0;
     private static final int NO_GENERATED_ID = -1;
     private static final int NEXT_ENTRY_OFFSET = 1;
@@ -256,7 +257,7 @@ public class ExpedientDAO implements IExpedientDAO {
         boolean areValidated = false;
         String expedientQuery = "SELECT COUNT(*) AS documentosFaltantes "
                               + "FROM Tipo_Documento td "
-                              + "WHERE td.idTipoDocumento >= ? "
+                              + "WHERE td.idTipoDocumento BETWEEN ? AND ? "
                               + "AND NOT EXISTS ("
                               + "SELECT 1 FROM expediente e "
                               + "WHERE e.matricula = ? "
@@ -267,8 +268,9 @@ public class ExpedientDAO implements IExpedientDAO {
             PreparedStatement preparedStatement = databaseConnection.prepareStatement(expedientQuery)) {
 
             preparedStatement.setInt(1, FIRST_INITIAL_DOCUMENT_TYPE_ID);
-            preparedStatement.setString(2, idStudent);
-            preparedStatement.setInt(3, STATUS_ASSIGNED);
+            preparedStatement.setInt(2, LAST_INITIAL_DOCUMENT_TYPE_ID);
+            preparedStatement.setString(3, idStudent);
+            preparedStatement.setInt(4, STATUS_ASSIGNED);
 
             try (ResultSet resultSet = preparedStatement.executeQuery()) {
                 if (resultSet.next()) {
@@ -314,13 +316,14 @@ public class ExpedientDAO implements IExpedientDAO {
         String expedientQuery = "SELECT DISTINCT e.matricula "
                               + "FROM expediente e "
                               + "INNER JOIN Alumno_Esta_EE aee ON e.matricula = aee.matricula "
-                              + "WHERE aee.NRC = ? AND e.idTipoDocumento >= ?";
+                              + "WHERE aee.NRC = ? AND e.idTipoDocumento BETWEEN ? AND ?";
 
         try (Connection databaseConnection = connectionManager.getConnection();
             PreparedStatement preparedStatement = databaseConnection.prepareStatement(expedientQuery)) {
 
             preparedStatement.setInt(1, nrc);
             preparedStatement.setInt(2, FIRST_INITIAL_DOCUMENT_TYPE_ID);
+            preparedStatement.setInt(3, LAST_INITIAL_DOCUMENT_TYPE_ID);
 
             try (ResultSet resultSet = preparedStatement.executeQuery()) {
                 while (resultSet.next()) {

@@ -62,6 +62,7 @@ public class FXMLNotificationsControllerTest extends ApplicationTest {
     private static final String EXPECTED_NO_NOTIFICATIONS_MESSAGE =
         "No tienes notificaciones por el momento";
     private static final String EXPECTED_OPERATION_ERROR_MESSAGE = "Error de operación de prueba";
+    private static final int FIRST_INDEX = 0;
 
     private Stage primaryStage;
     private FXMLNotificationsController controller;
@@ -146,8 +147,7 @@ public class FXMLNotificationsControllerTest extends ApplicationTest {
     }
 
     @Test
-    void loadNotifications_daoThrowsOperationException_showsErrorMessage()
-            throws OperationException {
+    void loadNotifications_daoThrowsOperationException_showsErrorMessage() throws OperationException {
         OperationException operationException =
             new OperationException(EXPECTED_OPERATION_ERROR_MESSAGE, null);
         when(notificationDAOMock.getNotificationsByStudentId(anyString())).thenThrow(operationException);
@@ -163,8 +163,7 @@ public class FXMLNotificationsControllerTest extends ApplicationTest {
             FXCollections.observableArrayList(buildUnreadNotification())));
         WaitForAsyncUtils.waitForFxEvents();
 
-        //FIXME Validar si es número mágico
-        interact(() -> listView().getSelectionModel().select(0));
+        interact(() -> listView().getSelectionModel().select(FIRST_INDEX));
         WaitForAsyncUtils.waitForFxEvents();
 
         verify(notificationDAOMock).markNotificationAsRead(VALID_NOTIFICATION_ID);
@@ -176,10 +175,10 @@ public class FXMLNotificationsControllerTest extends ApplicationTest {
             FXCollections.observableArrayList(buildUnreadNotification())));
         WaitForAsyncUtils.waitForFxEvents();
 
-        interact(() -> listView().getSelectionModel().select(0));
+        interact(() -> listView().getSelectionModel().select(FIRST_INDEX));
         WaitForAsyncUtils.waitForFxEvents();
 
-        Notification itemInList = listView().getItems().get(0);
+        Notification itemInList = listView().getItems().get(FIRST_INDEX);
         assertTrue(itemInList.isRead());
     }
 
@@ -189,7 +188,7 @@ public class FXMLNotificationsControllerTest extends ApplicationTest {
             FXCollections.observableArrayList(buildReadNotification())));
         WaitForAsyncUtils.waitForFxEvents();
 
-        interact(() -> listView().getSelectionModel().select(0));
+        interact(() -> listView().getSelectionModel().select(FIRST_INDEX));
         WaitForAsyncUtils.waitForFxEvents();
 
         verify(notificationDAOMock, never()).markNotificationAsRead(anyInt());
@@ -206,7 +205,7 @@ public class FXMLNotificationsControllerTest extends ApplicationTest {
             FXCollections.observableArrayList(buildUnreadNotification())));
         WaitForAsyncUtils.waitForFxEvents();
 
-        interact(() -> listView().getSelectionModel().select(0));
+        interact(() -> listView().getSelectionModel().select(FIRST_INDEX));
         WaitForAsyncUtils.waitForFxEvents();
 
         assertEquals(EXPECTED_OPERATION_ERROR_MESSAGE, messageText());
