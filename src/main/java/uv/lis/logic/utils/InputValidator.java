@@ -1,5 +1,6 @@
 package uv.lis.logic.utils;
 
+import java.math.BigInteger;
 import java.util.Optional;
 import java.util.stream.Stream;
 
@@ -15,7 +16,7 @@ public final class InputValidator {
     private InputValidator() {}
 
     public static final int IS_COORDINATOR = 3;
-    public static final int NO_ROWS_AFFECTED = 0;
+    public static final int NO_VALUE = 0;
     public static final int MAX_REQUESTS = 3;
     public static final int STATUS_REQUESTED = 1;
     public static final int STATUS_ASSIGNED = 2;
@@ -29,6 +30,7 @@ public final class InputValidator {
     public static final int POSTAL_CODE_LENGTH = 5;
     public static final int MAX_HOURS_PER_PARTIAL_REPORT = 210;
     public static final int MAX_HOURS_PER_DAY = 8;
+    public static final int MAX_PERCENTAGE = 100;
     public static final String PERIOD_TERM_FALL = "01";
     public static final String PERIOD_TERM_SPRING = "51";
     public static final String LETTERS_ONLY_REGEX = "^[\\p{L}\\s]+$";
@@ -36,6 +38,7 @@ public final class InputValidator {
     public static final String TRAILING_SPACE_REGEX = ".*\\s$";
     public static final String CONSECUTIVE_SPACES_REGEX = ".*\\s{2,}.*";
     public static final String ONLY_NUMBERS_REGEX = "\\d+";
+    private static final String INTEGER_REGEX = "^-?\\d+$";
     public static final String EMAIL_REGEX
         = "^[a-zA-Z0-9_+&*-]+(?:\\.[a-zA-Z0-9_+&*-]+)*@(?:[a-zA-Z0-9-]+\\.)+[a-zA-Z]{2,7}$";
     public static final String PHONE_REGEX = "^[0-9]{7,15}$";
@@ -174,6 +177,24 @@ public final class InputValidator {
     }
 
     /**
+     * Returns the first validation error found among the given results, so the
+     * caller can present one clear message at a time. Centralizes the stream
+     * traversal that was previously duplicated across several validators.
+     *
+     * @param validationResults the validation results to evaluate in order
+     * 
+     * @return the first non-empty result, or empty if every result is valid
+     */
+    @SafeVarargs
+    private static Optional<String> firstError(Optional<String>... validationResults) {
+        Optional<String> firstError = Stream.of(validationResults)
+            .filter(Optional::isPresent)
+            .findFirst()
+            .orElse(Optional.empty());
+        return firstError;
+    }
+
+    /**
      * Verifies that a text field passes all standard rules for names and descriptive fields,
      * returning the first violation found so the user receives one clear message at a time.
      *
@@ -184,16 +205,15 @@ public final class InputValidator {
      * @return the first error found, or empty if all rules pass
      */
     public static Optional<String> validateText(String name, String fieldName) {
-        return Stream.of(
-                InputValidator.validateNotEmpty(name, fieldName),
-                InputValidator.validateLettersOnly(name, fieldName),
-                InputValidator.validateNoLeadingSpace(name, fieldName),
-                InputValidator.validateNoTrailingSpace(name, fieldName),
-                InputValidator.validateNoConsecutiveSpaces(name, fieldName),
-                InputValidator.validateNoConsecutiveRepeatedLetters(name, fieldName))
-            .filter(Optional::isPresent)
-            .findFirst()
-            .orElse(Optional.empty());
+        Optional<String> error = firstError(
+            validateNotEmpty(name, fieldName),
+            validateMaxLength(name, MAX_TEXT_LENGTH, fieldName),
+            validateLettersOnly(name, fieldName),
+            validateNoLeadingSpace(name, fieldName),
+            validateNoTrailingSpace(name, fieldName),
+            validateNoConsecutiveSpaces(name, fieldName),
+            validateNoConsecutiveRepeatedLetters(name, fieldName));
+        return error;
     }
 
     /**
@@ -248,8 +268,6 @@ public final class InputValidator {
      * @return an error message if the value is empty or does not meet the criteria, empty otherwise
      */
     public static Optional<String> validatePassword(String passwordValue, String fieldName) {
-        validateNoTrailingSpace(passwordValue, fieldName);
-        validateNoConsecutiveSpaces(passwordValue, fieldName);
         Optional<String> validationResult;
         if (passwordValue.isEmpty()) {
             validationResult = Optional.of(fieldName + " no puede estar vacía");
@@ -281,6 +299,24 @@ public final class InputValidator {
     }
 
     /**
+     * Verifies that a value represents a valid progress percentage between 1 and 100,
+     * so that a final report cannot store an advance greater than full completion.
+     *
+     * @param percentageValue the value to evaluate
+     * 
+     * @param fieldName the field label used in the error message
+     * 
+     * @return an error message if the value is empty, not an integer or above 100, empty otherwise
+     */
+    public static Optional<String> validatePercentage(String percentageValue, String fieldName) {
+        Optional<String> validationResult = validatePositiveInteger(percentageValue, fieldName);
+        if (validationResult.isEmpty() && exceedsMaximum(percentageValue, MAX_PERCENTAGE)) {
+            validationResult = Optional.of(fieldName + " no puede ser mayor a " + MAX_PERCENTAGE);
+        }
+        return validationResult;
+    }
+
+    /**
      * Verifies that a string value represents a valid integer within the allowed range,
      * so that non-numeric input is rejected before it reaches any business logic.
      *
@@ -292,17 +328,44 @@ public final class InputValidator {
      */
     private static Optional<String> validateIntegerRange(String integerValue, String fieldName) {
         Optional<String> validationResult;
-        try {
-            int parsedNumber = Integer.parseInt(integerValue);
-            if (parsedNumber < MIN_POSITIVE_INTEGER) {
-                validationResult = Optional.of(fieldName + " debe ser un número positivo");
-            } else {
-                validationResult = Optional.empty();
-            }
-        } catch (NumberFormatException numberFormatException) {
+        if (!integerValue.matches(INTEGER_REGEX)) {
             validationResult = Optional.of(fieldName + " debe ser un número entero válido");
+        } else if (isBelowMinimum(integerValue, MIN_POSITIVE_INTEGER)) {
+            validationResult = Optional.of(fieldName + " debe ser un número positivo");
+        } else {
+            validationResult = Optional.empty();
         }
         return validationResult;
+    }
+
+    /**
+     * Verifies whether a numeric string is strictly below a minimum, using BigInteger so that
+     * values outside the int range are compared correctly instead of overflowing.
+     *
+     * @param integerValue the numeric string to compare, already validated as an integer
+     * 
+     * @param minimum the minimum value allowed
+     * 
+     * @return true if the value is below the minimum, false otherwise
+     */
+    private static boolean isBelowMinimum(String integerValue, int minimum) {
+        boolean isBelowMinimum = new BigInteger(integerValue).compareTo(BigInteger.valueOf(minimum)) < NO_VALUE;
+        return isBelowMinimum;
+    }
+
+    /**
+     * Verifies whether a numeric string is strictly above a maximum, using BigInteger so that
+     * values outside the int range are compared correctly instead of overflowing.
+     *
+     * @param integerValue the numeric string to compare, already validated as an integer
+     * 
+     * @param maximum the maximum value allowed
+     * 
+     * @return true if the value is above the maximum, false otherwise
+     */
+    private static boolean exceedsMaximum(String integerValue, int maximum) {
+        boolean isExceeded = new BigInteger(integerValue).compareTo(BigInteger.valueOf(maximum)) > NO_VALUE;
+        return isExceeded;
     }
 
     /**
@@ -340,13 +403,10 @@ public final class InputValidator {
     public static Optional<String> validateMaxIntValue(String integerValue, int maxInt, String fieldName) {
         Optional<String> validationResult = validateNotEmpty(integerValue, fieldName);
         if (validationResult.isEmpty()) {
-            try {
-                int parsedNumber = Integer.parseInt(integerValue);
-                if (parsedNumber > maxInt) {
-                    validationResult = Optional.of(fieldName + " no puede tener un valor mayor a " + maxInt);
-                }
-            } catch (NumberFormatException numberFormatException) {
+            if (!integerValue.matches(INTEGER_REGEX)) {
                 validationResult = Optional.of(fieldName + " debe ser un número entero válido");
+            } else if (exceedsMaximum(integerValue, maxInt)) {
+                validationResult = Optional.of(fieldName + " no puede tener un valor mayor a " + maxInt);
             }
         }
         return validationResult;
@@ -425,15 +485,10 @@ public final class InputValidator {
      * @return an error message if the value is empty or does not match the required length, empty otherwise
      */
     public static Optional<String> validatePostalCode(String postalCodeValue, String fieldName) {
-        Optional<String> validatePostalCode = Optional.empty();
-        validatePostalCode = Stream.of(
-                InputValidator.validateNotEmpty(postalCodeValue, fieldName),
-                InputValidator.validatePositiveInteger(postalCodeValue, fieldName),
-                InputValidator.validateExactLength(postalCodeValue, POSTAL_CODE_LENGTH, fieldName))
-            .filter(Optional::isPresent)
-            .findFirst()
-            .orElse(Optional.empty());
-        return validatePostalCode;
+        return firstError(
+            validateNotEmpty(postalCodeValue, fieldName),
+            validatePositiveInteger(postalCodeValue, fieldName),
+            validateExactLength(postalCodeValue, POSTAL_CODE_LENGTH, fieldName));
     }
 
     /**
@@ -448,21 +503,18 @@ public final class InputValidator {
      * @return the first error found, or empty if all rules pass
      */
     public static Optional<String> validateRegister(String registerValue, String fieldName) {
-        Optional<String> validateRegister = Optional.empty();
+        Optional<String> validationResult;
         if (!registerValue.matches(REGISTER_REGEX)) {
-            validateRegister = Optional.of(fieldName + " no acepta carácteres especiales");
+            validationResult = Optional.of(fieldName + " no acepta carácteres especiales");
         } else {
-            validateRegister = Stream.of(
-                InputValidator.validateNotEmpty(registerValue, fieldName),
-                InputValidator.validateNoConsecutiveRepeatedLetters(registerValue, fieldName),
-                InputValidator.validateNoConsecutiveSpaces(registerValue, fieldName),
-                InputValidator.validateNoTrailingSpace(registerValue, fieldName),
-                InputValidator.validateNoLeadingSpace(registerValue, fieldName))
-            .filter(Optional::isPresent)
-            .findFirst()
-            .orElse(Optional.empty());
+            validationResult = firstError(
+                validateNotEmpty(registerValue, fieldName),
+                validateNoConsecutiveRepeatedLetters(registerValue, fieldName),
+                validateNoConsecutiveSpaces(registerValue, fieldName),
+                validateNoTrailingSpace(registerValue, fieldName),
+                validateNoLeadingSpace(registerValue, fieldName));
         }
-        return validateRegister;
+        return validationResult;
     }
 
     /**
@@ -478,20 +530,17 @@ public final class InputValidator {
      */
 
     public static Optional<String> validateAddressNumber(String addressNumber, String fieldName) {
-        Optional<String> validateAddressNumber = Optional.empty();
+        Optional<String> validationResult;
         if (!addressNumber.matches(ADDRESS_NUMBER_REGEX)) {
-            validateAddressNumber = Optional.of(fieldName + " no acepta carácteres especial");
+            validationResult = Optional.of(fieldName + " no acepta carácteres especial");
         } else {
-            validateAddressNumber = Stream.of(
-                InputValidator.validateNotEmpty(addressNumber, fieldName),
-                InputValidator.validateNoConsecutiveSpaces(addressNumber, fieldName),
-                InputValidator.validateNoTrailingSpace(addressNumber, fieldName),
-                InputValidator.validateNoLeadingSpace(addressNumber, fieldName))
-            .filter(Optional::isPresent)
-            .findFirst()
-            .orElse(Optional.empty());
+            validationResult = firstError(
+                validateNotEmpty(addressNumber, fieldName),
+                validateNoConsecutiveSpaces(addressNumber, fieldName),
+                validateNoTrailingSpace(addressNumber, fieldName),
+                validateNoLeadingSpace(addressNumber, fieldName));
         }
-        return validateAddressNumber;
+        return validationResult;
     }
 
     /**

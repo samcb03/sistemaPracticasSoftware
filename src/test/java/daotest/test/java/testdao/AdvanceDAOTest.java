@@ -7,7 +7,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
-import static uv.lis.logic.utils.InputValidator.NO_ROWS_AFFECTED;
+import static uv.lis.logic.utils.InputValidator.NO_VALUE;
 
 import java.lang.reflect.Field;
 import java.sql.Connection;
@@ -101,7 +101,7 @@ class AdvanceDAOTest {
 
     @Test
     void registerAdvance_noRowsAffected_returnsFalse() throws Exception {
-        mockUpdateExecution(NO_ROWS_AFFECTED);
+        mockUpdateExecution(NO_VALUE);
 
         boolean result = advanceDAO.registerAdvance(builderAdvance());
 
@@ -158,7 +158,7 @@ class AdvanceDAOTest {
     void existsAdvanceForReport_noAdvance_returnsFalse() throws Exception {
         mockQueryExecution();
         when(resultSet.next()).thenReturn(true);
-        when(resultSet.getInt(1)).thenReturn(NO_ROWS_AFFECTED);
+        when(resultSet.getInt(1)).thenReturn(NO_VALUE);
 
         assertFalse(advanceDAO.existsAdvanceForReport(REPORT_ID));
     }

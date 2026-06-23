@@ -1,13 +1,12 @@
 package daotest.test.java.testdao;
 
-
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
-import static uv.lis.logic.utils.InputValidator.NO_ROWS_AFFECTED;
+import static uv.lis.logic.utils.InputValidator.NO_VALUE;
 
 import java.lang.reflect.Field;
 import java.sql.Connection;
@@ -37,6 +36,8 @@ class ActivityDAOTest {
     private static final int SECOND_PROJECT_ID = 11;
     private static final int ROWS_AFFECTED = 1;
     private static final int GENERATED_ID = 5;
+    private static final int TOTAL_ACTIVITY_HOURS = 120;
+    private static final int NO_HOURS = 0;
 
     private static final String FIRST_ACTIVITY_NAME = "Actividad 1";
     private static final String SECOND_ACTIVITY_NAME = "Actividad 2";
@@ -179,7 +180,7 @@ class ActivityDAOTest {
 
     @Test
     void registerActivity_noRowsAffected_throwsOperationException() throws Exception {
-        mockUpdateExecution(NO_ROWS_AFFECTED);
+        mockUpdateExecution(NO_VALUE);
 
         assertThrows(OperationException.class,
             () -> activityDAO.registerActivity(builderFirstActivity()));
@@ -202,7 +203,7 @@ class ActivityDAOTest {
 
     @Test
     void modifyActivity_noRowsAffected_throwsOperationException() throws Exception {
-        mockUpdateExecution(NO_ROWS_AFFECTED);
+        mockUpdateExecution(NO_VALUE);
 
         assertThrows(OperationException.class,
             () -> activityDAO.modifyActivity(builderFirstActivity()));
@@ -214,5 +215,31 @@ class ActivityDAOTest {
 
         assertThrows(OperationException.class,
             () -> activityDAO.modifyActivity(builderFirstActivity()));
+    }
+
+    @Test
+    void getTotalActivityHoursByProject_successful_returnsTotalHours() throws Exception {
+        mockQueryExecution();
+        when(resultSet.next()).thenReturn(true);
+        when(resultSet.getInt("total")).thenReturn(TOTAL_ACTIVITY_HOURS);
+
+        assertEquals(TOTAL_ACTIVITY_HOURS,
+            activityDAO.getTotalActivityHoursByProject(FIRST_PROJECT_ID));
+    }
+
+    @Test
+    void getTotalActivityHoursByProject_emptyResult_returnsZero() throws Exception {
+        mockQueryExecution();
+        when(resultSet.next()).thenReturn(false);
+
+        assertEquals(NO_HOURS, activityDAO.getTotalActivityHoursByProject(FIRST_PROJECT_ID));
+    }
+
+    @Test
+    void getTotalActivityHoursByProject_sqlError_throwsOperationException() throws Exception {
+        when(connectionManager.getConnection()).thenThrow(new SQLException(DATABASE_ERROR_MESSAGE));
+
+        assertThrows(OperationException.class,
+            () -> activityDAO.getTotalActivityHoursByProject(FIRST_PROJECT_ID));
     }
 }

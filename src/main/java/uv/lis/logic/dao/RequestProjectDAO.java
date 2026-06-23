@@ -1,7 +1,7 @@
 package uv.lis.logic.dao;
 
 import static uv.lis.logic.utils.InputValidator.MAX_REQUESTS;
-import static uv.lis.logic.utils.InputValidator.NO_ROWS_AFFECTED;
+import static uv.lis.logic.utils.InputValidator.NO_VALUE;
 import static uv.lis.logic.utils.InputValidator.STATUS_ASSIGNED;
 import static uv.lis.logic.utils.InputValidator.STATUS_REQUESTED;
 import static uv.lis.logic.utils.InputValidator.STATUS_REJECTED;
@@ -105,7 +105,7 @@ public class RequestProjectDAO implements IRequestProjectDAO {
 
             try (ResultSet resultSet = preparedStatement.executeQuery()) {
                 if (resultSet.next()) {
-                    hasRequested = resultSet.getInt("total") > NO_ROWS_AFFECTED;
+                    hasRequested = resultSet.getInt("total") > NO_VALUE;
                 }
             }
         } catch (SQLException e) {
@@ -160,7 +160,7 @@ public class RequestProjectDAO implements IRequestProjectDAO {
             preparedStatement.setString(2, idStudent);
             preparedStatement.setInt(3, STATUS_REQUESTED);
 
-            if (preparedStatement.executeUpdate() > NO_ROWS_AFFECTED) {
+            if (preparedStatement.executeUpdate() > NO_VALUE) {
                 isRegistered = true;
             }
         } catch (SQLException e) {
@@ -313,7 +313,7 @@ public class RequestProjectDAO implements IRequestProjectDAO {
             preparedStatement.setInt(2, STATUS_ASSIGNED);
 
             try (ResultSet resultSet = preparedStatement.executeQuery()) {
-                if (resultSet.next() && resultSet.getInt(1) > NO_ROWS_AFFECTED) {
+                if (resultSet.next() && resultSet.getInt(1) > NO_VALUE) {
                     throw new OperationException(
                         "El estudiante ya cuenta con un proyecto asignado.", null);
                 }

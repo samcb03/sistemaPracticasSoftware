@@ -1,6 +1,6 @@
 package uv.lis.logic.dao;
 
-import static uv.lis.logic.utils.InputValidator.NO_ROWS_AFFECTED;
+import static uv.lis.logic.utils.InputValidator.NO_VALUE;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -88,7 +88,7 @@ public class AffiliatedOrganizationDAO implements IAffiliatedOrganizationDAO {
             preparedStatement.setInt(11, affiliatedOrganization.getNumberOfDirectUsers());
             preparedStatement.setInt(12, ACTIVE_STATE);
 
-            if (preparedStatement.executeUpdate() > NO_ROWS_AFFECTED) {
+            if (preparedStatement.executeUpdate() > NO_VALUE) {
                 try (ResultSet generatedKeys = preparedStatement.getGeneratedKeys()) {
                     if (generatedKeys.next()) {
                         affiliatedOrganization.setId(generatedKeys.getInt(1));
@@ -137,7 +137,7 @@ public class AffiliatedOrganizationDAO implements IAffiliatedOrganizationDAO {
             preparedStatement.setInt(11, affiliatedOrganization.getNumberOfDirectUsers());
             preparedStatement.setInt(12, affiliatedOrganization.getId());
 
-            if (preparedStatement.executeUpdate() > NO_ROWS_AFFECTED) {
+            if (preparedStatement.executeUpdate() > NO_VALUE) {
                 isModified = true;
             } else {
                 LOGGER.log(Level.WARNING,
@@ -165,7 +165,7 @@ public class AffiliatedOrganizationDAO implements IAffiliatedOrganizationDAO {
 
             preparedStatement.setString(1, organizationName);
 
-            if (preparedStatement.executeUpdate() > NO_ROWS_AFFECTED) {
+            if (preparedStatement.executeUpdate() > NO_VALUE) {
                 isInactive = true;
             } else {
                 LOGGER.log(Level.WARNING,

@@ -54,4 +54,13 @@ public interface IActivityDAO {
      * @throws OperationException if the activities cannot be retrieved
      */
     List<Activity> getActivitiesByStudentId(String studentId) throws OperationException;
+
+    /**
+     * Calculates the total hours reported across all the activities of a project.
+     *
+     * @param projectId the identifier of the project whose activity hours are summed
+     * @return the total reported hours, zero if there are no activities
+     * @throws OperationException if the total cannot be calculated
+     */
+    int getTotalActivityHoursByProject(int projectId) throws OperationException;
 }

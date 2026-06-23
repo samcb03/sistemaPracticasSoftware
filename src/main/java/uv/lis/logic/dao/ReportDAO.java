@@ -1,6 +1,6 @@
 package uv.lis.logic.dao;
 
-import static uv.lis.logic.utils.InputValidator.NO_ROWS_AFFECTED;
+import static uv.lis.logic.utils.InputValidator.NO_VALUE;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -244,7 +244,7 @@ public class ReportDAO implements IReportDAO {
 
                 try (ResultSet resultSet = preparedStatement.executeQuery()) {
                     if (resultSet.next()) {
-                        hasReport = resultSet.getInt(1) > NO_ROWS_AFFECTED;
+                        hasReport = resultSet.getInt(1) > NO_VALUE;
                     }
                 }
             } catch (SQLException e) {
@@ -352,7 +352,7 @@ public class ReportDAO implements IReportDAO {
             preparedStatement.setInt(2, partialReport.getPlannedAdvanceWeek());
             preparedStatement.setInt(3, partialReport.getRealAdvanceWeek());
 
-            if (preparedStatement.executeUpdate() > NO_ROWS_AFFECTED) {
+            if (preparedStatement.executeUpdate() > NO_VALUE) {
                 isInserted = true;
             }
         }
@@ -413,7 +413,7 @@ public class ReportDAO implements IReportDAO {
             preparedStatement.setInt(2, partialReport.getRealAdvanceWeek());
             preparedStatement.setInt(3, partialReport.getId());
 
-            if (preparedStatement.executeUpdate() > NO_ROWS_AFFECTED) {
+            if (preparedStatement.executeUpdate() > NO_VALUE) {
                 isUpdated = true;
             }
         }
@@ -430,7 +430,7 @@ public class ReportDAO implements IReportDAO {
             preparedStatement.setInt(1, finalReport.getId());
             preparedStatement.setString(2, finalReport.getGeneralObservations());
 
-            if (preparedStatement.executeUpdate() > NO_ROWS_AFFECTED) {
+            if (preparedStatement.executeUpdate() > NO_VALUE) {
                 isInserted = true;
             }
         }
@@ -498,7 +498,7 @@ public class ReportDAO implements IReportDAO {
             preparedStatement.setString(1, finalReport.getGeneralObservations());
             preparedStatement.setInt(2, finalReport.getId());
 
-            if (preparedStatement.executeUpdate() > NO_ROWS_AFFECTED) {
+            if (preparedStatement.executeUpdate() > NO_VALUE) {
                 isUpdated = true;
             }
         }
@@ -520,7 +520,7 @@ public class ReportDAO implements IReportDAO {
             preparedStatement.setInt(4, monthlyReport.getReportedHours());
             preparedStatement.setInt(5, monthlyReport.getAccumulatedHours());
 
-            if (preparedStatement.executeUpdate() > NO_ROWS_AFFECTED) {
+            if (preparedStatement.executeUpdate() > NO_VALUE) {
                 isInserted = true;
             }
         }

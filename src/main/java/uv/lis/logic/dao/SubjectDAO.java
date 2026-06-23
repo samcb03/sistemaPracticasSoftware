@@ -1,6 +1,6 @@
 package uv.lis.logic.dao;
 
-import static uv.lis.logic.utils.InputValidator.NO_ROWS_AFFECTED;
+import static uv.lis.logic.utils.InputValidator.NO_VALUE;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -59,7 +59,7 @@ public class SubjectDAO implements ISubjectDAO {
                 professorSubjectStatement.setString(2, subject.getProfessorPersonnelNumber());
                 int professorRows = professorSubjectStatement.executeUpdate();
 
-                boolean bothInserted = subjectRows != NO_ROWS_AFFECTED && professorRows != NO_ROWS_AFFECTED;
+                boolean bothInserted = subjectRows != NO_VALUE && professorRows != NO_VALUE;
 
                 if (bothInserted) {
                     databaseConnection.commit();
@@ -117,7 +117,7 @@ public class SubjectDAO implements ISubjectDAO {
             preparedStatement.setString(1, studentId);
             preparedStatement.setInt(2, subjectNrc);
 
-            if (preparedStatement.executeUpdate() > NO_ROWS_AFFECTED) {
+            if (preparedStatement.executeUpdate() > NO_VALUE) {
                 isAssigned = true;
             }
         } catch (SQLException e) {

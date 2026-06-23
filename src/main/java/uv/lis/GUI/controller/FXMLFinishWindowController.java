@@ -10,7 +10,7 @@ import javafx.fxml.FXML;
 import javafx.scene.control.Label;
 
 import uv.lis.GUI.ValidationHandler;
-import uv.lis.logic.dao.AdvanceDAO;
+import uv.lis.logic.dao.ReportContextDAO;
 import uv.lis.logic.dao.ProjectDAO;
 import uv.lis.logic.dto.Project;
 import uv.lis.logic.dto.ProjectSummary;
@@ -39,7 +39,7 @@ public class FXMLFinishWindowController extends ValidationHandler {
 
     private Student currentStudent;
     private final ProjectDAO projectDAO = new ProjectDAO();
-    private final AdvanceDAO advanceDAO = new AdvanceDAO();
+    private final ReportContextDAO reportContextDAO = new ReportContextDAO();
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
@@ -70,8 +70,8 @@ public class FXMLFinishWindowController extends ValidationHandler {
                     labelObjective.setText(details.getObjective());
                     labelDescription.setText(details.getDescription());
 
-                    int accumulatedHours = advanceDAO.getAccumulatedHoursByProject(assignedProject.get().getId());
-                    labelAccumulatedHours.setText(String.valueOf(accumulatedHours));
+                    String accumulatedHours = reportContextDAO.getTotalReportedHoursByStudentId(studentId);
+                    labelAccumulatedHours.setText(accumulatedHours);
                 }
             } catch (OperationException e) {
                 LOGGER.log(Level.SEVERE, LOAD_ERROR_MESSAGE, e);

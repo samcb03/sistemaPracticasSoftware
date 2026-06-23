@@ -9,7 +9,7 @@ import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.when;
-import static uv.lis.logic.utils.InputValidator.NO_ROWS_AFFECTED;
+import static uv.lis.logic.utils.InputValidator.NO_VALUE;
 
 import java.lang.reflect.Field;
 import java.sql.Connection;
@@ -136,7 +136,7 @@ class UserDAOTest {
     @Test
     void registerUser_noRowsAffected_throwsOperationException() throws Exception {
         when(databaseConnection.prepareStatement(anyString(), anyInt())).thenReturn(preparedStatement);
-        when(preparedStatement.executeUpdate()).thenReturn(NO_ROWS_AFFECTED);
+        when(preparedStatement.executeUpdate()).thenReturn(NO_VALUE);
 
         try (MockedStatic<PasswordHasher> mockedHasher = mockStatic(PasswordHasher.class)) {
             mockedHasher.when(() -> PasswordHasher.hashPassword(anyString())).thenReturn(HASHED_PASSWORD);
@@ -227,7 +227,7 @@ class UserDAOTest {
     void existActiveCoordinator_noCoordinatorExists_returnsFalse() throws Exception {
         mockQueryExecution();
         when(resultSet.next()).thenReturn(true);
-        when(resultSet.getInt(1)).thenReturn(NO_ROWS_AFFECTED);
+        when(resultSet.getInt(1)).thenReturn(NO_VALUE);
 
         assertFalse(userDAO.existActiveCoordinator());
     }
@@ -260,7 +260,7 @@ class UserDAOTest {
     @Test
     void updateEmailAuthenticationPreference_noRowsAffected_returnsFalse() throws Exception {
         when(databaseConnection.prepareStatement(anyString())).thenReturn(preparedStatement);
-        when(preparedStatement.executeUpdate()).thenReturn(NO_ROWS_AFFECTED);
+        when(preparedStatement.executeUpdate()).thenReturn(NO_VALUE);
 
         assertFalse(userDAO.updateEmailAuthenticationPreference(DEFAULT_ID,
             EMAIL_AUTHENTICATION_DISABLED));

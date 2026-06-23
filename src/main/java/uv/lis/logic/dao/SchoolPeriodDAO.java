@@ -1,6 +1,6 @@
 package uv.lis.logic.dao;
 
-import static uv.lis.logic.utils.InputValidator.NO_ROWS_AFFECTED;
+import static uv.lis.logic.utils.InputValidator.NO_VALUE;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -117,7 +117,7 @@ public class SchoolPeriodDAO implements ISchoolPeriodDAO{
             preparedStatement.setDate(2, schoolPeriod.getStartDate());
             preparedStatement.setDate(3, schoolPeriod.getEndDate());
 
-            if (preparedStatement.executeUpdate() > NO_ROWS_AFFECTED) {
+            if (preparedStatement.executeUpdate() > NO_VALUE) {
                 isRegistered = true;
             } else {
                 throw new OperationException("No se pudo registrar el periodo escolar. Intentelo mas tarde", 
@@ -143,7 +143,7 @@ public class SchoolPeriodDAO implements ISchoolPeriodDAO{
             preparedStatement.setDate(2, schoolPeriod.getEndDate());
             preparedStatement.setInt(3, schoolPeriod.getId());
 
-            if (preparedStatement.executeUpdate() > NO_ROWS_AFFECTED) {
+            if (preparedStatement.executeUpdate() > NO_VALUE) {
                 isModified = true;
             } else {
                 throw new OperationException("No se pudo modificar el periodo escolar. Intentelo mas tarde",

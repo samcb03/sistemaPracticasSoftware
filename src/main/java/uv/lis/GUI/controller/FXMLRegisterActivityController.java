@@ -41,6 +41,9 @@ public class FXMLRegisterActivityController extends ValidationHandler {
     private static final String END_DATE_FIELD = "La fecha de finalización";
     private static final String HOURS_FIELD = "Las horas";
     private static final int COUNT_NEXT_DAY = 1;
+    private static final int MAX_TOTAL_HOURS = 420;
+    private static final String MAX_HOURS_EXCEEDED_MESSAGE =
+        "No puedes superar las 420 horas acumuladas de la práctica.";
 
     @FXML private Button buttonRegister;
     @FXML private Button buttonBack;
@@ -76,7 +79,22 @@ public class FXMLRegisterActivityController extends ValidationHandler {
     @FXML
     public void validateFields() {
         Optional<String> validationError = getFirstValidationError();
-        handleValidation(validationError, this::performRegistration);
+        handleValidation(validationError, this::registerIfWithinHourLimit);
+    }
+
+    private void registerIfWithinHourLimit() {
+        try {
+            int newHours = Integer.parseInt(textFieldHours.getText().trim());
+            int accumulatedHours = activityDAO.getTotalActivityHoursByProject(currentProjectId);
+
+            if (accumulatedHours + newHours > MAX_TOTAL_HOURS) {
+                showError(MAX_HOURS_EXCEEDED_MESSAGE);
+            } else {
+                performRegistration();
+            }
+        } catch (OperationException operationException) {
+            showError(operationException.getMessage());
+        }
     }
 
     private Optional<String> getFirstValidationError() {

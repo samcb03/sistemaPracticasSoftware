@@ -1,6 +1,6 @@
 package uv.lis.logic.dao;
 
-import static uv.lis.logic.utils.InputValidator.NO_ROWS_AFFECTED;
+import static uv.lis.logic.utils.InputValidator.NO_VALUE;
 import static uv.lis.logic.utils.InputValidator.STATUS_ASSIGNED;
 import static uv.lis.logic.utils.InputValidator.STATUS_REQUESTED;
 
@@ -59,7 +59,7 @@ public class ExpedientDAO implements IExpedientDAO {
             
             int affectedRows = preparedStatement.executeUpdate();
             
-            if (affectedRows > NO_ROWS_AFFECTED) {
+            if (affectedRows > NO_VALUE) {
                 try (ResultSet resultSet = preparedStatement.getGeneratedKeys()) {
                     if (resultSet.next()) {
                         generatedId = resultSet.getInt(1);
@@ -219,7 +219,7 @@ public class ExpedientDAO implements IExpedientDAO {
             preparedStatement.setInt(2, idExpedient);
 
             int affectedRows = preparedStatement.executeUpdate();
-            isUpdated = affectedRows > NO_ROWS_AFFECTED;
+            isUpdated = affectedRows > NO_VALUE;
         } catch (SQLException e) {
             LOGGER.log(Level.SEVERE, "Error al actualizar el estatus del documento", e);
             throw new OperationException("No se pudo actualizar el estatus del documento. Intente más tarde", e);
@@ -411,7 +411,7 @@ public class ExpedientDAO implements IExpedientDAO {
             preparedStatement.setString(4, expedient.getIdStudent());
             preparedStatement.setInt(5, expedient.getIdTypeDocument());
 
-            isReplaced = preparedStatement.executeUpdate() > NO_ROWS_AFFECTED;
+            isReplaced = preparedStatement.executeUpdate() > NO_VALUE;
         } catch (SQLException e) {
             LOGGER.log(Level.SEVERE, "Error al reemplazar el documento del expediente", e);
             throw new OperationException("No se pudo reemplazar el documento. Intente más tarde", e);
@@ -425,7 +425,7 @@ public class ExpedientDAO implements IExpedientDAO {
         if (expedient.getIdTypeDocument() == MONTHLY_REPORT_DOCUMENT_TYPE_ID) {
             int nextEntry = countDocumentsByStudentAndType(expedient.getIdStudent(),
                 MONTHLY_REPORT_DOCUMENT_TYPE_ID) + NEXT_ENTRY_OFFSET;
-            isSaved = saveMonthlyDocument(expedient, nextEntry) > NO_ROWS_AFFECTED;
+            isSaved = saveMonthlyDocument(expedient, nextEntry) > NO_VALUE;
         } else {
             isSaved = replaceOrInsertDocument(expedient);
         }
@@ -448,7 +448,7 @@ public class ExpedientDAO implements IExpedientDAO {
             preparedStatement.setInt(4, expedient.getIdTypeDocument());
             preparedStatement.setInt(5, entryNumber);
 
-            if (preparedStatement.executeUpdate() > NO_ROWS_AFFECTED) {
+            if (preparedStatement.executeUpdate() > NO_VALUE) {
                 try (ResultSet resultSet = preparedStatement.getGeneratedKeys()) {
                     if (resultSet.next()) {
                         generatedId = resultSet.getInt(1);
@@ -472,7 +472,7 @@ public class ExpedientDAO implements IExpedientDAO {
                 FileManager.deleteFile(previousUrl.get());
             }
         } else {
-            isSaved = saveDocument(expedient) > NO_ROWS_AFFECTED;
+            isSaved = saveDocument(expedient) > NO_VALUE;
         }
         return isSaved;
     }

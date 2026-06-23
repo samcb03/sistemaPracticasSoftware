@@ -2,7 +2,7 @@ package uv.lis.logic.dao;
 
 import static uv.lis.logic.utils.InputValidator.INVALID_ID;
 import static uv.lis.logic.utils.InputValidator.IS_COORDINATOR;
-import static uv.lis.logic.utils.InputValidator.NO_ROWS_AFFECTED;
+import static uv.lis.logic.utils.InputValidator.NO_VALUE;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -168,7 +168,7 @@ public class ProfessorDAO extends UserDAO implements IProfessorDAO {
             preparedStatement.setInt(1, professor.getId());
             preparedStatement.setString(2, professor.getPersonnelNumber());
 
-            if (preparedStatement.executeUpdate() <= NO_ROWS_AFFECTED) {
+            if (preparedStatement.executeUpdate() <= NO_VALUE) {
                 throw new OperationException("No se pudo registrar al profesor con número: "
                     + professor.getPersonnelNumber(), null);
             }
@@ -197,7 +197,7 @@ public class ProfessorDAO extends UserDAO implements IProfessorDAO {
             preparedStatement.setString(3, professor.getLastName());
             preparedStatement.setString(4, professor.getPersonnelNumber());
 
-            if (preparedStatement.executeUpdate() > NO_ROWS_AFFECTED) {
+            if (preparedStatement.executeUpdate() > NO_VALUE) {
                 isModified = true;
                 LOGGER.log(Level.INFO, "Profesor {0} modificado exitosamente.", professor.getPersonnelNumber());
             } else {
@@ -223,7 +223,7 @@ public class ProfessorDAO extends UserDAO implements IProfessorDAO {
 
             preparedStatement.setString(1, personalNumber);
 
-            if (preparedStatement.executeUpdate() > NO_ROWS_AFFECTED) {
+            if (preparedStatement.executeUpdate() > NO_VALUE) {
                 isInactived = true;
                 LOGGER.log(Level.INFO, "Profesor {0} inactivado exitosamente.", personalNumber);
             } else {
@@ -392,7 +392,7 @@ public class ProfessorDAO extends UserDAO implements IProfessorDAO {
 
             try (ResultSet resultSet = preparedStatement.executeQuery()) {
                 if (resultSet.next()) {
-                    exits = resultSet.getInt(1) > NO_ROWS_AFFECTED;
+                    exits = resultSet.getInt(1) > NO_VALUE;
                 }
             }
         } catch (SQLException e) {

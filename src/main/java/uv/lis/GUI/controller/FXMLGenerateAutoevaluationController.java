@@ -191,7 +191,6 @@ public class FXMLGenerateAutoevaluationController extends ValidationHandler {
     private void processAutoevaluation(int[] answers) {
         try {
             Autoevaluation evaluation = new Autoevaluation(currentStudent.getIdStudent(), answers);
-            autoevaluationDAO.registerAutoevaluation(evaluation);
             JasperPrint report = autoevaluationCommon.generateAutoevaluation(evaluation);
             JasperViewer.viewReport(report, false);
             labelMessage.setStyle("-fx-text-fill: green;");

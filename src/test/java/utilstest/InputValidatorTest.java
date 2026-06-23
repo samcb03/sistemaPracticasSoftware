@@ -2,6 +2,7 @@ package utilstest;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 
@@ -111,6 +112,15 @@ class InputValidatorTest {
         assertEquals(hasError, result);
     }
 
+    @Test
+    void validateText_textExceedingMaxLength_returnsError() {
+        String longText = "ab".repeat(InputValidator.MAX_TEXT_LENGTH);
+
+        boolean result = InputValidator.validateText(longText, FIELD_NAME).isPresent();
+
+        assertEquals(true, result);
+    }
+
     @ParameterizedTest
     @CsvSource({
         "correo@dominio.com, false",
@@ -163,6 +173,32 @@ class InputValidatorTest {
         boolean result = InputValidator.validatePositiveInteger(value, FIELD_NAME).isPresent();
 
         assertEquals(hasError, result);
+    }
+
+    @ParameterizedTest
+    @CsvSource({
+        "1, false",
+        "50, false",
+        "100, false",
+        "0, true",
+        "101, true",
+        "-5, true",
+        "'', true",
+        "abc, true"
+    })
+    void validatePercentage_variousInputs_returnsExpectedResult(String value, boolean hasError) {
+        boolean result = InputValidator.validatePercentage(value, FIELD_NAME).isPresent();
+
+        assertEquals(hasError, result);
+    }
+
+    @Test
+    void validatePercentage_integerLargerThanIntRange_returnsMaximumMessage() {
+        String hugeInteger = "1234567890123456789";
+
+        String message = InputValidator.validatePercentage(hugeInteger, FIELD_NAME).orElse("");
+
+        assertEquals(FIELD_NAME + " no puede ser mayor a 100", message);
     }
 
     @ParameterizedTest
@@ -247,6 +283,7 @@ class InputValidatorTest {
         "abc, 5, true",
         "41, 5, true",
         "40, 5, false",
+        "99999999999, 5, true",
         "8, 1, false"
     })
     void validateMaxHoursForDuration_variousInputs_returnsExpectedResult(String hoursValue,
