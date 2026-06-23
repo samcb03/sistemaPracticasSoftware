@@ -69,7 +69,7 @@ public class FXMLGenerateMonthlyReportControllerTest extends ApplicationTest {
     private static final int CONTEXT_REPORT_NUMBER = 1;
     private static final int NORMAL_REPORTED_HOURS = 40;
     private static final int NORMAL_ACCUMULATED_HOURS = 100;
-    private static final int LIMIT_ACCUMULATED_HOURS = 420;
+    private static final int EXCEED_LIMIT_ACCUMULATED_HOURS = 421;
     private static final int REPORT_PAGE_WIDTH = 595;
     private static final int REPORT_PAGE_HEIGHT = 842;
 
@@ -103,7 +103,8 @@ public class FXMLGenerateMonthlyReportControllerTest extends ApplicationTest {
             .thenReturn(List.of(buildActivity()));
         when(reportContextDAOMock.getSumOfReportedHours(anyInt(), anyInt(), anyInt()))
             .thenReturn(NORMAL_REPORTED_HOURS);
-        when(advanceDAOMock.getAccumulatedHoursByProject(anyInt())).thenReturn(NORMAL_ACCUMULATED_HOURS);
+        when(reportContextDAOMock.getTotalReportedHoursByStudentId(anyString()))
+            .thenReturn(String.valueOf(NORMAL_ACCUMULATED_HOURS));
 
         injectField(REPORT_CONTEXT_DAO_FIELD, reportContextDAOMock);
         injectField(ADVANCE_DAO_FIELD, advanceDAOMock);
@@ -144,7 +145,8 @@ public class FXMLGenerateMonthlyReportControllerTest extends ApplicationTest {
 
     @Test
     void validateMonthlyReport_accumulatedLimitReached_showsValidationError() throws Exception {
-        when(advanceDAOMock.getAccumulatedHoursByProject(anyInt())).thenReturn(LIMIT_ACCUMULATED_HOURS);
+        when(reportContextDAOMock.getTotalReportedHoursByStudentId(anyString()))
+            .thenReturn(String.valueOf(EXCEED_LIMIT_ACCUMULATED_HOURS));
 
         selectMonth();
         clickGenerate();

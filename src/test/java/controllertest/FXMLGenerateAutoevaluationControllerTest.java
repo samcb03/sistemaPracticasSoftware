@@ -9,11 +9,8 @@ import static org.mockito.Mockito.when;
 
 import java.io.IOException;
 import java.lang.reflect.Field;
-import java.lang.reflect.Method;
-import java.net.URL;
 import java.util.Arrays;
 import java.util.List;
-import java.util.ResourceBundle;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.awt.EventQueue;
@@ -241,17 +238,6 @@ public class FXMLGenerateAutoevaluationControllerTest extends ApplicationTest {
         clickOn(GENERATE_BUTTON_SELECTOR);
         WaitForAsyncUtils.waitForFxEvents();
     }
-
-    private void reinitializeController(FXMLGenerateAutoevaluationController controller) {
-    try {
-        Method initMethod = FXMLGenerateAutoevaluationController.class
-            .getMethod("initialize", URL.class, ResourceBundle.class);
-        initMethod.setAccessible(true);
-        initMethod.invoke(controller, null, null);
-    } catch (ReflectiveOperationException e) {
-        LOGGER.log(Level.SEVERE, "Error al re-inicializar el controlador", e);
-    }
-}
 
     private void clearLabelMessage() {
         lookup(MESSAGE_LABEL_SELECTOR).queryAs(Label.class).setText("");
