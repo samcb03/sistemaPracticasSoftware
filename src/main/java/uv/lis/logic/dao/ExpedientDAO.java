@@ -30,6 +30,8 @@ public class ExpedientDAO implements IExpedientDAO {
     private static final int FINAL_REPORT_DOCUMENT_TYPE_ID = 2;
     private static final int FIRST_INITIAL_DOCUMENT_TYPE_ID = 5;
     private static final int NO_MISSING_INITIAL_DOCUMENTS = 0;
+    private static final int NO_GENERATED_ID = -1;
+    private static final int NEXT_ENTRY_OFFSET = 1;
 
     private MySQLConnectionManager connectionManager;
     public ExpedientDAO() {
@@ -42,7 +44,7 @@ public class ExpedientDAO implements IExpedientDAO {
 
     @Override
     public int saveDocument(Expedient expedient) throws OperationException {
-        int generatedId = -1;
+        int generatedId = NO_GENERATED_ID;
         String expedientQuery = "INSERT INTO expediente (nombre, url, matricula, idTipoDocumento)" 
                               + " VALUES (?, ?, ?, ?)";
 
@@ -421,11 +423,43 @@ public class ExpedientDAO implements IExpedientDAO {
         boolean isSaved;
 
         if (expedient.getIdTypeDocument() == MONTHLY_REPORT_DOCUMENT_TYPE_ID) {
-            isSaved = saveDocument(expedient) > NO_ROWS_AFFECTED;
+            int nextEntry = countDocumentsByStudentAndType(expedient.getIdStudent(),
+                MONTHLY_REPORT_DOCUMENT_TYPE_ID) + NEXT_ENTRY_OFFSET;
+            isSaved = saveMonthlyDocument(expedient, nextEntry) > NO_ROWS_AFFECTED;
         } else {
             isSaved = replaceOrInsertDocument(expedient);
         }
         return isSaved;
+    }
+
+    private int saveMonthlyDocument(Expedient expedient, int entryNumber) throws OperationException {
+        int generatedId = NO_GENERATED_ID;
+        String expedientQuery = "INSERT INTO Expediente "
+                              + "(nombre, url, matricula, idTipoDocumento, numeroEntrega) "
+                              + "VALUES (?, ?, ?, ?, ?)";
+
+        try (Connection databaseConnection = connectionManager.getConnection();
+            PreparedStatement preparedStatement = databaseConnection.prepareStatement(expedientQuery,
+                Statement.RETURN_GENERATED_KEYS)) {
+
+            preparedStatement.setString(1, expedient.getName());
+            preparedStatement.setString(2, expedient.getUrl());
+            preparedStatement.setString(3, expedient.getIdStudent());
+            preparedStatement.setInt(4, expedient.getIdTypeDocument());
+            preparedStatement.setInt(5, entryNumber);
+
+            if (preparedStatement.executeUpdate() > NO_ROWS_AFFECTED) {
+                try (ResultSet resultSet = preparedStatement.getGeneratedKeys()) {
+                    if (resultSet.next()) {
+                        generatedId = resultSet.getInt(1);
+                    }
+                }
+            }
+        } catch (SQLException e) {
+            LOGGER.log(Level.SEVERE, "Error al guardar el reporte mensual en el expediente", e);
+            throw new OperationException("Error al guardar el documento en el expediente.", e);
+        }
+        return generatedId;
     }
 
     private boolean replaceOrInsertDocument(Expedient expedient) throws OperationException {
@@ -447,11 +481,11 @@ public class ExpedientDAO implements IExpedientDAO {
     @Override
     public int countDocumentsByStudentAndType(String studentId, int typeId) throws OperationException {
         int count = 0;
-        String query = "SELECT COUNT(*) FROM Expediente "
-                    + "WHERE matricula = ? AND idTipoDocumento = ?";
+        String documentQuery = "SELECT COUNT(*) FROM Expediente "
+                             + "WHERE matricula = ? AND idTipoDocumento = ?";
 
         try (Connection databaseConnection = connectionManager.getConnection();
-            PreparedStatement preparedStatement = databaseConnection.prepareStatement(query)) {
+            PreparedStatement preparedStatement = databaseConnection.prepareStatement(documentQuery)) {
 
             preparedStatement.setString(1, studentId);
             preparedStatement.setInt(2, typeId);
