@@ -42,6 +42,8 @@ public class FXMLUploadDocumentsController extends ValidationHandler {
     private static final int PARTIAL_REPORT_TYPE_ID = 4;
     private static final int ACCEPTANCE_LETTER_TYPE_ID = 9;
     private static final int MONTHLY_REPORT_TYPE = 3;
+    private static final int ACTIVITY_CRONOGRAM_ID = 11;
+    private static final int ORGANIZATION_EVALUATION = 12;
 
     private static final String NO_STUDENT_MESSAGE = "No hay alumno en sesión.";
     private static final String NO_TYPE_MESSAGE = "Seleccione un tipo de documento.";
@@ -56,6 +58,7 @@ public class FXMLUploadDocumentsController extends ValidationHandler {
         "Este documento solo puede subirse cuando ya esté generado.";
     private static final String ALREADY_VALIDATED_MESSAGE =
         "Este documento ya fue validado y no puede subirse nuevamente.";
+    private static final String NO_FINAL_REPORT = "Debe tener validado el reporte final";
 
     @FXML private Button buttonUploadDocument;
     @FXML private Button buttonBack;
@@ -165,12 +168,14 @@ public class FXMLUploadDocumentsController extends ValidationHandler {
             boolean isMonthlyReport = (idTypeDocument == MONTHLY_REPORT_TYPE);
             if (!isMonthlyReport && expedientDAO.isDocumentTypeValidated(studentId, idTypeDocument)) {
                 restriction = Optional.of(ALREADY_VALIDATED_MESSAGE);
-            } else if (idTypeDocument == ACCEPTANCE_LETTER_TYPE_ID
+            } else if (idTypeDocument == ACCEPTANCE_LETTER_TYPE_ID || idTypeDocument == ACTIVITY_CRONOGRAM_ID
                 && !studentDAO.hasProjectAssigned(studentId)) {
                 restriction = Optional.of(NO_PROJECT_MESSAGE);
             } else if (isGeneratedDocument(idTypeDocument)
                 && !generatedDocumentExists(idTypeDocument, studentId)) {
                 restriction = Optional.of(NOT_SAVED_MESSAGE);
+            } else if (idTypeDocument == ORGANIZATION_EVALUATION && !expedientDAO.isFinalReportValidated(studentId)) {
+                restriction = Optional.of(NO_FINAL_REPORT);
             }
         }
         return restriction;
