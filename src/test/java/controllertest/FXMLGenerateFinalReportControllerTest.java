@@ -73,9 +73,6 @@ public class FXMLGenerateFinalReportControllerTest extends ApplicationTest {
     private static final String NEGATIVE_ADVANCE = "-1";
 
     private static final String EXPECTED_NO_ACTIVITY_1_MESSAGE = "Seleccione Actividad 1";
-    private static final String EXPECTED_NO_ACTIVITY_2_MESSAGE = "Seleccione Actividad 2";
-    private static final String EXPECTED_EMPTY_ADVANCE_1_MESSAGE =
-        "Porcentaje de Avance de Actividad 1 no puede estar vacío";
     private static final String EXPECTED_INVALID_ADVANCE_1_MESSAGE =
         "Porcentaje de Avance de Actividad 1 debe ser un número entero válido";
     private static final String EXPECTED_NEGATIVE_ADVANCE_1_MESSAGE =
@@ -86,10 +83,6 @@ public class FXMLGenerateFinalReportControllerTest extends ApplicationTest {
         "Entregable 1 no puede estar vacío";
     private static final String EXPECTED_EMPTY_RESULT_ADVANCE_1_MESSAGE =
         "Porcentaje de Avance de Entregable 1 no puede estar vacío";
-    private static final String EXPECTED_EMPTY_OBSERVATION_RESULT_1_MESSAGE =
-        "Observación de Entregable 1 no puede estar vacío";
-    private static final String EXPECTED_EMPTY_RESULT_2_MESSAGE =
-        "Entregable 2 no puede estar vacío";
     private static final String EXPECTED_EMPTY_GENERAL_OBSERVATIONS_MESSAGE =
         "Observaciones Generales no puede estar vacío";
     private static final String EXPECTED_OPERATION_ERROR_MESSAGE = "Error de operación de prueba";
