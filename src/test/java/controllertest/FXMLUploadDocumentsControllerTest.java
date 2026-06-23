@@ -51,7 +51,7 @@ public class FXMLUploadDocumentsControllerTest extends ApplicationTest {
     private static final String LOAD_DOCUMENT_TYPES_METHOD = "loadDocumentTypes";
     private static final String LOAD_STUDENT_DOCUMENTS = "loadStudentDocuments";
 
-    private static final String BUTTON_UPLOAD_DOCUMENT_SELECTOR = "#buttonUpLoadDocument";
+    private static final String BUTTON_UPLOAD_DOCUMENT_SELECTOR = "#buttonUploadDocument";
     private static final String COMBOBOX_DOCUMENTS = "#comboBoxDocuments";
 
     private static final String VALID_STUDENT_ID = "S24013322";

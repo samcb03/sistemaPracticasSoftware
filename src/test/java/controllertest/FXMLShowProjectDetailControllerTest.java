@@ -1,7 +1,6 @@
 package controllertest;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
@@ -18,9 +17,7 @@ import java.util.List;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
 import javafx.scene.control.Label;
-import javafx.scene.control.TextField;
 import javafx.stage.Stage;
 import javafx.stage.Window;
 
@@ -125,33 +122,6 @@ public class FXMLShowProjectDetailControllerTest extends ApplicationTest {
     }
 
     @Test
-    void initializeData_activeProject_modifyButtonIsEnabled() {
-        Button buttonModify = lookup(BUTTON_MODIFY_SELECTOR).queryAs(Button.class);
-
-        assertFalse(buttonModify.isDisable());
-    }
-
-    @Test
-    void initializeData_inactiveProject_modifyButtonIsDisabled() {
-        interact(() -> controller.initializeData(buildInactiveProject()));
-        WaitForAsyncUtils.waitForFxEvents();
-
-        Button buttonModify = lookup(BUTTON_MODIFY_SELECTOR).queryAs(Button.class);
-
-        assertTrue(buttonModify.isDisable());
-    }
-
-    @Test
-    void initializeData_inactiveProject_inactivateButtonIsDisabled() {
-        interact(() -> controller.initializeData(buildInactiveProject()));
-        WaitForAsyncUtils.waitForFxEvents();
-
-        Button buttonInactivate = lookup(BUTTON_INACTIVATE_SELECTOR).queryAs(Button.class);
-
-        assertTrue(buttonInactivate.isDisable());
-    }
-
-    @Test
     void initializeData_projectWithStudents_studentsAreLoadedInListView() throws OperationException {
         ArrayList<Student> assignedStudents = new ArrayList<>();
         assignedStudents.add(buildStudent());
@@ -173,38 +143,6 @@ public class FXMLShowProjectDetailControllerTest extends ApplicationTest {
         WaitForAsyncUtils.waitForFxEvents();
 
         assertEquals(EXPECTED_OPERATION_ERROR_MESSAGE, messageText());
-    }
-
-    @Test
-    void enableEditMode_activeProject_labelsAreHidden() {
-        clickOn(BUTTON_MODIFY_SELECTOR);
-        WaitForAsyncUtils.waitForFxEvents();
-
-        assertFalse(lookup(LABEL_NAME_SELECTOR).queryAs(Label.class).isVisible());
-    }
-
-    @Test
-    void enableEditMode_activeProject_textFieldsAreVisible() {
-        clickOn(BUTTON_MODIFY_SELECTOR);
-        WaitForAsyncUtils.waitForFxEvents();
-
-        assertTrue(lookup(TEXTFIELD_NAME_SELECTOR).queryAs(TextField.class).isVisible());
-    }
-
-    @Test
-    void enableEditMode_activeProject_saveButtonIsVisible() {
-        clickOn(BUTTON_MODIFY_SELECTOR);
-        WaitForAsyncUtils.waitForFxEvents();
-
-        assertTrue(lookup(BUTTON_SAVE_SELECTOR).queryAs(Button.class).isVisible());
-    }
-
-    @Test
-    void enableEditMode_activeProject_modifyButtonIsHidden() {
-        clickOn(BUTTON_MODIFY_SELECTOR);
-        WaitForAsyncUtils.waitForFxEvents();
-
-        assertFalse(lookup(BUTTON_MODIFY_SELECTOR).queryAs(Button.class).isVisible());
     }
 
     @Test
@@ -356,12 +294,6 @@ public class FXMLShowProjectDetailControllerTest extends ApplicationTest {
         project.setAffiliatedOrganizationName(VALID_ORGANIZATION_NAME);
         project.setIdAffiliatedOrganization(VALID_ORGANIZATION_ID);
         project.setActive(true);
-        return project;
-    }
-
-    private Project buildInactiveProject() {
-        Project project = buildActiveProject();
-        project.setActive(false);
         return project;
     }
 

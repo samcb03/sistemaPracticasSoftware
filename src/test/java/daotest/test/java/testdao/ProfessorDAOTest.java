@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 
 import java.lang.reflect.Field;
@@ -23,6 +24,7 @@ import org.mockito.MockitoAnnotations;
 
 import uv.lis.dataaccess.MySQLConnectionManager;
 import uv.lis.logic.dao.ProfessorDAO;
+import uv.lis.logic.dao.UserDAO;
 import uv.lis.logic.dto.Professor;
 import uv.lis.logic.exceptions.OperationException;
 
@@ -46,11 +48,12 @@ class ProfessorDAOTest {
     private static final String SECOND_LAST_NAME = "García";
     private static final String FULL_NAME = "Juan Pérez";
     private static final String SECOND_FULL_NAME = "María García";
-    private static final String NRC = "NRC: 1 — Cálculo — ISW (2024-1)";
-    private static final String SECOND_NRC = "NRC: 2 — Álgebra — ISW (2024-1)";
+    private static final String NRC = "NRC: 1 — 32432 — Ingeniería de Software (Enero-Junio)";
+    private static final String SECOND_NRC = "NRC: 2 — 45423 — Ingeniería de Software (Enero-Junio)";
     private static final String PREFIX = "ABC";
     private static final String CONNECTION_ERROR = "Fallo";
     private static final String CONNECTION_MANAGER_FIELD = "connectionManager";
+    private static final String PASSWORD_DEFAULT = "Dsokgm02";
 
     private static final String COLUMN_NAME = "nombre";
     private static final String COLUMN_LAST_NAME = "apellidos";
@@ -63,10 +66,10 @@ class ProfessorDAOTest {
     private static final String COLUMN_CAREER = "carrera";
     private static final String COLUMN_PERIOD = "periodo";
 
-    private static final String NRC_VALUE_ONE = "Cálculo";
-    private static final String NRC_VALUE_TWO = "Álgebra";
-    private static final String CAREER_VALUE = "ISW";
-    private static final String PERIOD_VALUE = "2024-1";
+    private static final String NRC_VALUE_ONE = "32432";
+    private static final String NRC_VALUE_TWO = "45423";
+    private static final String CAREER_VALUE = "Ingeniería de Software";
+    private static final String PERIOD_VALUE = "Enero-Junio";
     private static final int NRC_NUMBER_ONE = 1;
     private static final int NRC_NUMBER_TWO = 2;
 
@@ -84,6 +87,11 @@ class ProfessorDAOTest {
         Field field = ProfessorDAO.class.getDeclaredField(CONNECTION_MANAGER_FIELD);
         field.setAccessible(true);
         field.set(professorDAO, connectionManager);
+
+        Field userField = UserDAO.class.getDeclaredField(CONNECTION_MANAGER_FIELD);
+        userField.setAccessible(true);
+        userField.set(professorDAO, connectionManager);
+
         when(connectionManager.getConnection()).thenReturn(databaseConnection);
     }
 
@@ -94,6 +102,7 @@ class ProfessorDAOTest {
         professor.setFirstName(FIRST_NAME);
         professor.setLastName(LAST_NAME);
         professor.setIsCoordinator(false);
+        professor.setPassword(PASSWORD_DEFAULT);
         return professor;
     }
 
@@ -104,6 +113,7 @@ class ProfessorDAOTest {
         professor.setFirstName(FIRST_NAME);
         professor.setLastName(LAST_NAME);
         professor.setIsCoordinator(true);
+        professor.setPassword(PASSWORD_DEFAULT);
         return professor;
     }
 
@@ -200,7 +210,14 @@ class ProfessorDAOTest {
     @Test
     void registerProfessor_successful_returnsTrue() throws Exception {
         when(databaseConnection.prepareStatement(anyString())).thenReturn(preparedStatement);
+        when(databaseConnection.prepareStatement(anyString(), eq(PreparedStatement.RETURN_GENERATED_KEYS)))
+        .thenReturn(preparedStatement);
         when(preparedStatement.executeUpdate()).thenReturn(ROWS_AFFECTED);
+        when(resultSet.next()).thenReturn(false);
+        when(preparedStatement.executeUpdate()).thenReturn(ROWS_AFFECTED);
+        when(preparedStatement.getGeneratedKeys()).thenReturn(resultSet);
+        when(resultSet.next()).thenReturn(true);
+        when(resultSet.getInt(COLUMN_USER_ID)).thenReturn(USER_ID);
 
         assertTrue(professorDAO.registerProfessor(buildProfessor()));
     }
@@ -208,9 +225,14 @@ class ProfessorDAOTest {
     @Test
     void registerProfessor_noRowsAffected_throwsOperationException() throws Exception {
         when(databaseConnection.prepareStatement(anyString())).thenReturn(preparedStatement);
+        when(databaseConnection.prepareStatement(anyString(), eq(PreparedStatement.RETURN_GENERATED_KEYS)))
+            .thenReturn(preparedStatement);
+        when(preparedStatement.executeQuery()).thenReturn(resultSet);
+        when(resultSet.next()).thenReturn(false);
         when(preparedStatement.executeUpdate()).thenReturn(NO_ROWS);
 
-        assertThrows(OperationException.class, () -> professorDAO.registerProfessor(buildProfessor()));
+        assertThrows(OperationException.class,
+            () -> professorDAO.registerProfessor(buildProfessor()));
     }
 
     @Test
