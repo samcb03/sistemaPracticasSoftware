@@ -5,20 +5,18 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
 
 import uv.lis.logic.dto.Professor;
 import uv.lis.logic.dto.Student;
 import uv.lis.logic.utils.SessionManager;
 
-@ExtendWith(MockitoExtension.class)
 class SessionManagerTest {
 
     @Mock private Student student;
@@ -28,6 +26,9 @@ class SessionManagerTest {
 
     @BeforeEach
     void setUp() {
+        student = mock(Student.class);
+        professor = mock(Professor.class);
+ 
         sessionManager = SessionManager.getInstance();
         sessionManager.clearSession();
     }

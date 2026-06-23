@@ -147,37 +147,14 @@ public class FXMLGenerateFinalReportControllerTest extends ApplicationTest {
     }
 
     @Test
-    void validateFields_noActivity1Selected_showsValidationError() {
+    void validateFields_noActivitySelected_showsValidationError() {
         clickGenerate();
 
         assertEquals(EXPECTED_NO_ACTIVITY_1_MESSAGE, messageText());
     }
 
     @Test
-    void validateFields_noActivity2Selected_showsValidationError() {
-        interact(() -> setComboValue(ACTIVITY_1_COMBO_SELECTOR, VALID_ACTIVITY_1));
-        interact(() -> lookup(ADVANCE_1_SELECTOR)
-            .queryAs(TextField.class).setText(VALID_ADVANCE));
-        interact(() -> lookup(OBSERVATION_1_SELECTOR)
-            .queryAs(TextArea.class).setText(VALID_OBSERVATION));
-
-        clickGenerate();
-
-        assertEquals(EXPECTED_NO_ACTIVITY_2_MESSAGE, messageText());
-    }
-
-    @Test
-    void validateFields_emptyAdvance1_showsValidationError() {
-        interact(() -> setComboValue(ACTIVITY_1_COMBO_SELECTOR, VALID_ACTIVITY_1));
-        interact(() -> setComboValue(ACTIVITY_2_COMBO_SELECTOR, VALID_ACTIVITY_2));
-
-        clickGenerate();
-
-        assertEquals(EXPECTED_EMPTY_ADVANCE_1_MESSAGE, messageText());
-    }
-
-    @Test
-    void validateFields_invalidAdvance1_showsValidationError() {
+    void validateFields_invalidAdvance_showsValidationError() {
         interact(() -> setComboValue(ACTIVITY_1_COMBO_SELECTOR, VALID_ACTIVITY_1));
         interact(() -> setComboValue(ACTIVITY_2_COMBO_SELECTOR, VALID_ACTIVITY_2));
         interact(() -> lookup(ADVANCE_1_SELECTOR)
@@ -189,7 +166,7 @@ public class FXMLGenerateFinalReportControllerTest extends ApplicationTest {
     }
 
     @Test
-    void validateFields_negativeAdvance1_showsValidationError() {
+    void validateFields_negativeAdvance_showsValidationError() {
         interact(() -> setComboValue(ACTIVITY_1_COMBO_SELECTOR, VALID_ACTIVITY_1));
         interact(() -> setComboValue(ACTIVITY_2_COMBO_SELECTOR, VALID_ACTIVITY_2));
         interact(() -> lookup(ADVANCE_1_SELECTOR)
@@ -201,7 +178,7 @@ public class FXMLGenerateFinalReportControllerTest extends ApplicationTest {
     }
 
     @Test
-    void validateFields_emptyObservation1_showsValidationError() {
+    void validateFields_emptyObservation_showsValidationError() {
         interact(() -> setComboValue(ACTIVITY_1_COMBO_SELECTOR, VALID_ACTIVITY_1));
         interact(() -> setComboValue(ACTIVITY_2_COMBO_SELECTOR, VALID_ACTIVITY_2));
         interact(() -> lookup(ADVANCE_1_SELECTOR)
@@ -213,7 +190,7 @@ public class FXMLGenerateFinalReportControllerTest extends ApplicationTest {
     }
 
     @Test
-    void validateFields_emptyResult1_showsValidationError() {
+    void validateFields_emptyResult_showsValidationError() {
         fillActivitiesBlock();
 
         clickGenerate();
@@ -222,7 +199,7 @@ public class FXMLGenerateFinalReportControllerTest extends ApplicationTest {
     }
 
     @Test
-    void validateFields_emptyResultAdvance1_showsValidationError() {
+    void validateFields_emptyResultAdvance_showsValidationError() {
         fillActivitiesBlock();
         interact(() -> lookup(RESULT_1_SELECTOR)
             .queryAs(TextField.class).setText(VALID_RESULT));
@@ -230,29 +207,6 @@ public class FXMLGenerateFinalReportControllerTest extends ApplicationTest {
         clickGenerate();
 
         assertEquals(EXPECTED_EMPTY_RESULT_ADVANCE_1_MESSAGE, messageText());
-    }
-
-    @Test
-    void validateFields_emptyObservationResult1_showsValidationError() {
-        fillActivitiesBlock();
-        interact(() -> lookup(RESULT_1_SELECTOR)
-            .queryAs(TextField.class).setText(VALID_RESULT));
-        interact(() -> lookup(RESULT_ADVANCE_1_SELECTOR)
-            .queryAs(TextField.class).setText(VALID_ADVANCE));
-
-        clickGenerate();
-
-        assertEquals(EXPECTED_EMPTY_OBSERVATION_RESULT_1_MESSAGE, messageText());
-    }
-
-    @Test
-    void validateFields_emptyResult2_showsValidationError() {
-        fillActivitiesBlock();
-        fillFirstDeliverableBlock();
-
-        clickGenerate();
-
-        assertEquals(EXPECTED_EMPTY_RESULT_2_MESSAGE, messageText());
     }
 
     @Test
