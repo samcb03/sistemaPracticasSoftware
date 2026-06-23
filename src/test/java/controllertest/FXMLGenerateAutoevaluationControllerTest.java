@@ -9,8 +9,11 @@ import static org.mockito.Mockito.when;
 
 import java.io.IOException;
 import java.lang.reflect.Field;
+import java.lang.reflect.Method;
+import java.net.URL;
 import java.util.Arrays;
 import java.util.List;
+import java.util.ResourceBundle;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.awt.EventQueue;
@@ -65,8 +68,8 @@ public class FXMLGenerateAutoevaluationControllerTest extends ApplicationTest {
     private static final String VALID_STUDENT_NAME = "Denisse";
     private static final String VALID_STUDENT_LASTNAME = "Reyes";
     private static final String VALID_ORGANIZATION = "Universidad Veracruzana";
-    private static final String VALID_PROJECT = "Optimización de redes neuronales convolucionales";
-    private static final String VALID_SUPERVISOR = "Paola";
+    private static final String VALID_PROJECT = "Analisis de requerimientos";
+    private static final String VALID_SUPERVISOR = "Sandra Paola Gutierrez";
 
     private static final String EXPECTED_NOT_ALL_ANSWERED_MESSAGE = "Por favor, responda todas las preguntas" 
         + " antes de generar.";
@@ -83,12 +86,34 @@ public class FXMLGenerateAutoevaluationControllerTest extends ApplicationTest {
     @Override
     public void start(Stage stage) {
         primaryStage = stage;
-        SessionManager.getInstance().setCurrentStudent(buildStudent());
+
+        Student testStudent = buildStudent();
+        SessionManager.getInstance().setCurrentStudent(testStudent);
+
+        autoevaluationCommonMock = mock(AutoevaluationCommon.class);
+        autoevaluationDAOMock = mock(AutoevaluationDAO.class);
+        expedientDAOMock = mock(ExpedientDAO.class);
+
+        try {
+            when(expedientDAOMock.isFinalReportValidated(any())).thenReturn(true);
+            when(autoevaluationDAOMock.getAutoevaluationData(anyString()))
+                .thenReturn(buildAutoevaluation());
+        } catch (OperationException e) {
+            LOGGER.log(Level.SEVERE, "Error configurando mocks", e);
+        }
 
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource(AUTOEVALUATION_VIEW_FXML));
+            loader.setControllerFactory(controllerClass -> {
+                FXMLGenerateAutoevaluationController controller = new FXMLGenerateAutoevaluationController();
+                injectField(AUTOEVALUATION_COMMON_FIELD, autoevaluationCommonMock, controller);
+                injectField(AUTOEVALUATION_DAO_FIELD, autoevaluationDAOMock, controller);
+                injectField(EXPEDIENT_DAO_FIELD, expedientDAOMock, controller);
+                return controller;
+            });
             Parent root = loader.load();
             autoevaluationController = loader.getController();
+
             stage.setScene(new Scene(root));
             stage.show();
         } catch (IOException ioException) {
@@ -98,17 +123,6 @@ public class FXMLGenerateAutoevaluationControllerTest extends ApplicationTest {
 
     @BeforeEach
     void setUpMocks() throws OperationException {
-        autoevaluationCommonMock = mock(AutoevaluationCommon.class);
-        autoevaluationDAOMock = mock(AutoevaluationDAO.class);
-        expedientDAOMock = mock(ExpedientDAO.class);
-
-        when(expedientDAOMock.isFinalReportValidated(anyString())).thenReturn(true);
-        when(autoevaluationDAOMock.getAutoevaluationData(anyString()))
-            .thenReturn(buildAutoevaluation());
-
-        injectField(AUTOEVALUATION_COMMON_FIELD, autoevaluationCommonMock, autoevaluationController);
-        injectField(AUTOEVALUATION_DAO_FIELD, autoevaluationDAOMock, autoevaluationController);
-        injectField(EXPEDIENT_DAO_FIELD, expedientDAOMock, autoevaluationController);
 
         interact(() -> clearLabelMessage());
         WaitForAsyncUtils.waitForFxEvents();
@@ -174,6 +188,7 @@ public class FXMLGenerateAutoevaluationControllerTest extends ApplicationTest {
  
         fillAllQuestions();
         clickGenerate();
+        WaitForAsyncUtils.waitForFxEvents();
  
         assertEquals(EXPECTED_JR_ERROR_MESSAGE, messageText());
     }
@@ -226,6 +241,17 @@ public class FXMLGenerateAutoevaluationControllerTest extends ApplicationTest {
         clickOn(GENERATE_BUTTON_SELECTOR);
         WaitForAsyncUtils.waitForFxEvents();
     }
+
+    private void reinitializeController(FXMLGenerateAutoevaluationController controller) {
+    try {
+        Method initMethod = FXMLGenerateAutoevaluationController.class
+            .getMethod("initialize", URL.class, ResourceBundle.class);
+        initMethod.setAccessible(true);
+        initMethod.invoke(controller, null, null);
+    } catch (ReflectiveOperationException e) {
+        LOGGER.log(Level.SEVERE, "Error al re-inicializar el controlador", e);
+    }
+}
 
     private void clearLabelMessage() {
         lookup(MESSAGE_LABEL_SELECTOR).queryAs(Label.class).setText("");
