@@ -10,7 +10,7 @@
 <?import javafx.scene.layout.RowConstraints?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane prefHeight="750.0" prefWidth="950.0" xmlns="http://javafx.com/javafx/26" xmlns:fx="http://javafx.com/fxml/1" fx:controller="uv.lis.GUI.controller.FXMLGenerateMonthlyReportController">
+<AnchorPane prefHeight="750.0" prefWidth="950.0" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="uv.lis.GUI.controller.FXMLGenerateMonthlyReportController">
    <children>
 
       <Label layoutX="0.0" layoutY="0.0" prefHeight="20.0" prefWidth="950.0" style="-fx-background-color: #a8c8e8; -fx-border-color: BLACK;" text="Generar Reporte Mensual" />
@@ -125,7 +125,7 @@
                   <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
                </rowConstraints>
                <children>
-                  <Label text="Periodo">
+                  <Label>
                      <font><Font name="System Bold" size="14.0" /></font>
                   </Label>
                   <Label text="Actividad" GridPane.columnIndex="1" GridPane.halignment="CENTER">
@@ -135,31 +135,31 @@
                      <font><Font name="System Bold" size="14.0" /></font>
                   </Label>
 
-                  <Label text="Semana 1" GridPane.rowIndex="1" />
+                  <Label text="Actividad 1" GridPane.rowIndex="1" />
                   <Label fx:id="labelActivity1" text="" wrapText="true" GridPane.columnIndex="1" GridPane.rowIndex="1" />
                   <Label fx:id="labelObservation1" text="" wrapText="true" GridPane.columnIndex="2" GridPane.rowIndex="1" />
 
-                  <Label text="Semana 2" GridPane.rowIndex="2" />
+                  <Label text="Actividad 2" GridPane.rowIndex="2" />
                   <Label fx:id="labelActivity2" text="" wrapText="true" GridPane.columnIndex="1" GridPane.rowIndex="2" />
                   <Label fx:id="labelObservation2" text="" wrapText="true" GridPane.columnIndex="2" GridPane.rowIndex="2" />
 
-                  <Label text="Semana 3" GridPane.rowIndex="3" />
+                  <Label text="Actividad 3" GridPane.rowIndex="3" />
                   <Label fx:id="labelActivity3" text="" wrapText="true" GridPane.columnIndex="1" GridPane.rowIndex="3" />
                   <Label fx:id="labelObservation3" text="" wrapText="true" GridPane.columnIndex="2" GridPane.rowIndex="3" />
 
-                  <Label text="Semana 4" GridPane.rowIndex="4" />
+                  <Label text="Actividad 4" GridPane.rowIndex="4" />
                   <Label fx:id="labelActivity4" text="" wrapText="true" GridPane.columnIndex="1" GridPane.rowIndex="4" />
                   <Label fx:id="labelObservation4" text="" wrapText="true" GridPane.columnIndex="2" GridPane.rowIndex="4" />
 
-                  <Label text="Semana 5" GridPane.rowIndex="5" />
+                  <Label text="Actividad 5" GridPane.rowIndex="5" />
                   <Label fx:id="labelActivity5" text="" wrapText="true" GridPane.columnIndex="1" GridPane.rowIndex="5" />
                   <Label fx:id="labelObservation5" text="" wrapText="true" GridPane.columnIndex="2" GridPane.rowIndex="5" />
 
-                  <Label text="Semana 6" GridPane.rowIndex="6" />
+                  <Label text="Actividad 6" GridPane.rowIndex="6" />
                   <Label fx:id="labelActivity6" text="" wrapText="true" GridPane.columnIndex="1" GridPane.rowIndex="6" />
                   <Label fx:id="labelObservation6" text="" wrapText="true" GridPane.columnIndex="2" GridPane.rowIndex="6" />
 
-                  <Label text="Semana 7" GridPane.rowIndex="7" />
+                  <Label text="Actividad 7" GridPane.rowIndex="7" />
                   <Label fx:id="labelActivity7" text="" wrapText="true" GridPane.columnIndex="1" GridPane.rowIndex="7" />
                   <Label fx:id="labelObservation7" text="" wrapText="true" GridPane.columnIndex="2" GridPane.rowIndex="7" />
                </children>

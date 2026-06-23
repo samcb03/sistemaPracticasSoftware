@@ -42,7 +42,7 @@
                     </font>
                 </Label>
 
-                <Button fx:id="buttonUpLoadDocument" layoutX="85.0" layoutY="348.0" mnemonicParsing="false" onAction="#uploadDocument" prefHeight="28.0" prefWidth="146.0" style="-fx-background-color: white;" text="Seleccionar Archivo" />
+                <Button fx:id="buttonUploadDocument" layoutX="85.0" layoutY="348.0" mnemonicParsing="false" onAction="#uploadDocument" prefHeight="28.0" prefWidth="146.0" style="-fx-background-color: white;" text="Seleccionar Archivo" />
 
               <Button fx:id="buttonBack" layoutX="276.0" layoutY="350.0" mnemonicParsing="false" onAction="#goBack" prefHeight="18.0" prefWidth="62.0" style="-fx-background-color: white;" text="Cancelar" />
             <TableView fx:id="tableViewFiles" layoutX="30.0" layoutY="106.0" prefHeight="200.0" prefWidth="390.0">

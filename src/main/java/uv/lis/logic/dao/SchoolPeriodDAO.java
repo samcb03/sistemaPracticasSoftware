@@ -49,6 +49,33 @@ public class SchoolPeriodDAO implements ISchoolPeriodDAO{
     }
 
     @Override
+    public Optional<SchoolPeriod> getSchoolPeriodByStudentId(String studentId) throws OperationException {
+        Optional<SchoolPeriod> studentPeriod = Optional.empty();
+        String schoolPeriodQuery = "SELECT pe.idPeriodoEscolar, pe.nombre, pe.FechaInicio, pe.FechaFin "
+                                 + "FROM Alumno_Esta_EE aee "
+                                 + "INNER JOIN ExperienciaEducativa ee ON aee.NRC = ee.NRC "
+                                 + "INNER JOIN PeriodoEscolar pe ON ee.idPeriodoEscolar = pe.idPeriodoEscolar "
+                                 + "WHERE aee.matricula = ? "
+                                 + "ORDER BY pe.FechaInicio DESC LIMIT 1";
+
+        try (Connection databaseConnection = connectionManager.getConnection();
+            PreparedStatement preparedStatement = databaseConnection.prepareStatement(schoolPeriodQuery)) {
+
+            preparedStatement.setString(1, studentId);
+
+            try (ResultSet resultSet = preparedStatement.executeQuery()) {
+                if (resultSet.next()) {
+                    studentPeriod = Optional.of(mapSchoolPeriod(resultSet));
+                }
+            }
+        } catch (SQLException e) {
+            LOGGER.log(Level.SEVERE, "Error de conexion con la base de datos", e);
+            throw new OperationException("Error al obtener el periodo escolar del alumno", e);
+        }
+        return studentPeriod;
+    }
+
+    @Override
     public Optional<String> getSchoolPeriodIdByName(String periodName) throws OperationException {
         Optional<String> validatePeriodId = Optional.empty();
         String schoolPeriodQuery = "SELECT idPeriodoEscolar FROM PeriodoEscolar WHERE nombre = ?";
@@ -146,5 +173,14 @@ public class SchoolPeriodDAO implements ISchoolPeriodDAO{
             throw new OperationException("Error al validar el periodo escolar", e);
         }
         return exists;
+    }
+
+    private SchoolPeriod mapSchoolPeriod(ResultSet resultSet) throws SQLException {
+        SchoolPeriod schoolPeriod = new SchoolPeriod();
+        schoolPeriod.setId(resultSet.getInt("idPeriodoEscolar"));
+        schoolPeriod.setName(resultSet.getString("nombre"));
+        schoolPeriod.setStartDate(resultSet.getDate("FechaInicio"));
+        schoolPeriod.setEndDate(resultSet.getDate("FechaFin"));
+        return schoolPeriod;
     }
 }

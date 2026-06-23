@@ -1,10 +1,10 @@
 package uv.lis.GUI.controller;
 
+import static uv.lis.logic.utils.DateValidator.validatePeriodEndDate;
+import static uv.lis.logic.utils.DateValidator.validatePeriodStartDate;
 import static uv.lis.logic.utils.InputValidator.PERIOD_TERM_FALL;
 import static uv.lis.logic.utils.InputValidator.PERIOD_TERM_SPRING;
 import static uv.lis.logic.utils.InputValidator.validateComboBox;
-import static uv.lis.logic.utils.InputValidator.validatePeriodEndDate;
-import static uv.lis.logic.utils.InputValidator.validatePeriodStartDate;
 
 import java.net.URL;
 import java.sql.Date;

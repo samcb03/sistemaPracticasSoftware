@@ -45,6 +45,9 @@ class SchoolPeriodDAOTest {
 
     private static final String COLUMN_NAME = "nombre";
     private static final String COLUMN_PERIOD_ID = "idPeriodoEscolar";
+    private static final String COLUMN_START_DATE = "FechaInicio";
+    private static final String COLUMN_END_DATE = "FechaFin";
+    private static final String VALID_STUDENT_ID = "S24013322";
 
     @Mock private MySQLConnectionManager connectionManager;
     @Mock private Connection databaseConnection;
@@ -135,6 +138,35 @@ class SchoolPeriodDAOTest {
 
         assertThrows(OperationException.class,
             () -> schoolPeriodDAO.getSchoolPeriodIdByName(FIRST_PERIOD_NAME));
+    }
+
+    @Test
+    void getSchoolPeriodByStudentId_found_returnsExpectedPeriod() throws Exception {
+        mockQueryExecution();
+        when(resultSet.next()).thenReturn(true);
+        when(resultSet.getInt(COLUMN_PERIOD_ID)).thenReturn(VALID_PERIOD_ID);
+        when(resultSet.getString(COLUMN_NAME)).thenReturn(PERIOD_CODE);
+        when(resultSet.getDate(COLUMN_START_DATE)).thenReturn(Date.valueOf(START_DATE));
+        when(resultSet.getDate(COLUMN_END_DATE)).thenReturn(Date.valueOf(END_DATE));
+
+        assertEquals(Optional.of(builderSchoolPeriod()),
+            schoolPeriodDAO.getSchoolPeriodByStudentId(VALID_STUDENT_ID));
+    }
+
+    @Test
+    void getSchoolPeriodByStudentId_notFound_returnsEmptyOptional() throws Exception {
+        mockQueryExecution();
+        when(resultSet.next()).thenReturn(false);
+
+        assertTrue(schoolPeriodDAO.getSchoolPeriodByStudentId(VALID_STUDENT_ID).isEmpty());
+    }
+
+    @Test
+    void getSchoolPeriodByStudentId_sqlError_throwsOperationException() throws Exception {
+        when(connectionManager.getConnection()).thenThrow(new SQLException(DATABASE_ERROR_MESSAGE));
+
+        assertThrows(OperationException.class,
+            () -> schoolPeriodDAO.getSchoolPeriodByStudentId(VALID_STUDENT_ID));
     }
 
     @Test

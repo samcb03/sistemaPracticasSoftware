@@ -20,6 +20,15 @@ public interface ISchoolPeriodDAO {
     ArrayList<String> getAllSchoolPeriodsNames() throws OperationException;
 
     /**
+     * Retrieves the school period a student is currently enrolled in.
+     *
+     * @param studentId the enrollment of the student to look up
+     * @return the enrolled school period with its date range if it exists, empty otherwise
+     * @throws OperationException if the school period cannot be retrieved
+     */
+    Optional<SchoolPeriod> getSchoolPeriodByStudentId(String studentId) throws OperationException;
+
+    /**
      * Retrieves the identifier of a school period from its name.
      *
      * @param periodName the name of the school period to look up

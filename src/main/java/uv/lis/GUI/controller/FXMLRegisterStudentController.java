@@ -1,8 +1,8 @@
 package uv.lis.GUI.controller;
 
+import static uv.lis.logic.utils.DateValidator.validateBirthDate;
 import static uv.lis.logic.utils.InputValidator.STUDENT_ENROLLMENT;
 import static uv.lis.logic.utils.InputValidator.STUDENT_ID_LENGTH;
-import static uv.lis.logic.utils.InputValidator.validateBirthDate;
 import static uv.lis.logic.utils.InputValidator.validateComboBox;
 import static uv.lis.logic.utils.InputValidator.validateEmail;
 import static uv.lis.logic.utils.InputValidator.validateExactLength;

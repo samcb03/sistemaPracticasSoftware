@@ -13,6 +13,7 @@ public class MonthlyReport extends Report {
     private String month;
     private int year;
     private String coordinatorName;
+    private String projectSupervisor;
     private int accumulatedHours;
     private int reportedHours;
     private int reportNumber;
@@ -51,6 +52,14 @@ public class MonthlyReport extends Report {
 
     public void setCoordinatorName(String coordinatorName) {
         this.coordinatorName = coordinatorName;
+    }
+
+    public String getProjectSupervisor() {
+        return projectSupervisor;
+    }
+
+    public void setProjectSupervisor(String projectSupervisor) {
+        this.projectSupervisor = projectSupervisor;
     }
 
     public int getAccumulatedHours() {

@@ -1,6 +1,7 @@
 package uv.lis.GUI.controller;
 
 import static uv.lis.logic.utils.InputValidator.validatePositiveInteger;
+import static uv.lis.logic.utils.InputValidator.validateRegister;
 import static uv.lis.logic.utils.InputValidator.validateText;
 
 import java.net.URL;
@@ -131,7 +132,7 @@ public class FXMLShowProjectDetailController extends ValidationHandler {
 
     private Optional<String> validateInputs() {
         return Stream.of(
-            validateText(textFieldName.getText(), "El nombre del proyecto"),
+            validateRegister(textFieldName.getText(), "El nombre del proyecto"),
             validateText(textAreaDescription.getText(), "La descripción"),
             validateText(textFieldObjective.getText(), "El objetivo"),
             validateText(textFieldMethodology.getText(), "La metodología"),
