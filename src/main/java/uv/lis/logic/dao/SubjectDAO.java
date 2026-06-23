@@ -83,7 +83,7 @@ public class SubjectDAO implements ISubjectDAO {
     @Override
     public ArrayList<String> getAllSubjectsNrcName() throws OperationException {
         ArrayList<String> subjects = new ArrayList<>();
-        String subjectQuery = "SELECT ee.NRC, ee.nombreExperiencia "
+        String subjectQuery = "SELECT ee.NRC, ee.nombreExperiencia, pe.nombre as PeriodoEscolar "
                             + "FROM ExperienciaEducativa ee "
                             + "INNER JOIN PeriodoEscolar pe "
                             + "ON ee.idPeriodoEscolar = pe.idPeriodoEscolar "
@@ -95,7 +95,8 @@ public class SubjectDAO implements ISubjectDAO {
 
             while (resultSet.next()) {
                 String formatted = resultSet.getInt("NRC") + " - "
-                                 + resultSet.getString("nombreExperiencia");
+                                 + resultSet.getString("nombreExperiencia") + " - "
+                                 + resultSet.getString("PeriodoEscolar");
                 subjects.add(formatted);
             }
 
