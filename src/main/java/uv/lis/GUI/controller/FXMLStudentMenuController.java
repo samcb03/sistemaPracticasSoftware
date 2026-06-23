@@ -21,6 +21,7 @@ public class FXMLStudentMenuController extends ValidationHandler {
     private static final String PENDING_DOCUMENTS_MESSAGE = 
         "Debe subir sus documentos iniciales y esperar a que el profesor los valide";
     private static final int AUTOEVALUATION_DOCUMENT_TYPE = 1;
+    private static final int EVALUATION_DOCUMENT_TYPE = 12;
 
     @FXML private Button buttonRequestProject;
     @FXML private Button buttonReports;
@@ -128,9 +129,11 @@ public class FXMLStudentMenuController extends ValidationHandler {
     @FXML 
     public void goToFinishWindows() {
         try {
-            boolean validatedAutoevaluation = expedientDAO.isDocumentTypeValidated(student.getIdStudent(), 
+            boolean isAutoevaluationValidated = expedientDAO.isDocumentTypeValidated(student.getIdStudent(), 
                 AUTOEVALUATION_DOCUMENT_TYPE);
-            if(validatedAutoevaluation) {
+            boolean isOrganizationEvaluationValidated = expedientDAO.isDocumentTypeValidated(student.getIdStudent(), 
+                EVALUATION_DOCUMENT_TYPE);
+            if(isAutoevaluationValidated && isOrganizationEvaluationValidated) {
                 navigateTo("/uv/lis/GUI/view/FXMLFinishWindow.fxml");
             } else {
                 showError("Debe completar y validar la autoevaluación");

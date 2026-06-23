@@ -138,7 +138,7 @@ public class FXMLGenerateAutoevaluationControllerTest extends ApplicationTest {
 
  
     @Test
-    void generateAutoevaluation_validData_registerAutoevaluation() throws Exception {
+    void generateAutoevaluation_validData_generatesReport() throws Exception {
         JasperPrint jasperPrint = new JasperPrint();
         jasperPrint.setName("TestAutoevaluation");
         jasperPrint.setPageWidth(595);
@@ -146,14 +146,13 @@ public class FXMLGenerateAutoevaluationControllerTest extends ApplicationTest {
         jasperPrint.addPage(new JRBasePrintPage());
  
         when(autoevaluationCommonMock.generateAutoevaluation(any())).thenReturn(jasperPrint);
-        when(autoevaluationDAOMock.registerAutoevaluation(any())).thenReturn(true);
-        
+
         fillAllQuestions();
         clickGenerate();
  
         WaitForAsyncUtils.waitForFxEvents();
 
-        verify(autoevaluationDAOMock).registerAutoevaluation(any());
+        verify(autoevaluationCommonMock).generateAutoevaluation(any());
     }
 
     @Test
