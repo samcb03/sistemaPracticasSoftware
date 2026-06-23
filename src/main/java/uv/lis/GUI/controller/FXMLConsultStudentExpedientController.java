@@ -44,6 +44,7 @@ public class FXMLConsultStudentExpedientController extends ValidationHandler {
 
     private static final int LAST_REPORT_TYPE_ID = 4;
     private static final int FIRST_INITIAL_DOCUMENT_TYPE_ID = 5;
+    private static final int LAST_INITIAL_DOCUMENT_TYPE_ID = 11;
 
     private static final String TOTAL_FORMAT = "Total: %d documento(s)";
     private static final String REVIEW_SUCCESS_MESSAGE = "Estatus del documento actualizado correctamente";
@@ -190,7 +191,9 @@ public class FXMLConsultStudentExpedientController extends ValidationHandler {
     }
 
     private boolean isInitialDocument(Expedient expedient) {
-        boolean isInitialDocumentType = expedient.getIdTypeDocument() >= FIRST_INITIAL_DOCUMENT_TYPE_ID;
+        int idTypeDocument = expedient.getIdTypeDocument();
+        boolean isInitialDocumentType = idTypeDocument >= FIRST_INITIAL_DOCUMENT_TYPE_ID
+            && idTypeDocument <= LAST_INITIAL_DOCUMENT_TYPE_ID;
         return isInitialDocumentType;
     }
 
