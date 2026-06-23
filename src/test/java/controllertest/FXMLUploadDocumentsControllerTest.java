@@ -15,8 +15,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import javax.management.RuntimeErrorException;
-
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -48,13 +46,11 @@ public class FXMLUploadDocumentsControllerTest extends ApplicationTest {
     private static final String STUDENT_FIELD = "student";
     private static final String REPORT_DAO_FIELD = "reportDAO";
     private static final String AUTOEVALUATION_DAO_FIELD = "autoevaluationDAO";
-    private static final String AUTOEVALUATION_FIELD = "autoevaluation";
     private static final String LABEL_MESSAGE_ERROR = "#labelError";
 
     private static final String LOAD_DOCUMENT_TYPES_METHOD = "loadDocumentTypes";
     private static final String LOAD_STUDENT_DOCUMENTS = "loadStudentDocuments";
 
-    private static final String BUTTON_BACK_SELECTOR = "#buttonBack";
     private static final String BUTTON_UPLOAD_DOCUMENT_SELECTOR = "#buttonUpLoadDocument";
     private static final String COMBOBOX_DOCUMENTS = "#comboBoxDocuments";
 
@@ -73,13 +69,12 @@ public class FXMLUploadDocumentsControllerTest extends ApplicationTest {
     private static final String EXPECTED_NO_TYPE_MESSAGE = "Seleccione un tipo de documento.";
     private static final String EXPECTED_NO_PROJECT_MESSAGE =
         "La carta de aceptación solo puede subirse cuando ya tenga un proyecto asignado.";
-    private static final String EXPECTED_NOT_SAVED_MESSAGE =
+    private static final String EXPECTED_NOT_SAVED_MESSAGE = 
         "Este documento solo puede subirse cuando ya esté generado.";
     private static final String EXPECTED_ALREADY_VALIDATED_MESSAGE =
         "Este documento ya fue validado y no puede subirse nuevamente.";
     private static final String EXPECTED_LOAD_TYPES_ERROR = "Error al cargar documentos";
-    private static final String EXPECTED_LOAD_DOCUMENTS_ERROR =
-        "Error al cargar los documentos subidos";
+    private static final String EXPECTED_LOAD_DOCUMENTS_ERROR = "Error al cargar los documentos subidos";
     private static final String EXPECTED_OPERATION_ERROR_MESSAGE = "Error de operación de prueba";
     private static final String EXPECTED_NO_DOCUMENTS_MESSAGE = "Aún no ha subido documentos.";
 
@@ -144,8 +139,7 @@ public class FXMLUploadDocumentsControllerTest extends ApplicationTest {
     }
 
     @Test
-    void uploadDocument_noDocumentTypeSelected_doesNotCallExpedientDAO()
-        throws OperationException {
+    void uploadDocument_noDocumentTypeSelected_doesNotCallExpedientDAO() throws OperationException {
             clickOn(BUTTON_UPLOAD_DOCUMENT_SELECTOR);
             WaitForAsyncUtils.waitForFxEvents();
             verify(expedientDAOMock, never()).getIdDocumentTypeByName(anyString());
@@ -167,8 +161,7 @@ public class FXMLUploadDocumentsControllerTest extends ApplicationTest {
     }
 
     @Test
-    void uploadDocument_autoevaluationNotGenerated_showsNotSavedMessage()
-            throws OperationException {
+    void uploadDocument_autoevaluationNotGenerated_showsNotSavedMessage() throws OperationException {
         when(expedientDAOMock.getIdDocumentTypeByName(DOCUMENT_TYPE_AUTOEVALUATION))
             .thenReturn(Optional.of(DOCUMENT_TYPE_ID_AUTOEVALUATION));
         when(expedientDAOMock.isDocumentTypeValidated(anyString(), anyInt())).thenReturn(false);
@@ -182,8 +175,7 @@ public class FXMLUploadDocumentsControllerTest extends ApplicationTest {
     }
 
     @Test
-    void uploadDocument_documentAlreadyValidated_showsAlreadyValidatedMessage()
-            throws OperationException {
+    void uploadDocument_documentAlreadyValidated_showsAlreadyValidatedMessage() throws OperationException {
         when(expedientDAOMock.getIdDocumentTypeByName(DOCUMENT_TYPE_AUTOEVALUATION))
             .thenReturn(Optional.of(DOCUMENT_TYPE_ID_AUTOEVALUATION));
         when(expedientDAOMock.isDocumentTypeValidated(VALID_STUDENT_ID, DOCUMENT_TYPE_ID_AUTOEVALUATION))
@@ -197,8 +189,7 @@ public class FXMLUploadDocumentsControllerTest extends ApplicationTest {
     }
 
     @Test
-    void uploadDocument_monthlyReportNoPending_showsNotSavedMessage()
-            throws OperationException {
+    void uploadDocument_monthlyReportNoPending_showsNotSavedMessage() throws OperationException {
         when(expedientDAOMock.getIdDocumentTypeByName(DOCUMENT_TYPE_MONTHLY_REPORT))
             .thenReturn(Optional.of(DOCUMENT_TYPE_ID_MONTHLY_REPORT));
         when(expedientDAOMock.isDocumentTypeValidated(anyString(), anyInt())).thenReturn(false);
@@ -214,8 +205,7 @@ public class FXMLUploadDocumentsControllerTest extends ApplicationTest {
     }
 
     @Test
-    void uploadDocument_restrictionCheckThrowsOperationException_showsErrorMessage()
-            throws OperationException {
+    void uploadDocument_restrictionCheckThrowsOperationException_showsErrorMessage() throws OperationException {
         OperationException operationException =
             new OperationException(EXPECTED_OPERATION_ERROR_MESSAGE, null);
         when(expedientDAOMock.getIdDocumentTypeByName(anyString())).thenThrow(operationException);
@@ -228,8 +218,7 @@ public class FXMLUploadDocumentsControllerTest extends ApplicationTest {
     }
 
     @Test
-    void loadDocumentTypes_daoThrowsOperationException_showsLoadTypesError()
-            throws OperationException {
+    void loadDocumentTypes_daoThrowsOperationException_showsLoadTypesError() throws OperationException {
         OperationException operationException =
             new OperationException(EXPECTED_OPERATION_ERROR_MESSAGE, null);
         when(expedientDAOMock.getAllDocumentsTypes()).thenThrow(operationException);
@@ -240,8 +229,7 @@ public class FXMLUploadDocumentsControllerTest extends ApplicationTest {
     }
 
     @Test
-    void loadStudentDocuments_daoThrowsOperationException_showsLoadDocumentsError()
-            throws OperationException {
+    void loadStudentDocuments_daoThrowsOperationException_showsLoadDocumentsError() throws OperationException {
         OperationException operationException =
             new OperationException(EXPECTED_OPERATION_ERROR_MESSAGE, null);
         when(expedientDAOMock.getDocumentsByStudentId(anyString())).thenThrow(operationException);

@@ -300,7 +300,7 @@ public class FXMLGenerateMonthlyReportController extends ValidationHandler {
                 int currentReported = reportContextDAO.getSumOfReportedHours(context.getIdProject(), month, year);
                 int newAccumulated = previousAccumulated + currentReported;
 
-                if (!advanceDAO.existsAdvanceForReport(context.getIdReport())) {
+                if (!advanceDAO.existsAdvanceForReport(report.getId())) {
                     Advance advance = new Advance();
                     advance.setProjectId(context.getIdProject());
                     advance.setReportId(report.getId());
@@ -310,7 +310,7 @@ public class FXMLGenerateMonthlyReportController extends ValidationHandler {
 
                 } else {
                     LOGGER.log(Level.INFO, "Ya existe un avance registrado para el reporte ID {0}. "
-                        + "Se omitirá el registro de avance.", context.getIdReport());
+                        + "Se omitirá el registro de avance.", report.getId());
                 }
 
                 showSuccess(REPORT_GENERATED_MESSAGE);

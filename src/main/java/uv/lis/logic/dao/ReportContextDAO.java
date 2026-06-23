@@ -344,15 +344,18 @@ public class ReportContextDAO implements IReportContextDAO {
 
     private void fillMonthlyReportContext(MonthlyReport monthlyReport, ResultSet resultSet) throws SQLException {
         String studentFullName = resultSet.getString("nombreAlumno") + " " + resultSet.getString("apellidosAlumno");
+        String professorFullName = resultSet.getString("nombreAcademico") + " "
+            + resultSet.getString("apellidosAcademico");
         monthlyReport.setStudentName(studentFullName);
         monthlyReport.setPeriod(resultSet.getString("periodoPrincipal"));
-        monthlyReport.setProfessorName(resultSet.getString("nombreAcademico"));
+        monthlyReport.setProfessorName(professorFullName);
         monthlyReport.setCoordinatorName(resultSet.getString("nombreCoordinador"));
         monthlyReport.setNrcSubject(resultSet.getString("nrc"));
         monthlyReport.setMonth(resultSet.getString("mes"));
         monthlyReport.setReportNumber(resultSet.getInt("numeroReporte"));
         monthlyReport.setIdProject(resultSet.getInt("idProyecto"));
         monthlyReport.setIdReport(resultSet.getInt("idReporte"));
+        monthlyReport.setProjectSupervisor(resultSet.getString("nombreResponsable"));
         String seccion = resultSet.getString("seccion");
         monthlyReport.setSection(seccion != null ?  seccion : "Sin sección");
     }

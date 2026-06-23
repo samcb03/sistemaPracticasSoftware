@@ -1,6 +1,5 @@
 package uv.lis.logic.common;
 
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -24,7 +23,6 @@ import uv.lis.logic.dto.MonthlyReport;
 import uv.lis.logic.dto.Student;
 import uv.lis.logic.exceptions.OperationException;
 import uv.lis.logic.utils.SessionManager;
-
 
 public class MonthlyReportCommon {
 
@@ -97,6 +95,7 @@ public class MonthlyReportCommon {
         report.setSection(context.getSection());
         report.setPeriod(context.getPeriod());
         report.setProfessorName(context.getProfessorName());
+        report.setProjectSupervisor(context.getProjectSupervisor());
         report.setYear(extractYearFromPeriod(context.getPeriod()));
  
     }
@@ -114,7 +113,7 @@ public class MonthlyReportCommon {
         parameters.put("Mes", report.getMonth());
         parameters.put("HorasReportadas", String.valueOf(report.getReportedHours()));
         parameters.put("NombreAlumno", report.getStudentName());
-        parameters.put("NombreResponsable", report.getCoordinatorName());
+        parameters.put("NombreResponsable", report.getProjectSupervisor());
         parameters.put("numeroReporte", String.valueOf(report.getReportNumber()));
         parameters.put("HorasAcumuladas", String.valueOf(report.getAccumulatedHours()));
         parameters.put("Bloque", report.getBlock());

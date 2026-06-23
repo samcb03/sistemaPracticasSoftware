@@ -2,8 +2,6 @@ package utilstest;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import java.time.LocalDate;
-
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 
@@ -205,46 +203,6 @@ class InputValidatorTest {
         assertEquals(hasError, result);
     }
 
-    @ParameterizedTest
-    @CsvSource({
-        "20, false",
-        "10, true",
-        "-1, true"
-    })
-    void validateBirthDate_variousAges_returnsExpectedResult(int yearsAgo, boolean hasError) {
-        LocalDate birthDate = LocalDate.now().minusYears(yearsAgo);
-
-        boolean result = InputValidator.validateBirthDate(birthDate, FIELD_NAME).isPresent();
-
-        assertEquals(hasError, result);
-    }
-
-    @ParameterizedTest
-    @CsvSource({
-        "5, false",
-        "-5, true"
-    })
-    void validateStartDate_variousDates_returnsExpectedResult(int daysFromNow, boolean hasError) {
-        LocalDate startDate = LocalDate.now().plusDays(daysFromNow);
-
-        boolean result = InputValidator.validateStartDate(startDate, FIELD_NAME).isPresent();
-
-        assertEquals(hasError, result);
-    }
-
-    @ParameterizedTest
-    @CsvSource({
-        "10, false",
-        "-10, true"
-    })
-    void validateEndDate_variousDates_returnsExpectedResult(int daysAfterStart, boolean hasError) {
-        LocalDate startDate = LocalDate.now();
-        LocalDate endDate = startDate.plusDays(daysAfterStart);
-
-        boolean result = InputValidator.validateEndDate(startDate, endDate, FIELD_NAME).isPresent();
-
-        assertEquals(hasError, result);
-    }
 
     @ParameterizedTest
     @CsvSource({

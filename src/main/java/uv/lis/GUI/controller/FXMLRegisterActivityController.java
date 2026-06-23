@@ -1,8 +1,9 @@
 package uv.lis.GUI.controller;
 
-import static uv.lis.logic.utils.InputValidator.validateEndDate;
+import static uv.lis.logic.utils.DateValidator.validateDateWithinPeriod;
+import static uv.lis.logic.utils.DateValidator.validateEndDate;
+import static uv.lis.logic.utils.DateValidator.validateRecentStartDate;
 import static uv.lis.logic.utils.InputValidator.validatePositiveInteger;
-import static uv.lis.logic.utils.InputValidator.validateRecentStartDate;
 import static uv.lis.logic.utils.InputValidator.validateRegister;
 import static uv.lis.logic.utils.InputValidator.validateText;
 import static uv.lis.logic.utils.InputValidator.validateMaxHoursForDuration;
@@ -24,8 +25,10 @@ import java.time.temporal.ChronoUnit;
 import uv.lis.GUI.ValidationHandler;
 import uv.lis.logic.dao.ActivityDAO;
 import uv.lis.logic.dao.ProjectDAO;
+import uv.lis.logic.dao.SchoolPeriodDAO;
 import uv.lis.logic.dto.Activity;
 import uv.lis.logic.dto.Project;
+import uv.lis.logic.dto.SchoolPeriod;
 import uv.lis.logic.dto.Student;
 import uv.lis.logic.exceptions.OperationException;
 import uv.lis.logic.utils.SessionManager;
@@ -57,12 +60,15 @@ public class FXMLRegisterActivityController extends ValidationHandler {
 
     private ActivityDAO activityDAO;
     private ProjectDAO projectDAO;
+    private SchoolPeriodDAO schoolPeriodDAO;
+    private SchoolPeriod studentPeriod;
     private int currentProjectId;
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         activityDAO = new ActivityDAO();
         projectDAO = new ProjectDAO();
+        schoolPeriodDAO = new SchoolPeriodDAO();
         setupControls(labelError, buttonBack);
         loadStudentProject();
     }
@@ -80,6 +86,8 @@ public class FXMLRegisterActivityController extends ValidationHandler {
             validateText(textFieldDescription.getText(), DESCRIPTION_FIELD),
             validateRecentStartDate(datePickerStartDate.getValue(), START_DATE_FIELD),
             validateEndDate(datePickerStartDate.getValue(), datePickerFinalDate.getValue(), END_DATE_FIELD),
+            validateDateWithinPeriod(datePickerStartDate.getValue(), studentPeriod, START_DATE_FIELD),
+            validateDateWithinPeriod(datePickerFinalDate.getValue(), studentPeriod, END_DATE_FIELD),
             validatePositiveInteger(textFieldHours.getText().trim(), HOURS_FIELD),
             validateMaxHoursForDuration(textFieldHours.getText().trim(), durationInDays, HOURS_FIELD)
         );
@@ -100,6 +108,7 @@ public class FXMLRegisterActivityController extends ValidationHandler {
                 if (assignedProject.isPresent()) {
                     this.currentProjectId = assignedProject.get().getId();
                     labelProject.setText(assignedProject.get().getName());
+                    this.studentPeriod = schoolPeriodDAO.getSchoolPeriodByStudentId(studentId).orElse(null);
                 } else {
                     showError("No tienes ningún proyecto asignado para registrar actividades.");
                     disableForm();
@@ -125,11 +134,8 @@ public class FXMLRegisterActivityController extends ValidationHandler {
 
     private long calculateDurationInDays(LocalDate startDate, LocalDate endDate) {
         long durationInDays = 0;
-        if(startDate != null || endDate != null) {
-            showError("Tiene que elegir una fecha");
-            if(!endDate.isBefore(startDate)) {
-                durationInDays = ChronoUnit.DAYS.between(startDate, endDate) + COUNT_NEXT_DAY;
-            }
+        if (startDate != null && endDate != null && !endDate.isBefore(startDate)) {
+            durationInDays = ChronoUnit.DAYS.between(startDate, endDate) + COUNT_NEXT_DAY;
         }
         return durationInDays;
     }
