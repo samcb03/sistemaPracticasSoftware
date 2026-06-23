@@ -4,6 +4,7 @@ import static uv.lis.logic.utils.DateValidator.validateBirthDate;
 import static uv.lis.logic.utils.InputValidator.STUDENT_ID_LENGTH;
 import static uv.lis.logic.utils.InputValidator.validateComboBox;
 import static uv.lis.logic.utils.InputValidator.validateExactLength;
+import static uv.lis.logic.utils.InputValidator.validateIdStudent;
 import static uv.lis.logic.utils.InputValidator.validateText;
 
 import java.net.URL;
@@ -156,8 +157,8 @@ public class FXMLManageStudentController extends ValidationHandler {
     private void searchStudent() {
         clearFields();
         String studentId = textFieldStudentId.getText().trim();
-        Optional<String> validationError = validateExactLength(studentId, STUDENT_ID_LENGTH, "La matricula");
-
+        Optional<String> validationError = validateIdStudent(studentId, STUDENT_ID_LENGTH, " la matrícula");
+        
         if (validationError.isPresent()) {
             showError(validationError.get());
         } else {

@@ -429,7 +429,7 @@ public final class InputValidator {
         if (fieldValue.isEmpty() || fieldValue.length() != requiredLenght) {
             validationResult = Optional.of(fieldName + "debe tener exactamente " + requiredLenght + " caracteres");
         } else if (!fieldValue.matches(STUDENT_ENROLLMENT)) {
-            validationResult = Optional.of(fieldName + " no sigue el formato establecido empezando con una S ");
+            validationResult = Optional.of(fieldName + " no sigue el formato establecido ");
         } else {
             validationResult = Optional.empty();
         }
