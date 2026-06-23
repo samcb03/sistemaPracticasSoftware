@@ -25,6 +25,7 @@ import org.mockito.MockitoAnnotations;
 
 import uv.lis.dataaccess.MySQLConnectionManager;
 import uv.lis.logic.dao.StudentDAO;
+import uv.lis.logic.dao.UserDAO;
 import uv.lis.logic.dto.Student;
 import uv.lis.logic.exceptions.OperationException;
 
@@ -49,7 +50,7 @@ class StudentDAOTest {
     private static final String DATABASE_ERROR_MESSAGE = "Fallo";
     private static final String CONNECTION_MANAGER_FIELD = "connectionManager";
 
-    private static final String DEFAULT_PASSWORD = null;
+    private static final String DEFAULT_PASSWORD = "Dsokgm02";
     private static final String DEFAULT_EMAIL = null;
     private static final String DEFAULT_GENDER = null;
     private static final Date DEFAULT_BIRTH_DATE = null;
@@ -82,6 +83,10 @@ class StudentDAOTest {
         field.setAccessible(true);
         field.set(studentDAO, connectionManager);
 
+        Field userField = UserDAO.class.getDeclaredField(CONNECTION_MANAGER_FIELD);
+        userField.setAccessible(true);
+        userField.set(studentDAO, connectionManager);
+
         when(connectionManager.getConnection()).thenReturn(databaseConnection);
     }
 
@@ -94,6 +99,9 @@ class StudentDAOTest {
         when(databaseConnection.prepareStatement(anyString())).thenReturn(preparedStatement);
         when(databaseConnection.prepareStatement(anyString(), anyInt())).thenReturn(preparedStatement);
         when(preparedStatement.executeUpdate()).thenReturn(rowsAffected);
+        when(preparedStatement.getGeneratedKeys()).thenReturn(resultSet);
+        when(resultSet.next()).thenReturn(true);
+        when(resultSet.getInt(COLUMN_USER_ID)).thenReturn(EXPECTED_USER_ID);
     }
 
     private void mockResultSetSingleStudent() throws Exception {
