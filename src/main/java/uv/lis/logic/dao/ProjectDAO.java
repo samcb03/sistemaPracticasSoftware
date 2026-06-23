@@ -1,6 +1,6 @@
 package uv.lis.logic.dao;
 
-import static uv.lis.logic.utils.InputValidator.NO_ROWS_AFFECTED;
+import static uv.lis.logic.utils.InputValidator.NO_VALUE;
 import static uv.lis.logic.utils.InputValidator.STATUS_ASSIGNED;
 
 import java.sql.Connection;
@@ -115,7 +115,7 @@ public class ProjectDAO implements IProjectDAO{
             preparedStatement.setInt(7, project.getIdAffiliatedOrganization());
             preparedStatement.setInt(8, project.getIdSupervisor());
 
-            if (preparedStatement.executeUpdate() > NO_ROWS_AFFECTED) {
+            if (preparedStatement.executeUpdate() > NO_VALUE) {
                 try(ResultSet resultSet = preparedStatement.getGeneratedKeys()) {
                     if (resultSet.next()) {
                         int generatedId = resultSet.getInt(1);
@@ -156,7 +156,7 @@ public class ProjectDAO implements IProjectDAO{
             preparedStatement.setBoolean(6, true); 
             preparedStatement.setInt(7, project.getId());
 
-            if (preparedStatement.executeUpdate() > NO_ROWS_AFFECTED) {
+            if (preparedStatement.executeUpdate() > NO_VALUE) {
                 isModified = true;
                 LOGGER.log(Level.INFO, "Proyecto con ID {0} modificado con éxito.", project.getId());
             } else {
@@ -182,7 +182,7 @@ public class ProjectDAO implements IProjectDAO{
             preparedStatement.setBoolean(1, false);
             preparedStatement.setInt(2, project.getId());
 
-            if (preparedStatement.executeUpdate() > NO_ROWS_AFFECTED) {
+            if (preparedStatement.executeUpdate() > NO_VALUE) {
                 isInactive = true;
                 project.setActive(false);
             } else {

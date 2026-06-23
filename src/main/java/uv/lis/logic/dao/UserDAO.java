@@ -1,6 +1,6 @@
 package uv.lis.logic.dao;
 
-import static uv.lis.logic.utils.InputValidator.NO_ROWS_AFFECTED;
+import static uv.lis.logic.utils.InputValidator.NO_VALUE;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -69,7 +69,7 @@ public class UserDAO implements IUserDAO {
             preparedStatement.setInt(5, user.getRoleId());
             preparedStatement.setBoolean(6, user.isActive());
 
-            if (preparedStatement.executeUpdate() > NO_ROWS_AFFECTED) {
+            if (preparedStatement.executeUpdate() > NO_VALUE) {
                 try (ResultSet resultSet = preparedStatement.getGeneratedKeys()) {
                     if (!resultSet.next()) {
                         throw new OperationException("No se pudo obtener el ID generado.", null);
@@ -134,7 +134,7 @@ public class UserDAO implements IUserDAO {
 
             try (ResultSet resultSet = preparedStatement.executeQuery()) {
                 if (resultSet.next()) {
-                    exists = resultSet.getInt(1) > NO_ROWS_AFFECTED; 
+                    exists = resultSet.getInt(1) > NO_VALUE; 
                 }
             }
         } catch (SQLException e) {
@@ -156,7 +156,7 @@ public class UserDAO implements IUserDAO {
             preparedStatement.setBoolean(1, isActive);
             preparedStatement.setInt(2, userId);
 
-            isUpdated = preparedStatement.executeUpdate() > NO_ROWS_AFFECTED;
+            isUpdated = preparedStatement.executeUpdate() > NO_VALUE;
         } catch (SQLException e) {
             LOGGER.log(Level.SEVERE, "Error de conexion con la base de datos", e);
             throw new OperationException("No se pudo actualizar la preferencia de autenticación. "

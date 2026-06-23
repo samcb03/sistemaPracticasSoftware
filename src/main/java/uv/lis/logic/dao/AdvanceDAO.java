@@ -1,6 +1,6 @@
 package uv.lis.logic.dao;
 
-import static uv.lis.logic.utils.InputValidator.NO_ROWS_AFFECTED;
+import static uv.lis.logic.utils.InputValidator.NO_VALUE;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -41,7 +41,7 @@ public class AdvanceDAO implements IAdvanceDAO {
             preparedStatement.setInt(3, advance.getWeekNumber());
             preparedStatement.setInt(4, advance.getAccumulatedHours());
 
-            isRegistered = preparedStatement.executeUpdate() > NO_ROWS_AFFECTED;
+            isRegistered = preparedStatement.executeUpdate() > NO_VALUE;
         } catch (SQLException e) {
             LOGGER.log(Level.SEVERE, "Error al registrar avance", e);
             throw new OperationException("Error al registrar el avance", e);

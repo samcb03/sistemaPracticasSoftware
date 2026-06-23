@@ -1,6 +1,6 @@
 package uv.lis.logic.dao;
 
-import static uv.lis.logic.utils.InputValidator.NO_ROWS_AFFECTED;
+import static uv.lis.logic.utils.InputValidator.NO_VALUE;
 import static uv.lis.logic.utils.InputValidator.STATUS_ASSIGNED;
 
 import java.sql.Connection;
@@ -110,7 +110,7 @@ public class ActivityDAO implements IActivityDAO {
             preparedStatement.setInt(5, activity.getProjectId());
             preparedStatement.setInt(6, activity.getHoursReported());
 
-            if (preparedStatement.executeUpdate() > NO_ROWS_AFFECTED) {
+            if (preparedStatement.executeUpdate() > NO_VALUE) {
                 try (ResultSet generatedKeys = preparedStatement.getGeneratedKeys()) {
                     if (generatedKeys.next()) {
                         int generatedId = generatedKeys.getInt(1);
@@ -151,7 +151,7 @@ public class ActivityDAO implements IActivityDAO {
             preparedStatement.setInt(5, activity.getProjectId());
             preparedStatement.setInt(6, activity.getHoursReported());
 
-            if (preparedStatement.executeUpdate() > NO_ROWS_AFFECTED) {
+            if (preparedStatement.executeUpdate() > NO_VALUE) {
                 isModified = true;
             } else {
                 LOGGER.log(Level.WARNING, "No se pudo modificar la actividad con ID {0}.", activity.getId());
@@ -193,6 +193,30 @@ public class ActivityDAO implements IActivityDAO {
             throw new OperationException("Error al obtener las actividades", e);
         }
         return activities;
+    }
+ 
+    @Override
+    public int getTotalActivityHoursByProject(int projectId) throws OperationException {
+        int totalHours = 0;
+        String activityQuery = "SELECT COALESCE(SUM(horasReportadas), 0) AS total "
+                             + "FROM Actividad "
+                             + "WHERE idProyecto = ?";
+
+        try (Connection databaseConnection = connectionManager.getConnection();
+            PreparedStatement preparedStatement = databaseConnection.prepareStatement(activityQuery)) {
+
+            preparedStatement.setInt(1, projectId);
+
+            try (ResultSet resultSet = preparedStatement.executeQuery()) {
+                if (resultSet.next()) {
+                    totalHours = resultSet.getInt("total");
+                }
+            }
+        } catch (SQLException e) {
+            LOGGER.log(Level.SEVERE, "Error al acceder a la base de datos", e);
+            throw new OperationException("Error al obtener el total de horas registradas", e);
+        }
+        return totalHours;
     }
  
     private Activity mapActivity(ResultSet resultSet) throws SQLException {

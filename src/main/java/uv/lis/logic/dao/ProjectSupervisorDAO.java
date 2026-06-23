@@ -1,6 +1,6 @@
 package uv.lis.logic.dao;
 
-import static uv.lis.logic.utils.InputValidator.NO_ROWS_AFFECTED;
+import static uv.lis.logic.utils.InputValidator.NO_VALUE;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -122,7 +122,7 @@ public class ProjectSupervisorDAO implements IProjectSupervisorDAO {
             preparedStatement.setBoolean(4, projectSupervisor.getIsActive());
             preparedStatement.setInt(5,projectSupervisor.getOrganizationInt());
 
-            if (preparedStatement.executeUpdate() > NO_ROWS_AFFECTED) {
+            if (preparedStatement.executeUpdate() > NO_VALUE) {
                 isRegistered = true;
                 LOGGER.log(Level.INFO, "Supervisor del proyecto registrado exitosamente");
             } else {
@@ -153,7 +153,7 @@ public class ProjectSupervisorDAO implements IProjectSupervisorDAO {
             preparedStatement.setString(3, projectSupervisor.getEmail());
             preparedStatement.setInt(4, projectSupervisor.getId());
 
-            if (preparedStatement.executeUpdate() > NO_ROWS_AFFECTED) {
+            if (preparedStatement.executeUpdate() > NO_VALUE) {
                 isModified = true;
                 LOGGER.log(Level.INFO, "Supervisor modificado exitosamente");
             } else {
@@ -181,7 +181,7 @@ public class ProjectSupervisorDAO implements IProjectSupervisorDAO {
 
             preparedStatement.setString(1,projectSupervisorName);
 
-            if (preparedStatement.executeUpdate() > NO_ROWS_AFFECTED) {
+            if (preparedStatement.executeUpdate() > NO_VALUE) {
                 isInactive = true;
                 LOGGER.log(Level.INFO, "Supervisor dado de baja exitosamente");
             } else {

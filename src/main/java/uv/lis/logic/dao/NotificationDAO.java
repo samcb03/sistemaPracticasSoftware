@@ -1,7 +1,7 @@
 package uv.lis.logic.dao;
 
 import static uv.lis.logic.utils.InputValidator.INVALID_ID;
-import static uv.lis.logic.utils.InputValidator.NO_ROWS_AFFECTED;
+import static uv.lis.logic.utils.InputValidator.NO_VALUE;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -97,7 +97,7 @@ public class NotificationDAO implements INotificationDAO {
             preparedStatement.setBoolean(1, true);
             preparedStatement.setInt(2, idNotification);
 
-            if (preparedStatement.executeUpdate() > NO_ROWS_AFFECTED) {
+            if (preparedStatement.executeUpdate() > NO_VALUE) {
                 isUpdated = true;
             }
         } catch (SQLException e) {

@@ -7,7 +7,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
-import static uv.lis.logic.utils.InputValidator.NO_ROWS_AFFECTED;
+import static uv.lis.logic.utils.InputValidator.NO_VALUE;
 
 import java.lang.reflect.Field;
 import java.sql.Connection;
@@ -228,7 +228,7 @@ class StudentDAOTest {
 
     @Test
     void registerStudent_noRowsAffected_throwsOperationException() throws Exception {
-        mockUpdateExecution(NO_ROWS_AFFECTED);
+        mockUpdateExecution(NO_VALUE);
 
         assertThrows(OperationException.class,
             () -> studentDAO.registerStudent(builderFirstStudent()));
@@ -251,7 +251,7 @@ class StudentDAOTest {
 
     @Test
     void modifyStudent_noRowsAffected_throwsOperationException() throws Exception {
-        mockUpdateExecution(NO_ROWS_AFFECTED);
+        mockUpdateExecution(NO_VALUE);
 
         assertThrows(OperationException.class,
             () -> studentDAO.modifyStudent(builderFirstStudent()));
@@ -274,7 +274,7 @@ class StudentDAOTest {
 
     @Test
     void inactivateStudent_noRowsAffected_throwsOperationException() throws Exception {
-        mockUpdateExecution(NO_ROWS_AFFECTED);
+        mockUpdateExecution(NO_VALUE);
 
         assertThrows(OperationException.class,
             () -> studentDAO.inactivateStudent(FIRST_STUDENT_ID));
@@ -292,7 +292,7 @@ class StudentDAOTest {
     void isStudentInactive_studentIsInactive_returnsTrue() throws Exception {
         mockQueryExecution();
         when(resultSet.next()).thenReturn(true);
-        when(resultSet.getInt(COLUMN_STATUS)).thenReturn(NO_ROWS_AFFECTED);
+        when(resultSet.getInt(COLUMN_STATUS)).thenReturn(NO_VALUE);
 
         assertTrue(studentDAO.isStudentInactive(FIRST_STUDENT_ID));
     }
@@ -362,7 +362,7 @@ class StudentDAOTest {
     void hasProjectAssigned_noAssignment_returnsFalse() throws Exception {
         mockQueryExecution();
         when(resultSet.next()).thenReturn(true);
-        when(resultSet.getInt(1)).thenReturn(NO_ROWS_AFFECTED);
+        when(resultSet.getInt(1)).thenReturn(NO_VALUE);
 
         assertFalse(studentDAO.hasProjectAssigned(FIRST_STUDENT_ID));
     }

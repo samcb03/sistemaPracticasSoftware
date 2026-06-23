@@ -1,6 +1,6 @@
 package uv.lis.logic.dao;
 
-import static uv.lis.logic.utils.InputValidator.NO_ROWS_AFFECTED;
+import static uv.lis.logic.utils.InputValidator.NO_VALUE;
 import static uv.lis.logic.utils.InputValidator.STATUS_ASSIGNED;
 
 import java.sql.Connection;
@@ -174,7 +174,7 @@ public class StudentDAO extends UserDAO implements IStudentDAO {
             preparedStatement.setDate(3, student.getBirthDate());
             preparedStatement.setString(4, student.getGender());
 
-            if (preparedStatement.executeUpdate() <= NO_ROWS_AFFECTED) {
+            if (preparedStatement.executeUpdate() <= NO_VALUE) {
                 throw new OperationException("El registro del alumno no afectó ninguna fila", null);
             }
         }
@@ -198,7 +198,7 @@ public class StudentDAO extends UserDAO implements IStudentDAO {
             preparedStatement.setString(4, student.getGender());
             preparedStatement.setString(5, student.getIdStudent());
 
-            if (preparedStatement.executeUpdate() > NO_ROWS_AFFECTED) {
+            if (preparedStatement.executeUpdate() > NO_VALUE) {
                 isModified = true;
                 LOGGER.log(Level.INFO, "Modificacion de alumno con matricula {0} exitosa.", student.getIdStudent());
             } else {
@@ -227,7 +227,7 @@ public class StudentDAO extends UserDAO implements IStudentDAO {
             preparedStatement.setInt(1, STATUS_INACTIVE);
             preparedStatement.setString(2, studentId);
 
-            if (preparedStatement.executeUpdate() > NO_ROWS_AFFECTED) {
+            if (preparedStatement.executeUpdate() > NO_VALUE) {
                 isInactive = true;
                 LOGGER.log(Level.INFO, "Inactivacion de alumno con matricula exitosa.", studentId);
             } else {
@@ -303,7 +303,7 @@ public class StudentDAO extends UserDAO implements IStudentDAO {
 
             try (ResultSet resultSet = preparedStatement.executeQuery()) {
                 if (resultSet.next()) {
-                    hasProject = resultSet.getInt(1) > NO_ROWS_AFFECTED;
+                    hasProject = resultSet.getInt(1) > NO_VALUE;
                 }
             }
         } catch (SQLException e) {

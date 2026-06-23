@@ -57,7 +57,6 @@ public class FXMLGeneratePartialReportController extends ValidationHandler {
 
     private static final int DEFAULT_REPORT_NUMBER = 1;
     private static final int INVALID_ADVANCE = 0;
-    private static final int MAX_ADVANCE = 100;
 
     private final PartialReportCommon partialReportCommon = new PartialReportCommon();
     private final ActivityDAO activityDAO = new ActivityDAO();
@@ -183,8 +182,8 @@ public class FXMLGeneratePartialReportController extends ValidationHandler {
     private Optional<String> validateFirstActivityRow() {
         Stream<Optional<String>> validationStream = Stream.of(
             InputValidator.validateComboBox(comboBoxActivity1.getValue(), "una actividad"),
-            InputValidator.validateMaxIntValue(
-                textFieldAdvance1.getText(),  MAX_ADVANCE,"Porcentaje de Avance de Actividad 1")
+            InputValidator.validatePercentage(
+                textFieldAdvance1.getText(), "Porcentaje de Avance de Actividad 1")
         );
 
         Optional<String> firstError = validationStream

@@ -1,6 +1,6 @@
 package uv.lis.logic.dao;
 
-import static uv.lis.logic.utils.InputValidator.NO_ROWS_AFFECTED;
+import static uv.lis.logic.utils.InputValidator.NO_VALUE;
 import static uv.lis.logic.utils.InputValidator.STATUS_ASSIGNED;
 
 import java.sql.Connection;
@@ -275,7 +275,7 @@ public class ReportContextDAO implements IReportContextDAO {
             preparedStatement.setString(2, month);
 
             try (ResultSet resultSet = preparedStatement.executeQuery()) {
-                isDuplicate = resultSet.next() && resultSet.getInt(1) > NO_ROWS_AFFECTED;
+                isDuplicate = resultSet.next() && resultSet.getInt(1) > NO_VALUE;
             }
         } catch (SQLException e) {
             LOGGER.log(Level.SEVERE, "Error al verificar duplicidad de reporte", e);

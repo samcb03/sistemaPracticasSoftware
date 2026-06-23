@@ -7,7 +7,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
-import static uv.lis.logic.utils.InputValidator.NO_ROWS_AFFECTED;
+import static uv.lis.logic.utils.InputValidator.NO_VALUE;
 
 import java.lang.reflect.Field;
 import java.sql.Connection;
@@ -124,7 +124,7 @@ class AutoevaluationDAOTest {
 
     @Test
     void registerAutoevaluation_noRowsAffected_throwsOperationException() throws Exception {
-        mockUpdateExecution(NO_ROWS_AFFECTED);
+        mockUpdateExecution(NO_VALUE);
 
         assertThrows(OperationException.class,
             () -> autoevaluationDAO.registerAutoevaluation(buildAutoevaluation()));

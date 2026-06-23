@@ -8,7 +8,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
-import static uv.lis.logic.utils.InputValidator.NO_ROWS_AFFECTED;
+import static uv.lis.logic.utils.InputValidator.NO_VALUE;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -193,7 +193,7 @@ class AffiliatedOrganizationDAOTest {
 
     @Test
     void registerOrganization_noRowsAffected_throwsOperationException() throws Exception {
-        mockGeneratedKeyUpdate(NO_ROWS_AFFECTED);
+        mockGeneratedKeyUpdate(NO_VALUE);
 
         assertThrows(OperationException.class,
             () -> affiliatedOrganizationDAO.registerOrganization(builderExpectedOrganization()));
@@ -217,7 +217,7 @@ class AffiliatedOrganizationDAOTest {
 
     @Test
     void modifyOrganization_noRowsAffected_throwsOperationException() throws Exception {
-        mockSimpleUpdate(NO_ROWS_AFFECTED);
+        mockSimpleUpdate(NO_VALUE);
 
         assertThrows(OperationException.class,
             () -> affiliatedOrganizationDAO.modifyOrganization(builderExpectedOrganization()));
@@ -241,7 +241,7 @@ class AffiliatedOrganizationDAOTest {
 
     @Test
     void inactivateOrganization_noRowsAffected_throwsOperationException() throws Exception {
-        mockSimpleUpdate(NO_ROWS_AFFECTED);
+        mockSimpleUpdate(NO_VALUE);
 
         assertThrows(OperationException.class,
             () -> affiliatedOrganizationDAO.inactivateOrganization(ORGANIZATION_NAME));

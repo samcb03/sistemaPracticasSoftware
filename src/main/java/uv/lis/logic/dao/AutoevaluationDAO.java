@@ -1,6 +1,6 @@
 package uv.lis.logic.dao;
 
-import static uv.lis.logic.utils.InputValidator.NO_ROWS_AFFECTED;
+import static uv.lis.logic.utils.InputValidator.NO_VALUE;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -101,7 +101,7 @@ public class AutoevaluationDAO implements IAutoevaluationDAO {
             preparedStatement.setInt(11, autoevaluation.getInternshipImportance());
             preparedStatement.setDouble(12, autoevaluation.getFinalScore());
 
-            if (preparedStatement.executeUpdate() > NO_ROWS_AFFECTED) {
+            if (preparedStatement.executeUpdate() > NO_VALUE) {
                 isRegistered = true;
                 LOGGER.log(Level.INFO, "Autoevaluación registrada para el alumno {0}", 
                     autoevaluation.getIdStudent());

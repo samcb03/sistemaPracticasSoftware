@@ -8,7 +8,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static uv.lis.logic.utils.InputValidator.NO_ROWS_AFFECTED;
+import static uv.lis.logic.utils.InputValidator.NO_VALUE;
 import static uv.lis.logic.utils.InputValidator.STATUS_ASSIGNED;
 
 import java.lang.reflect.Field;
@@ -241,7 +241,7 @@ class RequestProjectDAOTest {
 
     @Test
     void requestProject_noRowsAffected_returnsFalse() throws Exception {
-        mockUpdateExecution(NO_ROWS_AFFECTED);
+        mockUpdateExecution(NO_VALUE);
 
         assertFalse(requestProjectDAO.requestProject(FIRST_STUDENT_ID, FIRST_PROJECT_ID));
     }
