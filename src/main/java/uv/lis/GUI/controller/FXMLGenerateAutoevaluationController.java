@@ -98,9 +98,15 @@ public class FXMLGenerateAutoevaluationController extends ValidationHandler {
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        autoevaluationCommon = new AutoevaluationCommon();
-        autoevaluationDAO = new AutoevaluationDAO();
-        expedientDAO = new ExpedientDAO();
+        if (autoevaluationCommon == null) {
+                    autoevaluationCommon = new AutoevaluationCommon();
+        }
+        if (autoevaluationDAO == null) {
+            autoevaluationDAO = new AutoevaluationDAO();
+        }
+        if (expedientDAO == null) {
+            expedientDAO = new ExpedientDAO();
+        }
         currentStudent = SessionManager.getInstance().getCurrentStudent();
         setupControls(labelMessage, buttonBack);
         setupToggleGroups();
