@@ -82,9 +82,9 @@ public class SubjectDAO implements ISubjectDAO {
     }
     
     @Override
-    public ArrayList<String> getAllSubjectsNrcName() throws OperationException {
-        ArrayList<String> subjects = new ArrayList<>();
-        String subjectQuery = "SELECT ee.NRC, ee.nombreExperiencia, pe.nombre as PeriodoEscolar "
+    public ArrayList<Subject> getAllSubjectsNrcName() throws OperationException {
+        ArrayList<Subject> subjects = new ArrayList<>();
+        String subjectQuery = "SELECT ee.NRC, ee.nombreExperiencia, pe.nombre as PeriodoEscolar, pe.idPeriodoEscolar "
                             + "FROM ExperienciaEducativa ee "
                             + "INNER JOIN PeriodoEscolar pe "
                             + "ON ee.idPeriodoEscolar = pe.idPeriodoEscolar "
@@ -95,10 +95,12 @@ public class SubjectDAO implements ISubjectDAO {
             ResultSet resultSet = preparedStatement.executeQuery()) {
 
             while (resultSet.next()) {
-                String formatted = resultSet.getInt("NRC") + " - "
-                                 + resultSet.getString("nombreExperiencia") + " - "
-                                 + resultSet.getString("PeriodoEscolar");
-                subjects.add(formatted);
+                Subject subject = new Subject();
+                subject.setNrc(resultSet.getInt("NRC"));
+                subject.setName(resultSet.getString("nombreExperiencia"));
+                subject.setSchoolPeriodName(resultSet.getString("PeriodoEscolar"));
+                subject.setSchoolPeriodId(resultSet.getInt("idPeriodoEscolar"));
+                subjects.add(subject);
             }
 
         } catch (SQLException e) {
@@ -109,15 +111,16 @@ public class SubjectDAO implements ISubjectDAO {
     }
 
     @Override
-    public boolean assignStudentToSubject(String studentId, int subjectNrc) throws OperationException {
+    public boolean assignStudentToSubject(String studentId, int subjectNrc, int periodId) throws OperationException {
         boolean isAssigned = false;
-        String subjectQuery = "INSERT INTO alumno_esta_ee (matricula, NRC) VALUES (?, ?);";
+        String subjectQuery = "INSERT INTO alumno_esta_ee (matricula, NRC,idPeriodo) VALUES (?, ?,?);";
 
         try (Connection databaseConnection = connectionManager.getConnection();
             PreparedStatement preparedStatement = databaseConnection.prepareStatement(subjectQuery)) {
             
             preparedStatement.setString(1, studentId);
             preparedStatement.setInt(2, subjectNrc);
+            preparedStatement.setInt(3, periodId);
 
             if (preparedStatement.executeUpdate() > NO_VALUE) {
                 isAssigned = true;
