@@ -46,7 +46,6 @@ public class FXMLAssignStudentSubjectControllerTest extends ApplicationTest {
     private static final String MESSAGE_LABEL_SELECTOR = "#labelMessage";
 
     private static final int VALID_NRC = 50563;
-    private static final String VALID_SUBJECT = "50563 - Practicas Profesionales - Febrero-Julio 2026";
     private static final String VALID_STUDENT_ID = "S24013305";
     private static final String VALID_FIRST_NAME = "Ana";
     private static final String VALID_LAST_NAME = "Lopez";

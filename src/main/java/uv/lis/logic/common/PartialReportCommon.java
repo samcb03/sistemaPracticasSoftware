@@ -114,24 +114,51 @@ public class PartialReportCommon {
     }
 
     private void fillAdvanceMatrix(PartialReport partialReport, String studentId) throws OperationException {
-        List<Activity> selectedActivities = new ArrayList<>();
+        Activity[] resolvedActivities = resolveSelectedActivities(partialReport, studentId);
+        List<Activity> presentActivities = collectPresentActivities(resolvedActivities);
+
+        partialReport.setReportPeriod(buildReportPeriod(presentActivities));
+        partialReport.setReportPeriodStart(findEarliestStart(presentActivities));
+
+        if (!partialReport.isManualAdvances()) {
+            fillAutomaticAdvances(partialReport, resolvedActivities);
+        }
+    }
+
+    private Activity[] resolveSelectedActivities(PartialReport partialReport, String studentId)
+            throws OperationException {
+        Activity[] resolvedActivities = new Activity[PartialReport.MAX_ACTIVITIES];
         String[] activityNames = partialReport.getActivityNames();
-        boolean useManualAdvances = partialReport.isManualAdvances();
 
         for (int activityIndex = 0; activityIndex < PartialReport.MAX_ACTIVITIES; activityIndex++) {
             String activityName = activityNames[activityIndex];
 
             if (activityName != null && !activityName.isBlank()) {
-                Activity activity = resolveActivity(studentId, activityName);
-
-                if (!useManualAdvances) {
-                    fillActivityColumn(partialReport, activity, activityIndex);
-                }
-                selectedActivities.add(activity);
+                resolvedActivities[activityIndex] = resolveActivity(studentId, activityName);
             }
         }
+        return resolvedActivities;
+    }
 
-        partialReport.setReportPeriod(buildReportPeriod(selectedActivities));
+    private List<Activity> collectPresentActivities(Activity[] activities) {
+        List<Activity> presentActivities = new ArrayList<>();
+
+        for (Activity activity : activities) {
+            if (activity != null) {
+                presentActivities.add(activity);
+            }
+        }
+        return presentActivities;
+    }
+
+    private void fillAutomaticAdvances(PartialReport partialReport, Activity[] activities) {
+        for (int activityIndex = 0; activityIndex < PartialReport.MAX_ACTIVITIES; activityIndex++) {
+            Activity activity = activities[activityIndex];
+
+            if (activity != null) {
+                fillActivityColumn(partialReport, activity, activityIndex);
+            }
+        }
     }
 
     private Activity resolveActivity(String studentId, String activityName) throws OperationException {
@@ -144,16 +171,18 @@ public class PartialReportCommon {
     }
 
     private void fillActivityColumn(PartialReport partialReport, Activity activity, int activityIndex) {
+        LocalDate periodStart = partialReport.getReportPeriodStart();
+        int startWeek = WorkProgressCalculator.calculateStartWeekOffset(activity, periodStart);
         int activityWeeks = WorkProgressCalculator.calculateActivityWeeks(activity);
-        int totalWeeks = Math.min(activityWeeks, PartialReport.MAX_WEEKS);
         int plannedWeeklyAdvance = WorkProgressCalculator.calculateWeeklyPlannedAdvance(activity);
         int writtenRealAdvance = partialReport.getRealWeeklyAdvances()[activityIndex];
         int realWeeklyAdvance = WorkProgressCalculator.calculateWeeklyRealAdvance(writtenRealAdvance, activity);
 
+        int lastWeek = Math.min(startWeek + activityWeeks, PartialReport.MAX_WEEKS);
         int[][] plannedAdvances = partialReport.getPlannedAdvances();
         int[][] realAdvances = partialReport.getRealAdvances();
 
-        for (int weekIndex = 0; weekIndex < totalWeeks; weekIndex++) {
+        for (int weekIndex = startWeek; weekIndex < lastWeek; weekIndex++) {
             plannedAdvances[weekIndex][activityIndex] = plannedWeeklyAdvance;
             realAdvances[weekIndex][activityIndex] = realWeeklyAdvance;
         }
