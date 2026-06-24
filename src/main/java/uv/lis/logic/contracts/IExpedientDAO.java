@@ -134,4 +134,6 @@ public interface IExpedientDAO {
      * @throws OperationException if the student identifiers cannot be retrieved
      */
     List<String> getStudentIdsWithDocumentType(int nrc, int idTypeDocument) throws OperationException;
+
+    List<String> getStudentIdsWithLiberationLetter() throws OperationException;
 }

@@ -8,6 +8,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -311,5 +312,36 @@ public class StudentDAO extends UserDAO implements IStudentDAO {
             throw new OperationException("No se pudo verificar la asignación de proyecto. Intente más tarde", e);
         }
         return hasProject;
+    }
+
+    @Override
+    public List<Student> getStudentsByIds(List<String> studentIds) throws OperationException {
+        List<Student> students = new ArrayList<>();
+        String studentQuery = "SELECT a.matricula, u.nombre, u.apellidos "
+                            + "FROM Alumno a "
+                            + "INNER JOIN Usuario u ON a.idUsuario = u.idUsuario "
+                            + "WHERE a.matricula = ?";
+
+        try (Connection databaseConnection = connectionManager.getConnection();
+            PreparedStatement preparedStatement = databaseConnection.prepareStatement(studentQuery)) {
+
+            for (String studentId : studentIds) {
+                preparedStatement.setString(1, studentId);
+
+                try (ResultSet resultSet = preparedStatement.executeQuery()) {
+                    if (resultSet.next()) {
+                        Student student = new Student();
+                        student.setIdStudent(resultSet.getString("matricula"));
+                        student.setFirstName(resultSet.getString("nombre"));
+                        student.setLastName(resultSet.getString("apellidos"));
+                        students.add(student);
+                    }
+                }
+            }
+        } catch (SQLException e) {
+            LOGGER.log(Level.SEVERE, "Error al obtener alumnos por matrícula", e);
+            throw new OperationException("No se pudieron obtener los alumnos. Intente más tarde", e);
+        }
+        return students;
     }
 }

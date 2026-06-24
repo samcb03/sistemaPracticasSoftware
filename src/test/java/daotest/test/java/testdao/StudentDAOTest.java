@@ -390,4 +390,33 @@ class StudentDAOTest {
         assertThrows(OperationException.class,
             () -> studentDAO.hasProjectAssigned(FIRST_STUDENT_ID));
     }
+
+    @Test
+    void getStudentsByIds_studentsFound_returnsNonEmptyList() throws Exception {
+        mockQueryExecution();
+        mockResultSetTwoStudents();
+
+        assertFalse(studentDAO.getStudentsByIds(List.of(FIRST_STUDENT_ID, SECOND_STUDENT_ID)).isEmpty());
+    }
+
+    @Test
+    void getStudentsByIds_noStudentsFound_returnsEmptyList() throws Exception {
+        mockQueryExecution();
+        when(resultSet.next()).thenReturn(false);
+
+        assertTrue(studentDAO.getStudentsByIds(List.of(FIRST_STUDENT_ID)).isEmpty());
+    }
+
+    @Test
+    void getStudentsByIds_emptyList_returnsEmptyList() throws Exception {
+        assertTrue(studentDAO.getStudentsByIds(List.of()).isEmpty());
+    }
+
+    @Test
+    void getStudentsByIds_sqlError_throwsOperationException() throws Exception {
+        when(connectionManager.getConnection()).thenThrow(new SQLException(DATABASE_ERROR_MESSAGE));
+
+        assertThrows(OperationException.class,
+            () -> studentDAO.getStudentsByIds(List.of(FIRST_STUDENT_ID)));
+    }
 }
