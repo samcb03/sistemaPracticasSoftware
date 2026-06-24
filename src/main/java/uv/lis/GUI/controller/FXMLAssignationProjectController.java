@@ -189,7 +189,7 @@ public class FXMLAssignationProjectController extends ValidationHandler {
         if (project == null || applicantRow == null) {
             validationError = Optional.of("Seleccione un proyecto y un alumno de la lista.");
         } else {
-            validationError = InputValidator.validateNotEmpty(reason, REASON_FIELD);
+            validationError = InputValidator.validateDescriptiveText(reason, REASON_FIELD);
         }
 
         return validationError;

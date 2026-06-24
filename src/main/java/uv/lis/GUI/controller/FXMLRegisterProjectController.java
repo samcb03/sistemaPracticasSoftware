@@ -1,6 +1,7 @@
 package uv.lis.GUI.controller;
 
 import static uv.lis.logic.utils.InputValidator.validateComboBox;
+import static uv.lis.logic.utils.InputValidator.validateDescriptiveText;
 import static uv.lis.logic.utils.InputValidator.validateText;
 import static uv.lis.logic.utils.InputValidator.validatePositiveInteger;
 import static uv.lis.logic.utils.InputValidator.validateProjectCapacity;
@@ -97,8 +98,8 @@ public class FXMLRegisterProjectController extends ValidationHandler {
             validateText(textFieldMethodology.getText(), "La metodología"),
             formatError,
             capacityError,
-            validateText(textFieldObjective.getText(), "El objetivo"),
-            validateText(textAreaDescription.getText(), "La descripción"),
+            validateDescriptiveText(textFieldObjective.getText(), "El objetivo"),
+            validateDescriptiveText(textAreaDescription.getText(), "La descripción"),
             validateComboBox(comboBoxOrganizationName.getValue(), " organización"),
             validateComboBox(comboBoxResponsableName.getValue(), " responsable técnico")
         );

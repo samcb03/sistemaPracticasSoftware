@@ -48,6 +48,8 @@ public final class InputValidator {
     public static final String STUDENT_ENROLLMENT = "^[Ss]\\d{8}$";
     public static final String REGISTER_REGEX = "^[\\p{L}0-9\\s.,-]+$";
     public static final String ADDRESS_NUMBER_REGEX = "^[a-zA-Z0-9\\s/#-]+$";
+    public static final String REDACTER_REGEX = "^[\\p{L}\\s.,:!?()]+$";
+    private static final String INVALID_ENDING_REGEX = ".*[^\\p{L}.]$";
 
     /**
      * Verifies that a field is not null or blank.
@@ -560,12 +562,42 @@ public final class InputValidator {
     public static Optional<String> validateMaxHoursForDuration(String hoursValue, long durationInDays, 
         String fieldName) {
             Optional<String> validationResult;
-            if (durationInDays <= 0) {
+            if (durationInDays <= NO_VALUE) {
                 validationResult = Optional.empty();
             } else {
                 int maxAllowedHours =(int) durationInDays * MAX_HOURS_PER_DAY;
                 validationResult = validateMaxIntValue(hoursValue, maxAllowedHours, fieldName);
             }
+        return validationResult;
+    }
+
+    /**
+     * Verifies that a descriptive text field is not empty, does not exceed the character limit,
+     * contains only letters, spaces, and common punctuation marks used in writing, and ends
+     * with a letter or a period.
+     *
+     * @param fieldValue the value to evaluate
+     *
+     * @param fieldName the field label used in the error message
+     *
+     * @return the first error found, or empty if all rules pass
+     */
+    public static Optional<String> validateDescriptiveText(String fieldValue, String fieldName) {
+        Optional<String> validationResult;
+        if (!fieldValue.matches(REDACTER_REGEX)) {
+                validationResult = Optional.of(fieldName + " contiene caracteres no permitidos");
+        } else if (fieldValue.matches(INVALID_ENDING_REGEX)) {
+                validationResult = Optional.of(fieldName + " debe terminar con una letra o un punto");
+        } else {
+            validationResult = firstError(
+                validateNotEmpty(fieldValue, fieldName),
+                validateMaxLength(fieldValue, MAX_TEXT_LENGTH, fieldName),
+                validateNoLeadingSpace(fieldValue, fieldName),
+                validateNoTrailingSpace(fieldValue, fieldName),
+                validateNoConsecutiveSpaces(fieldValue, fieldName),
+                validateNoConsecutiveRepeatedCharacters(fieldValue, fieldName)
+            );
+        }
         return validationResult;
     }
 }

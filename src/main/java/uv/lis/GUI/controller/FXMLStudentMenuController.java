@@ -22,6 +22,7 @@ public class FXMLStudentMenuController extends ValidationHandler {
         "Debe subir sus documentos iniciales y esperar a que el profesor los valide";
     private static final int AUTOEVALUATION_DOCUMENT_TYPE = 1;
     private static final int EVALUATION_DOCUMENT_TYPE = 12;
+    private static final int LIBERATION_LETTER_DOCUMENT_TYPE = 13;
 
     @FXML private Button buttonRequestProject;
     @FXML private Button buttonReports;
@@ -42,17 +43,13 @@ public class FXMLStudentMenuController extends ValidationHandler {
         this.student = SessionManager.getInstance().getCurrentStudent();
         setupControls(labelMessage, buttonLogOut);
         try {
-            boolean isAutoevaluationValidated = expedientDAO.isDocumentTypeValidated(
-                student.getIdStudent(),AUTOEVALUATION_DOCUMENT_TYPE);
-            
-            if(isAutoevaluationValidated) {
-                navigateTo("/uv/lis/GUI/view/FXMLFinishWindow.fxml");
-            } else {
+            goToFinishWindows();
             disableActionsWithoutAssignedSubject();
             disableActionsWithoutAssignedProject();
             checkFinalReportValidation();
             disableActionsWithoutValidatedDocuments();
-            }
+            disableActionWithAssignedProject();
+
         } catch (OperationException e) {
             showError(e.getMessage());
         }
@@ -68,6 +65,13 @@ public class FXMLStudentMenuController extends ValidationHandler {
         if (NO_SUBJECT_MESSAGE.equals(subjectNRC)) {
             buttonRequestProject.setDisable(true);
             buttonReports.setDisable(true);
+        }
+    }
+
+    private void disableActionWithAssignedProject() throws OperationException {
+        String studentId = student.getIdStudent();
+        if(studentDAO.hasProjectAssigned(studentId)) {
+            buttonRequestProject.setDisable(true);
         }
     }
 
@@ -129,14 +133,14 @@ public class FXMLStudentMenuController extends ValidationHandler {
     @FXML 
     public void goToFinishWindows() {
         try {
-            boolean isAutoevaluationValidated = expedientDAO.isDocumentTypeValidated(student.getIdStudent(), 
-                AUTOEVALUATION_DOCUMENT_TYPE);
-            boolean isOrganizationEvaluationValidated = expedientDAO.isDocumentTypeValidated(student.getIdStudent(), 
-                EVALUATION_DOCUMENT_TYPE);
-            if(isAutoevaluationValidated && isOrganizationEvaluationValidated) {
+            boolean isAutoevaluationValidated = expedientDAO.isDocumentTypeValidated(
+                student.getIdStudent(), AUTOEVALUATION_DOCUMENT_TYPE);
+            boolean isOrganizationEvaluationValidated = expedientDAO.isDocumentTypeValidated(
+                student.getIdStudent(),EVALUATION_DOCUMENT_TYPE);
+            boolean isLiberationLetterValidated = expedientDAO.isDocumentTypeValidated(
+                student.getIdStudent(), LIBERATION_LETTER_DOCUMENT_TYPE);
+            if(isAutoevaluationValidated && isOrganizationEvaluationValidated && isLiberationLetterValidated) {
                 navigateTo("/uv/lis/GUI/view/FXMLFinishWindow.fxml");
-            } else {
-                showError("Debe completar y validar la autoevaluación");
             }
         } catch(OperationException e) {
             showError(e.getMessage());
