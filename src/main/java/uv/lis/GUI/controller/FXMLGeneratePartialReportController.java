@@ -154,8 +154,8 @@ public class FXMLGeneratePartialReportController extends ValidationHandler {
             InputValidator.validateComboBox(comboBoxActivity1.getValue(), "una actividad"),
             validateNoDuplicateActivities(),
             validateSelectedActivityPercentages(),
-            InputValidator.validateText(textAreaGeneralObservations.getText(), "Observaciones Generales"),
-            InputValidator.validateText(textAreaResults.getText(), "Resultados Obtenidos")
+            InputValidator.validateDescriptiveText(textAreaGeneralObservations.getText(), "Observaciones Generales"),
+            InputValidator.validateDescriptiveText(textAreaResults.getText(), "Resultados Obtenidos")
         );
 
         Optional<String> validationError = validationStream

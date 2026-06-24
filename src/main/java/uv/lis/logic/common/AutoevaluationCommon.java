@@ -31,6 +31,7 @@ public class AutoevaluationCommon {
     private static final String TEMPLATE_READ_ERROR_MESSAGE = "Error al cargar la plantilla del reporte.";
     private static final String INVALID_RANGE_MESSAGE = "Las respuestas deben estar entre 1 y 5.";
     private static final String ALREADY_REGISTERED_MESSAGE = "El alumno ya ha registrado una autoevaluación.";
+    private static final String NO_DEPARTMENT = "No aplica";
     private static final int MINIMUM_SCORE = 1;
     private static final int MAXIMUM_SCORE = 5;
     private static final String MARKED_OPTION = "X";
@@ -113,6 +114,7 @@ public class AutoevaluationCommon {
         parameters.put("matricula", autoevaluation.getIdStudent());
         parameters.put("organizacion", autoevaluation.getOrganizationName());
         parameters.put("responsableProyecto", autoevaluation.getProjectSupervisorName());
+        parameters.put("departamento", NO_DEPARTMENT);
         parameters.put("nombreProyecto", autoevaluation.getProjectName());
         parameters.put("puntuacion", String.format("%.1f%%", autoevaluation.getFinalScore()));
 
@@ -130,7 +132,7 @@ public class AutoevaluationCommon {
         };
 
         for (int i = 0; i < scores.length; i++) {
-            int questionNumber = i + 1;
+            int questionNumber = i + MINIMUM_SCORE;
             int selectedScore = scores[i];
             for (int column = MINIMUM_SCORE; column <= MAXIMUM_SCORE; column++) {
                 parameters.put("p" + column + "_" + questionNumber,

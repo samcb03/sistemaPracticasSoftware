@@ -7,6 +7,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import java.awt.EventQueue;
 import java.io.IOException;
 import java.lang.reflect.Field;
 import java.util.List;
@@ -126,7 +127,7 @@ public class FXMLGenerateFinalReportControllerTest extends ApplicationTest {
             .forEach(Window::hide));
         WaitForAsyncUtils.waitForFxEvents();
 
-        java.awt.EventQueue.invokeLater(() ->
+        EventQueue.invokeLater(() ->
             Arrays.stream(java.awt.Window.getWindows()).forEach(java.awt.Window::dispose));
 
     }
