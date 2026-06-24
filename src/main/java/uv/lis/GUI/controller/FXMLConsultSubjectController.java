@@ -43,8 +43,6 @@ public class FXMLConsultSubjectController extends WindowHandler {
     private static final int MONTHLY_REPORT_TYPE_ID = 3;
     private static final int PARTIAL_REPORT_TYPE_ID = 4;
 
-    private static final int LIBERATION_LETTER_TYPE_ID = 13;
-
     @FXML private Label labelSubject;
     @FXML private Label labelNrc;
     @FXML private Label labelSchoolPeriod;

@@ -1,7 +1,6 @@
 package uv.lis.logic.dao;
 
 import static uv.lis.logic.utils.InputValidator.NO_VALUE;
-import static uv.lis.logic.utils.InputValidator.STATUS_ASSIGNED;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -92,8 +91,8 @@ public class ActivityDAO implements IActivityDAO {
         boolean isRegistered = false;
 
         String activityQuery = "INSERT INTO Actividad(nombreActividad, descripcionActividad, FechaInicio, "
-                             + "FechaFin, idProyecto, horasReportadas) "
-                             + "VALUES(?, ?, ?, ?, ?, ?);";
+                             + "FechaFin, idProyecto, horasReportadas, matricula) "
+                             + "VALUES(?, ?, ?, ?, ?, ?, ?);";
 
         if (activity == null) {
             throw new OperationException("No se pudo registrar la actividad porque es nula", null);
@@ -109,6 +108,7 @@ public class ActivityDAO implements IActivityDAO {
             preparedStatement.setObject(4, activity.getEndDate());
             preparedStatement.setInt(5, activity.getProjectId());
             preparedStatement.setInt(6, activity.getHoursReported());
+            preparedStatement.setString(7, activity.getStudentId());
 
             if (preparedStatement.executeUpdate() > NO_VALUE) {
                 try (ResultSet generatedKeys = preparedStatement.getGeneratedKeys()) {
@@ -168,21 +168,17 @@ public class ActivityDAO implements IActivityDAO {
     @Override
     public List<Activity> getActivitiesByStudentId(String studentId) throws OperationException {
         List<Activity> activities = new ArrayList<>();
-        String activityContextQuery = "SELECT a.idActividad, a.nombreActividad, "
-                                    + "a.descripcionActividad, a.FechaInicio, a.FechaFin, "
-                                    + "p.idProyecto "
-                                    + "FROM Actividad a "
-                                    + "INNER JOIN Proyecto p ON a.idProyecto = p.idProyecto "
-                                    + "INNER JOIN Solicita_Proyecto sp ON p.idProyecto = sp.idProyecto "
-                                    + "WHERE sp.matricula = ? AND sp.estatus = ? "
-                                    + "ORDER BY a.idActividad";
- 
+        String activityQuery = "SELECT idActividad, nombreActividad, descripcionActividad, FechaInicio, "
+                             + "FechaFin, idProyecto, matricula "
+                             + "FROM Actividad "
+                             + "WHERE matricula = ? "
+                             + "ORDER BY idActividad;";
+
         try (Connection databaseConnection = connectionManager.getConnection();
-            PreparedStatement preparedStatement = databaseConnection.prepareStatement(activityContextQuery)) {
- 
+            PreparedStatement preparedStatement = databaseConnection.prepareStatement(activityQuery)) {
+
             preparedStatement.setString(1, studentId);
-            preparedStatement.setInt(2, STATUS_ASSIGNED);
- 
+
             try (ResultSet resultSet = preparedStatement.executeQuery()) {
                 while (resultSet.next()) {
                     activities.add(mapActivity(resultSet));
@@ -196,16 +192,16 @@ public class ActivityDAO implements IActivityDAO {
     }
  
     @Override
-    public int getTotalActivityHoursByProject(int projectId) throws OperationException {
+    public int getTotalActivityHoursByStudent(String studentId) throws OperationException {
         int totalHours = 0;
         String activityQuery = "SELECT COALESCE(SUM(horasReportadas), 0) AS total "
                              + "FROM Actividad "
-                             + "WHERE idProyecto = ?";
+                             + "WHERE matricula = ?;";
 
         try (Connection databaseConnection = connectionManager.getConnection();
             PreparedStatement preparedStatement = databaseConnection.prepareStatement(activityQuery)) {
 
-            preparedStatement.setInt(1, projectId);
+            preparedStatement.setString(1, studentId);
 
             try (ResultSet resultSet = preparedStatement.executeQuery()) {
                 if (resultSet.next()) {
@@ -220,14 +216,15 @@ public class ActivityDAO implements IActivityDAO {
     }
  
     private Activity mapActivity(ResultSet resultSet) throws SQLException {
-        int idActivity = resultSet.getInt("idActividad");
-        String activityName = resultSet.getString("nombreActividad");
-        String activityDescription = resultSet.getString("descripcionActividad");
-        LocalDate startDate = resultSet.getObject("FechaInicio", LocalDate.class);
-        LocalDate endDate = resultSet.getObject("FechaFin", LocalDate.class);
-        int idProject = resultSet.getInt("idProyecto");
-        Activity activity = new Activity(idActivity, activityName, activityDescription,startDate, endDate, idProject);
-            
+        Activity activity = new Activity();
+        activity.setId(resultSet.getInt("idActividad"));
+        activity.setName(resultSet.getString("nombreActividad"));
+        activity.setDescription(resultSet.getString("descripcionActividad"));
+        activity.setStartDate(resultSet.getObject("FechaInicio", LocalDate.class));
+        activity.setEndDate(resultSet.getObject("FechaFin", LocalDate.class));
+        activity.setProjectId(resultSet.getInt("idProyecto"));
+        activity.setStudentId(resultSet.getString("matricula"));
+
         return activity;
     }
 }

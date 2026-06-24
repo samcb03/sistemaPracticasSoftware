@@ -44,6 +44,7 @@ class ActivityDAOTest {
     private static final String FIRST_ACTIVITY_DESCRIPTION = "Descripción 1";
     private static final String SECOND_ACTIVITY_DESCRIPTION = "Descripción 2";
     private static final String DATABASE_ERROR_MESSAGE = "Fallo";
+    private static final String STUDENT_ID = "S22011223";
 
     private static final LocalDate FIRST_START_DATE = LocalDate.of(2024, 1, 1);
     private static final LocalDate FIRST_END_DATE = LocalDate.of(2024, 12, 31);
@@ -218,28 +219,54 @@ class ActivityDAOTest {
     }
 
     @Test
-    void getTotalActivityHoursByProject_successful_returnsTotalHours() throws Exception {
+    void getActivitiesByStudentId_successful_returnsActivityList() throws Exception {
+        mockQueryExecution();
+        mockResultSetTwoActivities();
+        when(resultSet.getString("matricula")).thenReturn(STUDENT_ID, STUDENT_ID);
+        List<Activity> expectedActivities = builderExpectedActivities();
+
+        assertEquals(expectedActivities, activityDAO.getActivitiesByStudentId(STUDENT_ID));
+    }
+
+    @Test
+    void getActivitiesByStudentId_emptyResult_returnsEmptyList() throws Exception {
+        mockQueryExecution();
+        when(resultSet.next()).thenReturn(false);
+
+        assertTrue(activityDAO.getActivitiesByStudentId(STUDENT_ID).isEmpty());
+    }
+
+    @Test
+    void getActivitiesByStudentId_sqlError_throwsOperationException() throws Exception {
+        when(connectionManager.getConnection()).thenThrow(new SQLException(DATABASE_ERROR_MESSAGE));
+
+        assertThrows(OperationException.class,
+            () -> activityDAO.getActivitiesByStudentId(STUDENT_ID));
+    }
+
+    @Test
+    void getTotalActivityHoursByStudent_successful_returnsTotalHours() throws Exception {
         mockQueryExecution();
         when(resultSet.next()).thenReturn(true);
         when(resultSet.getInt("total")).thenReturn(TOTAL_ACTIVITY_HOURS);
 
         assertEquals(TOTAL_ACTIVITY_HOURS,
-            activityDAO.getTotalActivityHoursByProject(FIRST_PROJECT_ID));
+            activityDAO.getTotalActivityHoursByStudent(STUDENT_ID));
     }
 
     @Test
-    void getTotalActivityHoursByProject_emptyResult_returnsZero() throws Exception {
+    void getTotalActivityHoursByStudent_emptyResult_returnsZero() throws Exception {
         mockQueryExecution();
         when(resultSet.next()).thenReturn(false);
 
-        assertEquals(NO_HOURS, activityDAO.getTotalActivityHoursByProject(FIRST_PROJECT_ID));
+        assertEquals(NO_HOURS, activityDAO.getTotalActivityHoursByStudent(STUDENT_ID));
     }
 
     @Test
-    void getTotalActivityHoursByProject_sqlError_throwsOperationException() throws Exception {
+    void getTotalActivityHoursByStudent_sqlError_throwsOperationException() throws Exception {
         when(connectionManager.getConnection()).thenThrow(new SQLException(DATABASE_ERROR_MESSAGE));
 
         assertThrows(OperationException.class,
-            () -> activityDAO.getTotalActivityHoursByProject(FIRST_PROJECT_ID));
+            () -> activityDAO.getTotalActivityHoursByStudent(STUDENT_ID));
     }
 }

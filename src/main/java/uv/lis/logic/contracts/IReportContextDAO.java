@@ -69,26 +69,26 @@ public interface IReportContextDAO {
     List<Activity> getRecordedActivities(String studentId) throws OperationException;
 
     /**
-     * Retrieves the recorded activities of a project for a given month and year.
+     * Retrieves the recorded activities of a student for a given month and year.
      *
-     * @param projectId the identifier of the project to query
+     * @param studentId the identifier of the student to query
      * @param month the month for which the activities are retrieved
      * @param year the year for which the activities are retrieved
      * @return the list of recorded activities, empty if there are none
      * @throws OperationException if the activities cannot be retrieved
      */
-    List<Activity> getRecordedActivitiesByMonth(int projectId, int month, int year) throws OperationException;
+    List<Activity> getRecordedActivitiesByMonth(String studentId, int month, int year) throws OperationException;
 
     /**
-     * Retrieves the sum of reported hours of a project for a given month and year.
+     * Retrieves the sum of reported hours of a student for a given month and year.
      *
-     * @param projectId the identifier of the project to query
+     * @param studentId the identifier of the student to query
      * @param month the month for which the hours are summed
      * @param year the year for which the hours are summed
      * @return the total reported hours for the period
      * @throws OperationException if the reported hours cannot be retrieved
      */
-    int getSumOfReportedHours(int projectId, int month, int year) throws OperationException;
+    int getSumOfReportedHours(String studentId, int month, int year) throws OperationException;
 
     /**
      * Indicates whether a student's report has already been generated for a month.

@@ -176,19 +176,20 @@ public class ReportContextDAO implements IReportContextDAO {
     }
 
     @Override
-    public List<Activity> getRecordedActivitiesByMonth(int idProyecto, int month, int year) throws OperationException {
+    public List<Activity> getRecordedActivitiesByMonth(String studentId, int month, int year)
+            throws OperationException {
         List<Activity> activities = new ArrayList<>();
-        String reportContextQuery = "SELECT nombreActividad, descripcionActividad, " 
+        String reportContextQuery = "SELECT nombreActividad, descripcionActividad, "
                                   + "horasReportadas AS horas "
                                   + "FROM Actividad "
-                                  + "WHERE idProyecto = ? "
+                                  + "WHERE matricula = ? "
                                   + "AND MONTH(FechaInicio) = ? "
                                   + "AND YEAR(FechaInicio) = ? ";
 
         try (Connection databaseConnection = connectionManager.getConnection();
             PreparedStatement preparedStatement = databaseConnection.prepareStatement(reportContextQuery)) {
             
-            preparedStatement.setInt(1, idProyecto);
+            preparedStatement.setString(1, studentId);
             preparedStatement.setInt(2, month);
             preparedStatement.setInt(3, year);
             
@@ -237,17 +238,17 @@ public class ReportContextDAO implements IReportContextDAO {
     }
 
     @Override
-    public int getSumOfReportedHours(int projectId, int month, int year) throws OperationException {
+    public int getSumOfReportedHours(String studentId, int month, int year) throws OperationException {
         int total = 0;
         String reportContextQuery = "SELECT COALESCE(SUM(horasReportadas), 0) AS total "
                                   + "FROM Actividad "
-                                  + "WHERE idProyecto = ? "
+                                  + "WHERE matricula = ? "
                                   + "AND MONTH(FechaInicio) = ? "
                                   + "AND YEAR(FechaInicio) = ?";
         
         try (Connection databaseConnection = connectionManager.getConnection();
             PreparedStatement preparedStatement = databaseConnection.prepareStatement(reportContextQuery)) {
-            preparedStatement.setInt(1, projectId);
+            preparedStatement.setString(1, studentId);
             preparedStatement.setInt(2, month);
             preparedStatement.setInt(3, year);
             try (ResultSet resultSet = preparedStatement.executeQuery()) {

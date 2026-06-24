@@ -54,9 +54,11 @@ public class FXMLGeneratePartialReportController extends ValidationHandler {
     private static final String REAL_EDITOR_TITLE = "Editar Avance Real";
     private static final String NO_ACTIVITY_SELECTED_MESSAGE 
         = "Selecciona al menos una actividad antes de editar el avance.";
+    private static final String ADVANCE_FIELD_LABEL = "Porcentaje de Avance de Actividad ";
 
     private static final int DEFAULT_REPORT_NUMBER = 1;
     private static final int INVALID_ADVANCE = 0;
+    private static final int ROW_LABEL_OFFSET = 1;
 
     private final PartialReportCommon partialReportCommon = new PartialReportCommon();
     private final ActivityDAO activityDAO = new ActivityDAO();
@@ -149,8 +151,9 @@ public class FXMLGeneratePartialReportController extends ValidationHandler {
 
     private void validateFields() {
         Stream<Optional<String>> validationStream = Stream.of(
-            validateFirstActivityRow(),
+            InputValidator.validateComboBox(comboBoxActivity1.getValue(), "una actividad"),
             validateNoDuplicateActivities(),
+            validateSelectedActivityPercentages(),
             InputValidator.validateText(textAreaGeneralObservations.getText(), "Observaciones Generales"),
             InputValidator.validateText(textAreaResults.getText(), "Resultados Obtenidos")
         );
@@ -179,19 +182,26 @@ public class FXMLGeneratePartialReportController extends ValidationHandler {
         return duplicateError;
     }
 
-    private Optional<String> validateFirstActivityRow() {
-        Stream<Optional<String>> validationStream = Stream.of(
-            InputValidator.validateComboBox(comboBoxActivity1.getValue(), "una actividad"),
-            InputValidator.validatePercentage(
-                textFieldAdvance1.getText(), "Porcentaje de Avance de Actividad 1")
-        );
+    private Optional<String> validateSelectedActivityPercentages() {
+        Optional<String> percentageError = Optional.empty();
+        int index = 0;
 
-        Optional<String> firstError = validationStream
-            .filter(Optional::isPresent)
-            .map(Optional::get)
-            .findFirst();
+        while (index < comboBoxActivities.length && percentageError.isEmpty()) {
+            percentageError = validateRowPercentage(index);
+            index++;
+        }
+        return percentageError;
+    }
 
-        return firstError;
+    private Optional<String> validateRowPercentage(int rowIndex) {
+        Optional<String> rowError = Optional.empty();
+
+        if (comboBoxActivities[rowIndex].getValue() != null) {
+            String fieldName = ADVANCE_FIELD_LABEL + (rowIndex + ROW_LABEL_OFFSET);
+            rowError = InputValidator.validatePercentage(
+                textFieldAdvances[rowIndex].getText(), fieldName);
+        }
+        return rowError;
     }
 
     private void generateReport() {

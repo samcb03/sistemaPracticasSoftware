@@ -12,6 +12,7 @@ public class Activity {
     private int hoursReported;
     private int reportId;
     private int projectId;
+    private String studentId;
 
     public Activity() {
     }
@@ -89,7 +90,15 @@ public class Activity {
     public void setProjectId(int projectId) {
         this.projectId = projectId;
     }
-    
+
+    public String getStudentId() {
+        return studentId;
+    }
+
+    public void setStudentId(String studentId) {
+        this.studentId = studentId;
+    }
+
     @Override
     public boolean equals(Object object) {
         boolean isEqual = false;

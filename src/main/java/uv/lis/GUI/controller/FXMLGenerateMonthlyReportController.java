@@ -227,12 +227,11 @@ public class FXMLGenerateMonthlyReportController extends ValidationHandler {
 
         if(selectedMonth.isPresent()) {
             try {
-                MonthlyReport context = reportContextDAO.getMonthlyReportData(currentStudent.getIdStudent());
-                
                 int month = convertMonthNameToNumber(getSelectedMonth().get());
                 int year = LocalDate.now().getYear(); 
 
-                List<Activity> registered = reportContextDAO.getRecordedActivitiesByMonth(context.getIdProject(), 
+                String studentId = currentStudent.getIdStudent();
+                List<Activity> registered = reportContextDAO.getRecordedActivitiesByMonth(studentId, 
                     month, year);
                     
                 clearFields(); 
@@ -241,7 +240,7 @@ public class FXMLGenerateMonthlyReportController extends ValidationHandler {
                     activityFields[i].setText(registered.get(i).getName());
                     observationFields[i].setText(registered.get(i).getDescription());
                 }
-                int totalHours = reportContextDAO.getSumOfReportedHours(context.getIdProject(), month, year);
+                int totalHours = reportContextDAO.getSumOfReportedHours(studentId, month, year);
                 labelReportedHours.setText(String.valueOf(totalHours));
 
                 int accumulatedHours = resolveAccumulatedHours(currentStudent.getIdStudent(),

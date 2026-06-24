@@ -49,6 +49,7 @@ public class FXMLGeneratePartialReportControllerTest extends ApplicationTest {
     private static final String ACTIVITY_1_COMBO_SELECTOR = "#comboBoxActivity1";
     private static final String ACTIVITY_2_COMBO_SELECTOR = "#comboBoxActivity2";
     private static final String ADVANCE_1_SELECTOR = "#textFieldAdvance1";
+    private static final String ADVANCE_2_SELECTOR = "#textFieldAdvance2";
     private static final String GENERAL_OBSERVATIONS_SELECTOR = "#textAreaGeneralObservations";
     private static final String RESULTS_SELECTOR = "#textAreaResults";
     private static final String GENERATE_BUTTON_SELECTOR = "#buttonGenerate";
@@ -56,7 +57,9 @@ public class FXMLGeneratePartialReportControllerTest extends ApplicationTest {
 
     private static final String VALID_STUDENT_ID = "S24013322";
     private static final String VALID_ACTIVITY_1 = "Analisis de requerimientos";
+    private static final String VALID_ACTIVITY_2 = "Diseno de base de datos";
     private static final String VALID_ADVANCE = "80";
+    private static final String ABOVE_LIMIT_ADVANCE = "150";
     private static final String VALID_GENERAL_OBSERVATION = "Avance del proyecto satisfactorio";
     private static final String VALID_RESULTS = "Entregable de documentacion tecnica";
 
@@ -65,6 +68,8 @@ public class FXMLGeneratePartialReportControllerTest extends ApplicationTest {
         "Porcentaje de Avance de Actividad 1 no puede estar vacío";
     private static final String EXPECTED_DUPLICATE_ACTIVITY_MESSAGE =
         "La actividad ya fue seleccionada. Cada actividad solo puede elegirse una vez.";
+    private static final String EXPECTED_ADVANCE_ABOVE_LIMIT_MESSAGE =
+        "Porcentaje de Avance de Actividad 2 no puede ser mayor a 100";
     private static final String EXPECTED_OPERATION_ERROR_MESSAGE = "Error de operación de prueba";
 
     private static final int REPORT_PAGE_WIDTH = 595;
@@ -167,6 +172,30 @@ public class FXMLGeneratePartialReportControllerTest extends ApplicationTest {
         verify(reportDAOMock).registerPartialReport(any());
     }
 
+    @Test
+    void validatorReport_selectedActivityAdvanceAboveLimit_showsValidationError() {
+        fillValidForm();
+        interact(() -> setComboValue(ACTIVITY_2_COMBO_SELECTOR, VALID_ACTIVITY_2));
+        interact(() -> lookup(ADVANCE_2_SELECTOR).queryAs(TextField.class).setText(ABOVE_LIMIT_ADVANCE));
+
+        clickGenerate();
+
+        assertEquals(EXPECTED_ADVANCE_ABOVE_LIMIT_MESSAGE, messageText());
+    }
+
+    @Test
+    void validatorReport_unselectedActivityInvalidAdvance_registersReport() throws Exception {
+        when(partialReportCommonMock.generatePartialReport(any())).thenReturn(buildJasperPrint());
+        when(reportDAOMock.registerPartialReport(any())).thenReturn(true);
+
+        fillValidForm();
+        interact(() -> lookup(ADVANCE_2_SELECTOR).queryAs(TextField.class).setText(ABOVE_LIMIT_ADVANCE));
+        clickGenerate();
+        WaitForAsyncUtils.waitForFxEvents();
+
+        verify(reportDAOMock).registerPartialReport(any());
+    }
+
     private void injectField(String fieldName, Object value) throws ReflectiveOperationException {
         Field field = FXMLGeneratePartialReportController.class.getDeclaredField(fieldName);
         field.setAccessible(true);
@@ -191,7 +220,10 @@ public class FXMLGeneratePartialReportControllerTest extends ApplicationTest {
     private void clearAllFields() {
         lookup(ACTIVITY_1_COMBO_SELECTOR).queryAs(ComboBox.class).getItems().clear();
         lookup(ACTIVITY_2_COMBO_SELECTOR).queryAs(ComboBox.class).getItems().clear();
+        lookup(ACTIVITY_1_COMBO_SELECTOR).queryAs(ComboBox.class).getSelectionModel().clearSelection();
+        lookup(ACTIVITY_2_COMBO_SELECTOR).queryAs(ComboBox.class).getSelectionModel().clearSelection();
         lookup(ADVANCE_1_SELECTOR).queryAs(TextField.class).clear();
+        lookup(ADVANCE_2_SELECTOR).queryAs(TextField.class).clear();
         lookup(GENERAL_OBSERVATIONS_SELECTOR).queryAs(TextArea.class).clear();
         lookup(RESULTS_SELECTOR).queryAs(TextArea.class).clear();
         lookup(MESSAGE_LABEL_SELECTOR).queryAs(Label.class).setText("");
