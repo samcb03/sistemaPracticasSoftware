@@ -32,20 +32,20 @@ public class SubjectDAO implements ISubjectDAO {
     public boolean registerSubject(Subject subject) throws OperationException {
         boolean isRegistered = false;
 
-        String subjectQuery = "INSERT INTO ExperienciaEducativa (NRC, nombreExperiencia, carrera, idPeriodoEscolar," 
+        String subjectQuery = "INSERT INTO ExperienciaEducativa (NRC, nombreExperiencia, carrera, idPeriodoEscolar,"
                             + "seccion) "
                             + "VALUES (?, ?, ?, ?, ?);";
 
-        String professorSubjectQuery = "INSERT INTO Profesor_Imparte_Experiencia (NRC, numeroPersonal) "
-                                     + "VALUES (?, ?) "
-                                     + "ON DUPLICATE KEY UPDATE estaActiva = TRUE;";
+        String professorSubjectQuery = "INSERT INTO Profesor_Imparte_Experiencia (NRC, numeroPersonal, idPeriodo) "
+                                    + "VALUES (?, ?, ?) "
+                                    + "ON DUPLICATE KEY UPDATE estaActiva = TRUE, idPeriodo = VALUES(idPeriodo);";
 
         try (Connection databaseConnection = connectionManager.getConnection()) {
 
             databaseConnection.setAutoCommit(false);
 
             try (PreparedStatement subjectStatement = databaseConnection.prepareStatement(subjectQuery);
-                PreparedStatement professorSubjectStatement = 
+                PreparedStatement professorSubjectStatement =
                 databaseConnection.prepareStatement(professorSubjectQuery)) {
 
                 subjectStatement.setInt(1, subject.getNrc());
@@ -57,6 +57,7 @@ public class SubjectDAO implements ISubjectDAO {
 
                 professorSubjectStatement.setInt(1, subject.getNrc());
                 professorSubjectStatement.setString(2, subject.getProfessorPersonnelNumber());
+                professorSubjectStatement.setInt(3, subject.getSchoolPeriodId());
                 int professorRows = professorSubjectStatement.executeUpdate();
 
                 boolean bothInserted = subjectRows != NO_VALUE && professorRows != NO_VALUE;
@@ -73,7 +74,7 @@ public class SubjectDAO implements ISubjectDAO {
             }
         } catch (SQLException e) {
             LOGGER.log(Level.SEVERE, "Error de conexión al registrar la Experiencia Educativa", e);
-            throw new OperationException("No se pudo registrar la Experiencia Educativa. Intentelo mas tarde", 
+            throw new OperationException("No se pudo registrar la Experiencia Educativa. Intentelo mas tarde",
                 e);
         }
 

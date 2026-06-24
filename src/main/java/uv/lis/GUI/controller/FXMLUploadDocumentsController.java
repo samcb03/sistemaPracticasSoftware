@@ -168,8 +168,7 @@ public class FXMLUploadDocumentsController extends ValidationHandler {
             boolean isMonthlyReport = (idTypeDocument == MONTHLY_REPORT_TYPE);
             if (!isMonthlyReport && expedientDAO.isDocumentTypeValidated(studentId, idTypeDocument)) {
                 restriction = Optional.of(ALREADY_VALIDATED_MESSAGE);
-            } else if (idTypeDocument == ACCEPTANCE_LETTER_TYPE_ID || idTypeDocument == ACTIVITY_CRONOGRAM_ID
-                && !studentDAO.hasProjectAssigned(studentId)) {
+            } else if (requiresAssignedProject(idTypeDocument) && !studentDAO.hasProjectAssigned(studentId)) {
                 restriction = Optional.of(NO_PROJECT_MESSAGE);
             } else if (isGeneratedDocument(idTypeDocument)
                 && !generatedDocumentExists(idTypeDocument, studentId)) {
@@ -179,6 +178,12 @@ public class FXMLUploadDocumentsController extends ValidationHandler {
             }
         }
         return restriction;
+    }
+
+    private boolean requiresAssignedProject(int idTypeDocument) {
+        boolean hasRequirement = idTypeDocument == ACCEPTANCE_LETTER_TYPE_ID
+            || idTypeDocument == ACTIVITY_CRONOGRAM_ID;
+        return hasRequirement;
     }
 
     private boolean isGeneratedDocument(int idTypeDocument) {
