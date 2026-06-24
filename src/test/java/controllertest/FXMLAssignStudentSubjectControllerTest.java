@@ -31,6 +31,7 @@ import uv.lis.GUI.controller.FXMLAssignStudentSubjectController;
 import uv.lis.logic.dao.StudentDAO;
 import uv.lis.logic.dao.SubjectDAO;
 import uv.lis.logic.dto.Student;
+import uv.lis.logic.dto.Subject;
 import uv.lis.logic.exceptions.OperationException;
 
 public class FXMLAssignStudentSubjectControllerTest extends ApplicationTest {
@@ -45,10 +46,11 @@ public class FXMLAssignStudentSubjectControllerTest extends ApplicationTest {
     private static final String MESSAGE_LABEL_SELECTOR = "#labelMessage";
 
     private static final int VALID_NRC = 50563;
-    private static final String VALID_SUBJECT = "50563 - Practicas Profesionales";
+    private static final String VALID_SUBJECT = "50563 - Practicas Profesionales - Febrero-Julio 2026";
     private static final String VALID_STUDENT_ID = "S24013305";
     private static final String VALID_FIRST_NAME = "Ana";
     private static final String VALID_LAST_NAME = "Lopez";
+    private static final int VALID_PERIOD_ID = 1;
 
     private static final String EXPECTED_SUCCESS_MESSAGE = "Alumno asignado correctamente.";
     private static final String EXPECTED_FAILURE_MESSAGE = "No se pudo asignar el alumno. Intente de nuevo.";
@@ -89,7 +91,7 @@ public class FXMLAssignStudentSubjectControllerTest extends ApplicationTest {
 
     @Test
     void validateFields_validSelection_showsSuccessMessage() throws OperationException {
-        when(subjectDAOMock.assignStudentToSubject(anyString(), anyInt())).thenReturn(true);
+        when(subjectDAOMock.assignStudentToSubject(anyString(), anyInt() ,anyInt())).thenReturn(true);
         when(studentDAOMock.getActiveStudentsNotInSubject()).thenReturn(new ArrayList<>());
 
         selectSubject();
@@ -101,19 +103,19 @@ public class FXMLAssignStudentSubjectControllerTest extends ApplicationTest {
 
     @Test
     void validateFields_validSelection_sendsDataToDAO() throws OperationException {
-        when(subjectDAOMock.assignStudentToSubject(anyString(), anyInt())).thenReturn(true);
+        when(subjectDAOMock.assignStudentToSubject(anyString(), anyInt(),anyInt())).thenReturn(true);
         when(studentDAOMock.getActiveStudentsNotInSubject()).thenReturn(new ArrayList<>());
 
         selectSubject();
         selectStudent();
         clickAssign();
 
-        verify(subjectDAOMock).assignStudentToSubject(VALID_STUDENT_ID, VALID_NRC);
+        verify(subjectDAOMock).assignStudentToSubject(VALID_STUDENT_ID, VALID_NRC,VALID_PERIOD_ID);
     }
 
     @Test
     void validateFields_assignmentFails_showsErrorMessage() throws OperationException {
-        when(subjectDAOMock.assignStudentToSubject(anyString(), anyInt())).thenReturn(false);
+        when(subjectDAOMock.assignStudentToSubject(anyString(), anyInt(), anyInt())).thenReturn(false);
 
         selectSubject();
         selectStudent();
@@ -125,7 +127,7 @@ public class FXMLAssignStudentSubjectControllerTest extends ApplicationTest {
     @Test
     void validateFields_daoError_showsExceptionMessage() throws OperationException {
         OperationException operationException = new OperationException(DAO_ERROR_MESSAGE, null);
-        when(subjectDAOMock.assignStudentToSubject(anyString(), anyInt())).thenThrow(operationException);
+        when(subjectDAOMock.assignStudentToSubject(anyString(), anyInt(), anyInt())).thenThrow(operationException);
 
         selectSubject();
         selectStudent();
@@ -160,9 +162,15 @@ public class FXMLAssignStudentSubjectControllerTest extends ApplicationTest {
     @SuppressWarnings("unchecked")
     private void selectSubject() {
         interact(() -> {
-            ComboBox<String> comboBox = lookup(SUBJECT_COMBO_SELECTOR).queryAs(ComboBox.class);
-            comboBox.getItems().setAll(VALID_SUBJECT);
-            comboBox.getSelectionModel().select(VALID_SUBJECT);
+            Subject subject = new Subject();
+            subject.setNrc(VALID_NRC);
+            subject.setName("Practicas Profesionales");
+            subject.setSchoolPeriodName("Febrero-Julio 2026");
+            subject.setSchoolPeriodId(VALID_PERIOD_ID);
+
+            ComboBox<Subject> comboBox = lookup(SUBJECT_COMBO_SELECTOR).queryAs(ComboBox.class);
+            comboBox.getItems().setAll(subject);
+            comboBox.getSelectionModel().select(subject);
         });
         WaitForAsyncUtils.waitForFxEvents();
     }
