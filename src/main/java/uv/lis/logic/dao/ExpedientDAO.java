@@ -33,6 +33,7 @@ public class ExpedientDAO implements IExpedientDAO {
     private static final int NO_MISSING_INITIAL_DOCUMENTS = 0;
     private static final int NO_GENERATED_ID = -1;
     private static final int NEXT_ENTRY_OFFSET = 1;
+    private static final int LIBERATION_LETTER_TYPE_ID = 13;
 
     private MySQLConnectionManager connectionManager;
     public ExpedientDAO() {
@@ -503,5 +504,28 @@ public class ExpedientDAO implements IExpedientDAO {
             throw new OperationException("Error al verificar documentos subidos", e);
         }
         return count;
+    }
+
+    @Override
+    public List<String> getStudentIdsWithLiberationLetter() throws OperationException {
+        List<String> studentIds = new ArrayList<>();
+        String expedientQuery = "SELECT DISTINCT matricula FROM Expediente "
+                            + "WHERE idTipoDocumento = ?";
+
+        try (Connection databaseConnection = connectionManager.getConnection();
+            PreparedStatement preparedStatement = databaseConnection.prepareStatement(expedientQuery)) {
+
+            preparedStatement.setInt(1, LIBERATION_LETTER_TYPE_ID);
+
+            try (ResultSet resultSet = preparedStatement.executeQuery()) {
+                while (resultSet.next()) {
+                    studentIds.add(resultSet.getString("matricula"));
+                }
+            }
+        } catch (SQLException e) {
+            LOGGER.log(Level.SEVERE, "Error al obtener alumnos con carta de liberación", e);
+            throw new OperationException("Error al obtener alumnos con carta de liberación. Intente más tarde", e);
+        }
+        return studentIds;
     }
 }

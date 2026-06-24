@@ -1,6 +1,7 @@
 package uv.lis.logic.contracts;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 import uv.lis.logic.dto.Student;
@@ -90,4 +91,6 @@ public interface IStudentDAO {
      * @throws OperationException if the verification cannot be completed
      */
     boolean hasProjectAssigned(String studentId) throws OperationException;
+
+    List<Student> getStudentsByIds(List<String> studentIds) throws OperationException;
 }

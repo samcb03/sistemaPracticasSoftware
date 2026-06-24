@@ -384,4 +384,29 @@ class ExpedientDAOTest {
         assertThrows(OperationException.class,
             () -> expedientDAO.getStudentIdsWithDocumentType(NRC, DOCUMENT_TYPE_ID));
     }
+
+    @Test
+    void getStudentIdsWithLiberationLetter_studentsExist_returnsNonEmptyList() throws Exception {
+        mockQueryExecution();
+        when(resultSet.next()).thenReturn(true, false);
+        when(resultSet.getString(STUDENT_ID_COLUMN)).thenReturn(STUDENT_ID);
+
+        assertFalse(expedientDAO.getStudentIdsWithLiberationLetter().isEmpty());
+    }
+
+    @Test
+    void getStudentIdsWithLiberationLetter_noStudents_returnsEmptyList() throws Exception {
+        mockQueryExecution();
+        when(resultSet.next()).thenReturn(false);
+
+        assertTrue(expedientDAO.getStudentIdsWithLiberationLetter().isEmpty());
+    }
+
+    @Test
+    void getStudentIdsWithLiberationLetter_sqlError_throwsOperationException() throws Exception {
+        when(connectionManager.getConnection()).thenThrow(new SQLException(DATABASE_ERROR_MESSAGE));
+
+        assertThrows(OperationException.class,
+            () -> expedientDAO.getStudentIdsWithLiberationLetter());
+    }
 }

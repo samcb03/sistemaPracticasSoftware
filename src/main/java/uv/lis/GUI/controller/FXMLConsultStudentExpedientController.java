@@ -30,6 +30,7 @@ import uv.lis.GUI.cell.DocumentReviewTableCell;
 import uv.lis.logic.dao.ExpedientDAO;
 import uv.lis.logic.dto.Expedient;
 import uv.lis.logic.exceptions.OperationException;
+import uv.lis.logic.utils.SessionManager;
 
 public class FXMLConsultStudentExpedientController extends ValidationHandler {
 
@@ -41,10 +42,13 @@ public class FXMLConsultStudentExpedientController extends ValidationHandler {
     private static final String FILTER_ALL = "Todos";
     private static final String FILTER_REPORTS = "Reportes";
     private static final String FILTER_INITIAL_DOCUMENTS = "Documentos iniciales";
+    private static final String FILTER_LIBERATION_LETTER = "Carta de liberación";
 
     private static final int LAST_REPORT_TYPE_ID = 4;
     private static final int FIRST_INITIAL_DOCUMENT_TYPE_ID = 5;
     private static final int LAST_INITIAL_DOCUMENT_TYPE_ID = 11;
+    private static final int LIBERATION_LETTER_TYPE_ID = 13;
+
 
     private static final String TOTAL_FORMAT = "Total: %d documento(s)";
     private static final String REVIEW_SUCCESS_MESSAGE = "Estatus del documento actualizado correctamente";
@@ -81,10 +85,19 @@ public class FXMLConsultStudentExpedientController extends ValidationHandler {
 
     public void loadStudentArchives(String studentId) {
         labelStudentId.setText(studentId);
-
         try {
             allDocuments = expedientDAO.getDocumentsByStudentId(studentId);
-            applyCurrentFilter();
+            if (SessionManager.getInstance().getCurrentCoordinator().isPresent()) {
+                allDocuments = allDocuments.stream()
+                    .filter(expedient -> expedient.getIdTypeDocument() == LIBERATION_LETTER_TYPE_ID)
+                    .collect(Collectors.toList());
+            } else {
+                allDocuments = allDocuments.stream()
+                    .filter(expedient -> expedient.getIdTypeDocument() != LIBERATION_LETTER_TYPE_ID)
+                    .collect(Collectors.toList());
+            }
+            
+        applyCurrentFilter();
         } catch (OperationException e) {
             LOGGER.log(Level.SEVERE, "Error al cargar los documentos del alumno", e);
             showError(e.getMessage());
@@ -93,6 +106,11 @@ public class FXMLConsultStudentExpedientController extends ValidationHandler {
 
     private void configureFilterComboBox() {
         comboBoxFilter.getItems().addAll(FILTER_ALL, FILTER_REPORTS, FILTER_INITIAL_DOCUMENTS);
+
+        if (SessionManager.getInstance().getCurrentCoordinator().isPresent()) {
+            comboBoxFilter.getItems().add(FILTER_LIBERATION_LETTER);
+        }
+
         comboBoxFilter.setValue(FILTER_ALL);
         comboBoxFilter.getSelectionModel().selectedItemProperty().addListener(
             (observable, oldValue, newValue) -> applyCurrentFilter());
@@ -179,6 +197,10 @@ public class FXMLConsultStudentExpedientController extends ValidationHandler {
             filtered = allDocuments.stream()
                 .filter(this::isInitialDocument)
                 .collect(Collectors.toList());
+        } else if(FILTER_LIBERATION_LETTER.equals(filter)) {
+            filtered = allDocuments.stream()
+                .filter(this::isLiberationLetter)
+                .collect(Collectors.toList());
         } else {
             filtered = new ArrayList<>(allDocuments);
         }
@@ -195,6 +217,12 @@ public class FXMLConsultStudentExpedientController extends ValidationHandler {
         boolean isInitialDocumentType = idTypeDocument >= FIRST_INITIAL_DOCUMENT_TYPE_ID
             && idTypeDocument <= LAST_INITIAL_DOCUMENT_TYPE_ID;
         return isInitialDocumentType;
+    }
+
+    private boolean isLiberationLetter(Expedient expedient) {
+        int idTypeDocument = expedient.getIdTypeDocument();
+        boolean isFinalDocumentType = idTypeDocument == LIBERATION_LETTER_TYPE_ID;
+        return isFinalDocumentType;
     }
 
     private void populateTable(List<Expedient> documents) {

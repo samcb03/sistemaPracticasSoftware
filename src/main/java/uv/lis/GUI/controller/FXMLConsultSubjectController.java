@@ -18,10 +18,12 @@ import javafx.scene.control.ListView;
 import uv.lis.GUI.WindowHandler;
 import uv.lis.GUI.cell.StudentListCell;
 import uv.lis.logic.dao.ExpedientDAO;
+import uv.lis.logic.dao.StudentDAO;
 import uv.lis.logic.dao.SubjectDAO;
 import uv.lis.logic.dto.Student;
 import uv.lis.logic.dto.Subject;
 import uv.lis.logic.exceptions.OperationException;
+import uv.lis.logic.utils.SessionManager;
 
 public class FXMLConsultSubjectController extends WindowHandler {
 
@@ -35,10 +37,13 @@ public class FXMLConsultSubjectController extends WindowHandler {
     private static final String FILTER_MONTHLY_REPORT = "Reporte mensual subido";
     private static final String FILTER_PARTIAL_REPORT = "Reporte parcial subido";
     private static final String FILTER_FINAL_REPORT = "Reporte final subido";
+    private static final String FILTER_LIBERATION_LETTER = "Carta de liberación subida";
 
     private static final int FINAL_REPORT_TYPE_ID = 2;
     private static final int MONTHLY_REPORT_TYPE_ID = 3;
     private static final int PARTIAL_REPORT_TYPE_ID = 4;
+
+    private static final int LIBERATION_LETTER_TYPE_ID = 13;
 
     @FXML private Label labelSubject;
     @FXML private Label labelNrc;
@@ -51,6 +56,7 @@ public class FXMLConsultSubjectController extends WindowHandler {
 
     private final SubjectDAO subjectDAO = new SubjectDAO();
     private final ExpedientDAO expedientDAO = new ExpedientDAO();
+    private final StudentDAO studentDAO = new StudentDAO();
     private Subject currentSubject;
     private List<Student> enrolledStudents;
 
@@ -74,6 +80,12 @@ public class FXMLConsultSubjectController extends WindowHandler {
     private void configureDocumentFilterComboBox() {
         comboBoxDocumentFilter.getItems().addAll(FILTER_ALL, FILTER_INITIAL_DOCUMENTS,
             FILTER_MONTHLY_REPORT, FILTER_PARTIAL_REPORT, FILTER_FINAL_REPORT);
+
+            if(SessionManager.getInstance().getCurrentCoordinator().isPresent()) {
+                comboBoxDocumentFilter.getItems().add(FILTER_LIBERATION_LETTER);
+
+            }
+
         comboBoxDocumentFilter.setValue(FILTER_ALL);
         comboBoxDocumentFilter.getSelectionModel().selectedItemProperty().addListener(
             (observable, oldValue, newValue) -> applyDocumentFilter(newValue));
@@ -109,13 +121,17 @@ public class FXMLConsultSubjectController extends WindowHandler {
     }
 
     private void showStudentsWithSelectedDocuments(String selectedFilter) {
-        try {
-            List<String> studentIds = resolveStudentIdsForFilter(selectedFilter);
-            List<Student> filteredStudents = filterEnrolledStudentsByIds(studentIds);
-            listViewStudent.setItems(FXCollections.observableArrayList(filteredStudents));
-        } catch (OperationException e) {
-            LOGGER.log(Level.SEVERE, "Error al filtrar los alumnos por documentos subidos", e);
-            showError(e.getMessage());
+        if (FILTER_LIBERATION_LETTER.equals(selectedFilter)) {
+            showAllStudentsWithLiberationLetter();
+        } else {
+            try {
+                List<String> studentIds = resolveStudentIdsForFilter(selectedFilter);
+                List<Student> filteredStudents = filterEnrolledStudentsByIds(studentIds);
+                listViewStudent.setItems(FXCollections.observableArrayList(filteredStudents));
+            } catch (OperationException e) {
+                LOGGER.log(Level.SEVERE, "Error al filtrar los alumnos por documentos subidos", e);
+                showError(e.getMessage());
+            }
         }
     }
 
@@ -183,6 +199,17 @@ public class FXMLConsultSubjectController extends WindowHandler {
         if (loader != null) {
             FXMLConsultStudentExpedientController controller = loader.getController();
             controller.loadStudentArchives(student.getIdStudent());
+        }
+    }
+
+    private void showAllStudentsWithLiberationLetter() {
+        try {
+            List<String> studentIds = expedientDAO.getStudentIdsWithLiberationLetter();
+            List<Student> students = studentDAO.getStudentsByIds(studentIds);
+            listViewStudent.setItems(FXCollections.observableArrayList(students));
+        } catch (OperationException e) {
+            LOGGER.log(Level.SEVERE, "Error al cargar alumnos con carta de liberación", e);
+            showError(e.getMessage());
         }
     }
 }
