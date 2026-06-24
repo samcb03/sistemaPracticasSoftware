@@ -20,6 +20,7 @@ import uv.lis.logic.dto.SchoolPeriod;
 public final class DateValidator {
 
     private static final int MINIMUM_AGE = 18;
+    private static final int MAXIMUM_AGE = 70;
     private static final int MAX_PAST_MONTHS = 6;
     private static final int FALL_TERM_YEAR_OFFSET = 1;
 
@@ -46,6 +47,8 @@ public final class DateValidator {
                 validationResult = Optional.of(fieldName + " no puede ser futura");
             } else if (age < MINIMUM_AGE) {
                 validationResult = Optional.of("El alumno debe ser mayor de " + MINIMUM_AGE + " años");
+            } else if(age > MAXIMUM_AGE) {
+                validationResult = Optional.of("El alumno no puede ser mayor de " + MAXIMUM_AGE + " años");
             } else {
                 validationResult = Optional.empty();
             }

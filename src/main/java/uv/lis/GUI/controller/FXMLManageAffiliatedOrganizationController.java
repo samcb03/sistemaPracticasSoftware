@@ -181,6 +181,7 @@ public class FXMLManageAffiliatedOrganizationController extends ValidationHandle
         textFieldStreet.setText(currentOrganization.getStreet());
         textFieldStreetNumber.setText(currentOrganization.getStreetNumber());
         textFieldPostalCode.setText(currentOrganization.getPostalCode());
+        textFieldPhoneNumber.setText(currentOrganization.getPhoneNumber());
         textFieldEmail.setText(currentOrganization.getEmail());
         textFieldSector.setText(currentOrganization.getSector());
         textFieldNumberOfDirectUsers.setText(String.valueOf(currentOrganization.getNumberOfDirectUsers()));
