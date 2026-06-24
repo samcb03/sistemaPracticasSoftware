@@ -39,6 +39,7 @@ class SubjectDAOTest {
     private static final String SECOND_STUDENT_ID = "S23013128";
     private static final String INVALID_STUDENT_ID = "S999999999";
     private static final String PERSONNEL_NUMBER = "UV-001";
+    private static final int VALID_PERIOD_ID = 3;
     private static final String SUBJECT_NAME = "Practicas Profesionales";
     private static final String SCHOOL_PERIOD_NAME = "Febrero-Julio 2026";
     private static final String CONNECTION_ERROR = "Fallo de conexión";
@@ -206,14 +207,14 @@ class SubjectDAOTest {
     void assignStudentToSubject_successful_returnsTrue() throws Exception {
         mockUpdateExecution(ROWS_AFFECTED);
 
-        assertTrue(subjectDAO.assignStudentToSubject(VALID_STUDENT_ID, EXPECTED_NRC));
+        assertTrue(subjectDAO.assignStudentToSubject(VALID_STUDENT_ID, EXPECTED_NRC,VALID_PERIOD_ID));
     }
 
     @Test
     void assignStudentToSubject_noRowsAffected_returnsFalse() throws Exception {
         mockUpdateExecution(NO_ROWS_AFFECTED);
 
-        assertFalse(subjectDAO.assignStudentToSubject(VALID_STUDENT_ID, EXPECTED_NRC));
+        assertFalse(subjectDAO.assignStudentToSubject(VALID_STUDENT_ID, EXPECTED_NRC,VALID_PERIOD_ID));
     }
 
     @Test
@@ -221,7 +222,7 @@ class SubjectDAOTest {
         when(connectionManager.getConnection()).thenThrow(new SQLException(CONNECTION_ERROR));
 
         assertThrows(OperationException.class,
-            () -> subjectDAO.assignStudentToSubject(VALID_STUDENT_ID, EXPECTED_NRC));
+            () -> subjectDAO.assignStudentToSubject(VALID_STUDENT_ID, EXPECTED_NRC,VALID_PERIOD_ID));
     }
 
     @Test
