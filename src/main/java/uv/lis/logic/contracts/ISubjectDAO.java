@@ -26,7 +26,7 @@ public interface ISubjectDAO {
      * @return the list of subject NRC and names, empty if there are none
      * @throws OperationException if the subjects cannot be retrieved
      */
-    ArrayList<String> getAllSubjectsNrcName() throws OperationException;
+    ArrayList<Subject> getAllSubjectsNrcName() throws OperationException;
 
     /**
      * Retrieves the NRC of the subject a student is enrolled in.
@@ -71,7 +71,7 @@ public interface ISubjectDAO {
      * @return true if the student was enrolled, false otherwise
      * @throws OperationException if the student cannot be enrolled
      */
-    boolean assignStudentToSubject(String studentId, int subjectNrc) throws OperationException;
+    boolean assignStudentToSubject(String studentId, int subjectNrc, int periodId) throws OperationException;
 
     /**
      * Checks whether a section is already taken in a given school period.

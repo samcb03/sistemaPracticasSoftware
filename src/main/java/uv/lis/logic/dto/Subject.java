@@ -85,6 +85,11 @@ public class Subject {
     public void setSection(String section) {
         this.section = section;
     }
+
+    @Override
+    public String toString() {
+        return nrc + " - " + name + " - " + schoolPeriodName;
+    }
     
     @Override
     public boolean equals(Object object) {

@@ -19,13 +19,14 @@ import uv.lis.GUI.ValidationHandler;
 import uv.lis.logic.dao.StudentDAO;
 import uv.lis.logic.dao.SubjectDAO;
 import uv.lis.logic.dto.Student;
+import uv.lis.logic.dto.Subject;
 import uv.lis.logic.exceptions.OperationException;
 import uv.lis.logic.utils.InputValidator;
 
 public class FXMLAssignStudentSubjectController extends ValidationHandler {
 
     @FXML private Label labelMessage;
-    @FXML private ComboBox<String> comboBoxSubjects;
+    @FXML private ComboBox<Subject> comboBoxSubjects;
     @FXML private Button buttonAssign;
     @FXML private Button buttonBack;
     @FXML private TableView<Student> tableViewStudents;
@@ -48,7 +49,7 @@ public class FXMLAssignStudentSubjectController extends ValidationHandler {
 
     private void loadSubjects() {
         try {
-            ArrayList<String> subjects = subjectDAO.getAllSubjectsNrcName();
+            ArrayList<Subject> subjects = subjectDAO.getAllSubjectsNrcName();
             comboBoxSubjects.setItems(FXCollections.observableArrayList(subjects));
         } catch (OperationException e) {
             showError(e.getMessage());
@@ -84,7 +85,7 @@ public class FXMLAssignStudentSubjectController extends ValidationHandler {
 
     @FXML
     public void validateFields() {
-        String selectedSubject = comboBoxSubjects.getSelectionModel().getSelectedItem();
+        Subject selectedSubject = comboBoxSubjects.getSelectionModel().getSelectedItem();
         Student selectedStudent = tableViewStudents.getSelectionModel().getSelectedItem();
 
         Optional<String> subjectValidation = InputValidator.validateComboBox(
@@ -100,15 +101,14 @@ public class FXMLAssignStudentSubjectController extends ValidationHandler {
     }
 
     private void assignStudent() {
-        String selectedSubject = comboBoxSubjects.getSelectionModel().getSelectedItem();
+        Subject selectedSubject = comboBoxSubjects.getSelectionModel().getSelectedItem();
         Student selectedStudent = tableViewStudents.getSelectionModel().getSelectedItem();
         
         try {
-            int nrc = Integer.parseInt(selectedSubject.split(" - ")[0]);
-
             boolean isAssigned = subjectDAO.assignStudentToSubject(
                 selectedStudent.getIdStudent(),
-                nrc
+                selectedSubject.getNrc(),
+                selectedSubject.getSchoolPeriodId()
             );
 
             if (isAssigned) {
