@@ -193,9 +193,7 @@ public class FXMLUploadDocumentsControllerTest extends ApplicationTest {
         when(expedientDAOMock.getIdDocumentTypeByName(DOCUMENT_TYPE_MONTHLY_REPORT))
             .thenReturn(Optional.of(DOCUMENT_TYPE_ID_MONTHLY_REPORT));
         when(expedientDAOMock.isDocumentTypeValidated(anyString(), anyInt())).thenReturn(false);
-        when(reportDAOMock.countMonthlyReportsByStudent(VALID_STUDENT_ID)).thenReturn(1);
-        when(expedientDAOMock.countDocumentsByStudentAndType(VALID_STUDENT_ID,
-            DOCUMENT_TYPE_ID_MONTHLY_REPORT)).thenReturn(1);
+        when(reportDAOMock.getUploadableMonthlyReports(VALID_STUDENT_ID)).thenReturn(List.of());
 
         selectDocumentType(DOCUMENT_TYPE_MONTHLY_REPORT);
         clickOn(BUTTON_UPLOAD_DOCUMENT_SELECTOR);

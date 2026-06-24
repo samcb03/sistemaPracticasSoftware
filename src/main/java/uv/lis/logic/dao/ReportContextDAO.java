@@ -2,6 +2,8 @@ package uv.lis.logic.dao;
 
 import static uv.lis.logic.utils.InputValidator.NO_VALUE;
 import static uv.lis.logic.utils.InputValidator.STATUS_ASSIGNED;
+import static uv.lis.logic.utils.InputValidator.STATUS_REJECTED;
+import static uv.lis.logic.utils.InputValidator.STATUS_REQUESTED;
 
 import java.sql.Connection;
 import java.sql.Date;
@@ -268,12 +270,16 @@ public class ReportContextDAO implements IReportContextDAO {
         boolean isDuplicate = false;
         String reportContextQuery = "SELECT COUNT(*) FROM Reporte r "
                                   + "INNER JOIN ReporteMensual rm ON r.idReporte = rm.idReporte "
-                                  + "WHERE r.matricula = ? AND rm.mes = ?";
+                                  + "LEFT JOIN Expediente e ON e.idReporte = r.idReporte "
+                                  + "WHERE r.matricula = ? AND rm.mes = ? "
+                                  + "AND COALESCE(e.idEstatus, ?) <> ?";
 
         try (Connection databaseConnection = connectionManager.getConnection();
             PreparedStatement preparedStatement = databaseConnection.prepareStatement(reportContextQuery)) {
             preparedStatement.setString(1, studentId);
             preparedStatement.setString(2, month);
+            preparedStatement.setInt(3, STATUS_REQUESTED);
+            preparedStatement.setInt(4, STATUS_REJECTED);
 
             try (ResultSet resultSet = preparedStatement.executeQuery()) {
                 isDuplicate = resultSet.next() && resultSet.getInt(1) > NO_VALUE;

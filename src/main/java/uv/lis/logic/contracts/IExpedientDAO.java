@@ -50,6 +50,17 @@ public interface IExpedientDAO {
     void uploadDocument(String idStudent, String typeDocument, File file) throws OperationException;
 
     /**
+     * Uploads a monthly report document linked to a specific generated report.
+     * If a rejected document already exists for that report, it is replaced.
+     *
+     * @param idStudent the identifier of the student who owns the expedient
+     * @param file the monthly report file to upload
+     * @param idReport the identifier of the report the document corresponds to
+     * @throws OperationException if the document cannot be uploaded
+     */
+    void uploadMonthlyReport(String idStudent, File file, int idReport) throws OperationException;
+
+    /**
      * Retrieves the names of all the available document types.
      *
      * @return the list of document type names, empty if there are none

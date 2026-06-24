@@ -1,6 +1,7 @@
 package uv.lis.logic.dao;
 
 import static uv.lis.logic.utils.InputValidator.NO_VALUE;
+import static uv.lis.logic.utils.InputValidator.STATUS_REJECTED;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -598,5 +599,44 @@ public class ReportDAO implements IReportDAO {
             throw new OperationException(CHECK_REPORT_ERROR, e);
         }
         return count;
+    }
+
+    @Override
+    public List<MonthlyReport> getUploadableMonthlyReports(String studentId) throws OperationException {
+        List<MonthlyReport> uploadableReports = new ArrayList<>();
+        String reportQuery = "SELECT r.idReporte, rm.mes "
+                            + "FROM Reporte r "
+                            + "INNER JOIN ReporteMensual rm ON r.idReporte = rm.idReporte "
+                            + "LEFT JOIN Expediente e ON e.idReporte = r.idReporte "
+                            + "WHERE r.matricula = ? "
+                            + "AND (e.idExpediente IS NULL OR e.idEstatus = ?) "
+                            + "AND r.idReporte = (SELECT MAX(r2.idReporte) "
+                            + "FROM Reporte r2 "
+                            + "INNER JOIN ReporteMensual rm2 ON r2.idReporte = rm2.idReporte "
+                            + "WHERE r2.matricula = r.matricula AND rm2.mes = rm.mes) "
+                            + "ORDER BY r.idReporte";
+
+        try (Connection databaseConnection = connectionManager.getConnection();
+            PreparedStatement preparedStatement = databaseConnection.prepareStatement(reportQuery)) {
+            preparedStatement.setString(1, studentId);
+            preparedStatement.setInt(2, STATUS_REJECTED);
+
+            try (ResultSet resultSet = preparedStatement.executeQuery()) {
+                while (resultSet.next()) {
+                    uploadableReports.add(mapUploadableMonthlyReport(resultSet));
+                }
+            }
+        } catch (SQLException e) {
+            LOGGER.log(Level.SEVERE, "Error al obtener los reportes mensuales por subir", e);
+            throw new OperationException(CHECK_REPORT_ERROR, e);
+        }
+        return uploadableReports;
+    }
+
+    private MonthlyReport mapUploadableMonthlyReport(ResultSet resultSet) throws SQLException {
+        MonthlyReport monthlyReport = new MonthlyReport();
+        monthlyReport.setIdReport(resultSet.getInt("idReporte"));
+        monthlyReport.setMonth(resultSet.getString("mes"));
+        return monthlyReport;
     }
 }
