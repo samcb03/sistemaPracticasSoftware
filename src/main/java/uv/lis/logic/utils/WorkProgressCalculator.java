@@ -14,6 +14,7 @@ public final class WorkProgressCalculator {
     private static final int TOTAL_PROGRESS_PERCENTAGE = 100;
     private static final int MINIMUM_WEEKS = 1;
     private static final int ZERO_PROGRESS = 0;
+    private static final int NO_WEEK_OFFSET = 0;
     private static final double DAYS_PER_WEEK = 7.0;
 
     private WorkProgressCalculator() {}
@@ -71,6 +72,29 @@ public final class WorkProgressCalculator {
             }
         }
         return weeks;
+    }
+
+    /**
+     * Returns how many weeks after the report period start an activity begins,
+     * so it can be placed in its matching week column instead of always week one.
+     *
+     * @param activity the activity to evaluate
+     * 
+     * @param periodStart the start date of the report period (earliest activity start)
+     * 
+     * @return the zero-based week offset where the activity starts,
+     *         or zero if it begins on or before the period start
+     */
+    public static int calculateStartWeekOffset(Activity activity, LocalDate periodStart) {
+        int weekOffset = NO_WEEK_OFFSET;
+        if (hasValidSchedule(activity) && periodStart != null) {
+            LocalDate startDate = activity.getStartDate();
+            if (startDate.isAfter(periodStart)) {
+                long daysFromStart = ChronoUnit.DAYS.between(periodStart, startDate);
+                weekOffset = (int) Math.floor(daysFromStart / DAYS_PER_WEEK);
+            }
+        }
+        return weekOffset;
     }
 
     /**

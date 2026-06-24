@@ -1,5 +1,6 @@
 package uv.lis.logic.dto;
 
+import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.Objects;
 
@@ -12,6 +13,7 @@ public class PartialReport extends Report {
     private int realAdvanceWeek;
     private String activityName;
     private String reportPeriod;
+    private LocalDate reportPeriodStart;
     private int reportNumber;
     private String projectSupervisor;
     private String result;
@@ -66,6 +68,14 @@ public class PartialReport extends Report {
 
     public void setReportPeriod(String reportPeriod) {
         this.reportPeriod = reportPeriod;
+    }
+
+    public LocalDate getReportPeriodStart() {
+        return reportPeriodStart;
+    }
+
+    public void setReportPeriodStart(LocalDate reportPeriodStart) {
+        this.reportPeriodStart = reportPeriodStart;
     }
 
     public int getReportNumber() {
@@ -202,6 +212,6 @@ public class PartialReport extends Report {
     @Override
     public int hashCode() {
         return Objects.hash(plannedAdvanceWeek, realAdvanceWeek, activityName, 
-                            reportPeriod, reportNumber, result, manualAdvances);
+            reportPeriod, reportNumber, result, manualAdvances);
     }
 }

@@ -113,7 +113,7 @@ public class SubjectDAO implements ISubjectDAO {
     @Override
     public boolean assignStudentToSubject(String studentId, int subjectNrc, int periodId) throws OperationException {
         boolean isAssigned = false;
-        String subjectQuery = "INSERT INTO alumno_esta_ee (matricula, NRC,idPeriodo) VALUES (?, ?,?);";
+        String subjectQuery = "INSERT INTO alumno_esta_ee (matricula, NRC, idPeriodo) VALUES (?, ?,?);";
 
         try (Connection databaseConnection = connectionManager.getConnection();
             PreparedStatement preparedStatement = databaseConnection.prepareStatement(subjectQuery)) {
