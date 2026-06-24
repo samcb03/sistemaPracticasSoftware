@@ -17,6 +17,7 @@ import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
+import javafx.scene.control.ChoiceDialog;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.TableColumn;
@@ -30,6 +31,7 @@ import uv.lis.logic.dao.ExpedientDAO;
 import uv.lis.logic.dao.ReportDAO;
 import uv.lis.logic.dao.StudentDAO;
 import uv.lis.logic.dto.Expedient;
+import uv.lis.logic.dto.MonthlyReport;
 import uv.lis.logic.dto.Student;
 import uv.lis.logic.exceptions.OperationException;
 import uv.lis.logic.utils.SessionManager;
@@ -59,6 +61,9 @@ public class FXMLUploadDocumentsController extends ValidationHandler {
     private static final String ALREADY_VALIDATED_MESSAGE =
         "Este documento ya fue validado y no puede subirse nuevamente.";
     private static final String NO_FINAL_REPORT = "Debe tener validado el reporte final";
+    private static final String MONTHLY_DIALOG_TITLE = "Subir reporte mensual";
+    private static final String MONTHLY_DIALOG_CONTENT = "Seleccione el mes del reporte a subir:";
+    private static final String MONTHLY_FILE_CHOOSER_TITLE = "Seleccionar archivo del reporte mensual";
 
     @FXML private Button buttonUploadDocument;
     @FXML private Button buttonBack;
@@ -151,8 +156,79 @@ public class FXMLUploadDocumentsController extends ValidationHandler {
             if (restriction.isPresent()) {
                 showError(restriction.get());
             } else {
-                chooseFileAndUpload(selectedDocument);
+                dispatchUpload(selectedDocument);
             }
+        } catch (OperationException e) {
+            showError(e.getMessage());
+        }
+    }
+
+    private void dispatchUpload(String selectedDocument) throws OperationException {
+        Optional<Integer> typeId = expedientDAO.getIdDocumentTypeByName(selectedDocument);
+
+        if (typeId.isPresent() && typeId.get() == MONTHLY_REPORT_TYPE) {
+            chooseMonthlyReportAndUpload();
+        } else {
+            chooseFileAndUpload(selectedDocument);
+        }
+    }
+
+    private void chooseMonthlyReportAndUpload() throws OperationException {
+        List<MonthlyReport> uploadableReports = reportDAO.getUploadableMonthlyReports(student.getIdStudent());
+
+        if (uploadableReports.isEmpty()) {
+            showError(NOT_SAVED_MESSAGE);
+        } else {
+            Optional<MonthlyReport> selectedReport = askMonthlyReportToUpload(uploadableReports);
+            selectedReport.ifPresent(this::uploadMonthlyReportFile);
+        }
+    }
+
+    private Optional<MonthlyReport> askMonthlyReportToUpload(List<MonthlyReport> uploadableReports) {
+        List<String> months = new ArrayList<>();
+        for (MonthlyReport report : uploadableReports) {
+            months.add(report.getMonth());
+        }
+
+        ChoiceDialog<String> monthDialog = new ChoiceDialog<>(months.get(0), months);
+        monthDialog.setTitle(MONTHLY_DIALOG_TITLE);
+        monthDialog.setHeaderText(null);
+        monthDialog.setContentText(MONTHLY_DIALOG_CONTENT);
+
+        Optional<String> chosenMonth = monthDialog.showAndWait();
+        return chosenMonth.flatMap(month -> findReportByMonth(uploadableReports, month));
+    }
+
+    private Optional<MonthlyReport> findReportByMonth(List<MonthlyReport> reports, String month) {
+        Optional<MonthlyReport> matchingReport = Optional.empty();
+        for (MonthlyReport report : reports) {
+            if (report.getMonth().equals(month)) {
+                matchingReport = Optional.of(report);
+            }
+        }
+        return matchingReport;
+    }
+
+    private void uploadMonthlyReportFile(MonthlyReport report) {
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.setTitle(MONTHLY_FILE_CHOOSER_TITLE);
+        fileChooser.getExtensionFilters().add(
+            new FileChooser.ExtensionFilter("Archivos PDF", "*.pdf"));
+
+        File selectedFile = fileChooser.showOpenDialog(buttonUploadDocument.getScene().getWindow());
+        if (selectedFile == null) {
+            showError(NO_FILE_MESSAGE);
+        } else {
+            persistMonthlyReport(report, selectedFile);
+        }
+    }
+
+    private void persistMonthlyReport(MonthlyReport report, File selectedFile) {
+        try {
+            expedientDAO.uploadMonthlyReport(student.getIdStudent(), selectedFile, report.getIdReport());
+            showSuccess(SUCCESS_MESSAGE);
+            clearFields();
+            loadStudentDocuments();
         } catch (OperationException e) {
             showError(e.getMessage());
         }
@@ -197,9 +273,7 @@ public class FXMLUploadDocumentsController extends ValidationHandler {
         if (idTypeDocument == AUTOEVALUATION_TYPE_ID) {
             exists = autoevaluationDAO.existsByStudent(studentId);
         } else if(idTypeDocument == MONTHLY_REPORT_TYPE) {
-            int generate = reportDAO.countMonthlyReportsByStudent(studentId);
-            int uploaded = expedientDAO.countDocumentsByStudentAndType(studentId, MONTHLY_REPORT_TYPE);
-            exists = generate > uploaded;
+            exists = !reportDAO.getUploadableMonthlyReports(studentId).isEmpty();
         } else {
             exists = reportDAO.hasReportOfType(studentId, idTypeDocument);
         }

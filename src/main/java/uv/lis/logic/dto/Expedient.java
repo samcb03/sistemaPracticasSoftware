@@ -15,6 +15,7 @@ public class Expedient {
     private int idTypeDocument;
     private int idStatus;
     private String statusName;
+    private int idReport;
 
     public Expedient() {
     }
@@ -90,6 +91,14 @@ public class Expedient {
 
     public void setStatusName(String statusName) {
         this.statusName = statusName;
+    }
+
+    public int getIdReport() {
+        return idReport;
+    }
+
+    public void setIdReport(int idReport) {
+        this.idReport = idReport;
     }
 
     public boolean isValidated() {

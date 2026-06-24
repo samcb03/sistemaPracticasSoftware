@@ -111,4 +111,15 @@ public interface IReportDAO {
      * @throws OperationException if the count cannot be retrieved
      */
     int countMonthlyReportsByStudent(String studentId) throws OperationException;
+
+    /**
+     * Retrieves the monthly reports of a student that can still be uploaded,
+     * meaning those without an uploaded document or whose document was rejected.
+     * Only the latest report per month is returned.
+     *
+     * @param studentId the identifier of the student to query
+     * @return the list of uploadable monthly reports, empty if there are none
+     * @throws OperationException if the reports cannot be retrieved
+     */
+    List<MonthlyReport> getUploadableMonthlyReports(String studentId) throws OperationException;
 }

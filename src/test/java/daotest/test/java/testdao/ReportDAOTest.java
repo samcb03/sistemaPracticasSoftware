@@ -7,6 +7,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
+import static uv.lis.logic.utils.InputValidator.NO_VALUE;
 
 import java.lang.reflect.Field;
 import java.sql.Connection;
@@ -47,6 +48,11 @@ class ReportDAOTest {
     private static final int NON_REPORT_TYPE_ID = 5;
     private static final int REPORT_COUNT = 1;
     private static final int NO_REPORT_COUNT = 0;
+    private static final int UPLOADABLE_REPORT_ID = 7;
+
+    private static final String UPLOADABLE_MONTH = "Mayo";
+    private static final String REPORT_ID_COLUMN = "idReporte";
+    private static final String MONTH_COLUMN = "mes";
 
     private static final String CONNECTION_MANAGER_FIELD = "connectionManager";
     private static final String FIRST_DESCRIPTION = "Descripcion test 1";
@@ -418,5 +424,33 @@ class ReportDAOTest {
 
         assertThrows(OperationException.class,
             () -> reportDAO.countMonthlyReportsByStudent(FIRST_STUDENT_ID));
+    }
+
+    @Test
+    void getUploadableMonthlyReports_pendingReport_returnsReportWithMonth() throws Exception {
+        mockQueryExecution();
+        when(resultSet.next()).thenReturn(true, false);
+        when(resultSet.getInt(REPORT_ID_COLUMN)).thenReturn(UPLOADABLE_REPORT_ID);
+        when(resultSet.getString(MONTH_COLUMN)).thenReturn(UPLOADABLE_MONTH);
+
+        List<MonthlyReport> uploadableReports = reportDAO.getUploadableMonthlyReports(FIRST_STUDENT_ID);
+
+        assertEquals(UPLOADABLE_MONTH, uploadableReports.get(NO_VALUE).getMonth());
+    }
+
+    @Test
+    void getUploadableMonthlyReports_noReports_returnsEmptyList() throws Exception {
+        mockQueryExecution();
+        when(resultSet.next()).thenReturn(false);
+
+        assertTrue(reportDAO.getUploadableMonthlyReports(FIRST_STUDENT_ID).isEmpty());
+    }
+
+    @Test
+    void getUploadableMonthlyReports_sqlError_throwsOperationException() throws Exception {
+        when(connectionManager.getConnection()).thenThrow(new SQLException(DATABASE_ERROR_MESSAGE));
+
+        assertThrows(OperationException.class,
+            () -> reportDAO.getUploadableMonthlyReports(FIRST_STUDENT_ID));
     }
 }
