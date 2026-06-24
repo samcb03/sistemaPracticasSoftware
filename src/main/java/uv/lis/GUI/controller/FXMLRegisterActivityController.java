@@ -66,6 +66,7 @@ public class FXMLRegisterActivityController extends ValidationHandler {
     private SchoolPeriodDAO schoolPeriodDAO;
     private SchoolPeriod studentPeriod;
     private int currentProjectId;
+    private String currentStudentId;
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
@@ -85,7 +86,7 @@ public class FXMLRegisterActivityController extends ValidationHandler {
     private void registerIfWithinHourLimit() {
         try {
             int newHours = Integer.parseInt(textFieldHours.getText().trim());
-            int accumulatedHours = activityDAO.getTotalActivityHoursByProject(currentProjectId);
+            int accumulatedHours = activityDAO.getTotalActivityHoursByStudent(currentStudentId);
 
             if (accumulatedHours + newHours > MAX_TOTAL_HOURS) {
                 showError(MAX_HOURS_EXCEEDED_MESSAGE);
@@ -121,6 +122,7 @@ public class FXMLRegisterActivityController extends ValidationHandler {
             Student student = SessionManager.getInstance().getCurrentStudent();
             if (student != null) {
                 String studentId = student.getIdStudent();
+                this.currentStudentId = studentId;
                 Optional<Project> assignedProject = projectDAO.getProjectByStudentId(studentId);
 
                 if (assignedProject.isPresent()) {
@@ -182,6 +184,7 @@ public class FXMLRegisterActivityController extends ValidationHandler {
         activity.setEndDate(datePickerFinalDate.getValue());
         activity.setHoursReported(Integer.parseInt(textFieldHours.getText().trim()));
         activity.setProjectId(currentProjectId);
+        activity.setStudentId(currentStudentId);
         return activity;
     }
 

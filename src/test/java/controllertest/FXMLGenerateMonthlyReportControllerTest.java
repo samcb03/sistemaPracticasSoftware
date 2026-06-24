@@ -99,9 +99,9 @@ public class FXMLGenerateMonthlyReportControllerTest extends ApplicationTest {
         monthlyReportCommonMock = mock(MonthlyReportCommon.class);
 
         when(reportContextDAOMock.getMonthlyReportData(anyString())).thenReturn(buildContext());
-        when(reportContextDAOMock.getRecordedActivitiesByMonth(anyInt(), anyInt(), anyInt()))
+        when(reportContextDAOMock.getRecordedActivitiesByMonth(anyString(), anyInt(), anyInt()))
             .thenReturn(List.of(buildActivity()));
-        when(reportContextDAOMock.getSumOfReportedHours(anyInt(), anyInt(), anyInt()))
+        when(reportContextDAOMock.getSumOfReportedHours(anyString(), anyInt(), anyInt()))
             .thenReturn(NORMAL_REPORTED_HOURS);
         when(reportContextDAOMock.getTotalReportedHoursByStudentId(anyString()))
             .thenReturn(String.valueOf(NORMAL_ACCUMULATED_HOURS));
@@ -134,7 +134,7 @@ public class FXMLGenerateMonthlyReportControllerTest extends ApplicationTest {
 
     @Test
     void validateMonthlyReport_noActivities_showsValidationError() throws Exception {
-        when(reportContextDAOMock.getRecordedActivitiesByMonth(anyInt(), anyInt(), anyInt()))
+        when(reportContextDAOMock.getRecordedActivitiesByMonth(anyString(), anyInt(), anyInt()))
             .thenReturn(List.of());
 
         selectMonth();
