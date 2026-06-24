@@ -44,7 +44,7 @@ public final class InputValidator {
     public static final String PHONE_REGEX = "^[0-9]{7,15}$";
     public static final String PASSWORD_REGEX
         = "^(?=.*[A-Z])(?=.*\\d)(?=.*[!@#$%^&*()_+=\\[\\]{};':\"|,.<>/?-]).{8,}$";
-    public static final String REPEAT_LETTERS_REGEX = "(?i)^.*([\\p{L}])\\1{2,}.*$";
+    public static final String REPEAT_CHARACTERS_REGEX = "(?i)^.*([\\p{L}\\d])\\1{2,}.*$";
     public static final String STUDENT_ENROLLMENT = "^[Ss]\\d{8}$";
     public static final String REGISTER_REGEX = "^[\\p{L}0-9\\s.,-]+$";
     public static final String ADDRESS_NUMBER_REGEX = "^[a-zA-Z0-9\\s/#-]+$";
@@ -166,10 +166,10 @@ public final class InputValidator {
      * 
      * @return an error message if the pattern is found, empty otherwise
      */
-    public static Optional<String> validateNoConsecutiveRepeatedLetters(String fieldValue, String fieldName) {
+    public static Optional<String> validateNoConsecutiveRepeatedCharacters(String fieldValue, String fieldName) {
         Optional<String> validationResult;
-        if (fieldValue.matches(REPEAT_LETTERS_REGEX)) {
-            validationResult = Optional.of(fieldName + " no puede contener la misma letra repetida 3 veces o más");
+        if (fieldValue.matches(REPEAT_CHARACTERS_REGEX)) {
+            validationResult = Optional.of(fieldName + " no puede contener el mismo carácter repetido 3 veces o más");
         } else {
             validationResult = Optional.empty();
         }
@@ -212,7 +212,7 @@ public final class InputValidator {
             validateNoLeadingSpace(name, fieldName),
             validateNoTrailingSpace(name, fieldName),
             validateNoConsecutiveSpaces(name, fieldName),
-            validateNoConsecutiveRepeatedLetters(name, fieldName));
+            validateNoConsecutiveRepeatedCharacters(name, fieldName));
         return error;
     }
 
@@ -509,10 +509,11 @@ public final class InputValidator {
         } else {
             validationResult = firstError(
                 validateNotEmpty(registerValue, fieldName),
-                validateNoConsecutiveRepeatedLetters(registerValue, fieldName),
-                validateNoConsecutiveSpaces(registerValue, fieldName),
+                validateMaxLength(registerValue, MAX_TEXT_LENGTH, fieldName),
                 validateNoTrailingSpace(registerValue, fieldName),
-                validateNoLeadingSpace(registerValue, fieldName));
+                validateNoLeadingSpace(registerValue, fieldName),
+                validateNoConsecutiveRepeatedCharacters(registerValue, fieldName),
+                validateNoConsecutiveSpaces(registerValue, fieldName));
         }
         return validationResult;
     }

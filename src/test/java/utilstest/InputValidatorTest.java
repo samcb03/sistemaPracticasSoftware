@@ -94,7 +94,7 @@ class InputValidatorTest {
     void validateNoConsecutiveRepeatedLetters_variousInputs_returnsExpectedResult(String value,
             boolean hasError) {
         boolean result =
-            InputValidator.validateNoConsecutiveRepeatedLetters(value, FIELD_NAME).isPresent();
+            InputValidator.validateNoConsecutiveRepeatedCharacters(value, FIELD_NAME).isPresent();
 
         assertEquals(hasError, result);
     }
