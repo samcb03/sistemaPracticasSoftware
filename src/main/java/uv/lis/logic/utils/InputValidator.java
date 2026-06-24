@@ -158,7 +158,7 @@ public final class InputValidator {
     }
 
     /**
-     * Verifies that a field does not contain the same letter repeated three or more times in a row.
+     * Verifies that a field does not contain the same character repeated three or more times in a row.
      *
      * @param fieldValue the value to evaluate
      * 
