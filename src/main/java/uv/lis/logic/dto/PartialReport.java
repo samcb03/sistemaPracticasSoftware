@@ -9,6 +9,7 @@ public class PartialReport extends Report {
     public static final int MAX_ACTIVITIES = 6;
     public static final int MAX_WEEKS = 8;
 
+    private String observations;
     private String activityName;
     private String reportPeriod;
     private LocalDate reportPeriodStart;
@@ -34,6 +35,14 @@ public class PartialReport extends Report {
         this.plannedAdvances = new int[MAX_WEEKS][MAX_ACTIVITIES];
         this.realAdvances = new int[MAX_WEEKS][MAX_ACTIVITIES];
         Arrays.fill(this.activityNames, "");
+    }
+
+    public String getObservations() {
+        return observations;
+    }
+
+    public void setObservations(String observations) {
+        this.observations = observations;
     }
 
     public String getActivityName() {
@@ -171,7 +180,7 @@ public class PartialReport extends Report {
     public void setManualAdvances(boolean manualAdvances) {
         this.manualAdvances = manualAdvances;
     }
-    
+
     @Override
     public boolean equals(Object object) {
         boolean isEqual = false;
@@ -180,9 +189,8 @@ public class PartialReport extends Report {
             isEqual = true;
         } else if (object != null && getClass() == object.getClass()) {
             PartialReport other = (PartialReport) object;
-            isEqual = plannedAdvanceWeek == other.plannedAdvanceWeek
-                && realAdvanceWeek == other.realAdvanceWeek
-                && reportNumber == other.reportNumber
+            isEqual = reportNumber == other.reportNumber
+                && Objects.equals(observations, other.observations)
                 && Objects.equals(activityName, other.activityName)
                 && Objects.equals(reportPeriod, other.reportPeriod)
                 && Objects.equals(result, other.result)
@@ -193,7 +201,6 @@ public class PartialReport extends Report {
 
     @Override
     public int hashCode() {
-        return Objects.hash(plannedAdvanceWeek, realAdvanceWeek, activityName, 
-            reportPeriod, reportNumber, result, manualAdvances);
+        return Objects.hash(observations, activityName, reportPeriod, reportNumber, result, manualAdvances);
     }
 }

@@ -41,7 +41,6 @@ class ReportDAOTest {
     private static final int PLANNED_HOURS = 10;
     private static final int REAL_HOURS = 8;
     private static final int REPORTED_HOURS = 40;
-    private static final float CALIFICATION = 9.0f;
 
     private static final int FIRST_COLUMN = 1;
     private static final int FINAL_REPORT_TYPE_ID = 2;
@@ -145,9 +144,6 @@ class ReportDAOTest {
     private Report builderFirstReport() {
         Report report = new Report();
         report.setId(FIRST_REPORT_ID);
-        report.setDescription(FIRST_DESCRIPTION);
-        report.setObservations(FIRST_OBSERVATIONS);
-        report.setActivity(FIRST_ACTIVITY);
         report.setStudentId(FIRST_STUDENT_ID);
         return report;
     }
@@ -155,37 +151,21 @@ class ReportDAOTest {
     private Report builderSecondReport() {
         Report report = new Report();
         report.setId(SECOND_REPORT_ID);
-        report.setDescription(SECOND_DESCRIPTION);
-        report.setObservations(SECOND_OBSERVATIONS);
-        report.setActivity(SECOND_ACTIVITY);
         report.setStudentId(SECOND_STUDENT_ID);
-        return report;
-    }
-
-    private Report builderReport() {
-        Report report = builderFirstReport();
-        report.setCalification(CALIFICATION);
         return report;
     }
 
     private PartialReport builderPartialReport() {
         PartialReport report = new PartialReport();
         report.setId(FIRST_REPORT_ID);
-        report.setDescription(FIRST_DESCRIPTION);
         report.setObservations(FIRST_OBSERVATIONS);
-        report.setActivity(FIRST_ACTIVITY);
         report.setStudentId(FIRST_STUDENT_ID);
-        report.setPlannedAdvanceWeek(PLANNED_HOURS);
-        report.setRealAdvanceWeek(REAL_HOURS);
         return report;
     }
 
     private FinalReport builderFinalReport() {
         FinalReport report = new FinalReport();
         report.setId(FIRST_REPORT_ID);
-        report.setDescription(FIRST_DESCRIPTION);
-        report.setObservations(FIRST_OBSERVATIONS);
-        report.setActivity(FIRST_ACTIVITY);
         report.setStudentId(FIRST_STUDENT_ID);
         report.setGeneralObservations(FIRST_OBSERVATIONS);
         return report;
@@ -194,9 +174,6 @@ class ReportDAOTest {
     private MonthlyReport builderMonthlyReport() {
         MonthlyReport report = new MonthlyReport();
         report.setId(FIRST_REPORT_ID);
-        report.setDescription(FIRST_DESCRIPTION);
-        report.setObservations(FIRST_OBSERVATIONS);
-        report.setActivity(FIRST_ACTIVITY);
         report.setStudentId(FIRST_STUDENT_ID);
         report.setMonth(MONTH);
         report.setReportedHours(REPORTED_HOURS);
@@ -351,23 +328,6 @@ class ReportDAOTest {
             () -> reportDAO.registerMonthlyReport(builderMonthlyReport()));
     }
 
-    @Test
-    void evaluationReport_validReport_executesWithoutException() throws Exception {
-        mockUpdateExecution(ROWS_AFFECTED);
-
-        reportDAO.evaluationReport(builderReport());
-
-        assertTrue(true);
-    }
-
-    @Test
-    void evaluationReport_sqlError_throwsOperationException() throws Exception {
-        when(connectionManager.getConnection()).thenThrow(
-            new SQLException(DATABASE_ERROR_MESSAGE));
-
-        assertThrows(OperationException.class,
-            () -> reportDAO.evaluationReport(builderReport()));
-    }
 
     @Test
     void hasReportOfType_reportExists_returnsTrue() throws Exception {
