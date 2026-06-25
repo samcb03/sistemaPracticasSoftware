@@ -146,6 +146,12 @@ public interface IExpedientDAO {
      */
     List<String> getStudentIdsWithDocumentType(int nrc, int idTypeDocument) throws OperationException;
 
-    //TODO falta el javadoc
+    /**
+     * Retrieves the identifiers of the students who have uploaded a liberation letter
+     * to their expedient.
+     *
+     * @return the list of student identifiers, empty if there are none
+     * @throws OperationException if the student identifiers cannot be retrieved
+     */
     List<String> getStudentIdsWithLiberationLetter() throws OperationException;
 }
