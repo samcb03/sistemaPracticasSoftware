@@ -9,7 +9,7 @@ import javafx.scene.control.Button;
 import uv.lis.GUI.WindowHandler;
 
 public class FXMLProjectManagementController extends WindowHandler {
-    
+
     private static final String REGISTER_PROJECT_VIEW = "/uv/lis/GUI/view/FXMLRegisterProject.fxml";
     private static final String CONSULT_PROJECT_VIEW = "/uv/lis/GUI/view/FXMLConsultProject.fxml";
     private static final String ASSIGNATION_PROJECT_VIEW = "/uv/lis/GUI/view/FXMLAssignationProject.fxml";
@@ -21,6 +21,7 @@ public class FXMLProjectManagementController extends WindowHandler {
     
     @Override
     public void initialize(URL location, ResourceBundle resources) {
+        /* No initialization required for this menu controller */
     }
 
     @FXML public void goToRegisterProject() { 
