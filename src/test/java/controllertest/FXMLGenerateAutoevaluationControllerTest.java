@@ -73,7 +73,6 @@ public class FXMLGenerateAutoevaluationControllerTest extends ApplicationTest {
     private static final String EXPECTED_JR_ERROR_MESSAGE = "Error técnico al generar el documento PDF.";
 
     private Stage primaryStage;
-    private FXMLGenerateAutoevaluationController autoevaluationController;
     private AutoevaluationCommon autoevaluationCommonMock;
     private AutoevaluationDAO autoevaluationDAOMock;
     private ExpedientDAO expedientDAOMock;
@@ -109,7 +108,6 @@ public class FXMLGenerateAutoevaluationControllerTest extends ApplicationTest {
                 return controller;
             });
             Parent root = loader.load();
-            autoevaluationController = loader.getController();
 
             stage.setScene(new Scene(root));
             stage.show();
