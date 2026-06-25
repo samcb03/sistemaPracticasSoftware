@@ -1,5 +1,6 @@
 package uv.lis.GUI.controller;
 
+import static uv.lis.logic.utils.InputValidator.EMAIL_REGEX;
 import static uv.lis.logic.utils.InputValidator.validateComboBox;
 import static uv.lis.logic.utils.InputValidator.validateEmail;
 import static uv.lis.logic.utils.InputValidator.validateText;
@@ -24,6 +25,12 @@ import uv.lis.logic.dto.ProjectSupervisor;
 import uv.lis.logic.exceptions.OperationException;
 
 public class FXMLRegisterProjectSupervisorController extends ValidationHandler {
+
+    private static final String POSITION_FIELD = "El cargo";
+    private static final String NAME_FIELD = "El nombre";
+    private static final String ORGANIZATION_FIELD = "La organización";
+    private static final String SUCCESSFUL_PROJECT_REGISTER_MESSAGE = "Encargado técnico registrado correctamente";
+    private static final String ERROR_PROJECT_REGISTER_MESSAGE = "Error al registrar al encargado técnico";
 
     @FXML private Button buttonBack;
     @FXML private Label labelError;
@@ -60,10 +67,10 @@ public class FXMLRegisterProjectSupervisorController extends ValidationHandler {
 
     private Optional<String> getFirstValidationError() {
         Stream<Optional<String>> validationStream = Stream.of(
-            validateText(textFieldName.getText(), "El nombre"),
-            validateText(textFieldPosition.getText(), "El cargo"),
-            validateEmail(textFieldEmail.getText().trim(), "El correo electrónico"),
-            validateComboBox(comboBoxOrganizationName.getValue(), "la organización")
+            validateText(textFieldName.getText(), NAME_FIELD),
+            validateText(textFieldPosition.getText(), POSITION_FIELD),
+            validateEmail(textFieldEmail.getText().trim(), EMAIL_REGEX),
+            validateComboBox(comboBoxOrganizationName.getValue(), ORGANIZATION_FIELD)
         );
         Optional<String> firstError = validationStream
             .filter(Optional::isPresent)
@@ -77,35 +84,33 @@ public class FXMLRegisterProjectSupervisorController extends ValidationHandler {
         try {
             boolean registered = projectSupervisorDAO.registerProjectSupervisor(projectSupervisor);
             if (registered) {
-                showSuccess("Encargado técnico registrado correctamente");
+                showSuccess(SUCCESSFUL_PROJECT_REGISTER_MESSAGE);
                 clearFields();
             } else {
-                showError("Error al registrar al encargado técnico");
+                showError(ERROR_PROJECT_REGISTER_MESSAGE);
             }
-        } catch (OperationException operationException) {
+        } catch(OperationException operationException) {
             showError(operationException.getMessage());
         }
     }
 
     private ProjectSupervisor buildProjectSupervisor() {
-    ProjectSupervisor projectSupervisor = new ProjectSupervisor();
-    projectSupervisor.setName(textFieldName.getText().trim());
-    projectSupervisor.setPosition(textFieldPosition.getText().trim());
-    projectSupervisor.setEmail(textFieldEmail.getText().trim());
-    projectSupervisor.setIsActive(true);
-    
-    String selectedOrganization = comboBoxOrganizationName.getValue();
-    
-    if (selectedOrganization != null) {
-        try {
-            int organizationId = affiliatedOrganizationDAO.getOrganizationIdByName(selectedOrganization);
-            projectSupervisor.setOrganizationInt(organizationId); 
-        } catch (OperationException e) {
-            showError(e.getMessage());
+        ProjectSupervisor projectSupervisor = new ProjectSupervisor();
+        projectSupervisor.setName(textFieldName.getText().trim());
+        projectSupervisor.setPosition(textFieldPosition.getText().trim());
+        projectSupervisor.setEmail(textFieldEmail.getText().trim());
+        projectSupervisor.setIsActive(true);
+        String selectedOrganization = comboBoxOrganizationName.getValue();
+        
+        if (selectedOrganization != null) {
+            try {
+                int organizationId = affiliatedOrganizationDAO.getOrganizationIdByName(selectedOrganization);
+                projectSupervisor.setOrganizationInt(organizationId); 
+            } catch (OperationException e) {
+                showError(e.getMessage());
+            }
         }
-    }
-    
-    return projectSupervisor;
+        return projectSupervisor;
     }
 
     @Override
