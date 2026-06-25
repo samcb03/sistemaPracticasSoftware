@@ -146,5 +146,6 @@ public interface IExpedientDAO {
      */
     List<String> getStudentIdsWithDocumentType(int nrc, int idTypeDocument) throws OperationException;
 
+    //TODO falta el javadoc
     List<String> getStudentIdsWithLiberationLetter() throws OperationException;
 }

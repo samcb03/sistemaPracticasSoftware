@@ -338,7 +338,7 @@ public class ProjectDAO implements IProjectDAO{
 
 
     @Override
-    public Optional<ProjectSummary> getDetailsProjectByStudentId(String studentId) throws OperationException {
+    public Optional<ProjectSummary> getProjectDetailsByStudentId(String studentId) throws OperationException {
         Optional<ProjectSummary> projectOptional = Optional.empty();
         String projectQuery = "SELECT p.nombre, p.metodologiaProyecto, "
                             + "p.objetivo, p.descripcion, "

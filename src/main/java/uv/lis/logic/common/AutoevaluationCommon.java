@@ -54,8 +54,7 @@ public class AutoevaluationCommon {
         return reportsContext;
     }
 
-    public JasperPrint generateAutoevaluation(Autoevaluation autoevaluation)
-            throws JRException, OperationException {
+    public JasperPrint generateAutoevaluation(Autoevaluation autoevaluation) throws JRException, OperationException {
         Student currentStudent = SessionManager.getInstance().getCurrentStudent();
 
         if (currentStudent == null) {
@@ -77,8 +76,7 @@ public class AutoevaluationCommon {
         return jasperPrint;
     }
 
-    public JasperPrint fillAutoevaluation(Autoevaluation autoevaluation)
-            throws JRException, OperationException {
+    public JasperPrint fillAutoevaluation(Autoevaluation autoevaluation) throws JRException, OperationException {
         JasperPrint jasperPrint;
 
         try (InputStream autoevaluationStream = getClass().getResourceAsStream(TEMPLATE_PATH)) {
@@ -147,10 +145,10 @@ public class AutoevaluationCommon {
         boolean isValid = true;
         int[] scores = {
             autoevaluation.getProductiveParticipation(), autoevaluation.getAppliedKnowledge(),
-            autoevaluation.getConfidenceInActivities(),  autoevaluation.getActivitiesInterest(),
-            autoevaluation.getOrganizationSupport(),     autoevaluation.getRulesAwareness(),
-            autoevaluation.getSupervisorGuidance(),      autoevaluation.getEffectiveMonitoring(),
-            autoevaluation.getCareerAlignment(),         autoevaluation.getInternshipImportance()
+            autoevaluation.getConfidenceInActivities(), autoevaluation.getActivitiesInterest(),
+            autoevaluation.getOrganizationSupport(), autoevaluation.getRulesAwareness(),
+            autoevaluation.getSupervisorGuidance(), autoevaluation.getEffectiveMonitoring(),
+            autoevaluation.getCareerAlignment(), autoevaluation.getInternshipImportance()
         };
         for (int score : scores) {
             if (score < MINIMUM_SCORE || score > MAXIMUM_SCORE) {
