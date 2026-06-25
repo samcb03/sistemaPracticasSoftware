@@ -1,6 +1,7 @@
 package controllertest;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
@@ -91,11 +92,13 @@ public class FXMLAssignationProjectControllerTest extends ApplicationTest {
     }
 
     @BeforeEach
-    void setUpMocks() throws ReflectiveOperationException {
+    void setUpMocks() throws ReflectiveOperationException, OperationException {
         requestProjectDAOMock = mock(RequestProjectDAO.class);
         projectDAOMock = mock(ProjectDAO.class);
         studentDAOMock = mock(StudentDAO.class);
         notificationDAOMock = mock(NotificationDAO.class);
+
+        when(requestProjectDAOMock.getAvailableProjects()).thenReturn(new ArrayList<>());
 
         injectField(REQUEST_PROJECT_DAO_FIELD, requestProjectDAOMock);
         injectField(PROJECT_DAO_FIELD, projectDAOMock);
@@ -106,8 +109,8 @@ public class FXMLAssignationProjectControllerTest extends ApplicationTest {
     @Test
     void assignStudent_validInput_showsSuccessMessage() throws OperationException {
         stubAvailableAssignment();
-        when(requestProjectDAOMock.assignStudentToProject(anyString(), anyInt())).thenReturn(true);
-        when(requestProjectDAOMock.getAvailableProjects()).thenReturn(new ArrayList<>());
+        when(requestProjectDAOMock.assignStudentToProject(anyString(), anyInt(), anyBoolean()))
+            .thenReturn(true);
 
         selectProject();
         selectApplicant();
@@ -145,20 +148,22 @@ public class FXMLAssignationProjectControllerTest extends ApplicationTest {
     }
 
     @Test
-    void assignStudent_emptyReason_showsValidationError() {
+    void assignStudent_emptyReason_showsValidationError() throws OperationException {
+        when(projectDAOMock.getProjectByName(anyString())).thenReturn(Optional.of(buildProject()));
+
         selectProject();
         selectApplicant();
-
         clickAssign();
 
         assertEquals(EXPECTED_EMPTY_REASON_MESSAGE, messageText());
     }
 
     @Test
-    void assignStudent_noApplicantSelected_showsValidationError() {
+    void assignStudent_noApplicantSelected_showsValidationError() throws OperationException {
+        when(projectDAOMock.getProjectByName(anyString())).thenReturn(Optional.of(buildProject()));
+
         selectProject();
         setReason();
-
         clickAssign();
 
         assertEquals(EXPECTED_NO_SELECTION_MESSAGE, messageText());
@@ -219,7 +224,6 @@ public class FXMLAssignationProjectControllerTest extends ApplicationTest {
     }
 
     private String messageText() {
-        String message = lookup(MESSAGE_LABEL_SELECTOR).queryAs(Label.class).getText();
-        return message;
+        return lookup(MESSAGE_LABEL_SELECTOR).queryAs(Label.class).getText();
     }
 }
