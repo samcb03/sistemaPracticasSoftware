@@ -294,27 +294,27 @@ class InputValidatorTest {
         assertEquals(hasError, result);
     }
 
-@ParameterizedTest
-@CsvSource({
-    "Actividad de desarrollo., false",
-    "Revisión del módulo, false",
-    "Análisis inicial, false",
-    "Texto con signos: hola., false",
-    "'', true",
-    "Texto@invalido, true",
-    "' Texto valido.', true",
-    "'Texto valido. ', true",
-    "'Texto  valido.', true",
-    "Texto terminando con coma,', true",
-    "Texto terminando con signo!, true",
-    "Termina con numero3, true",
-    "Texto terminando con hola., false"
-})
-void validateDescriptiveText_variousInputs_returnsExpectedResult(String value, boolean hasError) {
-    boolean result = InputValidator.validateDescriptiveText(value, FIELD_NAME).isPresent();
+    @ParameterizedTest
+    @CsvSource({
+        "Actividad de desarrollo., false",
+        "Revisión del módulo, false",
+        "Análisis inicial, false",
+        "Texto con signos: hola., false",
+        "'', true",
+        "Texto@invalido, true",
+        "' Texto valido.', true",
+        "'Texto valido. ', true",
+        "'Texto  valido.', true",
+        "Texto terminando con coma,', true",
+        "Texto terminando con signo!, true",
+        "Termina con numero3, true",
+        "Texto terminando con hola., false"
+    })
+    void validateDescriptiveText_variousInputs_returnsExpectedResult(String value, boolean hasError) {
+        boolean result = InputValidator.validateDescriptiveText(value, FIELD_NAME).isPresent();
 
-    assertEquals(hasError, result);
-}
+        assertEquals(hasError, result);
+    }
 
     @Test
     void validateDescriptiveText_textExceedingMaxLength_returnsError() {
