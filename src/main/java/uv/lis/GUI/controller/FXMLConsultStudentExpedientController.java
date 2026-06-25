@@ -271,16 +271,6 @@ public class FXMLConsultStudentExpedientController extends ValidationHandler {
         } catch (IOException ioException) {
             LOGGER.log(Level.SEVERE, "Error de E/S al abrir el documento", ioException);
             showError("No se pudo abrir el documento");
-        } catch (IllegalArgumentException illegalArgumentException) {
-            LOGGER.log(Level.WARNING, "Ruta de documento inválida", illegalArgumentException);
-            showError("La ruta del documento no es válida");
-        } catch (UnsupportedOperationException unsupportedOperationException) {
-            LOGGER.log(Level.WARNING, "La acción de abrir documentos no está soportada",
-                unsupportedOperationException);
-            showError("Esta acción no está soportada en el sistema");
-        } catch (SecurityException securityException) {
-            LOGGER.log(Level.WARNING, "Permisos insuficientes para abrir el documento", securityException);
-            showError("No se cuenta con permisos para abrir el documento");
         }
     }
 

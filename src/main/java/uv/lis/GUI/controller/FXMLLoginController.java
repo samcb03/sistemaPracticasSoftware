@@ -197,14 +197,15 @@ public class FXMLLoginController implements Initializable {
     }
 
     private boolean validateInputs(String email, String password) {
+        boolean isEmpty = false;
         Optional<String> emailError = InputValidator.validateEmail(email, "El correo electrónico");
         Optional<String> passwordError = InputValidator.validatePassword(password, "La contraseña");
 
         Optional<String> validationError = emailError.or(() -> passwordError);
 
         validationError.ifPresent(this::showError);
-
-        return validationError.isEmpty();
+        isEmpty = validationError.isEmpty();
+        return isEmpty;
     }
 
     private boolean loadSessionByRole(User user) {
@@ -311,7 +312,5 @@ public class FXMLLoginController implements Initializable {
                 showError("Error al cargar la pantalla.");
             }
         } 
-
-        
     }
 }

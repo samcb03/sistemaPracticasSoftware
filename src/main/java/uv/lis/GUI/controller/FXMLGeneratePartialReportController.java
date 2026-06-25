@@ -49,7 +49,7 @@ public class FXMLGeneratePartialReportController extends ValidationHandler {
     private static final String LOAD_ACTIVITIES_ERROR = "No se pudieron cargar las actividades";
     private static final String PARTIAL_REPORT_TITLE = "Reporte Parcial";
     private static final String DUPLICATE_ACTIVITY_MESSAGE
-        = "La actividad ya fue seleccionada. Cada actividad solo puede elegirse una vez.";
+        = "La actividad ya fue seleccionada.";
     private static final String PLANNED_EDITOR_TITLE = "Editar Avance Esperado";
     private static final String REAL_EDITOR_TITLE = "Editar Avance Real";
     private static final String NO_ACTIVITY_SELECTED_MESSAGE 
@@ -140,7 +140,7 @@ public class FXMLGeneratePartialReportController extends ValidationHandler {
             }
         } catch (OperationException operationException) {
             LOGGER.log(Level.SEVERE, LOAD_ACTIVITIES_ERROR, operationException);
-            showError(LOAD_ACTIVITIES_ERROR);
+            showError(operationException.getMessage());
         }
     }
 
@@ -154,7 +154,8 @@ public class FXMLGeneratePartialReportController extends ValidationHandler {
             InputValidator.validateComboBox(comboBoxActivity1.getValue(), "una actividad"),
             validateNoDuplicateActivities(),
             validateSelectedActivityPercentages(),
-            InputValidator.validateDescriptiveText(textAreaGeneralObservations.getText(), "Observaciones Generales"),
+            InputValidator.validateDescriptiveText(textAreaGeneralObservations.getText(), 
+                "Observaciones Generales"),
             InputValidator.validateDescriptiveText(textAreaResults.getText(), "Resultados Obtenidos")
         );
 

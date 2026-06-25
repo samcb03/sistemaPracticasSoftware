@@ -87,12 +87,11 @@ public class FXMLManageProjectSupervisorController extends ValidationHandler {
 
     private void executeSupervisorSearch(String name) {
         try {
-            Optional<ProjectSupervisor> result =
-                projectSupervisorDAO.getProjectSupervisorByName(name);
+            Optional<ProjectSupervisor> result = projectSupervisorDAO.getProjectSupervisorByName(name);
 
             if (result.isPresent()) {
                 currentSupervisor = result.get();
-                displaySupervisorInformation(currentSupervisor, name);
+                displaySupervisorInformation(currentSupervisor);
                 loadSupervisorRelatedData(name);
                 gridPaneProjectSupervisorInfo.setVisible(true);
                 buttonUpdate.setDisable(false);
@@ -101,14 +100,14 @@ public class FXMLManageProjectSupervisorController extends ValidationHandler {
                 showError("No se encontró ningún responsable con ese nombre");
                 resetSupervisorView();
             }
-        } catch (OperationException e) {
-            LOGGER.log(Level.SEVERE, "Error al buscar supervisor", e);
-            showError(e.getMessage());
+        } catch (OperationException operationException) {
+            LOGGER.log(Level.SEVERE, "Error al buscar supervisor", operationException);
+            showError(operationException.getMessage());
             resetSupervisorView();
         }
     }
 
-    private void displaySupervisorInformation(ProjectSupervisor supervisor, String name) {
+    private void displaySupervisorInformation(ProjectSupervisor supervisor) {
         labelName.setText(supervisor.getName());
         labelPosition.setText(supervisor.getPosition());
         labelEmail.setText(supervisor.getEmail());
@@ -211,7 +210,7 @@ public class FXMLManageProjectSupervisorController extends ValidationHandler {
             showError("No se realizaron cambios en el responsable");
         } else {
             currentSupervisor = updated;
-            displaySupervisorInformation(updated, updated.getName());
+            displaySupervisorInformation(updated);
             toggleEditMode(false);
             showSuccess("Responsable actualizado correctamente");
             LOGGER.log(Level.INFO, "Responsable actualizado: {0}", updated.getName());
@@ -291,8 +290,7 @@ public class FXMLManageProjectSupervisorController extends ValidationHandler {
                 contextMenuSuggestions.hide();
             } else {
                 populateSuggestions(matches);
-                contextMenuSuggestions.show(
-                    textFieldNameProjectSupervisor, Side.BOTTOM, 0, 0);
+                contextMenuSuggestions.show(textFieldNameProjectSupervisor, Side.BOTTOM, 0, 0);
             }
         } catch (OperationException e) {
             LOGGER.log(Level.WARNING, "Error en autocompletado", e);

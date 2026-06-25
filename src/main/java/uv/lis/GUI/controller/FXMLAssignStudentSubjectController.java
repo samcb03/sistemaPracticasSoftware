@@ -30,8 +30,8 @@ public class FXMLAssignStudentSubjectController extends ValidationHandler {
     @FXML private Button buttonAssign;
     @FXML private Button buttonBack;
     @FXML private TableView<Student> tableViewStudents;
-    @FXML private TableColumn<Student, String> columnIdStudent;
-    @FXML private TableColumn<Student, String> columnName;
+    @FXML private TableColumn<Student, String> tableColumnIdStudent;
+    @FXML private TableColumn<Student, String> tableColumnName;
 
     private SubjectDAO subjectDAO;
     private StudentDAO studentDAO;
@@ -57,8 +57,8 @@ public class FXMLAssignStudentSubjectController extends ValidationHandler {
     }
 
     private void setupTable() {
-        columnIdStudent.setCellValueFactory(new PropertyValueFactory<>("idStudent"));
-        columnName.setCellValueFactory(cellData -> new SimpleStringProperty(
+        tableColumnIdStudent.setCellValueFactory(new PropertyValueFactory<>("idStudent"));
+        tableColumnName.setCellValueFactory(cellData -> new SimpleStringProperty(
             cellData.getValue().getFirstName() + " " + cellData.getValue().getLastName()
         ));
     }
@@ -89,11 +89,9 @@ public class FXMLAssignStudentSubjectController extends ValidationHandler {
         Student selectedStudent = tableViewStudents.getSelectionModel().getSelectedItem();
 
         Optional<String> subjectValidation = InputValidator.validateComboBox(
-            selectedSubject, "una Experiencia Educativa"
-        );
+            selectedSubject, "una Experiencia Educativa");
         Optional<String> studentValidation = InputValidator.validateComboBox(
-            selectedStudent, "un alumno de la tabla"
-        );
+            selectedStudent, "un alumno de la tabla");
 
         Optional<String> validationError = subjectValidation.or(() -> studentValidation);
 

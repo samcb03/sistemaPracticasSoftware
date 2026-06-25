@@ -78,11 +78,10 @@ public class FXMLGenerateFinalReportController extends ValidationHandler {
 
     private void validateFields() {
         Stream<Optional<String>> validationStream = Stream.of(
-            validateFirstActivityBlock(),
-            validateSecondActivityBlock(),
-            validateFirstDeliverableBlock(),
-            validateSecondDeliverableBlock(),
-            InputValidator.validateDescriptiveText(textAreaGeneralObservations.getText(), "Observaciones Generales")
+            validateActivityBlocks(),
+            validateDeliverableBlocks(),
+            InputValidator.validateDescriptiveText(textAreaGeneralObservations.getText(), 
+                "Observaciones Generales")
         );
 
         Optional<String> validationError = validationStream
@@ -93,28 +92,18 @@ public class FXMLGenerateFinalReportController extends ValidationHandler {
         handleValidation(validationError, this::generateReport);
     }
 
-    private Optional<String> validateFirstActivityBlock() {
+    private Optional<String> validateActivityBlocks() {
         Stream<Optional<String>> validationStream = Stream.of(
             InputValidator.validateComboBox(comboBoxActivity1.getValue(), "Actividad 1"),
             InputValidator.validatePercentage(textFieldAdvance1.getText(), 
                 "Porcentaje de Avance de Actividad 1"),
-            InputValidator.validateDescriptiveText(textAreaObservation1.getText(), "Observación de Actividad 1")
-        );
-
-        Optional<String> firstError = validationStream
-            .filter(Optional::isPresent)
-            .map(Optional::get)
-            .findFirst();
-
-        return firstError;
-    }
-
-    private Optional<String> validateSecondActivityBlock() {
-        Stream<Optional<String>> validationStream = Stream.of(
+            InputValidator.validateDescriptiveText(textAreaObservation1.getText(), 
+                "Observación de Actividad 1"),
             InputValidator.validateComboBox(comboBoxActivity2.getValue(), "Actividad 2"),
             InputValidator.validatePercentage(textFieldAdvance2.getText(), 
                 "Porcentaje de Avance de Actividad 2"),
-            InputValidator.validateDescriptiveText(textAreaObservation2.getText(), "Observación de Actividad 2")
+            InputValidator.validateDescriptiveText(textAreaObservation2.getText(), 
+                "Observación de Actividad 2")
         );
 
         Optional<String> firstError = validationStream
@@ -125,28 +114,18 @@ public class FXMLGenerateFinalReportController extends ValidationHandler {
         return firstError;
     }
 
-    private Optional<String> validateFirstDeliverableBlock() {
+    private Optional<String> validateDeliverableBlocks() {
         Stream<Optional<String>> validationStream = Stream.of(
             InputValidator.validateText(textFieldResult1.getText(), "Entregable 1"),
             InputValidator.validatePercentage(textFieldResultAdvance1.getText(), 
                 "Porcentaje de Avance de Entregable 1"),
-            InputValidator.validateDescriptiveText(textAreaObservationResult1.getText(), "Observación de Entregable 1")
-        );
-
-        Optional<String> firstError = validationStream
-            .filter(Optional::isPresent)
-            .map(Optional::get)
-            .findFirst();
-
-        return firstError;
-    }
-
-    private Optional<String> validateSecondDeliverableBlock() {
-        Stream<Optional<String>> validationStream = Stream.of(
+            InputValidator.validateDescriptiveText(textAreaObservationResult1.getText(), 
+                "Observación de Entregable 1"),
             InputValidator.validateText(textFieldResult2.getText(), "Entregable 2"),
             InputValidator.validatePercentage(textFieldResultAdvance2.getText(), 
                 "Porcentaje de Avance de Entregable 2"),
-            InputValidator.validateDescriptiveText(textAreaObservationResult2.getText(), "Observación de Entregable 2")
+            InputValidator.validateDescriptiveText(textAreaObservationResult2.getText(), 
+                "Observación de Entregable 2")
         );
 
         Optional<String> firstError = validationStream

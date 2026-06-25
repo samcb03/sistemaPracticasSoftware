@@ -98,15 +98,9 @@ public class FXMLGenerateAutoevaluationController extends ValidationHandler {
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        if (autoevaluationCommon == null) {
-                    autoevaluationCommon = new AutoevaluationCommon();
-        }
-        if (autoevaluationDAO == null) {
-            autoevaluationDAO = new AutoevaluationDAO();
-        }
-        if (expedientDAO == null) {
-            expedientDAO = new ExpedientDAO();
-        }
+        autoevaluationCommon = new AutoevaluationCommon();
+        autoevaluationDAO = new AutoevaluationDAO();
+        expedientDAO = new ExpedientDAO();
         currentStudent = SessionManager.getInstance().getCurrentStudent();
         setupControls(labelMessage, buttonBack);
         setupToggleGroups();
@@ -115,15 +109,15 @@ public class FXMLGenerateAutoevaluationController extends ValidationHandler {
 
     private void setupToggleGroups() {
         groups = new ToggleGroup[NUMBER_CRITERIA]; 
-        groups[0] = createGroup(radioButton1_1,  radioButton1_2,  radioButton1_3,  radioButton1_4,  radioButton1_5);
-        groups[1] = createGroup(radioButton2_1,  radioButton2_2,  radioButton2_3,  radioButton2_4,  radioButton2_5);
-        groups[2] = createGroup(radioButton3_1,  radioButton3_2,  radioButton3_3,  radioButton3_4,  radioButton3_5);
-        groups[3] = createGroup(radioButton4_1,  radioButton4_2,  radioButton4_3,  radioButton4_4,  radioButton4_5);
-        groups[4] = createGroup(radioButton5_1,  radioButton5_2,  radioButton5_3,  radioButton5_4,  radioButton5_5);
-        groups[5] = createGroup(radioButton6_1,  radioButton6_2,  radioButton6_3,  radioButton6_4,  radioButton6_5);
-        groups[6] = createGroup(radioButton7_1,  radioButton7_2,  radioButton7_3,  radioButton7_4,  radioButton7_5);
-        groups[7] = createGroup(radioButton8_1,  radioButton8_2,  radioButton8_3,  radioButton8_4,  radioButton8_5);
-        groups[8] = createGroup(radioButton9_1,  radioButton9_2,  radioButton9_3,  radioButton9_4,  radioButton9_5);
+        groups[0] = createGroup(radioButton1_1, radioButton1_2, radioButton1_3, radioButton1_4, radioButton1_5);
+        groups[1] = createGroup(radioButton2_1, radioButton2_2, radioButton2_3, radioButton2_4, radioButton2_5);
+        groups[2] = createGroup(radioButton3_1, radioButton3_2, radioButton3_3, radioButton3_4, radioButton3_5);
+        groups[3] = createGroup(radioButton4_1, radioButton4_2, radioButton4_3, radioButton4_4, radioButton4_5);
+        groups[4] = createGroup(radioButton5_1, radioButton5_2, radioButton5_3, radioButton5_4, radioButton5_5);
+        groups[5] = createGroup(radioButton6_1, radioButton6_2, radioButton6_3, radioButton6_4, radioButton6_5);
+        groups[6] = createGroup(radioButton7_1, radioButton7_2, radioButton7_3, radioButton7_4, radioButton7_5);
+        groups[7] = createGroup(radioButton8_1, radioButton8_2, radioButton8_3, radioButton8_4, radioButton8_5);
+        groups[8] = createGroup(radioButton9_1, radioButton9_2, radioButton9_3, radioButton9_4, radioButton9_5);
         groups[9] = createGroup(radioButton10_1, radioButton10_2, radioButton10_3, radioButton10_4, radioButton10_5);  
     }
 
@@ -144,10 +138,10 @@ public class FXMLGenerateAutoevaluationController extends ValidationHandler {
             labelStudentId.setText(currentStudent.getIdStudent());
 
             try {
-                boolean hasFinalReport = expedientDAO.isFinalReportValidated(currentStudent.getIdStudent());
+                boolean hasFinalReportValidated = expedientDAO.isFinalReportValidated(currentStudent.getIdStudent());
 
-                if(!hasFinalReport) {
-                    showError("Debes entregar el reporte final antes de realizar la autoevaluación.");
+                if(!hasFinalReportValidated) {
+                    showError("Debe estar validado el reporte final antes de realizar la autoevaluación.");
                     buttonGenerate.setDisable(true);
 
                 }
@@ -158,7 +152,7 @@ public class FXMLGenerateAutoevaluationController extends ValidationHandler {
                 labelProjectSupervisor.setText(contextData.getProjectSupervisorName());
 
             } catch (OperationException e) {
-                showError("No se encontró un proyecto asignado: " + e.getMessage());
+                showError(e.getMessage());
                 buttonGenerate.setDisable(true);
             }
         }
@@ -201,9 +195,6 @@ public class FXMLGenerateAutoevaluationController extends ValidationHandler {
             JasperViewer.viewReport(report, false);
             labelMessage.setStyle("-fx-text-fill: green;");
             labelMessage.setText("Autoevaluación guardada y generada con éxito.");
-        } catch (IllegalArgumentException e) {
-            LOGGER.log(Level.WARNING, "Respuestas inválidas en la autoevaluación", e);
-            showError("Respuestas inválidas");
         } catch (OperationException e) {
             showError(e.getMessage());
         } catch (JRException e) {
@@ -214,9 +205,9 @@ public class FXMLGenerateAutoevaluationController extends ValidationHandler {
 
     @Override
     protected void clearFields() {
-        for (ToggleGroup g : groups) {
-            if (g.getSelectedToggle() != null) {
-                g.getSelectedToggle().setSelected(false);
+        for (ToggleGroup group : groups) {
+            if (group.getSelectedToggle() != null) {
+                group.getSelectedToggle().setSelected(false);
             }
         }
         labelMessage.setText("");

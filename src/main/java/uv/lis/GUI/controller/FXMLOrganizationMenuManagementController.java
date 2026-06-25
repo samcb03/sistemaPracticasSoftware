@@ -8,7 +8,7 @@ import javafx.scene.control.Button;
 
 import uv.lis.GUI.WindowHandler;
 
-public class FXMLOrganizationManagementController extends WindowHandler{
+public class FXMLOrganizationMenuManagementController extends WindowHandler{
     @FXML private Button buttonRegisterOrganization;
     @FXML private Button buttonConsultOrganization;
     @FXML private Button buttonBack;
@@ -26,5 +26,4 @@ public class FXMLOrganizationManagementController extends WindowHandler{
     public void goToConsultOrganization() { 
         navigateTo("/uv/lis/GUI/view/FXMLManageAffiliatedOrganization.fxml"); 
     }
-
 }
