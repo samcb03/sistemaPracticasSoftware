@@ -63,7 +63,8 @@ public class MonthlyReportCommon {
 
         mergeContextIntoMonthlyReport(monthlyReport, currentStudent.getIdStudent());
         reportDAO.registerMonthlyReport(monthlyReport);
-        return fillReportTemplate(monthlyReport);
+        JasperPrint jasperPrint = fillReportTemplate(monthlyReport);
+        return jasperPrint;
     }
 
     public JasperPrint fillReportTemplate(MonthlyReport monthlyReport) throws JRException, OperationException {
@@ -80,9 +81,9 @@ public class MonthlyReportCommon {
             jasperPrint = JasperFillManager.getInstance(jasperReportsContext)
                     .fill(templateStream, parameters, new JREmptyDataSource());
 
-        } catch (IOException e) {
-            LOGGER.log(Level.SEVERE, "Error al leer la plantilla del reporte mensual", e);
-            throw new OperationException(TEMPLATE_READ_ERROR_MESSAGE, e);
+        } catch (IOException ioException) {
+            LOGGER.log(Level.SEVERE, "Error al leer la plantilla del reporte mensual", ioException);
+            throw new OperationException(TEMPLATE_READ_ERROR_MESSAGE, ioException);
         }
         return jasperPrint;
     }
@@ -97,15 +98,12 @@ public class MonthlyReportCommon {
         report.setProfessorName(context.getProfessorName());
         report.setProjectSupervisor(context.getProjectSupervisor());
         report.setYear(extractYearFromPeriod(context.getPeriod()));
- 
     }
 
     private Map<String, Object> buildReportParameters(MonthlyReport report) {
         Map<String, Object> parameters = new HashMap<>();
-
         addStaticParameters(parameters, report);
         addDynamicActivityParameters(parameters, report);
-
         return parameters;
     }
 
@@ -126,8 +124,7 @@ public class MonthlyReportCommon {
         for (int activityIndex = 1; activityIndex <= MAX_ACTIVITIES; activityIndex++) {
             parameters.put("Periodo" + activityIndex, report.getPeriodAt(activityIndex));
             parameters.put("Actividad" + activityIndex, report.getActivityAt(activityIndex));
-            parameters.put("Observacion" + activityIndex,
-                report.getObservationAt(activityIndex));
+            parameters.put("Observacion" + activityIndex, report.getObservationAt(activityIndex));
         }
     }
 
