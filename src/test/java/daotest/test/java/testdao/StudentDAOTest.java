@@ -32,7 +32,7 @@ import uv.lis.logic.exceptions.OperationException;
 class StudentDAOTest {
 
     private static final int EXPECTED_USER_ID = 4;
-    private static final int ROWS_AFFECTED = 1;
+    private static final int FIRST_VALUE = 1;
     private static final int HAS_PROJECT = 1;
     private static final int DEFAULT_ID_USER = 0;
     private static final int DEFAULT_ROLE_ID = 2;
@@ -229,7 +229,7 @@ class StudentDAOTest {
 
     @Test
     void registerStudent_successful_returnsTrue() throws Exception {
-        mockUpdateExecution(ROWS_AFFECTED);
+        mockUpdateExecution(FIRST_VALUE);
 
         assertTrue(studentDAO.registerStudent(builderFirstStudent()));
     }
@@ -252,7 +252,7 @@ class StudentDAOTest {
 
     @Test
     void modifyStudent_successful_returnsTrue() throws Exception {
-        mockUpdateExecution(ROWS_AFFECTED);
+        mockUpdateExecution(FIRST_VALUE);
 
         assertTrue(studentDAO.modifyStudent(builderFirstStudent()));
     }
@@ -275,7 +275,7 @@ class StudentDAOTest {
 
     @Test
     void inactivateStudent_successful_returnsTrue() throws Exception {
-        mockUpdateExecution(ROWS_AFFECTED);
+        mockUpdateExecution(FIRST_VALUE);
 
         assertTrue(studentDAO.inactivateStudent(FIRST_STUDENT_ID));
     }
@@ -309,7 +309,7 @@ class StudentDAOTest {
     void isStudentInactive_studentIsActive_returnsFalse() throws Exception {
         mockQueryExecution();
         when(resultSet.next()).thenReturn(true);
-        when(resultSet.getInt(COLUMN_STATUS)).thenReturn(ROWS_AFFECTED);
+        when(resultSet.getInt(COLUMN_STATUS)).thenReturn(FIRST_VALUE);
 
         assertFalse(studentDAO.isStudentInactive(FIRST_STUDENT_ID));
     }
@@ -337,8 +337,7 @@ class StudentDAOTest {
         when(resultSet.next()).thenReturn(true, true, false);
         when(resultSet.getString(COLUMN_STUDENT_ID)).thenReturn(FIRST_STUDENT_ID, SECOND_STUDENT_ID);
 
-        assertEquals(List.of(FIRST_STUDENT_ID, SECOND_STUDENT_ID),
-            studentDAO.searchStudentIds(SEARCH_PREFIX));
+        assertEquals(List.of(FIRST_STUDENT_ID, SECOND_STUDENT_ID), studentDAO.searchStudentIds(SEARCH_PREFIX));
     }
 
     @Test
@@ -353,8 +352,7 @@ class StudentDAOTest {
     void searchStudentIds_sqlError_throwsOperationException() throws SQLException {
         when(connectionManager.getConnection()).thenThrow(new SQLException(DATABASE_ERROR_MESSAGE));
 
-        assertThrows(OperationException.class,
-            () -> studentDAO.searchStudentIds(SEARCH_PREFIX));
+        assertThrows(OperationException.class, () -> studentDAO.searchStudentIds(SEARCH_PREFIX));
     }
 
     @Test

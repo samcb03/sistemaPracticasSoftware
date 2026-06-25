@@ -275,8 +275,8 @@ class RequestProjectDAOTest {
         when(resultSet.getInt(COLUMN_CAPACITY)).thenReturn(CAPACITY_AVAILABLE);
         when(resultSet.getInt(COLUMN_REQUESTS)).thenReturn(ROWS_AFFECTED);
 
-        assertEquals(Optional.empty(), requestProjectDAO.validateProjectRequest(
-            FIRST_STUDENT_ID, FIRST_PROJECT_ID));
+        Optional<String> result = requestProjectDAO.validateProjectRequest(FIRST_STUDENT_ID, FIRST_PROJECT_ID);
+        assertEquals(Optional.empty(), result);
     }
 
     @Test

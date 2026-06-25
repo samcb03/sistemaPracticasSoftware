@@ -41,7 +41,7 @@ class UserDAOTest {
     private static final int PROFESSOR_ROLE_ID = 2;
     private static final int COORDINATOR_ROLE_ID = 3;
     private static final int ADMIN_ROLE_ID = 4;
-    private static final int ROWS_AFFECTED = 1;
+    private static final int FIRST_VALUE = 1;
     private static final int DEFAULT_ID = 99;
     private static final int STUDENT_USER_ID = 10;
     private static final int PROFESSOR_USER_ID = 12;
@@ -97,7 +97,7 @@ class UserDAOTest {
         when(preparedStatement.executeUpdate()).thenReturn(rowsAffected);
         when(preparedStatement.getGeneratedKeys()).thenReturn(resultSet);
         when(resultSet.next()).thenReturn(true);
-        when(resultSet.getInt(1)).thenReturn(generatedId);
+        when(resultSet.getInt(FIRST_VALUE)).thenReturn(generatedId);
     }
 
     private void mockResultSetAuthenticate(int userId, int roleId) throws Exception {
@@ -109,22 +109,23 @@ class UserDAOTest {
     }
 
     private User builderUser() {
-        return new User(DEFAULT_ID, FIRST_NAME, LAST_NAME, DEFAULT_PASSWORD, DEFAULT_EMAIL, DEFAULT_ROLE_ID, 
+        User user = new User(DEFAULT_ID, FIRST_NAME, LAST_NAME, DEFAULT_PASSWORD, DEFAULT_EMAIL, DEFAULT_ROLE_ID, 
             IS_ACTIVE, IS_ACTIVE);
+        return user;
     }
 
     private static Stream<Arguments> provideUsersByRole() {
-        return Stream.of(
+        Stream<Arguments> arguments = Stream.of(
             arguments(STUDENT_USER_ID, DEFAULT_ROLE_ID),
             arguments(PROFESSOR_USER_ID, PROFESSOR_ROLE_ID),
             arguments(COORDINATOR_USER_ID, COORDINATOR_ROLE_ID),
-            arguments(ADMIN_USER_ID, ADMIN_ROLE_ID)
-        );
+            arguments(ADMIN_USER_ID, ADMIN_ROLE_ID));
+        return arguments;
     }
 
     @Test
     void registerUser_successful_returnsGeneratedId() throws Exception {
-        mockUpdateExecutionWithGeneratedKey(ROWS_AFFECTED, EXPECTED_GENERATED_ID);
+        mockUpdateExecutionWithGeneratedKey(FIRST_VALUE, EXPECTED_GENERATED_ID);
 
         try (MockedStatic<PasswordHasher> mockedHasher = mockStatic(PasswordHasher.class)) {
             mockedHasher.when(() -> PasswordHasher.hashPassword(anyString())).thenReturn(HASHED_PASSWORD);
@@ -149,7 +150,7 @@ class UserDAOTest {
     @Test
     void registerUser_noGeneratedKeyReturned_throwsOperationException() throws SQLException {
         when(databaseConnection.prepareStatement(anyString(), anyInt())).thenReturn(preparedStatement);
-        when(preparedStatement.executeUpdate()).thenReturn(ROWS_AFFECTED);
+        when(preparedStatement.executeUpdate()).thenReturn(FIRST_VALUE);
         when(preparedStatement.getGeneratedKeys()).thenReturn(resultSet);
         when(resultSet.next()).thenReturn(false);
 
@@ -178,7 +179,8 @@ class UserDAOTest {
         mockResultSetAuthenticate(userId, roleId);
 
         try (MockedStatic<PasswordHasher> mockedHasher = mockStatic(PasswordHasher.class)) {
-            mockedHasher.when(() -> PasswordHasher.verifyPassword(VALID_PASSWORD, HASHED_PASSWORD)).thenReturn(true);
+            mockedHasher.when(() -> PasswordHasher.verifyPassword(VALID_PASSWORD, HASHED_PASSWORD)).
+                thenReturn(true);
 
             assertTrue(userDAO.authenticate(VALID_EMAIL, VALID_PASSWORD).isPresent());
         }
@@ -218,7 +220,7 @@ class UserDAOTest {
     void existActiveCoordinator_coordinatorExists_returnsTrue() throws Exception {
         mockQueryExecution();
         when(resultSet.next()).thenReturn(true);
-        when(resultSet.getInt(1)).thenReturn(ROWS_AFFECTED);
+        when(resultSet.getInt(FIRST_VALUE)).thenReturn(FIRST_VALUE);
 
         assertTrue(userDAO.existActiveCoordinator());
     }
@@ -227,7 +229,7 @@ class UserDAOTest {
     void existActiveCoordinator_noCoordinatorExists_returnsFalse() throws Exception {
         mockQueryExecution();
         when(resultSet.next()).thenReturn(true);
-        when(resultSet.getInt(1)).thenReturn(NO_VALUE);
+        when(resultSet.getInt(FIRST_VALUE)).thenReturn(NO_VALUE);
 
         assertFalse(userDAO.existActiveCoordinator());
     }
@@ -251,7 +253,7 @@ class UserDAOTest {
     @Test
     void updateEmailAuthenticationPreference_successful_returnsTrue() throws Exception {
         when(databaseConnection.prepareStatement(anyString())).thenReturn(preparedStatement);
-        when(preparedStatement.executeUpdate()).thenReturn(ROWS_AFFECTED);
+        when(preparedStatement.executeUpdate()).thenReturn(FIRST_VALUE);
 
         assertTrue(userDAO.updateEmailAuthenticationPreference(DEFAULT_ID,
             EMAIL_AUTHENTICATION_DISABLED));

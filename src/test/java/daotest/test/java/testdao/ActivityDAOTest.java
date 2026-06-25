@@ -34,16 +34,15 @@ class ActivityDAOTest {
     private static final int SEARCHED_ACTIVITY_ID = 3;
     private static final int FIRST_PROJECT_ID = 10;
     private static final int SECOND_PROJECT_ID = 11;
-    private static final int ROWS_AFFECTED = 1;
+    private static final int FIRST_VALUE = 1;
     private static final int GENERATED_ID = 5;
     private static final int TOTAL_ACTIVITY_HOURS = 120;
     private static final int NO_HOURS = 0;
-    private static final int FIRST_PARAMETER = 1;
 
-    private static final String FIRST_ACTIVITY_NAME = "Actividad 1";
-    private static final String SECOND_ACTIVITY_NAME = "Actividad 2";
-    private static final String FIRST_ACTIVITY_DESCRIPTION = "Descripción 1";
-    private static final String SECOND_ACTIVITY_DESCRIPTION = "Descripción 2";
+    private static final String FIRST_ACTIVITY_NAME = "Creacion de BD";
+    private static final String SECOND_ACTIVITY_NAME = "Analisis de Requisitos";
+    private static final String FIRST_ACTIVITY_DESCRIPTION = "Se debe crear la base de datos";
+    private static final String SECOND_ACTIVITY_DESCRIPTION = "Se debe analizar los requisitos del cliente";
     private static final String DATABASE_ERROR_MESSAGE = "Fallo";
     private static final String STUDENT_ID = "S22011223";
 
@@ -172,10 +171,10 @@ class ActivityDAOTest {
 
     @Test
     void registerActivity_successful_returnsTrue() throws Exception {
-        mockUpdateExecution(ROWS_AFFECTED);
+        mockUpdateExecution(FIRST_VALUE);
         when(preparedStatement.getGeneratedKeys()).thenReturn(resultSet);
         when(resultSet.next()).thenReturn(true);
-        when(resultSet.getInt(FIRST_PARAMETER)).thenReturn(GENERATED_ID);
+        when(resultSet.getInt(FIRST_VALUE)).thenReturn(GENERATED_ID);
 
         assertTrue(activityDAO.registerActivity(builderFirstActivity()));
     }
@@ -198,7 +197,7 @@ class ActivityDAOTest {
 
     @Test
     void modifyActivity_successful_returnsTrue() throws Exception {
-        mockUpdateExecution(ROWS_AFFECTED);
+        mockUpdateExecution(FIRST_VALUE);
 
         assertTrue(activityDAO.modifyActivity(builderFirstActivity()));
     }

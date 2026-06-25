@@ -1,6 +1,5 @@
 package daotest.test.java.testdao;
 
-
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -33,7 +32,7 @@ class AffiliatedOrganizationDAOTest {
     private static final int ORGANIZATION_ID = 3;
     private static final int DIRECT_USERS = 10;
     private static final int INDIRECT_USERS = 50;
-    private static final int ROWS_AFFECTED = 1;
+    private static final int FIRST_VALUE = 1;
     private static final int GENERATED_ID = 2;
     private static final int INACTIVE_STATE_VALUE = 0;
     private static final int ACTIVE_STATE_VALUE = 1;
@@ -54,6 +53,8 @@ class AffiliatedOrganizationDAOTest {
     private static final String PROJECT_OBJECTIVE = "Objetivo general";
     private static final String PROJECT_METHODOLOGY = "Scrum";
     private static final String DATABASE_ERROR_MESSAGE = "DB error";
+    private static final String EXPECTED_PROJECT_ENTRY =
+        "ID: " + PROJECT_ID + " — " + PROJECT_NAME + " (" + PROJECT_DESCRIPTION + ")";
 
     private static final boolean PROJECT_ACTIVE = true;
 
@@ -183,10 +184,10 @@ class AffiliatedOrganizationDAOTest {
 
     @Test
     void registerOrganization_successful_returnsTrue() throws Exception {
-        mockGeneratedKeyUpdate(ROWS_AFFECTED);
+        mockGeneratedKeyUpdate(FIRST_VALUE);
         when(preparedStatement.getGeneratedKeys()).thenReturn(resultSet);
         when(resultSet.next()).thenReturn(true);
-        when(resultSet.getInt(1)).thenReturn(GENERATED_ID);
+        when(resultSet.getInt(FIRST_VALUE)).thenReturn(GENERATED_ID);
 
         assertTrue(affiliatedOrganizationDAO.registerOrganization(builderExpectedOrganization()));
     }
@@ -210,7 +211,7 @@ class AffiliatedOrganizationDAOTest {
 
     @Test
     void modifyOrganization_successful_returnsTrue() throws Exception {
-        mockSimpleUpdate(ROWS_AFFECTED);
+        mockSimpleUpdate(FIRST_VALUE);
 
         assertTrue(affiliatedOrganizationDAO.modifyOrganization(builderExpectedOrganization()));
     }
@@ -234,7 +235,7 @@ class AffiliatedOrganizationDAOTest {
 
     @Test
     void inactivateOrganization_successful_returnsTrue() throws Exception {
-        mockSimpleUpdate(ROWS_AFFECTED);
+        mockSimpleUpdate(FIRST_VALUE);
 
         assertTrue(affiliatedOrganizationDAO.inactivateOrganization(ORGANIZATION_NAME));
     }
@@ -316,8 +317,8 @@ class AffiliatedOrganizationDAOTest {
         when(resultSet.next()).thenReturn(true);
         when(resultSet.getString("nombreOV")).thenReturn(ORGANIZATION_NAME);
 
-        assertEquals(Optional.of(ORGANIZATION_NAME),
-            affiliatedOrganizationDAO.getOrganizationBySupervisorName(SUPERVISOR_NAME));
+        Optional<String> result = affiliatedOrganizationDAO.getOrganizationBySupervisorName(SUPERVISOR_NAME);
+        assertEquals(Optional.of(ORGANIZATION_NAME), result);
     }
 
     @Test
@@ -435,10 +436,9 @@ class AffiliatedOrganizationDAOTest {
     void getProjectsByOrganization_projectsExist_returnsProjectEntryList() throws Exception {
         mockQueryExecution();
         mockResultSetProjectEntry();
-        List<String> expectedProjectEntries = List.of(
-            "ID: " + PROJECT_ID + " — " + PROJECT_NAME + " (" + PROJECT_DESCRIPTION + ")");
+        List<String> expectedEntries = List.of(EXPECTED_PROJECT_ENTRY);
 
-        assertEquals(expectedProjectEntries,
+        assertEquals(expectedEntries,
             affiliatedOrganizationDAO.getProjectsByOrganization(ORGANIZATION_NAME));
     }
 

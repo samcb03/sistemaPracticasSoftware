@@ -32,8 +32,8 @@ class SubjectDAOTest {
     private static final int SECOND_NRC = 67890;
     private static final int SCHOOL_PERIOD_ID = 3;
     private static final int EXPECTED_LIST_SIZE = 2;
-    private static final int ROWS_AFFECTED = 1;
-    private static final int NO_ROWS_AFFECTED = 0;
+    private static final int FIRST_VALUE = 1;
+    private static final int NO_VALID = 0;
 
     private static final String VALID_STUDENT_ID = "S23013127";
     private static final String SECOND_STUDENT_ID = "S23013128";
@@ -121,7 +121,7 @@ class SubjectDAOTest {
     @Test
     void registerSubject_bothInsertsSuccessful_returnsTrue() throws Exception {
         when(databaseConnection.prepareStatement(anyString())).thenReturn(preparedStatement);
-        when(preparedStatement.executeUpdate()).thenReturn(ROWS_AFFECTED, ROWS_AFFECTED);
+        when(preparedStatement.executeUpdate()).thenReturn(FIRST_VALUE, FIRST_VALUE);
 
         assertTrue(subjectDAO.registerSubject(builderSubject()));
     }
@@ -129,7 +129,7 @@ class SubjectDAOTest {
     @Test
     void registerSubject_firstInsertFails_returnsFalse() throws Exception {
         when(databaseConnection.prepareStatement(anyString())).thenReturn(preparedStatement);
-        when(preparedStatement.executeUpdate()).thenReturn(NO_ROWS_AFFECTED, ROWS_AFFECTED);
+        when(preparedStatement.executeUpdate()).thenReturn(NO_VALID, FIRST_VALUE);
 
         assertFalse(subjectDAO.registerSubject(builderSubject()));
     }
@@ -137,7 +137,7 @@ class SubjectDAOTest {
     @Test
     void registerSubject_secondInsertFails_returnsFalse() throws Exception {
         when(databaseConnection.prepareStatement(anyString())).thenReturn(preparedStatement);
-        when(preparedStatement.executeUpdate()).thenReturn(ROWS_AFFECTED, NO_ROWS_AFFECTED);
+        when(preparedStatement.executeUpdate()).thenReturn(FIRST_VALUE, NO_VALID);
 
         assertFalse(subjectDAO.registerSubject(builderSubject()));
     }
@@ -146,7 +146,7 @@ class SubjectDAOTest {
     void registerSubject_secondInsertThrows_rollsBack() throws SQLException {
         when(databaseConnection.prepareStatement(anyString())).thenReturn(preparedStatement);
         when(preparedStatement.executeUpdate())
-            .thenReturn(ROWS_AFFECTED)
+            .thenReturn(FIRST_VALUE)
             .thenThrow(new SQLException(CONNECTION_ERROR));
 
         assertThrows(OperationException.class,
@@ -205,14 +205,14 @@ class SubjectDAOTest {
 
     @Test
     void assignStudentToSubject_successful_returnsTrue() throws Exception {
-        mockUpdateExecution(ROWS_AFFECTED);
+        mockUpdateExecution(FIRST_VALUE);
 
         assertTrue(subjectDAO.assignStudentToSubject(VALID_STUDENT_ID, EXPECTED_NRC,VALID_PERIOD_ID));
     }
 
     @Test
     void assignStudentToSubject_noRowsAffected_returnsFalse() throws Exception {
-        mockUpdateExecution(NO_ROWS_AFFECTED);
+        mockUpdateExecution(NO_VALID);
 
         assertFalse(subjectDAO.assignStudentToSubject(VALID_STUDENT_ID, EXPECTED_NRC,VALID_PERIOD_ID));
     }
@@ -254,7 +254,7 @@ class SubjectDAOTest {
 
     @Test
     void unassignProfessorFromSubject_successful_doesNotThrow() throws SQLException {
-        mockUpdateExecution(ROWS_AFFECTED);
+        mockUpdateExecution(FIRST_VALUE);
 
         assertDoesNotThrow(() -> subjectDAO.unassignProfessorFromSubject(PERSONNEL_NUMBER));
     }
@@ -323,7 +323,7 @@ class SubjectDAOTest {
     void isSectionTakenInPeriod_sectionAlreadyExists_returnsTrue() throws Exception {
         mockQueryExecution();
         when(resultSet.next()).thenReturn(true);
-        when(resultSet.getInt(1)).thenReturn(1);
+        when(resultSet.getInt(FIRST_VALUE)).thenReturn(1);
 
         assertTrue(subjectDAO.isSectionTakenInPeriod(SCHOOL_PERIOD_ID, "1"));
     }
@@ -332,7 +332,7 @@ class SubjectDAOTest {
     void isSectionTakenInPeriod_sectionNotTaken_returnsFalse() throws Exception {
         mockQueryExecution();
         when(resultSet.next()).thenReturn(true);
-        when(resultSet.getInt(1)).thenReturn(0);
+        when(resultSet.getInt(FIRST_VALUE)).thenReturn(NO_VALID);
 
         assertFalse(subjectDAO.isSectionTakenInPeriod(SCHOOL_PERIOD_ID, "2"));
     }
