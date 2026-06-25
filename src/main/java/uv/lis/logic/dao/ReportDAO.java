@@ -217,22 +217,6 @@ public class ReportDAO implements IReportDAO {
     }
 
     @Override
-    public void evaluationReport(Report report) throws OperationException {
-        String reportQuery = "UPDATE Reporte SET calificacion = ? WHERE idReporte = ?";
-
-        try (Connection databaseConnection = connectionManager.getConnection();
-            PreparedStatement preparedStatement = databaseConnection.prepareStatement(reportQuery)) {
-
-            preparedStatement.setFloat(1, report.getCalification());
-            preparedStatement.setInt(2, report.getId());
-            preparedStatement.executeUpdate();
-        } catch (SQLException e) {
-            LOGGER.log(Level.SEVERE, DATABASE_CONNECTION_ERROR, e);
-            throw new OperationException(DATABASE_CONNECTION_ERROR, e);
-        }
-    }
-
-    @Override
     public boolean hasReportOfType(String idStudent, int idTypeDocument) throws OperationException {
         boolean hasReport = false;
         String reportQuery = buildReportExistenceQuery(idTypeDocument);

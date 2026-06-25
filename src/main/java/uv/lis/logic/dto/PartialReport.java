@@ -9,8 +9,6 @@ public class PartialReport extends Report {
     public static final int MAX_ACTIVITIES = 6;
     public static final int MAX_WEEKS = 8;
 
-    private int plannedAdvanceWeek;
-    private int realAdvanceWeek;
     private String activityName;
     private String reportPeriod;
     private LocalDate reportPeriodStart;
@@ -36,22 +34,6 @@ public class PartialReport extends Report {
         this.plannedAdvances = new int[MAX_WEEKS][MAX_ACTIVITIES];
         this.realAdvances = new int[MAX_WEEKS][MAX_ACTIVITIES];
         Arrays.fill(this.activityNames, "");
-    }
-
-    public int getPlannedAdvanceWeek() {
-        return plannedAdvanceWeek;
-    }
-
-    public void setPlannedAdvanceWeek(int plannedAdvanceWeek) {
-        this.plannedAdvanceWeek = plannedAdvanceWeek;
-    }
-
-    public int getRealAdvanceWeek() {
-        return realAdvanceWeek;
-    }
-
-    public void setRealAdvanceWeek(int realAdvanceWeek) {
-        this.realAdvanceWeek = realAdvanceWeek;
     }
 
     public String getActivityName() {
