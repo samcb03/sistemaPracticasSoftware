@@ -33,6 +33,7 @@ import uv.lis.logic.dto.Expedient;
 import uv.lis.logic.dto.MonthlyReport;
 import uv.lis.logic.dto.Student;
 import uv.lis.logic.exceptions.OperationException;
+import uv.lis.logic.utils.FileManager;
 import uv.lis.logic.utils.SessionManager;
 
 public class FXMLUploadDocumentsController extends ValidationHandler {
@@ -163,7 +164,6 @@ public class FXMLUploadDocumentsController extends ValidationHandler {
             showError(NO_DOCUMENTS_MESSAGE);
         }
     }
-
 
     private void validateRestrictionAndUpload(String selectedDocument) {
         try {
@@ -330,12 +330,16 @@ public class FXMLUploadDocumentsController extends ValidationHandler {
     }
 
     private void launchDocument(Expedient expedient) {
-        File documentFile = new File(expedient.getUrl());
-
-        if (!documentFile.exists()) {
+        try {
+            File documentFile = FileManager.resolveFile(expedient.getUrl());
+            
+            if (!documentFile.exists()) {
+                showError(FILE_NOT_FOUND_ERROR);
+            } else {
+                tryOpenWithDesktop(documentFile);
+            }
+        } catch (OperationException e) {
             showError(FILE_NOT_FOUND_ERROR);
-        } else {
-            tryOpenWithDesktop(documentFile);
         }
     }
 
