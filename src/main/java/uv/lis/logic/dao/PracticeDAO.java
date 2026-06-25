@@ -91,7 +91,7 @@ public class PracticeDAO implements IPracticeDAO {
     @Override
     public boolean existsByStudent(String idStudent) throws OperationException {
         boolean exists = false;
-        String practiceQuery = "SELECT 1 FROM Practice WHERE matricula = ? LIMIT 1;";
+        String practiceQuery = "SELECT 1 FROM Practica WHERE matricula = ? LIMIT 1;";
 
         try (Connection databaseConnection = connectionManager.getConnection();
             PreparedStatement preparedStatement = databaseConnection.prepareStatement(practiceQuery)) {
