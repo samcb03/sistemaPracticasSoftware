@@ -20,16 +20,16 @@ public class Practice {
     public int getCalification() { 
         return calification; 
     }
-    
+
     public void setCalification(int calification) { 
         this.calification = calification; 
     }
 
-    public String getidStudent() { 
+    public String getIdStudent() { 
         return idStudent; 
     }
 
-    public void setidStudent(String idStudent) { 
+    public void setIdStudent(String idStudent) { 
         this.idStudent = idStudent; 
     }
 }

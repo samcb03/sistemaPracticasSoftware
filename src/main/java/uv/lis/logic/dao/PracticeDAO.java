@@ -28,11 +28,11 @@ public class PracticeDAO implements IPracticeDAO {
 
     @Override
     public Practice getPracticeByStudent(String idStudent) throws OperationException {
-        Practice Practice = new Practice();
+        Practice practice = new Practice();
 
-        String practiceQuery = "SELECT idPractica, calificacion, idStudent "
+        String practiceQuery = "SELECT idPractica, calificacion, matricula "
                              + "FROM Practica "
-                             + "WHERE idStudent = ? "
+                             + "WHERE matricula = ? "
                              + "LIMIT 1;";
 
         try (Connection connection = connectionManager.getConnection();
@@ -42,9 +42,9 @@ public class PracticeDAO implements IPracticeDAO {
 
             try (ResultSet resultSet = preparedStatement.executeQuery()) {
                 if (resultSet.next()) {
-                    Practice.setIdPractice(resultSet.getInt("idPractica"));
-                    Practice.setCalification(resultSet.getInt("calificacion"));
-                    Practice.setidStudent(resultSet.getString("idStudent"));
+                    practice.setIdPractice(resultSet.getInt("idPractica"));
+                    practice.setCalification(resultSet.getInt("calificacion"));
+                    practice.setIdStudent(resultSet.getString("matricula"));
                 } else {
                     throw new OperationException(
                         "No se encontró práctica para el alumno indicado", null);
@@ -55,7 +55,7 @@ public class PracticeDAO implements IPracticeDAO {
             throw new OperationException("Error al recuperar la práctica del alumno", e);
         }
 
-        return Practice;
+        return practice;
     }
 
     @Override
@@ -69,15 +69,15 @@ public class PracticeDAO implements IPracticeDAO {
             PreparedStatement preparedStatement = databaseConnection.prepareStatement(practiceQuery)) {
 
             preparedStatement.setInt(1, Practice.getCalification());
-            preparedStatement.setString(2, Practice.getidStudent());
+            preparedStatement.setString(2, Practice.getIdStudent());
 
             if (preparedStatement.executeUpdate() > NO_VALUE) {
                 isRegistered = true;
                 LOGGER.log(Level.INFO, "Práctica registrada para el alumno {0}",
-                    Practice.getidStudent());
+                    Practice.getIdStudent());
             } else {
                 LOGGER.log(Level.WARNING, "No se pudo registrar la práctica para el alumno {0}",
-                    Practice.getidStudent());
+                    Practice.getIdStudent());
                 throw new OperationException("No se pudo registrar la práctica", null);
             }
         } catch (SQLException e) {
