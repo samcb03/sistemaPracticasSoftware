@@ -10,14 +10,15 @@ import uv.lis.logic.dto.Activity;
  * so that controllers and views do not need to handle date arithmetic directly.
  */
 public final class WorkProgressCalculator {
-
     private static final int TOTAL_PROGRESS_PERCENTAGE = 100;
     private static final int MINIMUM_WEEKS = 1;
     private static final int ZERO_PROGRESS = 0;
     private static final int NO_WEEK_OFFSET = 0;
     private static final double DAYS_PER_WEEK = 7.0;
 
-    private WorkProgressCalculator() {}
+    private WorkProgressCalculator() {
+        // Utility class, instantiation is not allowed
+    }
 
     /**
      * Returns how much progress the activity should accumulate per week

@@ -11,7 +11,6 @@ import de.mkammerer.argon2.Argon2Factory;
  * GPU-based and side-channel attacks.
  */
 public class PasswordHasher {
-
     private static final Argon2 ARGON2 = Argon2Factory.create(Argon2Factory.Argon2Types.ARGON2id);
     private static final int ITERATIONS = 3;
     private static final int MEMORY = 65536;

@@ -5,7 +5,6 @@ import java.util.Arrays;
 import java.util.Objects;
 
 public class PartialReport extends Report {
-
     public static final int MAX_ACTIVITIES = 6;
     public static final int MAX_WEEKS = 8;
 
@@ -23,7 +22,6 @@ public class PartialReport extends Report {
     private String totalHours;
     private String dateReport;
     private boolean manualAdvances;
-
     private String[] activityNames;
     private int[] realWeeklyAdvances;
     private int[][] plannedAdvances;

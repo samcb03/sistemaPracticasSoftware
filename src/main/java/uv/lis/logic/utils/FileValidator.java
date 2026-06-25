@@ -5,6 +5,8 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import uv.lis.logic.exceptions.OperationException;
 
@@ -18,7 +20,7 @@ import uv.lis.logic.exceptions.OperationException;
  * cause issues in the file system or in path construction.
  */
 public class FileValidator {
-
+    private static final Logger LOGGER = Logger.getLogger(FileValidator.class.getName());
     private static final long MAX_FILE_SIZE_BYTES = 20 * 1024 * 1024;
     public static final String EXTENSION_PDF = ".pdf";
 
@@ -49,6 +51,7 @@ public class FileValidator {
      */
     private static void validateSize(File file) throws OperationException {
         if (file.length() > MAX_FILE_SIZE_BYTES) {
+            LOGGER.log(Level.WARNING, "Archivo rechazado por tamano excesivo: {0} bytes", file.length());
             throw new OperationException("El documento no debe pasar de los 20MB", null);
         }
     }
@@ -63,6 +66,7 @@ public class FileValidator {
     private static void validateExtension(File file) throws OperationException {
         String fileName = file.getName().toLowerCase();
         if (!fileName.endsWith(EXTENSION_PDF)) {
+            LOGGER.log(Level.WARNING, "Extension no permitida en el archivo: {0}", fileName);
             throw new OperationException("Solo se permiten documentos PDF", null);
         }
     }
@@ -85,6 +89,7 @@ public class FileValidator {
                 throw new OperationException("El documento no coincide con el tipo declarado", null);
             }
         } catch (IOException e) {
+            LOGGER.log(Level.SEVERE, "Error al leer el archivo para validacion de magic bytes", e);
             throw new OperationException("Error al leer el archivo", e);
         }
     }
@@ -100,8 +105,13 @@ public class FileValidator {
     private static void validateFileName(File file) throws OperationException {
         String fileName = file.getName();
         if (!fileName.matches("[a-zA-Z0-9._\\-\\sñÑáéíóúÁÉÍÓÚ()]+")) {
+            LOGGER.log(Level.WARNING, "Nombre de archivo con caracteres no permitidos: {0}", fileName);
             throw new OperationException("El nombre del archivo contiene caracteres no permitidos",
                 null);
         }
+    }
+
+    private FileValidator() {
+        // Utility class, instantiation is not allowed
     }
 }

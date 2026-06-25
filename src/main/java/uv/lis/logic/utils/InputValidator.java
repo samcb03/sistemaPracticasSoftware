@@ -12,9 +12,6 @@ import java.util.stream.Stream;
  * can decide how to present the result without coupling validation logic to the UI.
  */
 public final class InputValidator {
-
-    private InputValidator() {}
-
     public static final int IS_COORDINATOR = 3;
     public static final int NO_VALUE = 0;
     public static final int MAX_REQUESTS = 3;
@@ -50,6 +47,10 @@ public final class InputValidator {
     public static final String ADDRESS_NUMBER_REGEX = "^[a-zA-Z0-9\\s/#-]+$";
     public static final String REDACTER_REGEX = "^[\\p{L}\\s.,:!?()]+$";
     private static final String INVALID_ENDING_REGEX = ".*[^\\p{L}.]$";
+
+    private InputValidator() {
+        // Utility class, instantiation is not allowed
+    }
 
     /**
      * Verifies that a field is not null or blank.
@@ -429,7 +430,7 @@ public final class InputValidator {
     public static Optional<String> validateIdStudent(String fieldValue, int requiredLenght, String fieldName) {
         Optional<String> validationResult;
         if (fieldValue.isEmpty() || fieldValue.length() != requiredLenght) {
-            validationResult = Optional.of(fieldName + "debe tener exactamente " + requiredLenght + " caracteres");
+            validationResult = Optional.of(fieldName + " debe tener exactamente " + requiredLenght + " caracteres");
         } else if (!fieldValue.matches(STUDENT_ENROLLMENT)) {
             validationResult = Optional.of(fieldName + " no sigue el formato establecido ");
         } else {
@@ -561,13 +562,13 @@ public final class InputValidator {
      */
     public static Optional<String> validateMaxHoursForDuration(String hoursValue, long durationInDays, 
         String fieldName) {
-            Optional<String> validationResult;
-            if (durationInDays <= NO_VALUE) {
-                validationResult = Optional.empty();
-            } else {
-                int maxAllowedHours =(int) durationInDays * MAX_HOURS_PER_DAY;
-                validationResult = validateMaxIntValue(hoursValue, maxAllowedHours, fieldName);
-            }
+        Optional<String> validationResult;
+        if (durationInDays <= NO_VALUE) {
+            validationResult = Optional.empty();
+        } else {
+            int maxAllowedHours =(int) durationInDays * MAX_HOURS_PER_DAY;
+            validationResult = validateMaxIntValue(hoursValue, maxAllowedHours, fieldName);
+        }
         return validationResult;
     }
 
@@ -587,9 +588,9 @@ public final class InputValidator {
         validationResult = validateNotEmpty(fieldValue, fieldName);
         if (validationResult.isEmpty()) {
             if (!fieldValue.matches(REDACTER_REGEX)) {
-                    validationResult = Optional.of(fieldName + " contiene caracteres no permitidos");
+                validationResult = Optional.of(fieldName + " contiene caracteres no permitidos");
             } else if (fieldValue.matches(INVALID_ENDING_REGEX)) {
-                    validationResult = Optional.of(fieldName + " debe terminar con una letra o un punto");
+                validationResult = Optional.of(fieldName + " debe terminar con una letra o un punto");
             } else {
                 validationResult = firstError(
                     validateMaxLength(fieldValue, MAX_TEXT_LENGTH, fieldName),

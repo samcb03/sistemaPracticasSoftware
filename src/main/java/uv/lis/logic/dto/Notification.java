@@ -15,8 +15,8 @@ public class Notification {
 
     }
 
-    public Notification(int id, String idStudent, String title, String message, Timestamp creationDate, 
-            boolean isRead) {
+    public Notification(int id, String idStudent, String title, 
+        String message, Timestamp creationDate, boolean isRead) {
         this.id = id;
         this.idStudent = idStudent;
         this.title = title;

@@ -73,6 +73,7 @@ public class FXMLGenerateAutoevaluationControllerTest extends ApplicationTest {
     private static final String EXPECTED_JR_ERROR_MESSAGE = "Error técnico al generar el documento PDF.";
 
     private Stage primaryStage;
+    private FXMLGenerateAutoevaluationController controller;
     private AutoevaluationCommon autoevaluationCommonMock;
     private AutoevaluationDAO autoevaluationDAOMock;
     private ExpedientDAO expedientDAOMock;
@@ -80,40 +81,25 @@ public class FXMLGenerateAutoevaluationControllerTest extends ApplicationTest {
     FXMLGenerateAutoevaluationControllerTest.class.getName());
 
     @Override
-    public void start(Stage stage) {
+    public void start(Stage stage) throws IOException {
         primaryStage = stage;
 
-        Student testStudent = buildStudent();
-        SessionManager.getInstance().setCurrentStudent(testStudent);
+        SessionManager.getInstance().setCurrentStudent(buildStudent());
 
         autoevaluationCommonMock = mock(AutoevaluationCommon.class);
-        autoevaluationDAOMock = mock(AutoevaluationDAO.class);
-        expedientDAOMock = mock(ExpedientDAO.class);
+        autoevaluationDAOMock    = mock(AutoevaluationDAO.class);
+        expedientDAOMock         = mock(ExpedientDAO.class);
 
-        try {
-            when(expedientDAOMock.isFinalReportValidated(any())).thenReturn(true);
-            when(autoevaluationDAOMock.getAutoevaluationData(anyString()))
-                .thenReturn(buildAutoevaluation());
-        } catch (OperationException e) {
-            LOGGER.log(Level.SEVERE, "Error configurando mocks", e);
-        }
+        FXMLLoader loader = new FXMLLoader(getClass().getResource(AUTOEVALUATION_VIEW_FXML));
+        Parent root = loader.load();
 
-        try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource(AUTOEVALUATION_VIEW_FXML));
-            loader.setControllerFactory(controllerClass -> {
-                FXMLGenerateAutoevaluationController controller = new FXMLGenerateAutoevaluationController();
-                injectField(AUTOEVALUATION_COMMON_FIELD, autoevaluationCommonMock, controller);
-                injectField(AUTOEVALUATION_DAO_FIELD, autoevaluationDAOMock, controller);
-                injectField(EXPEDIENT_DAO_FIELD, expedientDAOMock, controller);
-                return controller;
-            });
-            Parent root = loader.load();
+        controller = loader.getController();
+        injectField(AUTOEVALUATION_COMMON_FIELD, autoevaluationCommonMock);
+        injectField(AUTOEVALUATION_DAO_FIELD,    autoevaluationDAOMock);
+        injectField(EXPEDIENT_DAO_FIELD,         expedientDAOMock);
 
-            stage.setScene(new Scene(root));
-            stage.show();
-        } catch (IOException ioException) {
-            throw new RuntimeException(ioException);
-        }
+        stage.setScene(new Scene(root));
+        stage.show();
     }
 
     @BeforeEach
@@ -204,14 +190,14 @@ public class FXMLGenerateAutoevaluationControllerTest extends ApplicationTest {
         return autoevaluation;
     }
 
-    private void injectField(String fieldName, Object value,
-            FXMLGenerateAutoevaluationController controller) {
+    private void injectField(String fieldName, Object value) {
         try {
             Field field = FXMLGenerateAutoevaluationController.class.getDeclaredField(fieldName);
             field.setAccessible(true);
             field.set(controller, value);
-        } catch (ReflectiveOperationException e) {
-            LOGGER.log(Level.SEVERE, "Error al inyectar campo: " + fieldName, e);
+        } catch (ReflectiveOperationException reflectiveOperationException) {
+            LOGGER.log(Level.SEVERE,
+                    "Error al inyectar campo: " + fieldName, reflectiveOperationException);
         }
     }
 

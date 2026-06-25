@@ -6,6 +6,8 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import uv.lis.logic.exceptions.OperationException;
 
@@ -18,7 +20,7 @@ import uv.lis.logic.exceptions.OperationException;
  * escape the student's subdirectory.
  */
 public class FileManager {
-
+    private static final Logger LOGGER = Logger.getLogger(FileManager.class.getName());
     private static final String BASE_PATH = "Expediente";
 
     /**
@@ -44,28 +46,32 @@ public class FileManager {
      *                            including a path that would escape the base directory
      */
     public static String saveFile(File file, String idStudent) throws OperationException {
-
+        String savedFilePath = "";
         File studentDirectory = new File(BASE_PATH, idStudent);
         if (!studentDirectory.exists()) {
             boolean created = studentDirectory.mkdirs();
             if (!created) {
+                LOGGER.log(Level.SEVERE, "No se pudo crear el directorio para el alumno {0}", idStudent);
                 throw new OperationException("No se pudo crear el directorio", null);
             }
         }
 
-        Path absoluteBase   = Paths.get(BASE_PATH, idStudent).toAbsolutePath().normalize();
+        Path absoluteBase = Paths.get(BASE_PATH, idStudent).toAbsolutePath().normalize();
         Path absoluteTarget = absoluteBase.resolve(idStudent + "_" + file.getName()).normalize();
 
         if (!absoluteTarget.startsWith(absoluteBase)) {
+            LOGGER.log(Level.SEVERE, "Intento de path traversal detectado para el alumno {0}", idStudent);
             throw new OperationException("Ruta de archivo no permitida", null);
-        } else {
-            try {
-                Files.copy(file.toPath(), absoluteTarget, StandardCopyOption.REPLACE_EXISTING);
-                return absoluteTarget.toString();
-            } catch (IOException e) {
-                throw new OperationException("Error al guardar el archivo en el servidor", e);
-            }
+        } 
+
+        try {
+            Files.copy(file.toPath(), absoluteTarget, StandardCopyOption.REPLACE_EXISTING);
+            savedFilePath = absoluteTarget.toString();
+        } catch (IOException e) {
+            LOGGER.log(Level.SEVERE, "Error al guardar el archivo en el servidor", e);
+            throw new OperationException("Error al guardar el archivo en el servidor", e);
         }
+        return savedFilePath;
     }
 
     /**
@@ -81,7 +87,13 @@ public class FileManager {
     public static void deleteFile(String url) {
         File file = new File(url);
         if (file.exists()) {
-            file.delete();
+            if (!file.delete()) {
+                LOGGER.log(Level.WARNING, "No se pudo eliminar el archivo {0}", url);
+            }
         }
+    }
+
+    private FileManager() {
+        // Utility class, instantiation is not allowed
     }
 }
