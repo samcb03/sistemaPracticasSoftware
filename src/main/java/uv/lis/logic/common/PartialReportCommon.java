@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -30,16 +31,13 @@ import uv.lis.logic.utils.WorkProgressCalculator;
 public class PartialReportCommon {
 
     private static final Logger LOGGER = Logger.getLogger(PartialReportCommon.class.getName());
-
     private static final String REPORT_TEMPLATE_PATH = "/uv/lis/GUI/view/templates/partialReport.jasper";
     private static final String DATE_PATTERN = "dd/MM/yyyy";
     private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern(DATE_PATTERN);
-
     private static final String NO_STUDENT_IN_SESSION_MESSAGE = "No hay un estudiante en sesión";
     private static final String ACTIVITY_NOT_FOUND_MESSAGE = "No se encontró la actividad seleccionada para el alumno";
     private static final String TEMPLATE_NOT_FOUND_MESSAGE = "No se encontró la plantilla del reporte parcial.";
     private static final String TEMPLATE_READ_ERROR_MESSAGE = "Error al cargar la plantilla del reporte parcial.";
-
     private static final String ACTIVITY_NAME_PREFIX = "activityName";
     private static final String PLANNED_ADVANCE_PREFIX = "plannedAdvanceWeek";
     private static final String REAL_ADVANCE_PREFIX = "realAdvanceWeek";
@@ -51,8 +49,8 @@ public class PartialReportCommon {
     private final SimpleJasperReportsContext jasperReportsContext;
 
     public PartialReportCommon() {
-        this.reportContextDAO = new ReportContextDAO();
-        this.jasperReportsContext = buildReportsContext();
+        reportContextDAO = new ReportContextDAO();
+        jasperReportsContext = buildReportsContext();
     }
 
     private SimpleJasperReportsContext buildReportsContext() {
@@ -73,7 +71,8 @@ public class PartialReportCommon {
 
         mergeContextIntoReport(partialReport, currentStudent.getIdStudent());
         fillAdvanceMatrix(partialReport, currentStudent.getIdStudent());
-        return fillReportTemplate(partialReport);
+        JasperPrint jasperPrint = fillReportTemplate(partialReport);
+        return jasperPrint;
     }
 
     public JasperPrint fillReportTemplate(PartialReport partialReport) throws JRException, OperationException {
@@ -98,7 +97,6 @@ public class PartialReportCommon {
 
     private void mergeContextIntoReport(PartialReport partialReport, String studentId) throws OperationException {
         PartialReport context = reportContextDAO.getPartialReportContextByStudentId(studentId);
-
         partialReport.setStudentName(context.getStudentName());
         partialReport.setProfessorName(context.getProfessorName());
         partialReport.setNrcSubject(context.getNrcSubject());
@@ -108,7 +106,6 @@ public class PartialReportCommon {
         partialReport.setProjectMethodology(context.getProjectMethodology());
         partialReport.setAffiliatedOrganization(context.getAffiliatedOrganization());
         partialReport.setProjectSupervisor(context.getProjectSupervisor());
-
         partialReport.setTotalHours(reportContextDAO.getTotalReportedHoursByStudentId(studentId));
         partialReport.setDateReport(LocalDate.now().format(DATE_FORMATTER));
     }
@@ -116,9 +113,8 @@ public class PartialReportCommon {
     private void fillAdvanceMatrix(PartialReport partialReport, String studentId) throws OperationException {
         Activity[] resolvedActivities = resolveSelectedActivities(partialReport, studentId);
         List<Activity> presentActivities = collectPresentActivities(resolvedActivities);
-
         partialReport.setReportPeriod(buildReportPeriod(presentActivities));
-        partialReport.setReportPeriodStart(findEarliestStart(presentActivities));
+        partialReport.setReportPeriodStart(findEarliestStart(presentActivities).orElse(null));
 
         if (!partialReport.isManualAdvances()) {
             fillAutomaticAdvances(partialReport, resolvedActivities);
@@ -177,7 +173,6 @@ public class PartialReportCommon {
         int plannedWeeklyAdvance = WorkProgressCalculator.calculateWeeklyPlannedAdvance(activity);
         int writtenRealAdvance = partialReport.getRealWeeklyAdvances()[activityIndex];
         int realWeeklyAdvance = WorkProgressCalculator.calculateWeeklyRealAdvance(writtenRealAdvance, activity);
-
         int lastWeek = Math.min(startWeek + activityWeeks, PartialReport.MAX_WEEKS);
         int[][] plannedAdvances = partialReport.getPlannedAdvances();
         int[][] realAdvances = partialReport.getRealAdvances();
@@ -190,36 +185,37 @@ public class PartialReportCommon {
 
     private String buildReportPeriod(List<Activity> activities) {
         String reportPeriod = "";
-        LocalDate earliestStart = findEarliestStart(activities);
-        LocalDate latestEnd = findLatestEnd(activities);
+        Optional<LocalDate> earliestStart = findEarliestStart(activities);
+        Optional<LocalDate> latestEnd = findLatestEnd(activities);
 
-        if (earliestStart != null && latestEnd != null) {
-            reportPeriod = earliestStart.format(DATE_FORMATTER) + " - " + latestEnd.format(DATE_FORMATTER);
+        if (earliestStart.isPresent() && latestEnd.isPresent()) {
+            reportPeriod = earliestStart.get().format(DATE_FORMATTER) + " - " 
+            + latestEnd.get().format(DATE_FORMATTER);
         }
         return reportPeriod;
     }
 
-    private LocalDate findEarliestStart(List<Activity> activities) {
-        LocalDate earliestStart = null;
+    private Optional<LocalDate> findEarliestStart(List<Activity> activities) {
+        Optional<LocalDate> earliestStart = Optional.empty();
 
         for (Activity activity : activities) {
             LocalDate startDate = activity.getStartDate();
 
-            if (startDate != null && (earliestStart == null || startDate.isBefore(earliestStart))) {
-                earliestStart = startDate;
+            if (startDate != null && (earliestStart.isEmpty() || startDate.isBefore(earliestStart.get()))) {
+                earliestStart = Optional.of(startDate);
             }
         }
         return earliestStart;
     }
 
-    private LocalDate findLatestEnd(List<Activity> activities) {
-        LocalDate latestEnd = null;
+    private Optional<LocalDate> findLatestEnd(List<Activity> activities) {
+        Optional<LocalDate> latestEnd = Optional.empty();
 
         for (Activity activity : activities) {
             LocalDate endDate = activity.getEndDate();
 
-            if (endDate != null && (latestEnd == null || endDate.isAfter(latestEnd))) {
-                latestEnd = endDate;
+            if (endDate != null && (latestEnd.isEmpty() || endDate.isAfter(latestEnd.get()))) {
+                latestEnd = Optional.of(endDate);
             }
         }
         return latestEnd;
@@ -227,11 +223,9 @@ public class PartialReportCommon {
 
     private Map<String, Object> buildReportParameters(PartialReport report) {
         Map<String, Object> parameters = new HashMap<>();
-
         addContextParameters(parameters, report);
         addActivityNameParameters(parameters, report.getActivityNames());
         addAdvanceMatrixParameters(parameters, report);
-
         return parameters;
     }
 
