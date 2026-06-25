@@ -356,7 +356,7 @@ public class FXMLConsultStudentExpedientController extends ValidationHandler {
     private void saveGrade(String studentId, int grade) {
         try {
             Practice practice = new Practice();
-            practice.setidStudent(studentId);
+            practice.setIdStudent(studentId);
             practice.setCalification(grade);
 
             boolean isRegistered = practiceDAO.registerPractice(practice);
