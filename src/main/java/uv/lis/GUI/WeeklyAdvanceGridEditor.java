@@ -106,6 +106,7 @@ public class WeeklyAdvanceGridEditor {
         int weekCount = FIRST_DATA_INDEX;
 
         for (Activity activity : activitiesBySlot) {
+            
             if (activity != null) {
                 int activityWeeks = resolveActivityWeeks(activity);
 
