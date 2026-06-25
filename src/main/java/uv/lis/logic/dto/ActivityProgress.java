@@ -58,6 +58,7 @@ public class ActivityProgress {
 
     @Override
     public int hashCode() {
-        return Objects.hash(name, advancePercentage, observations);
+        int hash = Objects.hash(name, advancePercentage, observations);
+        return hash;
     }
 }

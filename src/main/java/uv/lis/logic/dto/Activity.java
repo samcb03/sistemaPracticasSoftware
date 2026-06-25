@@ -118,6 +118,7 @@ public class Activity {
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, name, description, startDate, endDate, projectId);
+        int hash = Objects.hash(id, name, description, startDate, endDate, projectId);
+        return hash;
     }
 }

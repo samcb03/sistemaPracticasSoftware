@@ -6,6 +6,7 @@ import java.util.Map;
 public class OperationException extends Exception {
 
     private static final int SQL_STATE_CLASS_LENGTH = 2;
+    private static final int FIRST_INDEX = 0;
     
     private static final Map<String, String> SQL_STATE_MESSAGES = Map.of(
         "08", "Error de conexion con la base de datos. Intente mas tarde",
@@ -37,7 +38,7 @@ public class OperationException extends Exception {
         if (cause instanceof SQLException) {
             String sqlState = ((SQLException) cause).getSQLState();
             if (sqlState != null && sqlState.length() >= SQL_STATE_CLASS_LENGTH) {
-                stateClass = sqlState.substring(0, SQL_STATE_CLASS_LENGTH);
+                stateClass = sqlState.substring(FIRST_INDEX, SQL_STATE_CLASS_LENGTH);
             }
         }
         return stateClass;

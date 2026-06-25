@@ -24,8 +24,6 @@ public final class DateValidator {
     private static final int MAX_PAST_MONTHS = 6;
     private static final int FALL_TERM_YEAR_OFFSET = 1;
 
-    private DateValidator() {}
-
     /**
      * Verifies that a birth date is not null, is not in the future,
      * and corresponds to a person of at least 18 years of age.
@@ -49,30 +47,6 @@ public final class DateValidator {
                 validationResult = Optional.of("El alumno debe ser mayor de " + MINIMUM_AGE + " años");
             } else if(age > MAXIMUM_AGE) {
                 validationResult = Optional.of("El alumno no puede ser mayor de " + MAXIMUM_AGE + " años");
-            } else {
-                validationResult = Optional.empty();
-            }
-        }
-        return validationResult;
-    }
-
-    /**
-     * Verifies that a start date is not null and is not in the past.
-     *
-     * @param startDate the date to evaluate
-     *
-     * @param fieldName the field label used in the error message
-     *
-     * @return an error message if the date is null or in the past, empty otherwise
-     */
-    public static Optional<String> validateStartDate(LocalDate startDate, String fieldName) {
-        Optional<String> validationResult;
-        if (startDate == null) {
-            validationResult = Optional.of("Seleccione una fecha de inicio");
-        } else {
-            LocalDate today = LocalDate.now();
-            if (startDate.isBefore(today)) {
-                validationResult = Optional.of(fieldName + " no puede ser pasada");
             } else {
                 validationResult = Optional.empty();
             }
@@ -219,5 +193,9 @@ public final class DateValidator {
         boolean isValidEnd = endDate.getMonth() == Month.JULY
             && endDate.getYear() == startDate.getYear();
         return isValidEnd;
+    }
+
+    private DateValidator() {
+        
     }
 }

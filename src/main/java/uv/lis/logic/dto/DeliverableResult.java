@@ -59,6 +59,7 @@ public class DeliverableResult {
 
     @Override
     public int hashCode() {
-        return Objects.hash(result, advancePercentage, observations);
+        int hash = Objects.hash(result, advancePercentage, observations);
+        return hash;
     }
 }
