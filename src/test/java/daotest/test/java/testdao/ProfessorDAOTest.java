@@ -50,7 +50,7 @@ class ProfessorDAOTest {
     private static final String SECOND_FULL_NAME = "María García";
     private static final String NRC = "NRC: 1 — 32432 — Ingeniería de Software (Enero-Junio)";
     private static final String SECOND_NRC = "NRC: 2 — 45423 — Ingeniería de Software (Enero-Junio)";
-    private static final String PREFIX = "ABC";
+    private static final String PREFIX = "Mar";
     private static final String CONNECTION_ERROR = "Fallo";
     private static final String CONNECTION_MANAGER_FIELD = "connectionManager";
     private static final String PASSWORD_DEFAULT = "Dsokgm02";
@@ -188,7 +188,8 @@ class ProfessorDAOTest {
         when(resultSet.getString(COLUMN_LAST_NAME)).thenReturn(LAST_NAME);
         when(resultSet.getInt(COLUMN_ROLE_ID)).thenReturn(ROLE_PROFESSOR);
 
-        assertEquals(Optional.of(buildProfessor()), professorDAO.getProfessorById(USER_ID));
+        Optional<Professor> result = professorDAO.getProfessorById(USER_ID);
+        assertEquals(Optional.of(buildProfessor()), result);
     }
 
     @Test

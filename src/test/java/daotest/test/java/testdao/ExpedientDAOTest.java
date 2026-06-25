@@ -34,7 +34,7 @@ class ExpedientDAOTest {
     private static final int EXPEDIENT_ID = 2;
     private static final int FIRST_EXPEDIENT_ID = 4;
     private static final int GENERATED_ID = 42;
-    private static final int ROWS_AFFECTED = 1;
+    private static final int FIRST_VALUE = 1;
     private static final int NO_ROWS_AFFECTED = 0;
     private static final int DOCUMENT_TYPE_ID = 3;
     private static final int MINUS_ONE = -1;
@@ -99,10 +99,10 @@ class ExpedientDAOTest {
 
     @Test
     void saveDocument_successful_returnsGeneratedId() throws Exception {
-        mockUpdateExecution(ROWS_AFFECTED);
+        mockUpdateExecution(FIRST_VALUE);
         when(preparedStatement.getGeneratedKeys()).thenReturn(generatedKeys);
         when(generatedKeys.next()).thenReturn(true);
-        when(generatedKeys.getInt(1)).thenReturn(GENERATED_ID);
+        when(generatedKeys.getInt(FIRST_VALUE)).thenReturn(GENERATED_ID);
 
         assertNotEquals(MINUS_ONE, expedientDAO.saveDocument(builderExpedient()));
     }
@@ -196,7 +196,7 @@ class ExpedientDAOTest {
     @Test
     void updateDocumentStatus_validateSuccessful_returnsTrue() throws Exception {
         mockQueryExecution();
-        when(preparedStatement.executeUpdate()).thenReturn(ROWS_AFFECTED);
+        when(preparedStatement.executeUpdate()).thenReturn(FIRST_VALUE);
 
         assertTrue(expedientDAO.updateDocumentStatus(EXPEDIENT_ID, STATUS_ASSIGNED));
     }
@@ -204,7 +204,7 @@ class ExpedientDAOTest {
     @Test
     void updateDocumentStatus_rejectSuccessful_returnsTrue() throws Exception {
         mockQueryExecution();
-        when(preparedStatement.executeUpdate()).thenReturn(ROWS_AFFECTED);
+        when(preparedStatement.executeUpdate()).thenReturn(FIRST_VALUE);
 
         assertTrue(expedientDAO.updateDocumentStatus(EXPEDIENT_ID, STATUS_REJECTED));
     }
@@ -287,7 +287,7 @@ class ExpedientDAOTest {
     void isDocumentTypeValidated_documentValidated_returnsTrue() throws Exception {
         mockQueryExecution();
         when(resultSet.next()).thenReturn(true);
-        when(resultSet.getInt(1)).thenReturn(ROWS_AFFECTED);
+        when(resultSet.getInt(FIRST_VALUE)).thenReturn(FIRST_VALUE);
 
         assertTrue(expedientDAO.isDocumentTypeValidated(STUDENT_ID, DOCUMENT_TYPE_ID));
     }
@@ -296,7 +296,7 @@ class ExpedientDAOTest {
     void isDocumentTypeValidated_documentNotValidated_returnsFalse() throws Exception {
         mockQueryExecution();
         when(resultSet.next()).thenReturn(true);
-        when(resultSet.getInt(1)).thenReturn(NO_ROWS_AFFECTED);
+        when(resultSet.getInt(FIRST_VALUE)).thenReturn(NO_ROWS_AFFECTED);
 
         assertFalse(expedientDAO.isDocumentTypeValidated(STUDENT_ID, DOCUMENT_TYPE_ID));
     }
@@ -313,16 +313,16 @@ class ExpedientDAOTest {
     void countDocumentsByStudentAndType_documentsExist_returnsCount() throws Exception {
         mockQueryExecution();
         when(resultSet.next()).thenReturn(true);
-        when(resultSet.getInt(1)).thenReturn(ROWS_AFFECTED);
+        when(resultSet.getInt(FIRST_VALUE)).thenReturn(FIRST_VALUE);
 
-        assertEquals(ROWS_AFFECTED, expedientDAO.countDocumentsByStudentAndType(STUDENT_ID, DOCUMENT_TYPE_ID));
+        assertEquals(FIRST_VALUE, expedientDAO.countDocumentsByStudentAndType(STUDENT_ID, DOCUMENT_TYPE_ID));
     }
 
     @Test
     void countDocumentsByStudentAndType_noDocuments_returnsZero() throws Exception {
         mockQueryExecution();
         when(resultSet.next()).thenReturn(true);
-        when(resultSet.getInt(1)).thenReturn(NO_ROWS_AFFECTED);
+        when(resultSet.getInt(FIRST_VALUE)).thenReturn(NO_ROWS_AFFECTED);
 
         assertEquals(NO_ROWS_AFFECTED, expedientDAO.countDocumentsByStudentAndType(STUDENT_ID, DOCUMENT_TYPE_ID));
     }

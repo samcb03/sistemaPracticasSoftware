@@ -109,8 +109,7 @@ class SchoolPeriodDAOTest {
     void getAllSchoolPeriodsNames_sqlError_throwsOperationException() throws SQLException {
         when(connectionManager.getConnection()).thenThrow(new SQLException(DATABASE_ERROR_MESSAGE));
 
-        assertThrows(OperationException.class,
-            () -> schoolPeriodDAO.getAllSchoolPeriodsNames());
+        assertThrows(OperationException.class, () -> schoolPeriodDAO.getAllSchoolPeriodsNames());
     }
 
     @Test
@@ -119,7 +118,7 @@ class SchoolPeriodDAOTest {
         when(resultSet.next()).thenReturn(true);
         when(resultSet.getString(COLUMN_PERIOD_ID)).thenReturn(EXPECTED_PERIOD_ID_STRING);
 
-        assertEquals(Optional.of(EXPECTED_PERIOD_ID_STRING),
+        assertEquals(Optional.of(EXPECTED_PERIOD_ID_STRING),    
             schoolPeriodDAO.getSchoolPeriodIdByName(FIRST_PERIOD_NAME));
     }
 
@@ -149,8 +148,8 @@ class SchoolPeriodDAOTest {
         when(resultSet.getDate(COLUMN_START_DATE)).thenReturn(Date.valueOf(START_DATE));
         when(resultSet.getDate(COLUMN_END_DATE)).thenReturn(Date.valueOf(END_DATE));
 
-        assertEquals(Optional.of(builderSchoolPeriod()),
-            schoolPeriodDAO.getSchoolPeriodByStudentId(VALID_STUDENT_ID));
+        Optional<SchoolPeriod> result = schoolPeriodDAO.getSchoolPeriodByStudentId(VALID_STUDENT_ID);
+        assertEquals(Optional.of(builderSchoolPeriod()), result);
     }
 
     @Test

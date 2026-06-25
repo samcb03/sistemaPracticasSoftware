@@ -7,7 +7,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
-import static uv.lis.logic.utils.InputValidator.NO_VALUE;
 
 import java.lang.reflect.Field;
 import java.sql.Connection;
@@ -42,11 +41,11 @@ class ReportDAOTest {
     private static final int REAL_HOURS = 8;
     private static final int REPORTED_HOURS = 40;
 
-    private static final int FIRST_COLUMN = 1;
+    private static final int FIRST_COLUMN_INDEX = 1;
     private static final int FINAL_REPORT_TYPE_ID = 2;
     private static final int NON_REPORT_TYPE_ID = 5;
     private static final int REPORT_COUNT = 1;
-    private static final int NO_REPORT_COUNT = 0;
+    private static final int NO_VALUE = 0;
     private static final int UPLOADABLE_REPORT_ID = 7;
 
     private static final String UPLOADABLE_MONTH = "Mayo";
@@ -54,9 +53,9 @@ class ReportDAOTest {
     private static final String MONTH_COLUMN = "mes";
 
     private static final String CONNECTION_MANAGER_FIELD = "connectionManager";
-    private static final String FIRST_DESCRIPTION = "Descripcion test 1";
-    private static final String FIRST_OBSERVATIONS = "Observacion test 1";
-    private static final String FIRST_ACTIVITY = "Actividad test 1";
+    private static final String FIRST_DESCRIPTION = "Hacer BD";
+    private static final String FIRST_OBSERVATIONS = "Espacio de mejora";
+    private static final String FIRST_ACTIVITY = "Realizar BD";
     private static final String FIRST_STUDENT_ID = "S23013127";
 
     private static final String SECOND_DESCRIPTION = "Descripcion test 2";
@@ -333,7 +332,7 @@ class ReportDAOTest {
     void hasReportOfType_reportExists_returnsTrue() throws Exception {
         mockQueryExecution();
         when(resultSet.next()).thenReturn(true);
-        when(resultSet.getInt(FIRST_COLUMN)).thenReturn(REPORT_COUNT);
+        when(resultSet.getInt(FIRST_COLUMN_INDEX)).thenReturn(REPORT_COUNT);
 
         assertTrue(reportDAO.hasReportOfType(FIRST_STUDENT_ID, FINAL_REPORT_TYPE_ID));
     }
@@ -342,7 +341,7 @@ class ReportDAOTest {
     void hasReportOfType_noReport_returnsFalse() throws Exception {
         mockQueryExecution();
         when(resultSet.next()).thenReturn(true);
-        when(resultSet.getInt(FIRST_COLUMN)).thenReturn(NO_REPORT_COUNT);
+        when(resultSet.getInt(FIRST_COLUMN_INDEX)).thenReturn(NO_VALUE);
 
         assertFalse(reportDAO.hasReportOfType(FIRST_STUDENT_ID, FINAL_REPORT_TYPE_ID));
     }
@@ -364,7 +363,7 @@ class ReportDAOTest {
     void countMonthlyReportsByStudent_reportsExist_returnsCount() throws Exception {
         mockQueryExecution();
         when(resultSet.next()).thenReturn(true);
-        when(resultSet.getInt(FIRST_COLUMN)).thenReturn(REPORT_COUNT);
+        when(resultSet.getInt(FIRST_COLUMN_INDEX)).thenReturn(REPORT_COUNT);
 
         assertEquals(REPORT_COUNT, reportDAO.countMonthlyReportsByStudent(FIRST_STUDENT_ID));
     }
@@ -373,9 +372,9 @@ class ReportDAOTest {
     void countMonthlyReportsByStudent_noReports_returnsZero() throws Exception {
         mockQueryExecution();
         when(resultSet.next()).thenReturn(true);
-        when(resultSet.getInt(FIRST_COLUMN)).thenReturn(NO_REPORT_COUNT);
+        when(resultSet.getInt(FIRST_COLUMN_INDEX)).thenReturn(NO_VALUE);
 
-        assertEquals(NO_REPORT_COUNT, reportDAO.countMonthlyReportsByStudent(FIRST_STUDENT_ID));
+        assertEquals(NO_VALUE, reportDAO.countMonthlyReportsByStudent(FIRST_STUDENT_ID));
     }
 
     @Test
@@ -395,9 +394,10 @@ class ReportDAOTest {
 
         List<MonthlyReport> uploadableReports = reportDAO.getUploadableMonthlyReports(FIRST_STUDENT_ID);
 
-        assertEquals(UPLOADABLE_MONTH, uploadableReports.get(NO_VALUE).getMonth());
+        MonthlyReport firstReport = uploadableReports.get(NO_VALUE);
+        assertEquals(UPLOADABLE_MONTH, firstReport.getMonth());
     }
-
+ 
     @Test
     void getUploadableMonthlyReports_noReports_returnsEmptyList() throws Exception {
         mockQueryExecution();

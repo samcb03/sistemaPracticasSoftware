@@ -1,6 +1,5 @@
 package daotest.test.java.testdao;
 
-
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -35,7 +34,7 @@ class AdvanceDAOTest {
     private static final int ACCUMULATED_HOURS = 8;
     private static final int LATEST_ACCUMULATED_HOURS = 48;
     private static final int ZERO_ACCUMULATED_HOURS = 0;
-    private static final int ROWS_AFFECTED = 1;
+    private static final int FIRST_VALUE = 1;
     private static final int ADVANCE_COUNT = 12;
 
     @Mock private MySQLConnectionManager connectionManager;
@@ -92,7 +91,7 @@ class AdvanceDAOTest {
 
     @Test
     void registerAdvance_validAdvance_returnsTrue() throws Exception {
-        mockUpdateExecution(ROWS_AFFECTED);
+        mockUpdateExecution(FIRST_VALUE);
 
         boolean result = advanceDAO.registerAdvance(builderAdvance());
 
@@ -149,7 +148,7 @@ class AdvanceDAOTest {
     void existsAdvanceForReport_advanceExists_returnsTrue() throws Exception {
         mockQueryExecution();
         when(resultSet.next()).thenReturn(true);
-        when(resultSet.getInt(1)).thenReturn(ADVANCE_COUNT);
+        when(resultSet.getInt(FIRST_VALUE)).thenReturn(ADVANCE_COUNT);
 
         assertTrue(advanceDAO.existsAdvanceForReport(REPORT_ID));
     }
@@ -158,7 +157,7 @@ class AdvanceDAOTest {
     void existsAdvanceForReport_noAdvance_returnsFalse() throws Exception {
         mockQueryExecution();
         when(resultSet.next()).thenReturn(true);
-        when(resultSet.getInt(1)).thenReturn(NO_VALUE);
+        when(resultSet.getInt(FIRST_VALUE)).thenReturn(NO_VALUE);
 
         assertFalse(advanceDAO.existsAdvanceForReport(REPORT_ID));
     }

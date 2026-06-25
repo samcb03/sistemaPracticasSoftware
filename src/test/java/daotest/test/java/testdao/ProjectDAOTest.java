@@ -31,23 +31,23 @@ import uv.lis.logic.exceptions.OperationException;
 
 class ProjectDAOTest {
 
-    private static final int ROWS_AFFECTED = 1;
+    private static final int FIRST_VALUE = 1;
     private static final int NO_ROWS = 0;
-    private static final int PROJECT_ID = 1;
-    private static final int SECOND_PROJECT_ID = 2;
+    private static final int PROJECT_ID = 3;
+    private static final int SECOND_PROJECT_ID = 4;
     private static final int GENERATED_ID = 7;
-    private static final int CAPACITY = 5;
-    private static final int ORGANIZATION_ID = 3;
-    private static final int SUPERVISOR_ID = 4;
+    private static final int CAPACITY = 2;
+    private static final int ORGANIZATION_ID = 5;
+    private static final int SUPERVISOR_ID = 6;
 
     private static final String PROJECT_NAME = "Sistema de Practicas";
     private static final String SECOND_NAME = "Portal Web";
-    private static final String PROJECT_DESCRIPTION = "Descripcion del proyecto";
-    private static final String SECOND_DESCRIPTION = "Desc B";
+    private static final String PROJECT_DESCRIPTION = "Hacer sistema de practicas";
+    private static final String SECOND_DESCRIPTION = "Hacer pagina web";
     private static final String METHODOLOGY = "Scrum";
     private static final String SECOND_METHODOLOGY = "Kanban";
-    private static final String OBJECTIVE = "Objetivo del proyecto";
-    private static final String SECOND_OBJECTIVE = "Obj B";
+    private static final String OBJECTIVE = "Facilitar el manejo de archivos";
+    private static final String SECOND_OBJECTIVE = "Consultar informacion";
     private static final String ORGANIZATION_NAME = "UV";
     private static final String SUPERVISOR_NAME = "Luis Martinez";
     private static final String PROFESSOR_FIRST_NAME = "Luis";
@@ -229,10 +229,10 @@ class ProjectDAOTest {
     @Test
     void registerProject_successful_returnsTrue() throws Exception {
         when(databaseConnection.prepareStatement(anyString(), anyInt())).thenReturn(preparedStatement);
-        when(preparedStatement.executeUpdate()).thenReturn(ROWS_AFFECTED);
+        when(preparedStatement.executeUpdate()).thenReturn(FIRST_VALUE);
         when(preparedStatement.getGeneratedKeys()).thenReturn(resultSet);
         when(resultSet.next()).thenReturn(true);
-        when(resultSet.getInt(1)).thenReturn(GENERATED_ID);
+        when(resultSet.getInt(FIRST_VALUE)).thenReturn(GENERATED_ID);
 
         assertTrue(projectDAO.registerProject(builderProject()));
     }
@@ -257,7 +257,7 @@ class ProjectDAOTest {
     @Test
     void modifyProject_successful_returnsTrue() throws Exception {
         when(databaseConnection.prepareStatement(anyString())).thenReturn(preparedStatement);
-        when(preparedStatement.executeUpdate()).thenReturn(ROWS_AFFECTED);
+        when(preparedStatement.executeUpdate()).thenReturn(FIRST_VALUE);
 
         assertTrue(projectDAO.modifyProject(builderProject()));
     }
@@ -282,7 +282,7 @@ class ProjectDAOTest {
     @Test
     void inactivateProject_successful_returnsTrue() throws Exception {
         when(databaseConnection.prepareStatement(anyString())).thenReturn(preparedStatement);
-        when(preparedStatement.executeUpdate()).thenReturn(ROWS_AFFECTED);
+        when(preparedStatement.executeUpdate()).thenReturn(FIRST_VALUE);
 
         assertTrue(projectDAO.inactivateProject(builderProject()));
     }
@@ -517,8 +517,8 @@ class ProjectDAOTest {
         when(resultSet.getString(COLUMN_DESCRIPTION)).thenReturn(PROJECT_DESCRIPTION);
         when(resultSet.getString(COLUMN_ORGANIZATION_NAME)).thenReturn(ORGANIZATION_NAME);
 
-        assertEquals(Optional.of(builderProjectSummary()),
-            projectDAO.getProjectDetailsByStudentId(STUDENT_ID));
+        Optional<ProjectSummary> result = projectDAO.getProjectDetailsByStudentId(STUDENT_ID);
+        assertEquals(Optional.of(builderProjectSummary()), result);
     }
 
     @Test

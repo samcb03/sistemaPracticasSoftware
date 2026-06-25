@@ -27,7 +27,7 @@ import uv.lis.logic.exceptions.OperationException;
 class NotificationDAOTest {
 
     private static final int GENERATED_ID = 15;
-    private static final int ROWS_AFFECTED = 1;
+    private static final int FIRST_VALUE = 1;
     private static final int NOTIFICATION_COUNT = 2;
     private static final int NOTIFICATION_ID = 15;
     private static final String STUDENT_ID = "S23013127";
@@ -62,7 +62,7 @@ class NotificationDAOTest {
 
     private void mockUpdateExecution() throws SQLException {
         when(databaseConnection.prepareStatement(anyString())).thenReturn(preparedStatement);
-        when(preparedStatement.executeUpdate()).thenReturn(ROWS_AFFECTED);
+        when(preparedStatement.executeUpdate()).thenReturn(FIRST_VALUE);
     }
 
     private Notification buildNotification() {
@@ -79,10 +79,10 @@ class NotificationDAOTest {
     void registerNotification_successful_returnsGeneratedId() throws Exception {
         when(databaseConnection.prepareStatement(anyString(), anyInt()))
             .thenReturn(preparedStatement);
-        when(preparedStatement.executeUpdate()).thenReturn(ROWS_AFFECTED);
+        when(preparedStatement.executeUpdate()).thenReturn(FIRST_VALUE);
         when(preparedStatement.getGeneratedKeys()).thenReturn(generatedKeys);
         when(generatedKeys.next()).thenReturn(true);
-        when(generatedKeys.getInt(1)).thenReturn(GENERATED_ID);
+        when(generatedKeys.getInt(FIRST_VALUE)).thenReturn(GENERATED_ID);
 
         assertEquals(GENERATED_ID, notificationDAO.registerNotification(buildNotification()));
     }
