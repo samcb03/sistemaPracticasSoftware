@@ -95,19 +95,19 @@ class ReportDAOTest {
         when(connectionManager.getConnection()).thenReturn(databaseConnection);
     }
 
-    private void mockQueryExecution() throws Exception {
+    private void mockQueryExecution() throws SQLException {
         when(databaseConnection.prepareStatement(anyString())).thenReturn(preparedStatement);
         when(preparedStatement.executeQuery()).thenReturn(resultSet);
     }
 
-    private void mockUpdateExecution(int rowsAffected) throws Exception {
+    private void mockUpdateExecution(int rowsAffected) throws SQLException {
         when(databaseConnection.prepareStatement(anyString())).thenReturn(preparedStatement);
         when(databaseConnection.prepareStatement(anyString(), anyInt()))
             .thenReturn(preparedStatement);
         when(preparedStatement.executeUpdate()).thenReturn(rowsAffected);
     }
 
-    private void mockResultSetSingleReport() throws Exception {
+    private void mockResultSetSingleReport() throws SQLException {
         when(resultSet.next()).thenReturn(true);
         when(resultSet.getInt(COLUMN_REPORT_ID)).thenReturn(FIRST_REPORT_ID);
         when(resultSet.getString(COLUMN_DESCRIPTION)).thenReturn(FIRST_DESCRIPTION);
@@ -116,7 +116,7 @@ class ReportDAOTest {
         when(resultSet.getString(COLUMN_STUDENT_ID)).thenReturn(FIRST_STUDENT_ID);
     }
 
-    private void mockResultSetTwoReports() throws Exception {
+    private void mockResultSetTwoReports() throws SQLException {
         when(resultSet.next()).thenReturn(true, true, false);
         when(resultSet.getInt(COLUMN_REPORT_ID))
             .thenReturn(FIRST_REPORT_ID, SECOND_REPORT_ID);
@@ -130,13 +130,13 @@ class ReportDAOTest {
             .thenReturn(FIRST_STUDENT_ID, SECOND_STUDENT_ID);
     }
 
-    private void mockResultSetPartialReport() throws Exception {
+    private void mockResultSetPartialReport() throws SQLException {
         mockResultSetSingleReport();
         when(resultSet.getInt(COLUMN_PLANNED_HOURS)).thenReturn(PLANNED_HOURS);
         when(resultSet.getInt(COLUMN_REAL_HOURS)).thenReturn(REAL_HOURS);
     }
 
-    private void mockResultSetFinalReport() throws Exception {
+    private void mockResultSetFinalReport() throws SQLException {
         mockResultSetSingleReport();
         when(resultSet.getString("observacionesGenerales")).thenReturn(FIRST_OBSERVATIONS);
     }
@@ -203,7 +203,7 @@ class ReportDAOTest {
     }
 
     @Test
-    void getAllReports_sqlError_throwsOperationException() throws Exception {
+    void getAllReports_sqlError_throwsOperationException() throws SQLException {
         when(connectionManager.getConnection()).thenThrow(
             new SQLException(DATABASE_ERROR_MESSAGE));
 
@@ -235,7 +235,7 @@ class ReportDAOTest {
     }
 
     @Test
-    void getPartialReportById_sqlError_throwsOperationException() throws Exception {
+    void getPartialReportById_sqlError_throwsOperationException() throws SQLException {
         when(connectionManager.getConnection()).thenThrow(
             new SQLException(DATABASE_ERROR_MESSAGE));
 
@@ -263,7 +263,7 @@ class ReportDAOTest {
     }
 
     @Test
-    void getFinalReportById_sqlError_throwsOperationException() throws Exception {
+    void getFinalReportById_sqlError_throwsOperationException() throws SQLException {
         when(connectionManager.getConnection()).thenThrow(
             new SQLException(DATABASE_ERROR_MESSAGE));
 
@@ -282,7 +282,7 @@ class ReportDAOTest {
     }
 
     @Test
-    void registerPartialReport_sqlError_throwsOperationException() throws Exception {
+    void registerPartialReport_sqlError_throwsOperationException() throws SQLException {
         when(connectionManager.getConnection()).thenThrow(
             new SQLException(DATABASE_ERROR_MESSAGE));
 
@@ -301,7 +301,7 @@ class ReportDAOTest {
     }
 
     @Test
-    void registerFinalReport_sqlError_throwsOperationException() throws Exception {
+    void registerFinalReport_sqlError_throwsOperationException() throws SQLException {
         when(connectionManager.getConnection()).thenThrow(
             new SQLException(DATABASE_ERROR_MESSAGE));
 
@@ -320,7 +320,7 @@ class ReportDAOTest {
     }
 
     @Test
-    void registerMonthlyReport_sqlError_throwsOperationException() throws Exception {
+    void registerMonthlyReport_sqlError_throwsOperationException() throws SQLException {
         when(connectionManager.getConnection()).thenThrow(
             new SQLException(DATABASE_ERROR_MESSAGE));
 
@@ -348,12 +348,12 @@ class ReportDAOTest {
     }
 
     @Test
-    void hasReportOfType_nonReportType_returnsFalse() throws Exception {
+    void hasReportOfType_nonReportType_returnsFalse() throws OperationException {
         assertFalse(reportDAO.hasReportOfType(FIRST_STUDENT_ID, NON_REPORT_TYPE_ID));
     }
 
     @Test
-    void hasReportOfType_sqlError_throwsOperationException() throws Exception {
+    void hasReportOfType_sqlError_throwsOperationException() throws SQLException {
         when(connectionManager.getConnection()).thenThrow(new SQLException(DATABASE_ERROR_MESSAGE));
 
         assertThrows(OperationException.class,
@@ -379,7 +379,7 @@ class ReportDAOTest {
     }
 
     @Test
-    void countMonthlyReportsByStudent_sqlError_throwsOperationException() throws Exception {
+    void countMonthlyReportsByStudent_sqlError_throwsOperationException() throws SQLException {
         when(connectionManager.getConnection()).thenThrow(new SQLException(DATABASE_ERROR_MESSAGE));
 
         assertThrows(OperationException.class,
@@ -407,7 +407,7 @@ class ReportDAOTest {
     }
 
     @Test
-    void getUploadableMonthlyReports_sqlError_throwsOperationException() throws Exception {
+    void getUploadableMonthlyReports_sqlError_throwsOperationException() throws SQLException {
         when(connectionManager.getConnection()).thenThrow(new SQLException(DATABASE_ERROR_MESSAGE));
 
         assertThrows(OperationException.class,

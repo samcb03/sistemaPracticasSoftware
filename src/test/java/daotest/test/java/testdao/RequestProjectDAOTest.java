@@ -33,6 +33,7 @@ import uv.lis.logic.exceptions.OperationException;
 class RequestProjectDAOTest {
 
     private static final int FIRST_PROJECT_ID = 9;
+    private static final int FIRST_PARAMETER = 1;
     private static final int THIRD_PARAMETER = 3;
     private static final int ROWS_AFFECTED = 1;  
     private static final int REQUEST_COUNT_ZERO = 0;
@@ -42,10 +43,10 @@ class RequestProjectDAOTest {
     private static final String FIRST_STUDENT_ID = "S23013127";
     private static final String FIRST_STUDENT_NAME = "Ana";
     private static final String FIRST_STUDENT_SURNAMES = "Gomez Ramirez";
-    private static final String FIRST_PROJECT_NAME = "Proyecto Test";
-    private static final String FIRST_PROJECT_DESCRIPTION = "Descripcion test";
+    private static final String FIRST_PROJECT_NAME = "Eminus";
+    private static final String FIRST_PROJECT_DESCRIPTION = "Mejorar la experiencia de usuario";
     private static final String FIRST_PROJECT_METHODOLOGY = "Scrum";
-    private static final String FIRST_PROJECT_OBJECTIVE = "Objetivo test";
+    private static final String FIRST_PROJECT_OBJECTIVE = "Mejor GUI";
     private static final String NO_PROJECT_MESSAGE = "Sin proyecto asignado";
     private static final String DATABASE_ERROR_MESSAGE = "Fallo";
     private static final String CONNECTION_MANAGER_FIELD = "connectionManager";
@@ -80,24 +81,24 @@ class RequestProjectDAOTest {
         when(connectionManager.getConnection()).thenReturn(databaseConnection);
     }
 
-    private void mockQueryExecution() throws Exception {
+    private void mockQueryExecution() throws SQLException {
         when(databaseConnection.prepareStatement(anyString())).thenReturn(preparedStatement);
         when(preparedStatement.executeQuery()).thenReturn(resultSet);
     }
 
-    private void mockUpdateExecution(int rowsAffected) throws Exception {
+    private void mockUpdateExecution(int rowsAffected) throws SQLException {
         when(databaseConnection.prepareStatement(anyString())).thenReturn(preparedStatement);
         when(preparedStatement.executeUpdate()).thenReturn(rowsAffected);
     }
 
-    private void mockResultSetSingleStudent() throws Exception {
+    private void mockResultSetSingleStudent() throws SQLException {
         when(resultSet.next()).thenReturn(true, false);
         when(resultSet.getString(COLUMN_STUDENT_ID)).thenReturn(FIRST_STUDENT_ID);
         when(resultSet.getString(COLUMN_NAME)).thenReturn(FIRST_STUDENT_NAME);
         when(resultSet.getString(COLUMN_LAST_NAME)).thenReturn(FIRST_STUDENT_SURNAMES);
     }
 
-    private void mockResultSetSingleProject() throws Exception {
+    private void mockResultSetSingleProject() throws SQLException {
         when(resultSet.next()).thenReturn(true, false);
         when(resultSet.getInt(COLUMN_PROJECT_ID)).thenReturn(FIRST_PROJECT_ID);
         when(resultSet.getString(COLUMN_NAME)).thenReturn(FIRST_PROJECT_NAME);
@@ -147,7 +148,7 @@ class RequestProjectDAOTest {
     }
 
     @Test
-    void getActiveRequestCountByStudentId_sqlError_throwsOperationException() throws Exception {
+    void getActiveRequestCountByStudentId_sqlError_throwsOperationException() throws SQLException {
         when(connectionManager.getConnection()).thenThrow(new SQLException(DATABASE_ERROR_MESSAGE));
 
         assertThrows(OperationException.class,
@@ -171,7 +172,7 @@ class RequestProjectDAOTest {
     }
 
     @Test
-    void getAvailableProjects_sqlError_throwsOperationException() throws Exception {
+    void getAvailableProjects_sqlError_throwsOperationException() throws SQLException {
         when(connectionManager.getConnection()).thenThrow(new SQLException(DATABASE_ERROR_MESSAGE));
 
         assertThrows(OperationException.class,
@@ -197,7 +198,7 @@ class RequestProjectDAOTest {
     }
 
     @Test
-    void hasAlreadyRequested_sqlError_throwsOperationException() throws Exception {
+    void hasAlreadyRequested_sqlError_throwsOperationException() throws SQLException {
         when(connectionManager.getConnection()).thenThrow(new SQLException(DATABASE_ERROR_MESSAGE));
 
         assertThrows(OperationException.class,
@@ -225,7 +226,7 @@ class RequestProjectDAOTest {
     }
 
     @Test
-    void hasAvailableCapacity_sqlError_throwsOperationException() throws Exception {
+    void hasAvailableCapacity_sqlError_throwsOperationException() throws SQLException {
         when(connectionManager.getConnection()).thenThrow(new SQLException(DATABASE_ERROR_MESSAGE));
 
         assertThrows(OperationException.class,
@@ -247,7 +248,7 @@ class RequestProjectDAOTest {
     }
 
     @Test
-    void requestProject_sqlError_throwsOperationException() throws Exception {
+    void requestProject_sqlError_throwsOperationException() throws SQLException {
         when(connectionManager.getConnection()).thenThrow(new SQLException(DATABASE_ERROR_MESSAGE));
 
         assertThrows(OperationException.class,
@@ -279,7 +280,7 @@ class RequestProjectDAOTest {
     }
 
     @Test
-    void validateProjectRequest_sqlError_throwsOperationException() throws Exception {
+    void validateProjectRequest_sqlError_throwsOperationException() throws SQLException {
         when(connectionManager.getConnection()).thenThrow(new SQLException(DATABASE_ERROR_MESSAGE));
 
         assertThrows(OperationException.class,
@@ -314,7 +315,7 @@ class RequestProjectDAOTest {
     }
 
     @Test
-    void getApplicantsByProjectId_sqlError_throwsOperationException() throws Exception {
+    void getApplicantsByProjectId_sqlError_throwsOperationException() throws SQLException {
         when(connectionManager.getConnection()).thenThrow(new SQLException(DATABASE_ERROR_MESSAGE));
 
         assertThrows(OperationException.class,
@@ -341,7 +342,7 @@ class RequestProjectDAOTest {
     }
 
     @Test
-    void getProjectAssignedToStudent_sqlError_throwsOperationException() throws Exception {
+    void getProjectAssignedToStudent_sqlError_throwsOperationException() throws SQLException {
         when(connectionManager.getConnection()).thenThrow(new SQLException(DATABASE_ERROR_MESSAGE));
 
         assertThrows(OperationException.class,
@@ -366,7 +367,7 @@ class RequestProjectDAOTest {
     }
 
     @Test
-    void getAssignedStudentsByProjectId_sqlError_throwsOperationException() throws Exception {
+    void getAssignedStudentsByProjectId_sqlError_throwsOperationException() throws SQLException {
         when(connectionManager.getConnection()).thenThrow(new SQLException(DATABASE_ERROR_MESSAGE));
 
         assertThrows(OperationException.class,
@@ -383,12 +384,69 @@ class RequestProjectDAOTest {
     }
 
     @Test
-    void unassignStudentFromProject_sqlError_throwsOperationException() throws Exception {
+    void unassignStudentFromProject_sqlError_throwsOperationException() throws SQLException {
         when(connectionManager.getConnection()).thenThrow(new SQLException(DATABASE_ERROR_MESSAGE));
 
         assertThrows(OperationException.class,
             () -> requestProjectDAO.unassignStudentFromProject(FIRST_STUDENT_ID));
     }
 
-    //FIXME faltan los test de asignar un proyecto
+    @Test
+    void assignStudentToProject_normalMode_returnsTrue() throws Exception {
+        when(databaseConnection.prepareStatement(anyString())).thenReturn(preparedStatement);
+        when(preparedStatement.executeQuery()).thenReturn(resultSet);
+        when(resultSet.next()).thenReturn(true);
+        when(resultSet.getInt(FIRST_PARAMETER)).thenReturn(REQUEST_COUNT_ZERO);
+        when(preparedStatement.executeUpdate()).thenReturn(ROWS_AFFECTED);
+
+        assertTrue(requestProjectDAO.assignStudentToProject(
+            FIRST_STUDENT_ID, FIRST_PROJECT_ID, false));
+    }
+
+    @Test
+    void assignStudentToProject_alternativeMode_returnsTrue() throws Exception {
+        when(databaseConnection.prepareStatement(anyString())).thenReturn(preparedStatement);
+        when(preparedStatement.executeQuery()).thenReturn(resultSet);
+
+        when(resultSet.next()).thenReturn(true);
+        when(resultSet.getInt(FIRST_PARAMETER)).thenReturn(REQUEST_COUNT_ZERO);
+        when(preparedStatement.executeUpdate()).thenReturn(ROWS_AFFECTED);
+
+        assertTrue(requestProjectDAO.assignStudentToProject(
+            FIRST_STUDENT_ID, FIRST_PROJECT_ID, true));
+    }
+
+    @Test
+    void assignStudentToProject_studentAlreadyAssigned_throwsOperationException() throws Exception {
+        when(databaseConnection.prepareStatement(anyString())).thenReturn(preparedStatement);
+        when(preparedStatement.executeQuery()).thenReturn(resultSet);
+
+        when(resultSet.next()).thenReturn(true);
+        when(resultSet.getInt(FIRST_PARAMETER)).thenReturn(ROWS_AFFECTED);
+
+        assertThrows(OperationException.class, () -> requestProjectDAO.assignStudentToProject(
+            FIRST_STUDENT_ID, FIRST_PROJECT_ID, false));
+    }
+
+    @Test
+    void assignStudentToProject_sqlErrorDuringTransaction_throwsOperationException() throws Exception {
+        when(databaseConnection.prepareStatement(anyString())).thenReturn(preparedStatement);
+        when(preparedStatement.executeQuery()).thenReturn(resultSet);
+
+        when(resultSet.next()).thenReturn(true);
+        when(resultSet.getInt(FIRST_PARAMETER)).thenReturn(REQUEST_COUNT_ZERO);
+
+        when(preparedStatement.executeUpdate()).thenThrow(new SQLException(DATABASE_ERROR_MESSAGE));
+
+        assertThrows(OperationException.class, () -> requestProjectDAO.assignStudentToProject(
+            FIRST_STUDENT_ID, FIRST_PROJECT_ID, false));
+    }
+
+    @Test
+    void assignStudentToProject_sqlErrorOnConnection_throwsOperationException() throws SQLException {
+        when(connectionManager.getConnection()).thenThrow(new SQLException(DATABASE_ERROR_MESSAGE));
+
+        assertThrows(OperationException.class, () -> requestProjectDAO.assignStudentToProject(
+            FIRST_STUDENT_ID, FIRST_PROJECT_ID, false));
+    }
 }

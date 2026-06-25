@@ -38,6 +38,7 @@ class ActivityDAOTest {
     private static final int GENERATED_ID = 5;
     private static final int TOTAL_ACTIVITY_HOURS = 120;
     private static final int NO_HOURS = 0;
+    private static final int FIRST_PARAMETER = 1;
 
     private static final String FIRST_ACTIVITY_NAME = "Actividad 1";
     private static final String SECOND_ACTIVITY_NAME = "Actividad 2";
@@ -70,19 +71,19 @@ class ActivityDAOTest {
         when(connectionManager.getConnection()).thenReturn(databaseConnection);
     }
 
-    private void mockQueryExecution() throws Exception {
+    private void mockQueryExecution() throws SQLException {
         when(databaseConnection.prepareStatement(anyString())).thenReturn(preparedStatement);
         when(preparedStatement.executeQuery()).thenReturn(resultSet);
     }
 
-    private void mockUpdateExecution(int rowsAffected) throws Exception {
+    private void mockUpdateExecution(int rowsAffected) throws SQLException {
         when(databaseConnection.prepareStatement(anyString())).thenReturn(preparedStatement);
         when(databaseConnection.prepareStatement(anyString(), anyInt()))
             .thenReturn(preparedStatement);
         when(preparedStatement.executeUpdate()).thenReturn(rowsAffected);
     }
 
-    private void mockResultSetSingleActivity() throws Exception {
+    private void mockResultSetSingleActivity() throws SQLException {
         when(resultSet.next()).thenReturn(true);
         when(resultSet.getInt("idActividad")).thenReturn(FIRST_ACTIVITY_ID);
         when(resultSet.getString("nombreActividad")).thenReturn(FIRST_ACTIVITY_NAME);
@@ -92,7 +93,7 @@ class ActivityDAOTest {
         when(resultSet.getInt("idProyecto")).thenReturn(FIRST_PROJECT_ID);
     }
 
-    private void mockResultSetTwoActivities() throws Exception {
+    private void mockResultSetTwoActivities() throws SQLException {
         when(resultSet.next()).thenReturn(true, true, false);
         when(resultSet.getInt("idActividad")).thenReturn(FIRST_ACTIVITY_ID, SECOND_ACTIVITY_ID);
         when(resultSet.getString("nombreActividad"))
@@ -138,7 +139,7 @@ class ActivityDAOTest {
     }
 
     @Test
-    void getAllActivities_sqlError_throwsOperationException() throws Exception {
+    void getAllActivities_sqlError_throwsOperationException() throws SQLException {
         when(connectionManager.getConnection()).thenThrow(new SQLException(DATABASE_ERROR_MESSAGE));
 
         assertThrows(OperationException.class, () -> activityDAO.getAllActivities());
@@ -162,7 +163,7 @@ class ActivityDAOTest {
     }
 
     @Test
-    void getActivityById_sqlError_throwsOperationException() throws Exception {
+    void getActivityById_sqlError_throwsOperationException() throws SQLException {
         when(connectionManager.getConnection()).thenThrow(new SQLException(DATABASE_ERROR_MESSAGE));
 
         assertThrows(OperationException.class,
@@ -174,13 +175,13 @@ class ActivityDAOTest {
         mockUpdateExecution(ROWS_AFFECTED);
         when(preparedStatement.getGeneratedKeys()).thenReturn(resultSet);
         when(resultSet.next()).thenReturn(true);
-        when(resultSet.getInt(1)).thenReturn(GENERATED_ID);
+        when(resultSet.getInt(FIRST_PARAMETER)).thenReturn(GENERATED_ID);
 
         assertTrue(activityDAO.registerActivity(builderFirstActivity()));
     }
 
     @Test
-    void registerActivity_noRowsAffected_throwsOperationException() throws Exception {
+    void registerActivity_noRowsAffected_throwsOperationException() throws SQLException {
         mockUpdateExecution(NO_VALUE);
 
         assertThrows(OperationException.class,
@@ -188,7 +189,7 @@ class ActivityDAOTest {
     }
 
     @Test
-    void registerActivity_sqlError_throwsOperationException() throws Exception {
+    void registerActivity_sqlError_throwsOperationException() throws SQLException {
         when(connectionManager.getConnection()).thenThrow(new SQLException(DATABASE_ERROR_MESSAGE));
 
         assertThrows(OperationException.class,
@@ -203,7 +204,7 @@ class ActivityDAOTest {
     }
 
     @Test
-    void modifyActivity_noRowsAffected_throwsOperationException() throws Exception {
+    void modifyActivity_noRowsAffected_throwsOperationException() throws SQLException {
         mockUpdateExecution(NO_VALUE);
 
         assertThrows(OperationException.class,
@@ -211,7 +212,7 @@ class ActivityDAOTest {
     }
 
     @Test
-    void modifyActivity_sqlError_throwsOperationException() throws Exception {
+    void modifyActivity_sqlError_throwsOperationException() throws SQLException {
         when(connectionManager.getConnection()).thenThrow(new SQLException(DATABASE_ERROR_MESSAGE));
 
         assertThrows(OperationException.class,
@@ -237,7 +238,7 @@ class ActivityDAOTest {
     }
 
     @Test
-    void getActivitiesByStudentId_sqlError_throwsOperationException() throws Exception {
+    void getActivitiesByStudentId_sqlError_throwsOperationException() throws SQLException {
         when(connectionManager.getConnection()).thenThrow(new SQLException(DATABASE_ERROR_MESSAGE));
 
         assertThrows(OperationException.class,
@@ -263,7 +264,7 @@ class ActivityDAOTest {
     }
 
     @Test
-    void getTotalActivityHoursByStudent_sqlError_throwsOperationException() throws Exception {
+    void getTotalActivityHoursByStudent_sqlError_throwsOperationException() throws SQLException {
         when(connectionManager.getConnection()).thenThrow(new SQLException(DATABASE_ERROR_MESSAGE));
 
         assertThrows(OperationException.class,

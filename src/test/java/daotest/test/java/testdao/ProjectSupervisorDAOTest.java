@@ -31,7 +31,7 @@ class ProjectSupervisorDAOTest {
     private static final int NO_ROWS_AFFECTED = 0;
     private static final int ROWS_AFFECTED = 1;
     private static final int SUPERVISOR_ID = 2;
-    private static final int ORGANIZATION_ID = 1;
+    private static final int ORGANIZATION_ID = 3;
     private static final int GENERATED_ID = 5;
     private static final int ACTIVE_STATUS = 1;
     private static final int INACTIVE_STATUS = 0;
@@ -67,12 +67,12 @@ class ProjectSupervisorDAOTest {
         when(connectionManager.getConnection()).thenReturn(databaseConnection);
     }
 
-    private void mockQueryExecution() throws Exception {
+    private void mockQueryExecution() throws SQLException {
         when(databaseConnection.prepareStatement(anyString())).thenReturn(preparedStatement);
         when(preparedStatement.executeQuery()).thenReturn(resultSet);
     }
 
-    private void mockResultSetSingleSupervisor() throws Exception {
+    private void mockResultSetSingleSupervisor() throws SQLException {
         when(resultSet.next()).thenReturn(true, false);
         when(resultSet.getInt(COLUMN_SUPERVISOR_ID)).thenReturn(SUPERVISOR_ID);
         when(resultSet.getString(COLUMN_NAME)).thenReturn(SUPERVISOR_NAME);
@@ -122,7 +122,7 @@ class ProjectSupervisorDAOTest {
     }
 
     @Test
-    void getAllSupervisorNames_databaseError_throwsOperationException() throws Exception {
+    void getAllSupervisorNames_databaseError_throwsOperationException() throws SQLException {
         when(connectionManager.getConnection()).thenThrow(new SQLException(CONNECTION_ERROR));
 
         assertThrows(OperationException.class,
@@ -141,7 +141,7 @@ class ProjectSupervisorDAOTest {
     }
 
     @Test
-    void getProjectSupervisorById_supervisorNotFound_throwsOperationException() throws Exception {
+    void getProjectSupervisorById_supervisorNotFound_throwsOperationException() throws SQLException {
         mockQueryExecution();
         when(resultSet.next()).thenReturn(false);
 
@@ -150,7 +150,7 @@ class ProjectSupervisorDAOTest {
     }
 
     @Test
-    void getProjectSupervisorById_databaseError_throwsOperationException() throws Exception {
+    void getProjectSupervisorById_databaseError_throwsOperationException() throws SQLException {
         when(connectionManager.getConnection()).thenThrow(new SQLException(CONNECTION_ERROR));
 
         assertThrows(OperationException.class,
@@ -166,7 +166,7 @@ class ProjectSupervisorDAOTest {
     }
 
     @Test
-    void registerProjectSupervisor_noRowsAffected_throwsOperationException() throws Exception {
+    void registerProjectSupervisor_noRowsAffected_throwsOperationException() throws SQLException {
         when(databaseConnection.prepareStatement(anyString())).thenReturn(preparedStatement);
         when(preparedStatement.executeUpdate()).thenReturn(NO_ROWS_AFFECTED);
 
@@ -175,7 +175,7 @@ class ProjectSupervisorDAOTest {
     }
 
     @Test
-    void registerProjectSupervisor_databaseError_throwsOperationException() throws Exception {
+    void registerProjectSupervisor_databaseError_throwsOperationException() throws SQLException {
         when(connectionManager.getConnection()).thenThrow(new SQLException(CONNECTION_ERROR));
 
         assertThrows(OperationException.class,
@@ -191,7 +191,7 @@ class ProjectSupervisorDAOTest {
     }
 
     @Test
-    void modifyProjectSupervisor_noRowsAffected_throwsOperationException() throws Exception {
+    void modifyProjectSupervisor_noRowsAffected_throwsOperationException() throws SQLException {
         when(databaseConnection.prepareStatement(anyString())).thenReturn(preparedStatement);
         when(preparedStatement.executeUpdate()).thenReturn(NO_ROWS_AFFECTED);
 
@@ -200,7 +200,7 @@ class ProjectSupervisorDAOTest {
     }
 
     @Test
-    void modifyProjectSupervisor_databaseError_throwsOperationException() throws Exception {
+    void modifyProjectSupervisor_databaseError_throwsOperationException() throws SQLException {
         when(connectionManager.getConnection()).thenThrow(new SQLException(CONNECTION_ERROR));
 
         assertThrows(OperationException.class,
@@ -216,7 +216,7 @@ class ProjectSupervisorDAOTest {
     }
 
     @Test
-    void inactivateProjectSupervisor_noRowsAffected_throwsOperationException() throws Exception {
+    void inactivateProjectSupervisor_noRowsAffected_throwsOperationException() throws SQLException {
         when(databaseConnection.prepareStatement(anyString())).thenReturn(preparedStatement);
         when(preparedStatement.executeUpdate()).thenReturn(NO_ROWS_AFFECTED);
 
@@ -225,7 +225,7 @@ class ProjectSupervisorDAOTest {
     }
 
     @Test
-    void inactivateProjectSupervisor_databaseError_throwsOperationException() throws Exception {
+    void inactivateProjectSupervisor_databaseError_throwsOperationException() throws SQLException {
         when(connectionManager.getConnection()).thenThrow(new SQLException(CONNECTION_ERROR));
 
         assertThrows(OperationException.class,
@@ -253,7 +253,7 @@ class ProjectSupervisorDAOTest {
     }
 
     @Test
-    void isSupervisorInactive_supervisorNotFound_throwsOperationException() throws Exception {
+    void isSupervisorInactive_supervisorNotFound_throwsOperationException() throws SQLException {
         when(databaseConnection.prepareStatement(anyString())).thenReturn(preparedStatement);
         when(preparedStatement.executeQuery()).thenReturn(resultSet);
         when(resultSet.next()).thenReturn(false);

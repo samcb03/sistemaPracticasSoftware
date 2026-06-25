@@ -79,12 +79,12 @@ class SubjectDAOTest {
         when(connectionManager.getConnection()).thenReturn(databaseConnection);
     }
 
-    private void mockQueryExecution() throws Exception {
+    private void mockQueryExecution() throws SQLException {
         when(databaseConnection.prepareStatement(anyString())).thenReturn(preparedStatement);
         when(preparedStatement.executeQuery()).thenReturn(resultSet);
     }
 
-    private void mockUpdateExecution(int rowsAffected) throws Exception {
+    private void mockUpdateExecution(int rowsAffected) throws SQLException {
         when(databaseConnection.prepareStatement(anyString())).thenReturn(preparedStatement);
         when(preparedStatement.executeUpdate()).thenReturn(rowsAffected);
     }
@@ -97,13 +97,13 @@ class SubjectDAOTest {
         return subject;
     }
 
-    private void mockResultSetAllSubjects() throws Exception {
+    private void mockResultSetAllSubjects() throws SQLException {
         when(resultSet.next()).thenReturn(true, true, false);
         when(resultSet.getInt(COLUMN_NRC_UPPER)).thenReturn(EXPECTED_NRC, SECOND_NRC);
         when(resultSet.getString(COLUMN_SUBJECT_NAME)).thenReturn(SUBJECT_NAME, SUBJECT_NAME);
     }
 
-    private void mockResultSetSubjectsByProfessor() throws Exception {
+    private void mockResultSetSubjectsByProfessor() throws SQLException {
         when(resultSet.next()).thenReturn(true, true, false);
         when(resultSet.getInt(COLUMN_NRC_LOWER)).thenReturn(EXPECTED_NRC, SECOND_NRC);
         when(resultSet.getString(COLUMN_SUBJECT_NAME)).thenReturn(SUBJECT_NAME, SUBJECT_NAME);
@@ -111,7 +111,7 @@ class SubjectDAOTest {
         when(resultSet.getInt(COLUMN_PERIOD_ID)).thenReturn(SCHOOL_PERIOD_ID);
     }
 
-    private void mockResultSetEnrolledStudents() throws Exception {
+    private void mockResultSetEnrolledStudents() throws SQLException {
         when(resultSet.next()).thenReturn(true, true, false);
         when(resultSet.getString(COLUMN_STUDENT_ID)).thenReturn(VALID_STUDENT_ID, SECOND_STUDENT_ID);
         when(resultSet.getString(COLUMN_NAME)).thenReturn(FIRST_STUDENT_NAME, SECOND_STUDENT_NAME);
@@ -143,7 +143,7 @@ class SubjectDAOTest {
     }
 
     @Test
-    void registerSubject_secondInsertThrows_rollsBack() throws Exception {
+    void registerSubject_secondInsertThrows_rollsBack() throws SQLException {
         when(databaseConnection.prepareStatement(anyString())).thenReturn(preparedStatement);
         when(preparedStatement.executeUpdate())
             .thenReturn(ROWS_AFFECTED)
@@ -154,7 +154,7 @@ class SubjectDAOTest {
     }
 
     @Test
-    void registerSubject_executeUpdateThrows_throwsOperationException() throws Exception {
+    void registerSubject_executeUpdateThrows_throwsOperationException() throws SQLException {
         when(databaseConnection.prepareStatement(anyString())).thenReturn(preparedStatement);
         when(preparedStatement.executeUpdate()).thenThrow(new SQLException(CONNECTION_ERROR));
 
@@ -163,7 +163,7 @@ class SubjectDAOTest {
     }
 
     @Test
-    void registerSubject_preparedStatementError_throwsOperationException() throws Exception {
+    void registerSubject_preparedStatementError_throwsOperationException() throws SQLException {
         when(databaseConnection.prepareStatement(anyString()))
             .thenThrow(new SQLException(CONNECTION_ERROR));
 
@@ -172,7 +172,7 @@ class SubjectDAOTest {
     }
 
     @Test
-    void registerSubject_sqlError_throwsOperationException() throws Exception {
+    void registerSubject_sqlError_throwsOperationException() throws SQLException {
         when(connectionManager.getConnection()).thenThrow(new SQLException(CONNECTION_ERROR));
 
         assertThrows(OperationException.class,
@@ -196,7 +196,7 @@ class SubjectDAOTest {
     }
 
     @Test
-    void getAllSubjectsNrcName_sqlError_throwsOperationException() throws Exception {
+    void getAllSubjectsNrcName_sqlError_throwsOperationException() throws SQLException {
         when(connectionManager.getConnection()).thenThrow(new SQLException(CONNECTION_ERROR));
 
         assertThrows(OperationException.class,
@@ -218,7 +218,7 @@ class SubjectDAOTest {
     }
 
     @Test
-    void assignStudentToSubject_sqlError_throwsOperationException() throws Exception {
+    void assignStudentToSubject_sqlError_throwsOperationException() throws SQLException {
         when(connectionManager.getConnection()).thenThrow(new SQLException(CONNECTION_ERROR));
 
         assertThrows(OperationException.class,
@@ -245,7 +245,7 @@ class SubjectDAOTest {
     }
 
     @Test
-    void getSubjectNrcByStudentID_sqlError_throwsOperationException() throws Exception {
+    void getSubjectNrcByStudentID_sqlError_throwsOperationException() throws SQLException {
         when(connectionManager.getConnection()).thenThrow(new SQLException(CONNECTION_ERROR));
 
         assertThrows(OperationException.class,
@@ -253,14 +253,14 @@ class SubjectDAOTest {
     }
 
     @Test
-    void unassignProfessorFromSubject_successful_doesNotThrow() throws Exception {
+    void unassignProfessorFromSubject_successful_doesNotThrow() throws SQLException {
         mockUpdateExecution(ROWS_AFFECTED);
 
         assertDoesNotThrow(() -> subjectDAO.unassignProfessorFromSubject(PERSONNEL_NUMBER));
     }
 
     @Test
-    void unassignProfessorFromSubject_sqlError_throwsOperationException() throws Exception {
+    void unassignProfessorFromSubject_sqlError_throwsOperationException() throws SQLException {
         when(connectionManager.getConnection()).thenThrow(new SQLException(CONNECTION_ERROR));
 
         assertThrows(OperationException.class,
@@ -286,7 +286,7 @@ class SubjectDAOTest {
     }
 
     @Test
-    void getSubjectsByProfessor_sqlError_throwsOperationException() throws Exception {
+    void getSubjectsByProfessor_sqlError_throwsOperationException() throws SQLException {
         when(connectionManager.getConnection()).thenThrow(new SQLException(CONNECTION_ERROR));
 
         assertThrows(OperationException.class,
@@ -338,7 +338,7 @@ class SubjectDAOTest {
     }
 
     @Test
-    void isSectionTakenInPeriod_sqlError_throwsOperationException() throws Exception {
+    void isSectionTakenInPeriod_sqlError_throwsOperationException() throws SQLException {
         when(connectionManager.getConnection()).thenThrow(new SQLException(CONNECTION_ERROR));
 
         assertThrows(OperationException.class,
