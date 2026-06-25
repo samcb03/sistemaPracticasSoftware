@@ -13,12 +13,13 @@ import uv.lis.logic.dto.Student;
  * Only one session exists at a time, shared across the entire application.
  */
 public class SessionManager {
-
-    private static SessionManager instance;
+    private static final SessionManager INSTANCE = new SessionManager();
     private Student currentStudent;
     private Professor currentProfessor;
 
-    private SessionManager() {}
+    private SessionManager() {
+        // Singleton, instantiation is not allowed outside this class
+    }
 
     /**
      * Returns the single instance shared across the application.
@@ -26,10 +27,7 @@ public class SessionManager {
      * @return the global SessionManager instance
      */
     public static SessionManager getInstance() {
-        if (instance == null) {
-            instance = new SessionManager();
-        }
-        return instance;
+        return INSTANCE;
     }
 
     /**

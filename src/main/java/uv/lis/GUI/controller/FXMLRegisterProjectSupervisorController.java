@@ -28,6 +28,7 @@ public class FXMLRegisterProjectSupervisorController extends ValidationHandler {
 
     private static final String POSITION_FIELD = "El cargo";
     private static final String NAME_FIELD = "El nombre";
+    private static final String EMAIL_FIELD = "El correo electrónico";
     private static final String ORGANIZATION_FIELD = "La organización";
     private static final String SUCCESSFUL_PROJECT_REGISTER_MESSAGE = "Encargado técnico registrado correctamente";
     private static final String ERROR_PROJECT_REGISTER_MESSAGE = "Error al registrar al encargado técnico";
@@ -77,7 +78,7 @@ public class FXMLRegisterProjectSupervisorController extends ValidationHandler {
         Stream<Optional<String>> validationStream = Stream.of(
             validateText(textFieldName.getText(), NAME_FIELD),
             validateText(textFieldPosition.getText(), POSITION_FIELD),
-            validateEmail(textFieldEmail.getText().trim(), EMAIL_REGEX),
+            validateEmail(textFieldEmail.getText().trim(), EMAIL_FIELD),
             validateComboBox(comboBoxOrganizationName.getValue(), ORGANIZATION_FIELD)
         );
         Optional<String> firstError = validationStream

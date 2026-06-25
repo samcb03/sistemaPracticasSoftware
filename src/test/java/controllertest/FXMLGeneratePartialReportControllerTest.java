@@ -68,7 +68,7 @@ public class FXMLGeneratePartialReportControllerTest extends ApplicationTest {
     private static final String EXPECTED_EMPTY_ADVANCE_MESSAGE =
         "Porcentaje de Avance de Actividad 1 no puede estar vacío";
     private static final String EXPECTED_DUPLICATE_ACTIVITY_MESSAGE =
-        "La actividad ya fue seleccionada. Cada actividad solo puede elegirse una vez.";
+        "La actividad ya fue seleccionada.";
     private static final String EXPECTED_ADVANCE_ABOVE_LIMIT_MESSAGE =
         "Porcentaje de Avance de Actividad 2 no puede ser mayor a 100";
     private static final String EXPECTED_OPERATION_ERROR_MESSAGE = "Error de operación de prueba";

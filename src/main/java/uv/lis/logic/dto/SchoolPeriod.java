@@ -9,7 +9,8 @@ public class SchoolPeriod {
     private Date startDate;
     private Date endDate;        
 
-    public SchoolPeriod() {    
+    public SchoolPeriod() {   
+
     }
 
     public SchoolPeriod(int id, Date startDate, Date endDate) {

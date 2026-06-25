@@ -7,7 +7,6 @@ import java.util.Objects;
 import uv.lis.logic.utils.InputValidator;
 
 public class MonthlyReport extends Report {
-
     private int idReport;
     private int idProject;
     private String month;
@@ -109,7 +108,6 @@ public class MonthlyReport extends Report {
     public void setBlock(String block) {
         this.block = block;
     }
-
 
     public int getIdProject() {
         return idProject;

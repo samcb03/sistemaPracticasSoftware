@@ -14,6 +14,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -334,24 +335,20 @@ class ReportContextDAOTest {
     @Test
     void getActivityByName_found_returnsExpectedActivity() throws Exception {
         when(resultSet.next()).thenReturn(true);
-        when(resultSet.getInt(COLUMN_ID_ACTIVITY)).thenReturn(ACTIVITY_ID);
         when(resultSet.getString(COLUMN_ACTIVITY_NAME)).thenReturn(ACTIVITY_NAME);
-        when(resultSet.getString(COLUMN_ACTIVITY_DESCRIPTION)).thenReturn(ACTIVITY_DESCRIPTION);
-        when(resultSet.getDate(COLUMN_START_DATE))
-            .thenReturn(Date.valueOf(LocalDate.of(YEAR, MONTH_NUMBER, 1)));
-        when(resultSet.getDate(COLUMN_END_DATE))
-            .thenReturn(Date.valueOf(LocalDate.of(YEAR, MONTH_NUMBER, 31)));
 
-        Activity result = reportContextDAO.getActivityByName(STUDENT_ID, ACTIVITY_NAME);
+        Optional<Activity> result = reportContextDAO.getActivityByName(STUDENT_ID, ACTIVITY_NAME);
 
-        assertEquals(ACTIVITY_NAME, result.getName());
+        assertEquals(ACTIVITY_NAME, result.get().getName());
     }
 
     @Test
     void getActivityByName_notFound_returnsEmptyActivity() throws Exception {
         when(resultSet.next()).thenReturn(false);
 
-        assertEquals(0, reportContextDAO.getActivityByName(STUDENT_ID, ACTIVITY_NAME).getId());
+        Optional<Activity> result = reportContextDAO.getActivityByName(STUDENT_ID, ACTIVITY_NAME);
+
+        assertTrue(result.isEmpty());
     }
 
     @Test

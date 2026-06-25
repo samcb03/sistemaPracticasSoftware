@@ -31,7 +31,7 @@ public class FXMLRegisterProfessorController extends ValidationHandler {
     private static final String PERSONNEL_NUMER_FIELD = "El número de personal";
     private static final String EMAIL_FIELD = "El correo electrónico";
     private static final String SUCCESSFUL_PROFESSOR_REGISTER_MESSAGE = "Profesor registrado correctamente";
-    private static final String ERROR_PROFESSOR_REGISTER_MESSAGE = "Error al registrar la profesor";
+    private static final String ERROR_PROFESSOR_REGISTER_MESSAGE = "Error al registrar al profesor";
 
     private static final int PROFESSOR_ROLE_ID = 2;
 

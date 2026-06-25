@@ -37,8 +37,8 @@
                 <Button fx:id="buttonBack" layoutX="266.0" layoutY="337.0" mnemonicParsing="false" onAction="#goBack" prefHeight="28.0" prefWidth="146.0" style="-fx-background-color: white;" text="Cancelar" />
             <TableView fx:id="tableViewStudents" layoutX="57.0" layoutY="66.0" prefHeight="229.0" prefWidth="339.0">
               <columns>
-                <TableColumn fx:id="columnIdStudent" prefWidth="169.60003662109375" text="Matricula" />
-                <TableColumn fx:id="columnName" prefWidth="168.79998779296875" text="Nombre" />
+                <TableColumn fx:id="tableColumnIdStudent" prefWidth="169.60003662109375" text="Matricula" />
+                <TableColumn fx:id="tableColumnName" prefWidth="168.79998779296875" text="Nombre" />
               </columns>
             </TableView>
 
