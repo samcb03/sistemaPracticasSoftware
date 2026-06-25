@@ -70,7 +70,7 @@ public class WeeklyAdvanceGridEditor {
         }
         return validationError;
     }
-
+    //FIXME verificar que este metodo no validaciones duplicadas
     private Optional<String> validateColumn(int slot) {
         Optional<String> validationError = Optional.empty();
         int columnSum = 0;
@@ -82,8 +82,8 @@ public class WeeklyAdvanceGridEditor {
                 String cellText = cell.getText().trim();
 
                 if (!cellText.isEmpty()) {
-                    Optional<String> cellError = InputValidator.validateMaxIntValue(
-                        cellText, MAX_ADVANCE, WEEKLY_FIELD_NAME);
+                    Optional<String> cellError = InputValidator.validateMaxIntValue(cellText, MAX_ADVANCE, 
+                        WEEKLY_FIELD_NAME);
 
                     if (cellError.isPresent()) {
                         validationError = cellError;
@@ -160,9 +160,9 @@ public class WeeklyAdvanceGridEditor {
     private TextField createCell(Activity activity, int value, int weekIndex) {
         TextField cell = new TextField();
         cell.setPrefWidth(CELL_WIDTH);
-        boolean weekBelongsToActivity = weekIndex < resolveActivityWeeks(activity);
+        boolean isWeekBelongingToActivity = weekIndex < resolveActivityWeeks(activity);
 
-        if (weekBelongsToActivity) {
+        if (isWeekBelongingToActivity) {
             cell.setText(String.valueOf(value));
         } else {
             cell.setText(EMPTY_CELL);
