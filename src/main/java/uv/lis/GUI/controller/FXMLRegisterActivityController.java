@@ -76,6 +76,17 @@ public class FXMLRegisterActivityController extends ValidationHandler {
         handleValidation(validationError, this::registerIfWithinHourLimit);
     }
 
+    @Override
+    protected void clearFields() {
+        textFieldActivity.clear();
+        textFieldDescription.clear();
+        textFieldHours.clear();
+        datePickerStartDate.setValue(null);
+        datePickerFinalDate.setValue(null);
+
+        textFieldActivity.requestFocus();
+    }
+
     private void registerIfWithinHourLimit() {
         try {
             int newHours = Integer.parseInt(textFieldHours.getText().trim());
@@ -179,16 +190,5 @@ public class FXMLRegisterActivityController extends ValidationHandler {
         activity.setProjectId(currentProjectId);
         activity.setStudentId(currentStudentId);
         return activity;
-    }
-
-    @Override
-    protected void clearFields() {
-        textFieldActivity.clear();
-        textFieldDescription.clear();
-        textFieldHours.clear();
-        datePickerStartDate.setValue(null);
-        datePickerFinalDate.setValue(null);
-
-        textFieldActivity.requestFocus();
     }
 }

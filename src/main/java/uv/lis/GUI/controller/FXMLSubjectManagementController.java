@@ -9,27 +9,33 @@ import javafx.scene.control.Button;
 import uv.lis.GUI.WindowHandler;
 
 public class FXMLSubjectManagementController extends WindowHandler{
-        @FXML private Button buttonRegisterSubject;
-        @FXML private Button buttonAssignStudentSubject;
-        @FXML private Button buttonConsultSubject;
-        @FXML private Button buttonBack;
 
-        @Override
-        public void initialize(URL location, ResourceBundle resources) {
-        }
+    private static final String REGISTER_SUBJECT_VIEW = "/uv/lis/GUI/view/FXMLRegisterSubject.fxml";
+    private static final String ASSIGNATION_STUDENT_VIEW = "/uv/lis/GUI/view/FXMLAssignStudentSubject.fxml";
+    private static final String PROFESSOR_MENU_VIEW = "/uv/lis/GUI/view/FXMLProfessorMenu.fxml";
 
-        @FXML 
-        public void goToRegisterSubject() { 
-            navigateTo("/uv/lis/GUI/view/FXMLRegisterSubject.fxml"); 
-        }
+    @FXML private Button buttonRegisterSubject;
+    @FXML private Button buttonAssignStudentSubject;
+    @FXML private Button buttonConsultSubject;
+    @FXML private Button buttonBack;
 
-        @FXML 
-        public void goToAssignationStudentSubject() {
-            navigateTo("/uv/lis/GUI/view/FXMLAssignStudentSubject.fxml");
-        }
+    @Override
+    public void initialize(URL location, ResourceBundle resources) {
 
-        @FXML 
-        public void goToProfessorMenu() {
-            navigateTo("/uv/lis/GUI/view/FXMLProfessorMenu.fxml");
-        }
+    }
+
+    @FXML 
+    public void goToRegisterSubject() { 
+        navigateTo(REGISTER_SUBJECT_VIEW); 
+    }
+
+    @FXML 
+    public void goToAssignationStudentSubject() {
+        navigateTo(ASSIGNATION_STUDENT_VIEW);
+    }
+
+    @FXML 
+    public void goToProfessorMenu() {
+        navigateTo(PROFESSOR_MENU_VIEW);
+    }
 }

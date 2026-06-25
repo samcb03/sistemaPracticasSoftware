@@ -17,6 +17,14 @@ import uv.lis.logic.utils.SessionManager;
 
 public class FXMLStudentMenuController extends ValidationHandler {
 
+    private static final String FINISH_WINDOW_VIEW = "/uv/lis/GUI/view/FXMLFinishWindow.fxml";
+    private static final String REQUEST_PROJECT_VIEW = "/uv/lis/GUI/view/FXMLRequestProject.fxml";
+    private static final String REPORTS_VIEW = "/uv/lis/GUI/view/FXMLReportsMenu.fxml";
+    private static final String AUTOEVALUATION_VIEW = "/uv/lis/GUI/view/FXMLGenerateAutoevaluation.fxml";
+    private static final String UPLOAD_DOCUMENTS_VIEW = "/uv/lis/GUI/view/FXMLUploadDocuments.fxml";
+    private static final String REGISTER_ACTIVITY_VIEW = "/uv/lis/GUI/view/FXMLRegisterActivity.fxml";
+    private static final String NOTIFICATIONS_VIEW = "/uv/lis/GUI/view/FXMLNotifications.fxml";
+
     private static final String NO_SUBJECT_MESSAGE = "No tiene asignada una experiencia";
     private static final String PENDING_DOCUMENTS_MESSAGE = 
         "Debe subir sus documentos iniciales y esperar a que el profesor los valide";
@@ -33,14 +41,15 @@ public class FXMLStudentMenuController extends ValidationHandler {
     @FXML private Label labelMessage;
     @FXML private Button buttonNotifications;
 
-    private Student student;
     private final StudentDAO studentDAO = new StudentDAO();
     private final SubjectDAO subjectDAO = new SubjectDAO();
     private final ExpedientDAO expedientDAO = new ExpedientDAO();
 
+    private Student student;
+
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        this.student = SessionManager.getInstance().getCurrentStudent();
+        student = SessionManager.getInstance().getCurrentStudent();
         setupControls(labelMessage, buttonLogOut);
         try {
             goToFinishWindows();
@@ -49,7 +58,6 @@ public class FXMLStudentMenuController extends ValidationHandler {
             checkFinalReportValidation();
             disableActionsWithoutValidatedDocuments();
             disableActionWithAssignedProject();
-
         } catch (OperationException e) {
             showError(e.getMessage());
         }
@@ -57,7 +65,63 @@ public class FXMLStudentMenuController extends ValidationHandler {
 
     @FXML
     public void goToRequestProject() {
-        navigateTo("/uv/lis/GUI/view/FXMLRequestProject.fxml");
+        navigateTo(REQUEST_PROJECT_VIEW);
+    }
+
+    @FXML
+    public void goToReports() {
+        navigateTo(REPORTS_VIEW);
+    }
+
+    @FXML   
+    public void goToAutoevaluation() {
+        navigateTo(AUTOEVALUATION_VIEW);
+    }
+
+    @FXML 
+    public void goToUploadDocuments() {
+        navigateTo(UPLOAD_DOCUMENTS_VIEW);
+    }
+
+    @FXML 
+    public void goToRegisterActivity() {
+        navigateTo(REGISTER_ACTIVITY_VIEW);
+    }
+
+    @FXML
+    public void goToNotifications() {
+        navigateTo(NOTIFICATIONS_VIEW);
+    }
+
+    @FXML 
+    public void goToFinishWindows() {
+        try {
+            boolean isAutoevaluationValidated = expedientDAO.isDocumentTypeValidated(
+                student.getIdStudent(), AUTOEVALUATION_DOCUMENT_TYPE);
+            boolean isOrganizationEvaluationValidated = expedientDAO.isDocumentTypeValidated(
+                student.getIdStudent(),EVALUATION_DOCUMENT_TYPE);
+            boolean isLiberationLetterValidated = expedientDAO.isDocumentTypeValidated(
+                student.getIdStudent(), LIBERATION_LETTER_DOCUMENT_TYPE);
+            if(isAutoevaluationValidated && isOrganizationEvaluationValidated && isLiberationLetterValidated) {
+                navigateTo(FINISH_WINDOW_VIEW);
+            }
+        } catch(OperationException e) {
+            showError(e.getMessage());
+        }
+    }
+
+    @Override
+    protected void clearFields() {
+
+    }
+
+    private void disableActionsWithoutAssignedProject() throws OperationException {
+        String studentId = student.getIdStudent();
+
+        if (!studentDAO.hasProjectAssigned(studentId)) {
+            buttonReports.setDisable(true);
+            buttonRegisterActivity.setDisable(true);
+        }
     }
 
     private void disableActionsWithoutAssignedSubject() throws OperationException {
@@ -75,23 +139,12 @@ public class FXMLStudentMenuController extends ValidationHandler {
         }
     }
 
-    @FXML
-    public void goToReports() {
-        navigateTo("/uv/lis/GUI/view/FXMLReportsMenu.fxml");
-    }
-
-    private void disableActionsWithoutAssignedProject() throws OperationException {
-        String studentId = student.getIdStudent();
-
-        if (!studentDAO.hasProjectAssigned(studentId)) {
+    private void disableActionsWithoutValidatedDocuments() throws OperationException {
+        if (!expedientDAO.areInitialDocumentsValidated(student.getIdStudent())) {
             buttonReports.setDisable(true);
             buttonRegisterActivity.setDisable(true);
+            showError(PENDING_DOCUMENTS_MESSAGE);
         }
-    }
-
-    @FXML   
-    public void goToAutoevaluation() {
-        navigateTo("/uv/lis/GUI/view/FXMLGenerateAutoevaluation.fxml");
     }
 
     private void checkFinalReportValidation() { 
@@ -105,49 +158,5 @@ public class FXMLStudentMenuController extends ValidationHandler {
             buttonAutoevaluation.setDisable(true);
             showError(e.getMessage());
         }
-    }
-
-    private void disableActionsWithoutValidatedDocuments() throws OperationException {
-        if (!expedientDAO.areInitialDocumentsValidated(student.getIdStudent())) {
-            buttonReports.setDisable(true);
-            buttonRegisterActivity.setDisable(true);
-            showError(PENDING_DOCUMENTS_MESSAGE);
-        }
-    }
- 
-    @FXML 
-    public void goToUploadDocuments() {
-        navigateTo("/uv/lis/GUI/view/FXMLUploadDocuments.fxml");
-    }
-
-    @FXML 
-    public void goToRegisterActivity() {
-        navigateTo("/uv/lis/GUI/view/FXMLRegisterActivity.fxml");
-    }
-
-    @FXML
-    public void goToNotifications() {
-        navigateTo("/uv/lis/GUI/view/FXMLNotifications.fxml");
-    }
-
-    @FXML 
-    public void goToFinishWindows() {
-        try {
-            boolean isAutoevaluationValidated = expedientDAO.isDocumentTypeValidated(
-                student.getIdStudent(), AUTOEVALUATION_DOCUMENT_TYPE);
-            boolean isOrganizationEvaluationValidated = expedientDAO.isDocumentTypeValidated(
-                student.getIdStudent(),EVALUATION_DOCUMENT_TYPE);
-            boolean isLiberationLetterValidated = expedientDAO.isDocumentTypeValidated(
-                student.getIdStudent(), LIBERATION_LETTER_DOCUMENT_TYPE);
-            if(isAutoevaluationValidated && isOrganizationEvaluationValidated && isLiberationLetterValidated) {
-                navigateTo("/uv/lis/GUI/view/FXMLFinishWindow.fxml");
-            }
-        } catch(OperationException e) {
-            showError(e.getMessage());
-        }
-    }
-
-    @Override
-    protected void clearFields() {
     }
 }

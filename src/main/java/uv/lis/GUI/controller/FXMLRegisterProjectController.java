@@ -63,15 +63,6 @@ public class FXMLRegisterProjectController extends ValidationHandler {
         loadOrganizationNames();
     }
 
-    private void loadOrganizationNames() {
-        try {
-            ArrayList<String> organizationNames = affiliatedOrganizationDAO.getAllOrganizationNames();
-            comboBoxOrganizationName.setItems(FXCollections.observableArrayList(organizationNames));
-        } catch (OperationException operationException) {
-            showError(operationException.getMessage());
-        }
-    }
-
     @FXML
     public void filterSupervisors() {
         String selectedOrganization = comboBoxOrganizationName.getValue();
@@ -91,6 +82,27 @@ public class FXMLRegisterProjectController extends ValidationHandler {
     public void validateFields() {
         Optional<String> firstValidationError = getFirstValidationError();
         handleValidation(firstValidationError, this::performRegistration);
+    }
+
+    @Override
+    protected void clearFields() {
+        textFieldName.clear();
+        textFieldMethodology.clear();
+        textFieldCapacity.clear();
+        textFieldObjective.clear();
+        textAreaDescription.clear();
+        comboBoxOrganizationName.getSelectionModel().clearSelection();
+        comboBoxSupervisorName.getSelectionModel().clearSelection();
+        comboBoxSupervisorName.getItems().clear(); 
+    }
+
+    private void loadOrganizationNames() {
+        try {
+            ArrayList<String> organizationNames = affiliatedOrganizationDAO.getAllOrganizationNames();
+            comboBoxOrganizationName.setItems(FXCollections.observableArrayList(organizationNames));
+        } catch (OperationException operationException) {
+            showError(operationException.getMessage());
+        }
     }
 
     private Optional<String> getFirstValidationError() {
@@ -148,17 +160,5 @@ public class FXMLRegisterProjectController extends ValidationHandler {
         project.setIdAffiliatedOrganization(organizationId);
         project.setIdSupervisor(supervisorId); 
         return project;
-    }
-
-    @Override
-    public void clearFields() {
-        textFieldName.clear();
-        textFieldMethodology.clear();
-        textFieldCapacity.clear();
-        textFieldObjective.clear();
-        textAreaDescription.clear();
-        comboBoxOrganizationName.getSelectionModel().clearSelection();
-        comboBoxSupervisorName.getSelectionModel().clearSelection();
-        comboBoxSupervisorName.getItems().clear(); 
     }
 }

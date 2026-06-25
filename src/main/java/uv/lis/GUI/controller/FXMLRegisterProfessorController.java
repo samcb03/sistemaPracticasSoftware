@@ -57,6 +57,15 @@ public class FXMLRegisterProfessorController extends ValidationHandler {
         handleValidation(firstValidationError, this::performRegistration);
     }
 
+    @Override
+    protected void clearFields() {
+        textFieldFirstName.clear();
+        textFieldLastName.clear();
+        textFieldEmail.clear();
+        passwordFieldPassword.clear();
+        textFieldPersonnelNumber.clear();
+    }
+
     private Optional<String> getFirstValidationError() {
         Stream<Optional<String>> validationStream = Stream.of(
             validateText(textFieldFirstName.getText(), FIRST_NAME_FIELD),
@@ -98,14 +107,5 @@ public class FXMLRegisterProfessorController extends ValidationHandler {
         professor.setActive(true);
         professor.setRoleId(PROFESSOR_ROLE_ID);
         return professor;
-    }
-
-    @Override
-    public void clearFields() {
-        textFieldFirstName.clear();
-        textFieldLastName.clear();
-        textFieldEmail.clear();
-        passwordFieldPassword.clear();
-        textFieldPersonnelNumber.clear();
     }
 }

@@ -38,7 +38,7 @@ public class FXMLRegisterStudentController extends ValidationHandler {
     private static final String PASSWORD_FIELD = "La contraseña";
     private static final String STUDENT_ID_FIELD = "La matrícula";
     private static final String BIRTHDAY_DATE_FIELD = "La fecha de nacimiento";
-    private static final String GENERE_FIELD = "Un género";
+    private static final String GENDER_FIELD = "Un género";
     private static final String INVALID_FORMAT_ID_STUDENT = "La matrícula no tiene un formato válido";
     private static final String SUCCESSFUL_STUDENT_REGISTER_MESSAGE = "Estudiante registrado correctamente";
     private static final String ERROR_STUDENT_REGISTER_MESSAGE = "Error al registrar al estudiante";
@@ -69,6 +69,17 @@ public class FXMLRegisterStudentController extends ValidationHandler {
         handleValidation(firstValidationError, this::performRegistration);
     }
 
+    @Override
+    public void clearFields() {
+        textFieldFirstName.clear();
+        textFieldLastName.clear();
+        textFieldEmail.clear();
+        passwordFieldPassword.clear();
+        textFieldStudentId.clear();
+        datePickerBirthDate.setValue(null);
+        comboBoxGender.setValue(null);
+    }
+
     private Optional<String> getFirstValidationError() {
         String studentId = textFieldStudentId.getText().trim();
         Stream<Optional<String>> validationStream = Stream.of(
@@ -79,7 +90,7 @@ public class FXMLRegisterStudentController extends ValidationHandler {
             validateExactLength(textFieldStudentId.getText().trim(), STUDENT_ID_LENGTH, STUDENT_ID_FIELD),
             validateIdStudent(studentId, STUDENT_ID_LENGTH, STUDENT_ID_FIELD),
             validateBirthDate(datePickerBirthDate.getValue(), BIRTHDAY_DATE_FIELD),
-            validateComboBox(comboBoxGender.getValue(), GENERE_FIELD)
+            validateComboBox(comboBoxGender.getValue(), GENDER_FIELD)
         );
         Optional<String> firstError = validationStream
             .filter(Optional::isPresent)
@@ -120,16 +131,5 @@ public class FXMLRegisterStudentController extends ValidationHandler {
         student.setRoleId(USER_TYPE_STUDENT);
         student.setActive(true);
         return student;
-    }
-
-    @Override
-    public void clearFields() {
-        textFieldFirstName.clear();
-        textFieldLastName.clear();
-        textFieldEmail.clear();
-        passwordFieldPassword.clear();
-        textFieldStudentId.clear();
-        datePickerBirthDate.setValue(null);
-        comboBoxGender.setValue(null);
     }
 }
