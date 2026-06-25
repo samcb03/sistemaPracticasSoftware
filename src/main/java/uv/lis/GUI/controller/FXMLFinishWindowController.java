@@ -11,6 +11,7 @@ import javafx.scene.control.Label;
 
 import uv.lis.GUI.ValidationHandler;
 import uv.lis.logic.dao.ReportContextDAO;
+import uv.lis.logic.dao.PracticeDAO;
 import uv.lis.logic.dao.ProjectDAO;
 import uv.lis.logic.dto.Project;
 import uv.lis.logic.dto.ProjectSummary;
@@ -35,10 +36,12 @@ public class FXMLFinishWindowController extends ValidationHandler {
     @FXML private Label labelObjective;
     @FXML private Label labelDescription;
     @FXML private Label labelAccumulatedHours;
+    @FXML private Label labelGrade;
     @FXML private Label labelMessage;
 
     private Student currentStudent;
     private final ProjectDAO projectDAO = new ProjectDAO();
+    private final PracticeDAO practiceDAO = new PracticeDAO();
     private final ReportContextDAO reportContextDAO = new ReportContextDAO();
 
     @Override
@@ -59,6 +62,7 @@ public class FXMLFinishWindowController extends ValidationHandler {
         labelDescription.setText(EMPTY_TEXT);
         labelAccumulatedHours.setText(EMPTY_TEXT);
         labelMessage.setText(EMPTY_TEXT);
+        labelGrade.setText(EMPTY_TEXT);
     }
 
     private void loadSummary() {
@@ -85,6 +89,9 @@ public class FXMLFinishWindowController extends ValidationHandler {
 
                     String accumulatedHours = reportContextDAO.getTotalReportedHoursByStudentId(studentId);
                     labelAccumulatedHours.setText(accumulatedHours);
+
+                    String finalGrade = practiceDAO.getFinalGrade(studentId);
+                    labelGrade.setText(finalGrade);
                 }
             } catch (OperationException e) {
                 LOGGER.log(Level.SEVERE, LOAD_ERROR_MESSAGE, e);
