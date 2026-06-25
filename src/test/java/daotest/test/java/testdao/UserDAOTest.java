@@ -87,12 +87,12 @@ class UserDAOTest {
         when(connectionManager.getConnection()).thenReturn(databaseConnection);
     }
 
-    private void mockQueryExecution() throws Exception {
+    private void mockQueryExecution() throws SQLException {
         when(databaseConnection.prepareStatement(anyString())).thenReturn(preparedStatement);
         when(preparedStatement.executeQuery()).thenReturn(resultSet);
     }
 
-    private void mockUpdateExecutionWithGeneratedKey(int rowsAffected, int generatedId) throws Exception {
+    private void mockUpdateExecutionWithGeneratedKey(int rowsAffected, int generatedId) throws SQLException {
         when(databaseConnection.prepareStatement(anyString(), anyInt())).thenReturn(preparedStatement);
         when(preparedStatement.executeUpdate()).thenReturn(rowsAffected);
         when(preparedStatement.getGeneratedKeys()).thenReturn(resultSet);
@@ -134,7 +134,7 @@ class UserDAOTest {
     }
 
     @Test
-    void registerUser_noRowsAffected_throwsOperationException() throws Exception {
+    void registerUser_noRowsAffected_throwsOperationException() throws SQLException {
         when(databaseConnection.prepareStatement(anyString(), anyInt())).thenReturn(preparedStatement);
         when(preparedStatement.executeUpdate()).thenReturn(NO_VALUE);
 
@@ -147,7 +147,7 @@ class UserDAOTest {
     }
 
     @Test
-    void registerUser_noGeneratedKeyReturned_throwsOperationException() throws Exception {
+    void registerUser_noGeneratedKeyReturned_throwsOperationException() throws SQLException {
         when(databaseConnection.prepareStatement(anyString(), anyInt())).thenReturn(preparedStatement);
         when(preparedStatement.executeUpdate()).thenReturn(ROWS_AFFECTED);
         when(preparedStatement.getGeneratedKeys()).thenReturn(resultSet);
@@ -162,7 +162,7 @@ class UserDAOTest {
     }
 
     @Test
-    void registerUser_sqlError_throwsOperationException() throws Exception {
+    void registerUser_sqlError_throwsOperationException() throws SQLException {
         try (MockedStatic<PasswordHasher> mockedHasher = mockStatic(PasswordHasher.class)) {
             mockedHasher.when(() -> PasswordHasher.hashPassword(anyString())).thenReturn(HASHED_PASSWORD);
             when(connectionManager.getConnection()).thenThrow(new SQLException(DATABASE_ERROR_MESSAGE));
@@ -207,7 +207,7 @@ class UserDAOTest {
     }
 
     @Test
-    void authenticate_sqlError_throwsAuthenticateException() throws Exception {
+    void authenticate_sqlError_throwsAuthenticateException() throws SQLException {
         when(databaseConnection.prepareStatement(anyString())).thenThrow(new SQLException(DATABASE_ERROR_MESSAGE));
 
         assertThrows(AuthenticateException.class,
@@ -241,7 +241,7 @@ class UserDAOTest {
     }
 
     @Test
-    void existActiveCoordinator_sqlError_throwsOperationException() throws Exception {
+    void existActiveCoordinator_sqlError_throwsOperationException() throws SQLException {
         when(databaseConnection.prepareStatement(anyString())).thenThrow(new SQLException(DATABASE_ERROR_MESSAGE));
 
         assertThrows(OperationException.class,
@@ -267,7 +267,7 @@ class UserDAOTest {
     }
 
     @Test
-    void updateEmailAuthenticationPreference_sqlError_throwsOperationException() throws Exception {
+    void updateEmailAuthenticationPreference_sqlError_throwsOperationException() throws SQLException {
         when(databaseConnection.prepareStatement(anyString()))
             .thenThrow(new SQLException(DATABASE_ERROR_MESSAGE));
 

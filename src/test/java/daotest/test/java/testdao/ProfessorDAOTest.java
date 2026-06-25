@@ -143,7 +143,7 @@ class ProfessorDAOTest {
     }
 
     @Test
-    void getAllActiveProfessorsMap_sqlError_throwsOperationException() throws Exception {
+    void getAllActiveProfessorsMap_sqlError_throwsOperationException() throws SQLException {
         when(connectionManager.getConnection()).thenThrow(new SQLException(CONNECTION_ERROR));
 
         assertThrows(OperationException.class, () -> professorDAO.getAllActiveProfessorsMap());
@@ -161,7 +161,7 @@ class ProfessorDAOTest {
     }
 
     @Test
-    void getProfessorPersonnelNumberByName_notFound_throwsOperationException() throws Exception {
+    void getProfessorPersonnelNumberByName_notFound_throwsOperationException() throws SQLException {
         when(databaseConnection.prepareStatement(anyString())).thenReturn(preparedStatement);
         when(preparedStatement.executeQuery()).thenReturn(resultSet);
         when(resultSet.next()).thenReturn(false);
@@ -171,7 +171,7 @@ class ProfessorDAOTest {
     }
 
     @Test
-    void getProfessorPersonnelNumberByName_sqlError_throwsOperationException() throws Exception {
+    void getProfessorPersonnelNumberByName_sqlError_throwsOperationException() throws SQLException {
         when(connectionManager.getConnection()).thenThrow(new SQLException(CONNECTION_ERROR));
 
         assertThrows(OperationException.class,
@@ -192,7 +192,7 @@ class ProfessorDAOTest {
     }
 
     @Test
-    void getProfessorById_notFound_throwsOperationException() throws Exception {
+    void getProfessorById_notFound_throwsOperationException() throws SQLException {
         when(databaseConnection.prepareStatement(anyString())).thenReturn(preparedStatement);
         when(preparedStatement.executeQuery()).thenReturn(resultSet);
         when(resultSet.next()).thenReturn(false);
@@ -201,7 +201,7 @@ class ProfessorDAOTest {
     }
 
     @Test
-    void getProfessorById_sqlError_throwsOperationException() throws Exception {
+    void getProfessorById_sqlError_throwsOperationException() throws SQLException {
         when(connectionManager.getConnection()).thenThrow(new SQLException(CONNECTION_ERROR));
 
         assertThrows(OperationException.class, () -> professorDAO.getProfessorById(USER_ID));
@@ -236,7 +236,7 @@ class ProfessorDAOTest {
     }
 
     @Test
-    void registerProfessor_sqlError_throwsOperationException() throws Exception {
+    void registerProfessor_sqlError_throwsOperationException() throws SQLException {
         when(connectionManager.getConnection()).thenThrow(new SQLException(CONNECTION_ERROR));
 
         assertThrows(OperationException.class, () -> professorDAO.registerProfessor(buildProfessor()));
@@ -251,7 +251,7 @@ class ProfessorDAOTest {
     }
 
     @Test
-    void modifyProfessor_noRowsAffected_throwsOperationException() throws Exception {
+    void modifyProfessor_noRowsAffected_throwsOperationException() throws SQLException {
         when(databaseConnection.prepareStatement(anyString())).thenReturn(preparedStatement);
         when(preparedStatement.executeUpdate()).thenReturn(NO_ROWS);
 
@@ -260,7 +260,7 @@ class ProfessorDAOTest {
 
     @Test
     void modifyProfessor_asCoordinatorWithAnotherActiveCoordinator_throwsOperationException()
-            throws Exception {
+            throws SQLException {
         when(databaseConnection.prepareStatement(anyString())).thenReturn(preparedStatement);
         when(preparedStatement.executeQuery()).thenReturn(resultSet);
         when(resultSet.next()).thenReturn(true);
@@ -271,7 +271,7 @@ class ProfessorDAOTest {
     }
 
     @Test
-    void modifyProfessor_sqlError_throwsOperationException() throws Exception {
+    void modifyProfessor_sqlError_throwsOperationException() throws SQLException {
         when(connectionManager.getConnection()).thenThrow(new SQLException(CONNECTION_ERROR));
 
         assertThrows(OperationException.class, () -> professorDAO.modifyProfessor(buildProfessor()));
@@ -286,7 +286,7 @@ class ProfessorDAOTest {
     }
 
     @Test
-    void inactivateProfessor_noRowsAffected_throwsOperationException() throws Exception {
+    void inactivateProfessor_noRowsAffected_throwsOperationException() throws SQLException {
         when(databaseConnection.prepareStatement(anyString())).thenReturn(preparedStatement);
         when(preparedStatement.executeUpdate()).thenReturn(NO_ROWS);
 
@@ -295,7 +295,7 @@ class ProfessorDAOTest {
     }
 
     @Test
-    void inactivateProfessor_sqlError_throwsOperationException() throws Exception {
+    void inactivateProfessor_sqlError_throwsOperationException() throws SQLException {
         when(connectionManager.getConnection()).thenThrow(new SQLException(CONNECTION_ERROR));
 
         assertThrows(OperationException.class,
@@ -323,7 +323,7 @@ class ProfessorDAOTest {
     }
 
     @Test
-    void isProfessorInactive_notFound_throwsOperationException() throws Exception {
+    void isProfessorInactive_notFound_throwsOperationException() throws SQLException {
         when(databaseConnection.prepareStatement(anyString())).thenReturn(preparedStatement);
         when(preparedStatement.executeQuery()).thenReturn(resultSet);
         when(resultSet.next()).thenReturn(false);
@@ -333,7 +333,7 @@ class ProfessorDAOTest {
     }
 
     @Test
-    void isProfessorInactive_sqlError_throwsOperationException() throws Exception {
+    void isProfessorInactive_sqlError_throwsOperationException() throws SQLException {
         when(connectionManager.getConnection()).thenThrow(new SQLException(CONNECTION_ERROR));
 
         assertThrows(OperationException.class,
@@ -352,7 +352,7 @@ class ProfessorDAOTest {
     }
 
     @Test
-    void getIdUserByProfessorPersonnelNumber_notFound_throwsOperationException() throws Exception {
+    void getIdUserByProfessorPersonnelNumber_notFound_throwsOperationException() throws SQLException {
         when(databaseConnection.prepareStatement(anyString())).thenReturn(preparedStatement);
         when(preparedStatement.executeQuery()).thenReturn(resultSet);
         when(resultSet.next()).thenReturn(false);
@@ -362,7 +362,7 @@ class ProfessorDAOTest {
     }
 
     @Test
-    void getIdUserByProfessorPersonnelNumber_sqlError_throwsOperationException() throws Exception {
+    void getIdUserByProfessorPersonnelNumber_sqlError_throwsOperationException() throws SQLException {
         when(connectionManager.getConnection()).thenThrow(new SQLException(CONNECTION_ERROR));
 
         assertThrows(OperationException.class,
@@ -391,7 +391,7 @@ class ProfessorDAOTest {
     }
 
     @Test
-    void searchProfessorPersonalNumbers_sqlError_throwsOperationException() throws Exception {
+    void searchProfessorPersonalNumbers_sqlError_throwsOperationException() throws SQLException {
         when(connectionManager.getConnection()).thenThrow(new SQLException(CONNECTION_ERROR));
 
         assertThrows(OperationException.class,
@@ -417,7 +417,7 @@ class ProfessorDAOTest {
     }
 
     @Test
-    void hasSubjectAssigned_sqlError_throwsOperationException() throws Exception {
+    void hasSubjectAssigned_sqlError_throwsOperationException() throws SQLException {
         when(connectionManager.getConnection()).thenThrow(new SQLException(CONNECTION_ERROR));
 
         assertThrows(OperationException.class,
@@ -448,7 +448,7 @@ class ProfessorDAOTest {
     }
 
     @Test
-    void getSubjectsByProfessor_sqlError_throwsOperationException() throws Exception {
+    void getSubjectsByProfessor_sqlError_throwsOperationException() throws SQLException {
         when(connectionManager.getConnection()).thenThrow(new SQLException(CONNECTION_ERROR));
 
         assertThrows(OperationException.class,
@@ -476,7 +476,7 @@ class ProfessorDAOTest {
     }
 
     @Test
-    void isAnotherCoordinatorActive_sqlError_throwsOperationException() throws Exception {
+    void isAnotherCoordinatorActive_sqlError_throwsOperationException() throws SQLException {
         when(connectionManager.getConnection()).thenThrow(new SQLException(CONNECTION_ERROR));
 
         assertThrows(OperationException.class,

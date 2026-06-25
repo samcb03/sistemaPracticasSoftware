@@ -55,17 +55,17 @@ class AutoevaluationDAOTest {
         when(connectionManager.getConnection()).thenReturn(databaseConnection);
     }
 
-    private void mockQueryExecution() throws Exception {
+    private void mockQueryExecution() throws SQLException {
         when(databaseConnection.prepareStatement(anyString())).thenReturn(preparedStatement);
         when(preparedStatement.executeQuery()).thenReturn(resultSet);
     }
 
-    private void mockUpdateExecution(int rowsAffected) throws Exception {
+    private void mockUpdateExecution(int rowsAffected) throws SQLException {
         when(databaseConnection.prepareStatement(anyString())).thenReturn(preparedStatement);
         when(preparedStatement.executeUpdate()).thenReturn(rowsAffected);
     }
 
-    private void mockResultSetAutoevaluationData() throws Exception {
+    private void mockResultSetAutoevaluationData() throws SQLException {
         when(resultSet.next()).thenReturn(true);
         when(resultSet.getString("nombreAlumno")).thenReturn(STUDENT_NAME);
         when(resultSet.getString("apellidosAlumno")).thenReturn(STUDENT_LASTNAME);
@@ -99,7 +99,7 @@ class AutoevaluationDAOTest {
     }
 
     @Test
-    void getAutoevaluationData_studentNotFound_throwsOperationException() throws Exception {
+    void getAutoevaluationData_studentNotFound_throwsOperationException() throws SQLException {
         mockQueryExecution();
         when(resultSet.next()).thenReturn(false);
 
@@ -108,7 +108,7 @@ class AutoevaluationDAOTest {
     }
 
     @Test
-    void getAutoevaluationData_sqlError_throwsOperationException() throws Exception {
+    void getAutoevaluationData_sqlError_throwsOperationException() throws SQLException {
         when(connectionManager.getConnection()).thenThrow(new SQLException(DATABASE_ERROR_MESSAGE));
 
         assertThrows(OperationException.class,
@@ -123,7 +123,7 @@ class AutoevaluationDAOTest {
     }
 
     @Test
-    void registerAutoevaluation_noRowsAffected_throwsOperationException() throws Exception {
+    void registerAutoevaluation_noRowsAffected_throwsOperationException() throws SQLException {
         mockUpdateExecution(NO_VALUE);
 
         assertThrows(OperationException.class,
@@ -131,7 +131,7 @@ class AutoevaluationDAOTest {
     }
 
     @Test
-    void registerAutoevaluation_sqlError_throwsOperationException() throws Exception {
+    void registerAutoevaluation_sqlError_throwsOperationException() throws SQLException {
         when(connectionManager.getConnection()).thenThrow(new SQLException(DATABASE_ERROR_MESSAGE));
 
         assertThrows(OperationException.class,
@@ -155,7 +155,7 @@ class AutoevaluationDAOTest {
     }
 
     @Test
-    void existsByStudent_sqlError_throwsOperationException() throws Exception {
+    void existsByStudent_sqlError_throwsOperationException() throws SQLException {
         when(connectionManager.getConnection()).thenThrow(new SQLException(DATABASE_ERROR_MESSAGE));
 
         assertThrows(OperationException.class,

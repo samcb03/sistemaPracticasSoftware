@@ -57,17 +57,17 @@ class AdvanceDAOTest {
         when(connectionManager.getConnection()).thenReturn(databaseConnection);
     }
 
-    private void mockQueryExecution() throws Exception {
+    private void mockQueryExecution() throws SQLException {
         when(databaseConnection.prepareStatement(anyString())).thenReturn(preparedStatement);
         when(preparedStatement.executeQuery()).thenReturn(resultSet);
     }
 
-    private void mockUpdateExecution(int rowsAffected) throws Exception {
+    private void mockUpdateExecution(int rowsAffected) throws SQLException {
         when(databaseConnection.prepareStatement(anyString())).thenReturn(preparedStatement);
         when(preparedStatement.executeUpdate()).thenReturn(rowsAffected);
     }
 
-    private void mockResultSetSingleAdvance() throws Exception {
+    private void mockResultSetSingleAdvance() throws SQLException {
         when(resultSet.next()).thenReturn(true, false);
         when(resultSet.getInt("idProyecto")).thenReturn(PROJECT_ID);
         when(resultSet.getInt("idReporte")).thenReturn(REPORT_ID);
@@ -109,7 +109,7 @@ class AdvanceDAOTest {
     }
 
     @Test
-    void registerAdvance_databaseError_throwsOperationException() throws Exception {
+    void registerAdvance_databaseError_throwsOperationException() throws SQLException {
         when(databaseConnection.prepareStatement(anyString())).thenThrow(new SQLException());
 
         assertThrows(OperationException.class,
@@ -138,7 +138,7 @@ class AdvanceDAOTest {
     }
 
     @Test
-    void getAdvancesByProject_databaseError_throwsOperationException() throws Exception {
+    void getAdvancesByProject_databaseError_throwsOperationException() throws SQLException {
         when(databaseConnection.prepareStatement(anyString())).thenThrow(new SQLException());
 
         assertThrows(OperationException.class,
@@ -164,7 +164,7 @@ class AdvanceDAOTest {
     }
 
     @Test
-    void existsAdvanceForReport_databaseError_throwsOperationException() throws Exception {
+    void existsAdvanceForReport_databaseError_throwsOperationException() throws SQLException {
         when(databaseConnection.prepareStatement(anyString())).thenThrow(new SQLException());
 
         assertThrows(OperationException.class,
@@ -193,7 +193,7 @@ class AdvanceDAOTest {
     }
 
     @Test
-    void getAccumulatedHoursByProject_databaseError_throwsOperationException() throws Exception {
+    void getAccumulatedHoursByProject_databaseError_throwsOperationException() throws SQLException {
         when(databaseConnection.prepareStatement(anyString())).thenThrow(new SQLException());
 
         assertThrows(OperationException.class,

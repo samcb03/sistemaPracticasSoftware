@@ -68,12 +68,12 @@ class SchoolPeriodDAOTest {
         when(connectionManager.getConnection()).thenReturn(databaseConnection);
     }
 
-    private void mockQueryExecution() throws Exception {
+    private void mockQueryExecution() throws SQLException {
         when(databaseConnection.prepareStatement(anyString())).thenReturn(preparedStatement);
         when(preparedStatement.executeQuery()).thenReturn(resultSet);
     }
 
-    private void mockUpdateExecution(int rowsAffected) throws Exception {
+    private void mockUpdateExecution(int rowsAffected) throws SQLException {
         when(databaseConnection.prepareStatement(anyString())).thenReturn(preparedStatement);
         when(preparedStatement.executeUpdate()).thenReturn(rowsAffected);
     }
@@ -106,7 +106,7 @@ class SchoolPeriodDAOTest {
     }
 
     @Test
-    void getAllSchoolPeriodsNames_sqlError_throwsOperationException() throws Exception {
+    void getAllSchoolPeriodsNames_sqlError_throwsOperationException() throws SQLException {
         when(connectionManager.getConnection()).thenThrow(new SQLException(DATABASE_ERROR_MESSAGE));
 
         assertThrows(OperationException.class,
@@ -124,7 +124,7 @@ class SchoolPeriodDAOTest {
     }
 
     @Test
-    void getSchoolPeriodIdByName_notFound_throwsOperationException() throws Exception {
+    void getSchoolPeriodIdByName_notFound_throwsOperationException() throws SQLException {
         mockQueryExecution();
         when(resultSet.next()).thenReturn(false);
 
@@ -133,7 +133,7 @@ class SchoolPeriodDAOTest {
     }
 
     @Test
-    void getSchoolPeriodIdByName_sqlError_throwsOperationException() throws Exception {
+    void getSchoolPeriodIdByName_sqlError_throwsOperationException() throws SQLException {
         when(connectionManager.getConnection()).thenThrow(new SQLException(DATABASE_ERROR_MESSAGE));
 
         assertThrows(OperationException.class,
@@ -162,7 +162,7 @@ class SchoolPeriodDAOTest {
     }
 
     @Test
-    void getSchoolPeriodByStudentId_sqlError_throwsOperationException() throws Exception {
+    void getSchoolPeriodByStudentId_sqlError_throwsOperationException() throws SQLException {
         when(connectionManager.getConnection()).thenThrow(new SQLException(DATABASE_ERROR_MESSAGE));
 
         assertThrows(OperationException.class,
@@ -177,7 +177,7 @@ class SchoolPeriodDAOTest {
     }
 
     @Test
-    void registerSchoolPeriod_noRowsAffected_throwsOperationException() throws Exception {
+    void registerSchoolPeriod_noRowsAffected_throwsOperationException() throws SQLException {
         mockUpdateExecution(NO_ROWS_AFFECTED);
 
         assertThrows(OperationException.class,
@@ -185,7 +185,7 @@ class SchoolPeriodDAOTest {
     }
 
     @Test
-    void registerSchoolPeriod_sqlError_throwsOperationException() throws Exception {
+    void registerSchoolPeriod_sqlError_throwsOperationException() throws SQLException {
         when(connectionManager.getConnection()).thenThrow(new SQLException(DATABASE_ERROR_MESSAGE));
 
         assertThrows(OperationException.class,
@@ -200,7 +200,7 @@ class SchoolPeriodDAOTest {
     }
 
     @Test
-    void modifySchoolPeriod_noRowsAffected_throwsOperationException() throws Exception {
+    void modifySchoolPeriod_noRowsAffected_throwsOperationException() throws SQLException {
         mockUpdateExecution(NO_ROWS_AFFECTED);
 
         assertThrows(OperationException.class,
@@ -208,7 +208,7 @@ class SchoolPeriodDAOTest {
     }
 
     @Test
-    void modifySchoolPeriod_sqlError_throwsOperationException() throws Exception {
+    void modifySchoolPeriod_sqlError_throwsOperationException() throws SQLException {
         when(connectionManager.getConnection()).thenThrow(new SQLException(DATABASE_ERROR_MESSAGE));
 
         assertThrows(OperationException.class,
@@ -232,7 +232,7 @@ class SchoolPeriodDAOTest {
     }
 
     @Test
-    void existsSchoolPeriod_sqlError_throwsOperationException() throws Exception {
+    void existsSchoolPeriod_sqlError_throwsOperationException() throws SQLException {
         when(connectionManager.getConnection()).thenThrow(new SQLException(DATABASE_ERROR_MESSAGE));
 
         assertThrows(OperationException.class,

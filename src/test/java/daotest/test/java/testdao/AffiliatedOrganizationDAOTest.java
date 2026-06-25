@@ -30,7 +30,7 @@ import uv.lis.logic.exceptions.OperationException;
 
 class AffiliatedOrganizationDAOTest {
 
-    private static final int ORGANIZATION_ID = 1;
+    private static final int ORGANIZATION_ID = 3;
     private static final int DIRECT_USERS = 10;
     private static final int INDIRECT_USERS = 50;
     private static final int ROWS_AFFECTED = 1;
@@ -65,29 +65,29 @@ class AffiliatedOrganizationDAOTest {
     private AffiliatedOrganizationDAO affiliatedOrganizationDAO;
 
     @BeforeEach
-    void setUp() throws Exception {
+    void setUp() throws SQLException {
         MockitoAnnotations.openMocks(this);
 
         when(connectionManager.getConnection()).thenReturn(connection);
         affiliatedOrganizationDAO = new AffiliatedOrganizationDAO(connectionManager);
     }
 
-    private void mockQueryExecution() throws Exception {
+    private void mockQueryExecution() throws SQLException {
         when(connection.prepareStatement(anyString())).thenReturn(preparedStatement);
         when(preparedStatement.executeQuery()).thenReturn(resultSet);
     }
 
-    private void mockGeneratedKeyUpdate(int rowsAffected) throws Exception {
+    private void mockGeneratedKeyUpdate(int rowsAffected) throws SQLException {
         when(connection.prepareStatement(anyString(), anyInt())).thenReturn(preparedStatement);
         when(preparedStatement.executeUpdate()).thenReturn(rowsAffected);
     }
 
-    private void mockSimpleUpdate(int rowsAffected) throws Exception {
+    private void mockSimpleUpdate(int rowsAffected) throws SQLException {
         when(connection.prepareStatement(anyString())).thenReturn(preparedStatement);
         when(preparedStatement.executeUpdate()).thenReturn(rowsAffected);
     }
 
-    private void mockResultSetOrganization() throws Exception {
+    private void mockResultSetOrganization() throws SQLException {
         when(resultSet.next()).thenReturn(true);
         when(resultSet.getInt("idOrganizacionVinculada")).thenReturn(ORGANIZATION_ID);
         when(resultSet.getString("nombreOV")).thenReturn(ORGANIZATION_NAME);
@@ -100,20 +100,20 @@ class AffiliatedOrganizationDAOTest {
         when(resultSet.getInt("numUsuariosIndirectos")).thenReturn(INDIRECT_USERS);
     }
 
-    private void mockResultSetTwoOrganizationNames() throws Exception {
+    private void mockResultSetTwoOrganizationNames() throws SQLException {
         when(resultSet.next()).thenReturn(true, true, false);
         when(resultSet.getString("nombreOV"))
             .thenReturn(ORGANIZATION_NAME, SECOND_ORGANIZATION_NAME);
     }
 
-    private void mockResultSetProjectEntry() throws Exception {
+    private void mockResultSetProjectEntry() throws SQLException {
         when(resultSet.next()).thenReturn(true, false);
         when(resultSet.getInt("idProyecto")).thenReturn(PROJECT_ID);
         when(resultSet.getString("nombre")).thenReturn(PROJECT_NAME);
         when(resultSet.getString("descripcion")).thenReturn(PROJECT_DESCRIPTION);
     }
 
-    private void mockResultSetCompleteProject() throws Exception {
+    private void mockResultSetCompleteProject() throws SQLException {
         when(resultSet.next()).thenReturn(true, false);
         when(resultSet.getInt("idProyecto")).thenReturn(PROJECT_ID);
         when(resultSet.getString("nombre")).thenReturn(PROJECT_NAME);
@@ -164,7 +164,7 @@ class AffiliatedOrganizationDAOTest {
     }
 
     @Test
-    void getOrganizationById_notFound_throwsOperationException() throws Exception {
+    void getOrganizationById_notFound_throwsOperationException() throws SQLException {
         mockQueryExecution();
         when(resultSet.next()).thenReturn(false);
 
@@ -173,7 +173,7 @@ class AffiliatedOrganizationDAOTest {
     }
 
     @Test
-    void getOrganizationById_sqlError_throwsOperationException() throws Exception {
+    void getOrganizationById_sqlError_throwsOperationException() throws SQLException {
         when(connection.prepareStatement(anyString()))
             .thenThrow(new SQLException(DATABASE_ERROR_MESSAGE));
 
@@ -192,7 +192,7 @@ class AffiliatedOrganizationDAOTest {
     }
 
     @Test
-    void registerOrganization_noRowsAffected_throwsOperationException() throws Exception {
+    void registerOrganization_noRowsAffected_throwsOperationException() throws SQLException {
         mockGeneratedKeyUpdate(NO_VALUE);
 
         assertThrows(OperationException.class,
@@ -200,7 +200,7 @@ class AffiliatedOrganizationDAOTest {
     }
 
     @Test
-    void registerOrganization_sqlError_throwsOperationException() throws Exception {
+    void registerOrganization_sqlError_throwsOperationException() throws SQLException {
         when(connection.prepareStatement(anyString(), anyInt()))
             .thenThrow(new SQLException(DATABASE_ERROR_MESSAGE));
 
@@ -216,7 +216,7 @@ class AffiliatedOrganizationDAOTest {
     }
 
     @Test
-    void modifyOrganization_noRowsAffected_throwsOperationException() throws Exception {
+    void modifyOrganization_noRowsAffected_throwsOperationException() throws SQLException {
         mockSimpleUpdate(NO_VALUE);
 
         assertThrows(OperationException.class,
@@ -224,7 +224,7 @@ class AffiliatedOrganizationDAOTest {
     }
 
     @Test
-    void modifyOrganization_sqlError_throwsOperationException() throws Exception {
+    void modifyOrganization_sqlError_throwsOperationException() throws SQLException {
         when(connection.prepareStatement(anyString()))
             .thenThrow(new SQLException(DATABASE_ERROR_MESSAGE));
 
@@ -240,7 +240,7 @@ class AffiliatedOrganizationDAOTest {
     }
 
     @Test
-    void inactivateOrganization_noRowsAffected_throwsOperationException() throws Exception {
+    void inactivateOrganization_noRowsAffected_throwsOperationException() throws SQLException {
         mockSimpleUpdate(NO_VALUE);
 
         assertThrows(OperationException.class,
@@ -248,7 +248,7 @@ class AffiliatedOrganizationDAOTest {
     }
 
     @Test
-    void inactivateOrganization_sqlError_throwsOperationException() throws Exception {
+    void inactivateOrganization_sqlError_throwsOperationException() throws SQLException {
         when(connection.prepareStatement(anyString()))
             .thenThrow(new SQLException(DATABASE_ERROR_MESSAGE));
 
@@ -274,7 +274,7 @@ class AffiliatedOrganizationDAOTest {
     }
 
     @Test
-    void getAllOrganizationNames_sqlError_throwsOperationException() throws Exception {
+    void getAllOrganizationNames_sqlError_throwsOperationException() throws SQLException {
         when(connection.prepareStatement(anyString()))
             .thenThrow(new SQLException(DATABASE_ERROR_MESSAGE));
 
@@ -293,7 +293,7 @@ class AffiliatedOrganizationDAOTest {
     }
 
     @Test
-    void getOrganizationIdByName_notFound_throwsOperationException() throws Exception {
+    void getOrganizationIdByName_notFound_throwsOperationException() throws SQLException {
         mockQueryExecution();
         when(resultSet.next()).thenReturn(false);
 
@@ -302,7 +302,7 @@ class AffiliatedOrganizationDAOTest {
     }
 
     @Test
-    void getOrganizationIdByName_sqlError_throwsOperationException() throws Exception {
+    void getOrganizationIdByName_sqlError_throwsOperationException() throws SQLException {
         when(connection.prepareStatement(anyString()))
             .thenThrow(new SQLException(DATABASE_ERROR_MESSAGE));
 
@@ -330,7 +330,7 @@ class AffiliatedOrganizationDAOTest {
     }
 
     @Test
-    void getOrganizationBySupervisorName_sqlError_throwsOperationException() throws Exception {
+    void getOrganizationBySupervisorName_sqlError_throwsOperationException() throws SQLException {
         when(connection.prepareStatement(anyString()))
             .thenThrow(new SQLException(DATABASE_ERROR_MESSAGE));
 
@@ -357,7 +357,7 @@ class AffiliatedOrganizationDAOTest {
     }
 
     @Test
-    void isOrganizationInactive_notFound_throwsOperationException() throws Exception {
+    void isOrganizationInactive_notFound_throwsOperationException() throws SQLException {
         mockQueryExecution();
         when(resultSet.next()).thenReturn(false);
 
@@ -366,7 +366,7 @@ class AffiliatedOrganizationDAOTest {
     }
 
     @Test
-    void isOrganizationInactive_sqlError_throwsOperationException() throws Exception {
+    void isOrganizationInactive_sqlError_throwsOperationException() throws SQLException {
         when(connection.prepareStatement(anyString()))
             .thenThrow(new SQLException(DATABASE_ERROR_MESSAGE));
 
@@ -394,7 +394,7 @@ class AffiliatedOrganizationDAOTest {
     }
 
     @Test
-    void searchActiveOrganizationsByNamePrefix_sqlError_throwsOperationException() throws Exception {
+    void searchActiveOrganizationsByNamePrefix_sqlError_throwsOperationException() throws SQLException {
         when(connection.prepareStatement(anyString()))
             .thenThrow(new SQLException(DATABASE_ERROR_MESSAGE));
 
@@ -423,7 +423,7 @@ class AffiliatedOrganizationDAOTest {
     }
 
     @Test
-    void getOrganizationByName_sqlError_throwsOperationException() throws Exception {
+    void getOrganizationByName_sqlError_throwsOperationException() throws SQLException {
         when(connection.prepareStatement(anyString()))
             .thenThrow(new SQLException(DATABASE_ERROR_MESSAGE));
 
@@ -451,7 +451,7 @@ class AffiliatedOrganizationDAOTest {
     }
 
     @Test
-    void getProjectsByOrganization_sqlError_throwsOperationException() throws Exception {
+    void getProjectsByOrganization_sqlError_throwsOperationException() throws SQLException {
         when(connection.prepareStatement(anyString()))
             .thenThrow(new SQLException(DATABASE_ERROR_MESSAGE));
 
@@ -476,7 +476,7 @@ class AffiliatedOrganizationDAOTest {
     }
 
     @Test
-    void hasActiveProjects_sqlError_throwsOperationException() throws Exception {
+    void hasActiveProjects_sqlError_throwsOperationException() throws SQLException {
         when(connection.prepareStatement(anyString()))
             .thenThrow(new SQLException(DATABASE_ERROR_MESSAGE));
 
@@ -504,7 +504,7 @@ class AffiliatedOrganizationDAOTest {
     }
 
     @Test
-    void getCompleteProjectsByOrganization_sqlError_throwsOperationException() throws Exception {
+    void getCompleteProjectsByOrganization_sqlError_throwsOperationException() throws SQLException{
         when(connection.prepareStatement(anyString()))
             .thenThrow(new SQLException(DATABASE_ERROR_MESSAGE));
 

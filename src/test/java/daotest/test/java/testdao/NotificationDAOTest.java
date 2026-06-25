@@ -55,12 +55,12 @@ class NotificationDAOTest {
         when(connectionManager.getConnection()).thenReturn(databaseConnection);
     }
 
-    private void mockQueryExecution() throws Exception {
+    private void mockQueryExecution() throws SQLException {
         when(databaseConnection.prepareStatement(anyString())).thenReturn(preparedStatement);
         when(preparedStatement.executeQuery()).thenReturn(resultSet);
     }
 
-    private void mockUpdateExecution() throws Exception {
+    private void mockUpdateExecution() throws SQLException {
         when(databaseConnection.prepareStatement(anyString())).thenReturn(preparedStatement);
         when(preparedStatement.executeUpdate()).thenReturn(ROWS_AFFECTED);
     }
@@ -88,7 +88,7 @@ class NotificationDAOTest {
     }
 
     @Test
-    void registerNotification_sqlError_throwsOperationException() throws Exception {
+    void registerNotification_sqlError_throwsOperationException() throws SQLException {
         when(connectionManager.getConnection()).thenThrow(new SQLException(DATABASE_ERROR_MESSAGE));
 
         assertThrows(OperationException.class,
@@ -113,7 +113,7 @@ class NotificationDAOTest {
     }
 
     @Test
-    void getNotificationsByStudentId_sqlError_throwsOperationException() throws Exception {
+    void getNotificationsByStudentId_sqlError_throwsOperationException() throws SQLException {
         when(connectionManager.getConnection()).thenThrow(new SQLException(DATABASE_ERROR_MESSAGE));
 
         assertThrows(OperationException.class,
@@ -128,7 +128,7 @@ class NotificationDAOTest {
     }
 
     @Test
-    void markNotificationAsRead_sqlError_throwsOperationException() throws Exception {
+    void markNotificationAsRead_sqlError_throwsOperationException() throws SQLException {
         when(connectionManager.getConnection()).thenThrow(new SQLException(DATABASE_ERROR_MESSAGE));
 
         assertThrows(OperationException.class,

@@ -187,7 +187,7 @@ class ProjectDAOTest {
     }
 
     @Test
-    void getAllProjects_sqlError_throwsOperationException() throws Exception {
+    void getAllProjects_sqlError_throwsOperationException() throws SQLException {
         when(connectionManager.getConnection()).thenThrow(new SQLException(CONNECTION_ERROR));
 
         assertThrows(OperationException.class, () -> projectDAO.getAllProjects());
@@ -209,7 +209,7 @@ class ProjectDAOTest {
     }
 
     @Test
-    void getProjectByName_notFound_throwsOperationException() throws Exception {
+    void getProjectByName_notFound_throwsOperationException() throws SQLException {
         when(databaseConnection.prepareStatement(anyString(), anyInt())).thenReturn(preparedStatement);
         when(preparedStatement.executeQuery()).thenReturn(resultSet);
         when(resultSet.next()).thenReturn(false);
@@ -219,7 +219,7 @@ class ProjectDAOTest {
     }
 
     @Test
-    void getProjectByName_sqlError_throwsOperationException() throws Exception {
+    void getProjectByName_sqlError_throwsOperationException() throws SQLException {
         when(connectionManager.getConnection()).thenThrow(new SQLException(CONNECTION_ERROR));
 
         assertThrows(OperationException.class, 
@@ -238,7 +238,7 @@ class ProjectDAOTest {
     }
 
     @Test
-    void registerProject_noRowsAffected_throwsOperationException() throws Exception {
+    void registerProject_noRowsAffected_throwsOperationException() throws SQLException {
         when(databaseConnection.prepareStatement(anyString(), anyInt())).thenReturn(preparedStatement);
         when(preparedStatement.executeUpdate()).thenReturn(NO_ROWS);
 
@@ -247,7 +247,7 @@ class ProjectDAOTest {
     }
 
     @Test
-    void registerProject_sqlError_throwsOperationException() throws Exception {
+    void registerProject_sqlError_throwsOperationException() throws SQLException {
         when(connectionManager.getConnection()).thenThrow(new SQLException(CONNECTION_ERROR));
 
         assertThrows(OperationException.class,
@@ -263,7 +263,7 @@ class ProjectDAOTest {
     }
 
     @Test
-    void modifyProject_noRowsAffected_throwsOperationException() throws Exception {
+    void modifyProject_noRowsAffected_throwsOperationException() throws SQLException {
         when(databaseConnection.prepareStatement(anyString())).thenReturn(preparedStatement);
         when(preparedStatement.executeUpdate()).thenReturn(NO_ROWS);
 
@@ -272,7 +272,7 @@ class ProjectDAOTest {
     }
 
     @Test
-    void modifyProject_sqlError_throwsOperationException() throws Exception {
+    void modifyProject_sqlError_throwsOperationException() throws SQLException {
         when(connectionManager.getConnection()).thenThrow(new SQLException(CONNECTION_ERROR));
 
         assertThrows(OperationException.class,
@@ -288,7 +288,7 @@ class ProjectDAOTest {
     }
 
     @Test
-    void inactivateProject_noRowsAffected_throwsOperationException() throws Exception {
+    void inactivateProject_noRowsAffected_throwsOperationException() throws SQLException {
         when(databaseConnection.prepareStatement(anyString())).thenReturn(preparedStatement);
         when(preparedStatement.executeUpdate()).thenReturn(NO_ROWS);
 
@@ -297,7 +297,7 @@ class ProjectDAOTest {
     }
 
     @Test
-    void inactivateProject_sqlError_throwsOperationException() throws Exception {
+    void inactivateProject_sqlError_throwsOperationException() throws SQLException {
         when(connectionManager.getConnection()).thenThrow(new SQLException(CONNECTION_ERROR));
 
         assertThrows(OperationException.class,
@@ -324,7 +324,7 @@ class ProjectDAOTest {
     }
 
     @Test
-    void getAllProjectNames_sqlError_throwsOperationException() throws Exception {
+    void getAllProjectNames_sqlError_throwsOperationException() throws SQLException {
         when(connectionManager.getConnection()).thenThrow(new SQLException(CONNECTION_ERROR));
 
         assertThrows(OperationException.class, 
@@ -351,7 +351,7 @@ class ProjectDAOTest {
     }
 
     @Test
-    void getProjectBySupervisorName_sqlError_throwsOperationException() throws Exception {
+    void getProjectBySupervisorName_sqlError_throwsOperationException() throws SQLException {
         when(connectionManager.getConnection()).thenThrow(new SQLException(CONNECTION_ERROR));
 
         assertThrows(OperationException.class,
@@ -424,7 +424,7 @@ class ProjectDAOTest {
     }
 
     @Test
-    void getProjectNamesByOrganizationId_sqlError_throwsOperationException() throws Exception {
+    void getProjectNamesByOrganizationId_sqlError_throwsOperationException() throws SQLException {
         when(connectionManager.getConnection()).thenThrow(new SQLException(CONNECTION_ERROR));
 
         assertThrows(OperationException.class,
@@ -456,7 +456,7 @@ class ProjectDAOTest {
     }
 
     @Test
-    void getProjectByStudentId_sqlError_throwsOperationException() throws Exception {
+    void getProjectByStudentId_sqlError_throwsOperationException() throws SQLException {
         when(connectionManager.getConnection()).thenThrow(new SQLException(CONNECTION_ERROR));
 
         assertThrows(OperationException.class,
@@ -498,7 +498,7 @@ class ProjectDAOTest {
     }
 
     @Test
-    void getAllProjectsWithCapacity_sqlError_throwsOperationException() throws Exception {
+    void getAllProjectsWithCapacity_sqlError_throwsOperationException() throws SQLException {
         when(connectionManager.getConnection()).thenThrow(new SQLException(CONNECTION_ERROR));
 
         assertThrows(OperationException.class, () -> projectDAO.getAllProjectsWithCapacity());
@@ -531,7 +531,7 @@ class ProjectDAOTest {
     }
 
     @Test
-    void getProjectDetailsByStudentId_sqlError_throwsOperationException() throws Exception {
+    void getProjectDetailsByStudentId_sqlError_throwsOperationException() throws SQLException {
         when(connectionManager.getConnection()).thenThrow(new SQLException(CONNECTION_ERROR));
 
         assertThrows(OperationException.class,

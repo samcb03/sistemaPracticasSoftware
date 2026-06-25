@@ -213,7 +213,7 @@ public class ReportContextDAO implements IReportContextDAO {
 
     @Override
     public Activity getActivityByName(String studentId, String activityName) throws OperationException {
-        Activity activity = null;
+        Activity activity = new Activity();
         String reportContextQuery = "SELECT a.idActividad, a.nombreActividad, "
                                   + "a.descripcionActividad, a.FechaInicio, a.FechaFin "
                                   + "FROM Actividad a "

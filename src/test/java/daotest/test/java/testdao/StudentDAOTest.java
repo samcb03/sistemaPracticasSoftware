@@ -90,12 +90,12 @@ class StudentDAOTest {
         when(connectionManager.getConnection()).thenReturn(databaseConnection);
     }
 
-    private void mockQueryExecution() throws Exception {
+    private void mockQueryExecution() throws SQLException {
         when(databaseConnection.prepareStatement(anyString())).thenReturn(preparedStatement);
         when(preparedStatement.executeQuery()).thenReturn(resultSet);
     }
 
-    private void mockUpdateExecution(int rowsAffected) throws Exception {
+    private void mockUpdateExecution(int rowsAffected) throws SQLException {
         when(databaseConnection.prepareStatement(anyString())).thenReturn(preparedStatement);
         when(databaseConnection.prepareStatement(anyString(), anyInt())).thenReturn(preparedStatement);
         when(preparedStatement.executeUpdate()).thenReturn(rowsAffected);
@@ -104,7 +104,7 @@ class StudentDAOTest {
         when(resultSet.getInt(COLUMN_USER_ID)).thenReturn(EXPECTED_USER_ID);
     }
 
-    private void mockResultSetSingleStudent() throws Exception {
+    private void mockResultSetSingleStudent() throws SQLException {
         when(resultSet.next()).thenReturn(true);
         when(resultSet.getString(COLUMN_STUDENT_ID)).thenReturn(FIRST_STUDENT_ID);
         when(resultSet.getString(COLUMN_NAME)).thenReturn(FIRST_NAME);
@@ -113,7 +113,7 @@ class StudentDAOTest {
         when(resultSet.getString(COLUMN_GENDER)).thenReturn(GENDER);
     }
 
-    private void mockResultSetTwoStudents() throws Exception {
+    private void mockResultSetTwoStudents() throws SQLException {
         when(resultSet.next()).thenReturn(true, true, false);
         when(resultSet.getString(COLUMN_STUDENT_ID)).thenReturn(FIRST_STUDENT_ID, SECOND_STUDENT_ID);
         when(resultSet.getString(COLUMN_NAME)).thenReturn(FIRST_NAME, SECOND_FIRST_NAME);
@@ -168,7 +168,7 @@ class StudentDAOTest {
     }
 
     @Test
-    void getStudentById_sqlError_throwsOperationException() throws Exception {
+    void getStudentById_sqlError_throwsOperationException() throws SQLException {
         when(connectionManager.getConnection()).thenThrow(new SQLException(DATABASE_ERROR_MESSAGE));
 
         assertThrows(OperationException.class,
@@ -186,7 +186,7 @@ class StudentDAOTest {
     }
 
     @Test
-    void getIdUserByStudentId_notFound_throwsOperationException() throws Exception {
+    void getIdUserByStudentId_notFound_throwsOperationException() throws SQLException {
         mockQueryExecution();
         when(resultSet.next()).thenReturn(false);
 
@@ -195,7 +195,7 @@ class StudentDAOTest {
     }
 
     @Test
-    void getIdUserByStudentId_sqlError_throwsOperationException() throws Exception {
+    void getIdUserByStudentId_sqlError_throwsOperationException() throws SQLException {
         when(connectionManager.getConnection()).thenThrow(new SQLException(DATABASE_ERROR_MESSAGE));
 
         assertThrows(OperationException.class,
@@ -220,7 +220,7 @@ class StudentDAOTest {
     }
 
     @Test
-    void getActiveStudentsNotInSubject_sqlError_throwsOperationException() throws Exception {
+    void getActiveStudentsNotInSubject_sqlError_throwsOperationException() throws SQLException {
         when(connectionManager.getConnection()).thenThrow(new SQLException(DATABASE_ERROR_MESSAGE));
 
         assertThrows(OperationException.class,
@@ -235,7 +235,7 @@ class StudentDAOTest {
     }
 
     @Test
-    void registerStudent_noRowsAffected_throwsOperationException() throws Exception {
+    void registerStudent_noRowsAffected_throwsOperationException() throws SQLException {
         mockUpdateExecution(NO_VALUE);
 
         assertThrows(OperationException.class,
@@ -243,7 +243,7 @@ class StudentDAOTest {
     }
 
     @Test
-    void registerStudent_sqlError_throwsOperationException() throws Exception {
+    void registerStudent_sqlError_throwsOperationException() throws SQLException {
         when(connectionManager.getConnection()).thenThrow(new SQLException(DATABASE_ERROR_MESSAGE));
 
         assertThrows(OperationException.class,
@@ -258,7 +258,7 @@ class StudentDAOTest {
     }
 
     @Test
-    void modifyStudent_noRowsAffected_throwsOperationException() throws Exception {
+    void modifyStudent_noRowsAffected_throwsOperationException() throws SQLException {
         mockUpdateExecution(NO_VALUE);
 
         assertThrows(OperationException.class,
@@ -266,7 +266,7 @@ class StudentDAOTest {
     }
 
     @Test
-    void modifyStudent_sqlError_throwsOperationException() throws Exception {
+    void modifyStudent_sqlError_throwsOperationException() throws SQLException {
         when(connectionManager.getConnection()).thenThrow(new SQLException(DATABASE_ERROR_MESSAGE));
 
         assertThrows(OperationException.class,
@@ -281,7 +281,7 @@ class StudentDAOTest {
     }
 
     @Test
-    void inactivateStudent_noRowsAffected_throwsOperationException() throws Exception {
+    void inactivateStudent_noRowsAffected_throwsOperationException() throws SQLException {
         mockUpdateExecution(NO_VALUE);
 
         assertThrows(OperationException.class,
@@ -289,7 +289,7 @@ class StudentDAOTest {
     }
 
     @Test
-    void inactivateStudent_sqlError_throwsOperationException() throws Exception {
+    void inactivateStudent_sqlError_throwsOperationException() throws SQLException {
         when(connectionManager.getConnection()).thenThrow(new SQLException(DATABASE_ERROR_MESSAGE));
 
         assertThrows(OperationException.class,
@@ -315,7 +315,7 @@ class StudentDAOTest {
     }
 
     @Test
-    void isStudentInactive_notFound_throwsOperationException() throws Exception {
+    void isStudentInactive_notFound_throwsOperationException() throws SQLException {
         mockQueryExecution();
         when(resultSet.next()).thenReturn(false);
 
@@ -324,7 +324,7 @@ class StudentDAOTest {
     }
 
     @Test
-    void isStudentInactive_sqlError_throwsOperationException() throws Exception {
+    void isStudentInactive_sqlError_throwsOperationException() throws SQLException {
         when(connectionManager.getConnection()).thenThrow(new SQLException(DATABASE_ERROR_MESSAGE));
 
         assertThrows(OperationException.class,
@@ -350,7 +350,7 @@ class StudentDAOTest {
     }
 
     @Test
-    void searchStudentIds_sqlError_throwsOperationException() throws Exception {
+    void searchStudentIds_sqlError_throwsOperationException() throws SQLException {
         when(connectionManager.getConnection()).thenThrow(new SQLException(DATABASE_ERROR_MESSAGE));
 
         assertThrows(OperationException.class,
@@ -384,7 +384,7 @@ class StudentDAOTest {
     }
 
     @Test
-    void hasProjectAssigned_sqlError_throwsOperationException() throws Exception {
+    void hasProjectAssigned_sqlError_throwsOperationException() throws SQLException {
         when(connectionManager.getConnection()).thenThrow(new SQLException(DATABASE_ERROR_MESSAGE));
 
         assertThrows(OperationException.class,
@@ -408,12 +408,12 @@ class StudentDAOTest {
     }
 
     @Test
-    void getStudentsByIds_emptyList_returnsEmptyList() throws Exception {
+    void getStudentsByIds_emptyList_returnsEmptyList() throws OperationException {
         assertTrue(studentDAO.getStudentsByIds(List.of()).isEmpty());
     }
 
     @Test
-    void getStudentsByIds_sqlError_throwsOperationException() throws Exception {
+    void getStudentsByIds_sqlError_throwsOperationException() throws SQLException {
         when(connectionManager.getConnection()).thenThrow(new SQLException(DATABASE_ERROR_MESSAGE));
 
         assertThrows(OperationException.class,

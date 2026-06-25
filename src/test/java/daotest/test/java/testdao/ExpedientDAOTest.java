@@ -70,18 +70,18 @@ class ExpedientDAOTest {
         when(connectionManager.getConnection()).thenReturn(databaseConnection);
     }
 
-    private void mockQueryExecution() throws Exception {
+    private void mockQueryExecution() throws SQLException {
         when(databaseConnection.prepareStatement(anyString())).thenReturn(preparedStatement);
         when(preparedStatement.executeQuery()).thenReturn(resultSet);
     }
 
-    private void mockUpdateExecution(int rowsAffected) throws Exception {
+    private void mockUpdateExecution(int rowsAffected) throws SQLException {
         when(databaseConnection.prepareStatement(anyString())).thenReturn(preparedStatement);
         when(databaseConnection.prepareStatement(anyString(), anyInt())).thenReturn(preparedStatement);
         when(preparedStatement.executeUpdate()).thenReturn(rowsAffected);
     }
 
-    private void mockResultSetSingleExpedient() throws Exception {
+    private void mockResultSetSingleExpedient() throws SQLException {
         when(resultSet.next()).thenReturn(true, false);
         when(resultSet.getInt("idExpediente")).thenReturn(FIRST_EXPEDIENT_ID);
         when(resultSet.getString("nombre")).thenReturn(DOCUMENT_NAME);
@@ -115,7 +115,7 @@ class ExpedientDAOTest {
     }
 
     @Test
-    void saveDocument_sqlError_throwsOperationException() throws Exception {
+    void saveDocument_sqlError_throwsOperationException() throws SQLException {
         when(connectionManager.getConnection()).thenThrow(new SQLException(DATABASE_ERROR_MESSAGE));
 
         assertThrows(OperationException.class, () -> expedientDAO.saveDocument(builderExpedient()));
@@ -138,7 +138,7 @@ class ExpedientDAOTest {
     }
 
     @Test
-    void getAllDocuments_sqlError_throwsOperationException() throws Exception {
+    void getAllDocuments_sqlError_throwsOperationException() throws SQLException {
         when(connectionManager.getConnection()).thenThrow(new SQLException(DATABASE_ERROR_MESSAGE));
 
         assertThrows(OperationException.class, () -> expedientDAO.getAllDocuments());
@@ -161,7 +161,7 @@ class ExpedientDAOTest {
     }
 
     @Test
-    void getDocumentsByStudentId_sqlError_throwsOperationException() throws Exception {
+    void getDocumentsByStudentId_sqlError_throwsOperationException() throws SQLException {
         when(connectionManager.getConnection()).thenThrow(new SQLException(DATABASE_ERROR_MESSAGE));
 
         assertThrows(OperationException.class,
@@ -186,7 +186,7 @@ class ExpedientDAOTest {
     }
 
     @Test
-    void getIdDocumentTypeByName_sqlError_throwsOperationException() throws Exception {
+    void getIdDocumentTypeByName_sqlError_throwsOperationException() throws SQLException {
         when(connectionManager.getConnection()).thenThrow(new SQLException(DATABASE_ERROR_MESSAGE));
 
         assertThrows(OperationException.class,
@@ -218,7 +218,7 @@ class ExpedientDAOTest {
     }
 
     @Test
-    void updateDocumentStatus_sqlError_throwsOperationException() throws Exception {
+    void updateDocumentStatus_sqlError_throwsOperationException() throws SQLException {
         when(connectionManager.getConnection()).thenThrow(new SQLException(DATABASE_ERROR_MESSAGE));
 
         assertThrows(OperationException.class,
@@ -243,7 +243,7 @@ class ExpedientDAOTest {
     }
 
     @Test
-    void getAllDocumentsTypes_sqlError_throwsOperationException() throws Exception {
+    void getAllDocumentsTypes_sqlError_throwsOperationException() throws SQLException {
         when(connectionManager.getConnection()).thenThrow(new SQLException(DATABASE_ERROR_MESSAGE));
 
         assertThrows(OperationException.class, () -> expedientDAO.getAllDocumentsTypes());
@@ -276,7 +276,7 @@ class ExpedientDAOTest {
     }
  
     @Test
-    void isFinalReportValidated_sqlError_throwsOperationException() throws Exception {
+    void isFinalReportValidated_sqlError_throwsOperationException() throws SQLException {
         when(connectionManager.getConnection()).thenThrow(new SQLException(DATABASE_ERROR_MESSAGE));
  
         assertThrows(OperationException.class,
@@ -302,7 +302,7 @@ class ExpedientDAOTest {
     }
 
     @Test
-    void isDocumentTypeValidated_sqlError_throwsOperationException() throws Exception {
+    void isDocumentTypeValidated_sqlError_throwsOperationException() throws SQLException {
         when(connectionManager.getConnection()).thenThrow(new SQLException(DATABASE_ERROR_MESSAGE));
 
         assertThrows(OperationException.class,
@@ -328,7 +328,7 @@ class ExpedientDAOTest {
     }
 
     @Test
-    void countDocumentsByStudentAndType_sqlError_throwsOperationException() throws Exception {
+    void countDocumentsByStudentAndType_sqlError_throwsOperationException() throws SQLException {
         when(connectionManager.getConnection()).thenThrow(new SQLException(DATABASE_ERROR_MESSAGE));
 
         assertThrows(OperationException.class,
@@ -353,7 +353,7 @@ class ExpedientDAOTest {
     }
 
     @Test
-    void getStudentIdsWithInitialDocuments_sqlError_throwsOperationException() throws Exception {
+    void getStudentIdsWithInitialDocuments_sqlError_throwsOperationException() throws SQLException {
         when(connectionManager.getConnection()).thenThrow(new SQLException(DATABASE_ERROR_MESSAGE));
 
         assertThrows(OperationException.class,
@@ -378,7 +378,7 @@ class ExpedientDAOTest {
     }
 
     @Test
-    void getStudentIdsWithDocumentType_sqlError_throwsOperationException() throws Exception {
+    void getStudentIdsWithDocumentType_sqlError_throwsOperationException() throws SQLException {
         when(connectionManager.getConnection()).thenThrow(new SQLException(DATABASE_ERROR_MESSAGE));
 
         assertThrows(OperationException.class,
@@ -403,7 +403,7 @@ class ExpedientDAOTest {
     }
 
     @Test
-    void getStudentIdsWithLiberationLetter_sqlError_throwsOperationException() throws Exception {
+    void getStudentIdsWithLiberationLetter_sqlError_throwsOperationException() throws SQLException {
         when(connectionManager.getConnection()).thenThrow(new SQLException(DATABASE_ERROR_MESSAGE));
 
         assertThrows(OperationException.class,
