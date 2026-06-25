@@ -125,6 +125,7 @@ public class Expedient {
 
     @Override
     public int hashCode() {
-        return Objects.hash(name, typeDocument, url, idStudent);
+        int hash = Objects.hash(name, typeDocument, url, idStudent);
+        return hash;
     }
 }

@@ -69,6 +69,7 @@ public class Advance {
 
     @Override
     public int hashCode() {
-        return Objects.hash(projectId, reportId, weekNumber);
+        int hash = Objects.hash(projectId, reportId, weekNumber);
+        return hash;
     }
 }

@@ -139,9 +139,10 @@ public class FinalReport extends Report {
 
     @Override
     public int hashCode() {
-        return Objects.hash(super.hashCode(), projectName, projectMethodology,
+        int hash = Objects.hash(super.hashCode(), projectName, projectMethodology,
             projectObjective, affiliatedOrganization, totalHours, dateReport,
             firstActivity, secondActivity, firstDeliverable, secondDeliverable,
             generalObservations);
+        return hash;
     }
 }

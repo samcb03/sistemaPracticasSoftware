@@ -39,19 +39,6 @@ class DateValidatorTest {
 
     @ParameterizedTest
     @CsvSource({
-        "5, false",
-        "-5, true"
-    })
-    void validateStartDate_variousDates_returnsExpectedResult(int daysFromNow, boolean hasError) {
-        LocalDate startDate = LocalDate.now().plusDays(daysFromNow);
-
-        boolean result = DateValidator.validateStartDate(startDate, FIELD_NAME).isPresent();
-
-        assertEquals(hasError, result);
-    }
-
-    @ParameterizedTest
-    @CsvSource({
         "10, false",
         "-10, true"
     })

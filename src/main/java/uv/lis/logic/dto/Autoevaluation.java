@@ -240,8 +240,9 @@ public class Autoevaluation {
 
     @Override
     public int hashCode() {
-        return Objects.hash(idStudent, productiveParticipation, appliedKnowledge, confidenceInActivities,
-                            activitiesInterest, organizationSupport, rulesAwareness, supervisorGuidance,
-                            effectiveMonitoring, careerAlignment, internshipImportance, finalScore);
+        int hash = Objects.hash(idStudent, productiveParticipation, appliedKnowledge, confidenceInActivities,
+            activitiesInterest, organizationSupport, rulesAwareness, supervisorGuidance,
+            effectiveMonitoring, careerAlignment, internshipImportance, finalScore);
+        return hash;
     }
 }

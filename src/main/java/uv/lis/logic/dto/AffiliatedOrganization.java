@@ -16,7 +16,6 @@ public class AffiliatedOrganization {
     private int numberOfDirectUsers;
     private int numberOfIndirectUsers;
     private ProjectSupervisor projectSupervisor;
-    private int counter = 0;
 
     public AffiliatedOrganization() {       
         
@@ -25,7 +24,6 @@ public class AffiliatedOrganization {
     public AffiliatedOrganization(String name, String city,
             String state, String sector,String email, String phoneNumber, int numberOfDirectUsers, 
             int numberOfIndirectUsers) {
-        this.id = generateId();
         this.name = name;
         this.city = city;
         this.state = state;
@@ -108,10 +106,6 @@ public class AffiliatedOrganization {
         this.numberOfIndirectUsers = numberOfIndirectUsers;
     } 
 
-    private int generateId() {
-        return counter++;
-    }
-
     public ProjectSupervisor getProjectSupervisor() {
         return projectSupervisor;
     }
@@ -167,7 +161,8 @@ public class AffiliatedOrganization {
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, name, city, state, sector, email, phoneNumber, numberOfDirectUsers, 
+        int hash = Objects.hash(id, name, city, state, sector, email, phoneNumber, numberOfDirectUsers, 
             numberOfIndirectUsers);
+        return hash;
     }
 }
