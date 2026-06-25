@@ -62,7 +62,7 @@ public class PracticeDAO implements IPracticeDAO {
     public boolean registerPractice(Practice Practice) throws OperationException {
         boolean isRegistered = false;
 
-        String practiceQuery = "INSERT INTO Practica (calificacion, idStudent) "
+        String practiceQuery = "INSERT INTO Practica (calificacion, matricula) "
                              + "VALUES (?, ?);";
 
         try (Connection databaseConnection = connectionManager.getConnection();
