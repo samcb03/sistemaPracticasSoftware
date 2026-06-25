@@ -389,4 +389,6 @@ class RequestProjectDAOTest {
         assertThrows(OperationException.class,
             () -> requestProjectDAO.unassignStudentFromProject(FIRST_STUDENT_ID));
     }
+
+    //FIXME faltan los test de asignar un proyecto
 }

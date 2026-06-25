@@ -70,7 +70,7 @@ public class WeeklyAdvanceGridEditor {
         }
         return validationError;
     }
-    //FIXME verificar que este metodo no validaciones duplicadas
+    
     private Optional<String> validateColumn(int slot) {
         Optional<String> validationError = Optional.empty();
         int columnSum = 0;

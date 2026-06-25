@@ -244,7 +244,7 @@ public class FXMLAssignationProjectController extends ValidationHandler {
             Notification notification = buildAssignmentNotification(idStudent, projectName, reason);
             notificationDAO.registerNotification(notification);
         } catch (OperationException e) {
-            showError("Asignación realizada, pero no se pudo enviar la notificación al alumno");
+            showError(e.getMessage());
         }
     }
 
@@ -285,8 +285,7 @@ public class FXMLAssignationProjectController extends ValidationHandler {
         String studentId = "";
 
         if (separatorIndex >= INVALID_ID) {
-            studentId = applicantRow.substring(
-                separatorIndex + APPLICANT_SEPARATOR.length()).trim();
+            studentId = applicantRow.substring(separatorIndex + APPLICANT_SEPARATOR.length()).trim();
         }
 
         return studentId;

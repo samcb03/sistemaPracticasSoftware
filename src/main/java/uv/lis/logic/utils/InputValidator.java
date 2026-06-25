@@ -584,19 +584,21 @@ public final class InputValidator {
      */
     public static Optional<String> validateDescriptiveText(String fieldValue, String fieldName) {
         Optional<String> validationResult;
-        if (!fieldValue.matches(REDACTER_REGEX)) {
-                validationResult = Optional.of(fieldName + " contiene caracteres no permitidos");
-        } else if (fieldValue.matches(INVALID_ENDING_REGEX)) {
-                validationResult = Optional.of(fieldName + " debe terminar con una letra o un punto");
-        } else {
-            validationResult = firstError(
-                validateNotEmpty(fieldValue, fieldName),
-                validateMaxLength(fieldValue, MAX_TEXT_LENGTH, fieldName),
-                validateNoLeadingSpace(fieldValue, fieldName),
-                validateNoTrailingSpace(fieldValue, fieldName),
-                validateNoConsecutiveSpaces(fieldValue, fieldName),
-                validateNoConsecutiveRepeatedCharacters(fieldValue, fieldName)
-            );
+        validationResult = validateNotEmpty(fieldValue, fieldName);
+        if (validationResult.isEmpty()) {
+            if (!fieldValue.matches(REDACTER_REGEX)) {
+                    validationResult = Optional.of(fieldName + " contiene caracteres no permitidos");
+            } else if (fieldValue.matches(INVALID_ENDING_REGEX)) {
+                    validationResult = Optional.of(fieldName + " debe terminar con una letra o un punto");
+            } else {
+                validationResult = firstError(
+                    validateMaxLength(fieldValue, MAX_TEXT_LENGTH, fieldName),
+                    validateNoLeadingSpace(fieldValue, fieldName),
+                    validateNoTrailingSpace(fieldValue, fieldName),
+                    validateNoConsecutiveSpaces(fieldValue, fieldName),
+                    validateNoConsecutiveRepeatedCharacters(fieldValue, fieldName)
+                );
+            }
         }
         return validationResult;
     }
