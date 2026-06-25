@@ -66,6 +66,21 @@ public class FXMLRegisterAffiliatedOrganizationController extends ValidationHand
         Optional<String> firstValidationError = getFirstValidationError();
         handleValidation(firstValidationError, this::performRegistration);
     }
+
+    @Override
+    protected void clearFields() {
+        textFieldName.clear();
+        textFieldCity.clear();
+        textFieldState.clear();
+        textFieldSector.clear();
+        textFieldStreet.clear();
+        textFieldStreetNumber.clear();
+        textFieldPostalCode.clear();
+        textFieldEmail.clear();
+        textFieldPhoneNumber.clear();
+        textFieldNumberOfDirectUsers.clear();
+        textFieldNumberOfIndirectUsers.clear();
+    }
     
     private Optional<String> getFirstValidationError() {
         Stream<Optional<String>> validationStream = Stream.of(
@@ -117,20 +132,5 @@ public class FXMLRegisterAffiliatedOrganizationController extends ValidationHand
         organization.setNumberOfDirectUsers(Integer.parseInt(textFieldNumberOfDirectUsers.getText().trim()));
         organization.setNumberOfIndirectUsers(Integer.parseInt(textFieldNumberOfIndirectUsers.getText().trim()));
         return organization;
-    }
-
-    @Override
-    public void clearFields() {
-        textFieldName.clear();
-        textFieldCity.clear();
-        textFieldState.clear();
-        textFieldSector.clear();
-        textFieldStreet.clear();
-        textFieldStreetNumber.clear();
-        textFieldPostalCode.clear();
-        textFieldEmail.clear();
-        textFieldPhoneNumber.clear();
-        textFieldNumberOfDirectUsers.clear();
-        textFieldNumberOfIndirectUsers.clear();
     }
 }

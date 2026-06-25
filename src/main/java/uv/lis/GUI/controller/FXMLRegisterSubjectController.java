@@ -31,6 +31,16 @@ public class FXMLRegisterSubjectController extends ValidationHandler {
     private static final Logger LOGGER = Logger.getLogger(FXMLRegisterSubjectController.class.getName());
     private static final String SECTION_TAKEN_ERROR = 
         "La sección seleccionada ya está asignada en este periodo escolar.";
+    private static final String NRC_FIELD = "El NRC";
+    private static final String SCHOOL_PERIOD_FIELD = "Un periodo escolar";
+    private static final String PROFESSOR_FIELD = "Un profesor";
+    private static final String SECTION_FIELD = "Una sección";
+    private static final String SUCCESSFUL_SUBJECT_REGISTER_MESSAGE = "Experiencia educativa registrada correctamente";
+    private static final String ERROR_SUBJECT_REGISTER_MESSAGE = "Error al registrar la experiencia educativa";
+    private static final String FAIL_SEARCH_ID_SCHOOL_PERIOD = "No se encontró el ID para el periodo escolar seleccionado";
+    private static final String INVALID_NRC_MESSAGE = "El formato del NRC o el ID del periodo es incorrecto";
+    private static final String SECTION_1 = "1";
+    private static final String SECTION_2 = "2";
 
     @FXML private TextField textFieldNRC;
     @FXML private ComboBox<String> comboBoxProfessorName;
@@ -52,12 +62,26 @@ public class FXMLRegisterSubjectController extends ValidationHandler {
         subjectDAO = new SubjectDAO();
         professorDAO = new ProfessorDAO();
         schoolPeriodDAO = new SchoolPeriodDAO();
-
         setupControls(labelMessage, buttonBack);
         loadStaticLabels();
         loadProfessorsNames();
         loadPeriodsNames();
         loadSections();
+    }
+
+    @FXML
+    public void validateFields() {
+        Optional<String> firstValidationError = getFirstValidationError();
+        handleValidation(firstValidationError, this::performRegistration);
+    }
+
+    @Override
+    protected void clearFields() {
+        textFieldNRC.clear();
+        comboBoxProfessorName.getSelectionModel().clearSelection();
+        comboBoxPeriodName.getSelectionModel().clearSelection();
+        comboBoxSection.getSelectionModel().clearSelection();
+        labelMessage.setText("");
     }
 
     private void loadStaticLabels() {
@@ -79,26 +103,20 @@ public class FXMLRegisterSubjectController extends ValidationHandler {
             ArrayList<String> periodsNames = schoolPeriodDAO.getAllSchoolPeriodsNames();
             comboBoxPeriodName.setItems(FXCollections.observableArrayList(periodsNames));
         } catch (OperationException e) {
-            showError(e.getMessage());   
+            showError(e.getMessage());
         }
     }
 
     private void loadSections() {
-        comboBoxSection.getItems().addAll("1", "2");
-    }
-
-    @FXML
-    public void validateFields() {
-        Optional<String> firstValidationError = getFirstValidationError();
-        handleValidation(firstValidationError, this::performRegistration);
+        comboBoxSection.getItems().addAll(SECTION_1, SECTION_2);
     }
 
     private Optional<String> getFirstValidationError() {
         Stream<Optional<String>> validationStream = Stream.of(
-            validatePositiveInteger(textFieldNRC.getText().trim(), "El NRC"),
-            validateComboBox(comboBoxPeriodName.getValue(), "un periodo escolar"),
-            validateComboBox(comboBoxProfessorName.getValue(), "un profesor"),
-            validateComboBox(comboBoxSection.getValue(), "una sección")
+            validatePositiveInteger(textFieldNRC.getText().trim(), NRC_FIELD),
+            validateComboBox(comboBoxPeriodName.getValue(), SCHOOL_PERIOD_FIELD),
+            validateComboBox(comboBoxProfessorName.getValue(), PROFESSOR_FIELD),
+            validateComboBox(comboBoxSection.getValue(), SECTION_FIELD)
         );
         Optional<String> firstError = validationStream
             .filter(Optional::isPresent)
@@ -109,63 +127,51 @@ public class FXMLRegisterSubjectController extends ValidationHandler {
 
     private void performRegistration() {
         Optional<Subject> subject = buildSubject();
+        subject.ifPresent(this::registerSubject);
+    }
 
-        subject.ifPresent(newSubject -> {
-            try {
-                boolean isSectionTaken = subjectDAO.isSectionTakenInPeriod(
-                    newSubject.getSchoolPeriodId(), newSubject.getSection()
-                );
-                if (isSectionTaken) {
-                    showError(SECTION_TAKEN_ERROR);
-                } else {
-                    boolean isRegistered = subjectDAO.registerSubject(newSubject);
-                    if (isRegistered) {
-                        showSuccess("Experiencia Educativa registrada con éxito.");
-                        clearFields();
-                    }
+    private void registerSubject(Subject subject) {
+        try {
+            boolean isSectionTaken = subjectDAO.isSectionTakenInPeriod(
+                subject.getSchoolPeriodId(), subject.getSection());
+            if (isSectionTaken) {
+                showError(SECTION_TAKEN_ERROR);
+            } else {
+                boolean isRegistered = subjectDAO.registerSubject(subject);
+                if (isRegistered) {
+                    showSuccess(SUCCESSFUL_SUBJECT_REGISTER_MESSAGE);
+                    clearFields();
                 }
-            } catch (OperationException e) {
-                LOGGER.log(Level.SEVERE, "Error al registrar la Experiencia Educativa", e);
-                showError(e.getMessage());
             }
-        });
+        } catch (OperationException e) {
+            LOGGER.log(Level.SEVERE, ERROR_SUBJECT_REGISTER_MESSAGE, e);
+            showError(e.getMessage());
+        }
     }
 
     private Optional<Subject> buildSubject() {
         Optional<Subject> validateSubject = Optional.empty();
+        try {
+            Subject subject = new Subject();
+            subject.setNrc(Integer.parseInt(textFieldNRC.getText().trim()));
+            subject.setSection(comboBoxSection.getValue());
+            String personnelNumber = professorsMap.get(comboBoxProfessorName.getValue());
+            subject.setProfessorPersonnelNumber(personnelNumber);
+            String selectedPeriod = comboBoxPeriodName.getValue();
+            Optional<String> validatePeriodId = schoolPeriodDAO.getSchoolPeriodIdByName(selectedPeriod);
 
-            try {
-                Subject subject = new Subject();
-                subject.setNrc(Integer.parseInt(textFieldNRC.getText().trim()));
-                subject.setSection(comboBoxSection.getValue());
-                String personnelNumber = professorsMap.get(comboBoxProfessorName.getValue());
-                subject.setProfessorPersonnelNumber(personnelNumber);
-                String selectedPeriod = comboBoxPeriodName.getValue();
-
-                Optional<String> validatePeriodId = schoolPeriodDAO.getSchoolPeriodIdByName(selectedPeriod);
-
-                    if (validatePeriodId.isPresent()) {
-                        int periodId = Integer.parseInt(validatePeriodId.get());
-                        subject.setSchoolPeriodId(periodId);
-                        validateSubject = Optional.of(subject);
-                    } else {
-                        showError("No se encontró el ID para el periodo escolar seleccionado.");
-                    }
-            } catch (OperationException e) {
-                showError("Error al consultar la base de datos: " + e.getMessage());
-            } catch (NumberFormatException e) {
-                showError("El formato del NRC o el ID del periodo es incorrecto.");
+            if (validatePeriodId.isPresent()) {
+                int periodId = Integer.parseInt(validatePeriodId.get());
+                subject.setSchoolPeriodId(periodId);
+                validateSubject = Optional.of(subject);
+            } else {
+                showError(FAIL_SEARCH_ID_SCHOOL_PERIOD);
             }
-
-        return validateSubject; 
-    }
-
-    @Override
-    protected void clearFields() {
-        textFieldNRC.clear();
-        comboBoxProfessorName.getSelectionModel().clearSelection();
-        comboBoxPeriodName.getSelectionModel().clearSelection();
-        comboBoxSection.getSelectionModel().clearSelection();
-        labelMessage.setText("");
+        } catch (OperationException e) {
+            showError(e.getMessage());
+        } catch (NumberFormatException e) {
+            showError(INVALID_NRC_MESSAGE);
+        }
+        return validateSubject;
     }
 }

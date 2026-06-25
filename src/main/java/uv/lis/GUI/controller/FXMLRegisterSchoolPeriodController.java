@@ -51,6 +51,14 @@ public class FXMLRegisterSchoolPeriodController extends ValidationHandler {
         handleValidation(validationError, this::performRegistration);
     }
 
+    @Override
+    protected void clearFields() {
+        comboBoxTerm.getSelectionModel().clearSelection();
+        datePickerStartDate.setValue(null);
+        datePickerEndDate.setValue(null);
+        comboBoxTerm.requestFocus();
+    }
+
     private Optional<String> getFirstValidationError() {
         Stream<Optional<String>> validationStream = Stream.of(
             validateComboBox(comboBoxTerm.getValue(), TERM_FIELD),
@@ -89,13 +97,5 @@ public class FXMLRegisterSchoolPeriodController extends ValidationHandler {
         schoolPeriod.setStartDate(Date.valueOf(datePickerStartDate.getValue()));
         schoolPeriod.setEndDate(Date.valueOf(datePickerEndDate.getValue()));
         return schoolPeriod;
-    }
-
-    @Override
-    protected void clearFields() {
-        comboBoxTerm.getSelectionModel().clearSelection();
-        datePickerStartDate.setValue(null);
-        datePickerEndDate.setValue(null);
-        comboBoxTerm.requestFocus();
     }
 }

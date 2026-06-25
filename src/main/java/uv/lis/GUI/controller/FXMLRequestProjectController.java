@@ -28,6 +28,15 @@ import uv.lis.logic.utils.SessionManager;
 public class FXMLRequestProjectController extends ValidationHandler {
 
     private static final int MAX_PROJECTS = 3;
+    private static final String WITHOUT_ACTIVE_SESSION = "No hay una sesión activa. Por favor inicia sesión";
+    private static final String MAX_PROJECTS_ERROR = "Solo puedes solicitar " + MAX_PROJECTS + " proyectos";
+    private static final String EXACT_PROJECTS_ERROR = "Debes seleccionar exactamente " + MAX_PROJECTS + " proyectos";
+    private static final String NO_PROJECT_SELECTED_ERROR = "Por favor, selecciona un proyecto de la lista.";
+    private static final String PROJECT_ALREADY_ADDED_ERROR = "Ya agregaste este proyecto";
+    private static final String PROJECT_NOT_FOUND_ERROR = "El proyecto seleccionado no se encontró en la base de datos.";
+    private static final String PROJECT_DETAILS_NOT_FOUND_ERROR = "No se encontraron los detalles del proyecto seleccionado.";
+    private static final String ORGANIZATION_NOT_FOUND = "Organización no encontrada";
+    private static final String SUCCESSFUL_REQUEST_MESSAGE = "Solicitudes registradas correctamente";
 
     @FXML private ComboBox<String> comboBoxProjects;
     @FXML private Button buttonBack;
@@ -46,7 +55,6 @@ public class FXMLRequestProjectController extends ValidationHandler {
     private AffiliatedOrganizationDAO affiliatedOrganizationDAO;
     private RequestProjectDAO requestProjectDAO;
     private Student student;
-
     private LinkedHashMap<String, Integer> selectedProjects = new LinkedHashMap<>();
     private String studentId;
 
@@ -55,20 +63,87 @@ public class FXMLRequestProjectController extends ValidationHandler {
         projectDAO = new ProjectDAO();
         affiliatedOrganizationDAO = new AffiliatedOrganizationDAO();
         requestProjectDAO = new RequestProjectDAO();
-
         student = SessionManager.getInstance().getCurrentStudent();
 
         if (student == null) {
-            showError("No hay una sesión activa. Por favor inicia sesión.");
+            showError(WITHOUT_ACTIVE_SESSION);
             buttonAddProject.setDisable(true);
             buttonSubmit.setDisable(true);
+        } else {
+            studentId = student.getIdStudent();
+            setupControls(labelError, buttonBack);
+            loadProjectNames();
+            setupComboBoxListener();
+            updateSelectedCount();
         }
-        
-        studentId = student.getIdStudent();
-        setupControls(labelError, buttonBack);
-        loadProjectNames();
-        setupComboBoxListener();
+    }
+
+    @FXML
+    public void addProject() {
+        String projectSelected = comboBoxProjects.getValue();
+
+        if (projectSelected == null || projectSelected.trim().isEmpty()) {
+            showError(NO_PROJECT_SELECTED_ERROR);
+        } else if (selectedProjects.containsKey(projectSelected)) {
+            showError(PROJECT_ALREADY_ADDED_ERROR);
+        } else if (selectedProjects.size() >= MAX_PROJECTS) {
+            showError(MAX_PROJECTS_ERROR);
+        } else {
+            addValidatedProject(projectSelected);
+        }
+    }
+
+    @FXML
+    public void submitRequests() {
+        if (selectedProjects.size() < MAX_PROJECTS) {
+            showError(EXACT_PROJECTS_ERROR);
+        } else {
+            try {
+                for (Map.Entry<String, Integer> entry : selectedProjects.entrySet()) {
+                    requestProjectDAO.requestProject(studentId, entry.getValue());
+                }
+                showSuccess(SUCCESSFUL_REQUEST_MESSAGE);
+                clearFields();
+            } catch (OperationException e) {
+                showError(e.getMessage());
+            }
+        }
+    }
+
+    @Override
+    protected void clearFields() {
+        comboBoxProjects.getSelectionModel().clearSelection();
+        selectedProjects.clear();
+        listViewSelectedProjects.getItems().clear();
+        labelOrganizationName.setText("");
+        labelMethodology.setText("");
+        labelCapacity.setText("");
+        labelObjective.setText("");
+        labelDescription.setText("");
         updateSelectedCount();
+    }
+
+    private void addValidatedProject(String projectSelected) {
+        try {
+            Optional<Project> validateProject = projectDAO.getProjectByName(projectSelected);
+
+            if(validateProject.isPresent()) {
+                Project project = validateProject.get();
+                Optional<String> validationError = requestProjectDAO.validateProjectRequest(studentId, project.getId());
+                handleValidation(validationError, () -> registerSelectedProject(projectSelected, project.getId()));
+            } else {
+                showError(PROJECT_NOT_FOUND_ERROR);
+            }
+        } catch (OperationException e) {
+            showError(e.getMessage());
+        }
+    }
+
+    private void registerSelectedProject(String projectSelected, int projectId) {
+        selectedProjects.put(projectSelected, projectId);
+        listViewSelectedProjects.getItems().add(projectSelected);
+        updateSelectedCount();
+        labelError.setText("");
     }
 
     private void loadProjectNames() {
@@ -85,12 +160,14 @@ public class FXMLRequestProjectController extends ValidationHandler {
 
     private void setupComboBoxListener() {
         comboBoxProjects.getSelectionModel().selectedItemProperty().addListener(
-            (observable, oldValue, newValue) -> {
-                if (newValue != null) {
-                    loadProjectDetails(newValue);
-                }
-            }
+            (observable, oldValue, newValue) -> handleProjectSelection(newValue)
         );
+    }
+
+    private void handleProjectSelection(String newValue) {
+        if(newValue != null) {
+            loadProjectDetails(newValue);
+        }
     }
 
     private void loadProjectDetails(String projectName) {
@@ -99,95 +176,27 @@ public class FXMLRequestProjectController extends ValidationHandler {
 
             if (validateProject.isPresent()) {
                 Project project = validateProject.get();
-                
                 labelMethodology.setText(project.getMethodology());
                 labelCapacity.setText(String.valueOf(project.getCapacity()));
                 labelObjective.setText(project.getObjective());
                 labelDescription.setText(project.getDescription());
-
                 Optional<AffiliatedOrganization> validateOrganization = affiliatedOrganizationDAO
                     .getOrganizationById(project.getIdAffiliatedOrganization());
                 
                 if (validateOrganization.isPresent()) {
                     labelOrganizationName.setText(validateOrganization.get().getName());
                 } else {
-                    labelOrganizationName.setText("Organización no encontrada");
+                    labelOrganizationName.setText(ORGANIZATION_NOT_FOUND);
                 }
-                
             } else {
-                showError("No se encontraron los detalles del proyecto seleccionado.");
+                showError(PROJECT_DETAILS_NOT_FOUND_ERROR);
             }
         } catch (OperationException e) {
             showError(e.getMessage());
         }
     }
 
-    @FXML
-    public void addProject() {
-        String projectSelected = comboBoxProjects.getValue();
-
-        if (projectSelected == null || projectSelected.trim().isEmpty()) {
-            showError("Por favor, selecciona un proyecto de la lista.");
-        } else if (selectedProjects.containsKey(projectSelected)) {
-            showError("Ya agregaste este proyecto");
-        } else if (selectedProjects.size() >= MAX_PROJECTS) {
-            showError("Solo puedes solicitar " + MAX_PROJECTS + " proyectos");
-        } else {
-            try {
-                Optional<Project> validateProject = projectDAO.getProjectByName(projectSelected);
-
-                if (validateProject.isPresent()) {
-                    Project project = validateProject.get();
-                    
-                    Optional<String> validationError = requestProjectDAO.validateProjectRequest(studentId, 
-                        project.getId());
-
-                    handleValidation(validationError, () -> {
-                        selectedProjects.put(projectSelected, project.getId());
-                        listViewSelectedProjects.getItems().add(projectSelected);
-                        updateSelectedCount();
-                        labelError.setText(""); 
-                    });
-                } else {
-                    showError("El proyecto seleccionado no se encontró en la base de datos.");
-                }
-            } catch (OperationException e) {
-                showError(e.getMessage());
-            }
-        }   
-    }
-
-    @FXML
-    public void submitRequests() {
-        if (selectedProjects.size() < MAX_PROJECTS) {
-            showError("Debes seleccionar exactamente " + MAX_PROJECTS + " proyectos");
-        } else {
-            try {
-                for (Map.Entry<String, Integer> entry : selectedProjects.entrySet()) {
-                    requestProjectDAO.requestProject(studentId, entry.getValue());
-                }
-                showSuccess("Solicitudes registradas correctamente");
-                clearFields();
-            } catch (OperationException e) {
-                showError(e.getMessage());
-            }
-        }
-    }
-
     private void updateSelectedCount() {
         labelSelectedCount.setText(selectedProjects.size() + "/" + MAX_PROJECTS);
-    }
- 
-    @Override
-    protected void clearFields() {
-        comboBoxProjects.getSelectionModel().clearSelection();
-        selectedProjects.clear();
-        listViewSelectedProjects.getItems().clear();
-        labelOrganizationName.setText("");
-        labelMethodology.setText("");
-        labelCapacity.setText("");
-        labelObjective.setText("");
-        labelDescription.setText("");
-        updateSelectedCount();
     }
 }

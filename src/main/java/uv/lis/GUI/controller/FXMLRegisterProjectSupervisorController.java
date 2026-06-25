@@ -50,6 +50,20 @@ public class FXMLRegisterProjectSupervisorController extends ValidationHandler {
         loadOrganizationNames();
     }
 
+    @FXML
+    public void validateFields() {
+        Optional<String> firstValidationError = getFirstValidationError();
+        handleValidation(firstValidationError, this::performRegistration);
+    }
+
+    @Override
+    protected void clearFields() {
+        textFieldName.clear();
+        textFieldPosition.clear();
+        textFieldEmail.clear();
+        comboBoxOrganizationName.setValue(null);
+    }
+
     private void loadOrganizationNames() {
         try {
             ArrayList<String> organizationNames = affiliatedOrganizationDAO.getAllOrganizationNames();
@@ -57,12 +71,6 @@ public class FXMLRegisterProjectSupervisorController extends ValidationHandler {
         } catch (OperationException operationException) {
             showError(operationException.getMessage());
         }
-    }
-
-    @FXML
-    public void validateFields() {
-        Optional<String> firstValidationError = getFirstValidationError();
-        handleValidation(firstValidationError, this::performRegistration);
     }
 
     private Optional<String> getFirstValidationError() {
@@ -111,13 +119,5 @@ public class FXMLRegisterProjectSupervisorController extends ValidationHandler {
             }
         }
         return projectSupervisor;
-    }
-
-    @Override
-    protected void clearFields() {
-        textFieldName.clear();
-        textFieldPosition.clear();
-        textFieldEmail.clear();
-        comboBoxOrganizationName.setValue(null);
     }
 }

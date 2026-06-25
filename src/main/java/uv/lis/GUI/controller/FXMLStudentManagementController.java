@@ -9,22 +9,27 @@ import javafx.scene.control.Button;
 import uv.lis.GUI.WindowHandler;
 
 public class FXMLStudentManagementController extends WindowHandler {
+
+    private static final String REGISTER_STUDENT_VIEW = "/uv/lis/GUI/view/FXMLRegisterStudent.fxml";
+    private static final String CONSULT_STUDENT_VIEW = "/uv/lis/GUI/view/FXMLManageStudent.fxml";
+
     @FXML private Button buttonRegisterStudent;
     @FXML private Button buttonConsultStudent;
     @FXML private Button buttonBack;
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
+
     }
 
     @FXML 
     public void goToRegisterStudent() { 
-        navigateTo("/uv/lis/GUI/view/FXMLRegisterStudent.fxml"); 
+        navigateTo(REGISTER_STUDENT_VIEW); 
     }
 
     @FXML
     public void goToConsultStudent() { 
-        navigateTo("/uv/lis/GUI/view/FXMLManageStudent.fxml"); 
+        navigateTo(CONSULT_STUDENT_VIEW); 
     }
 
 }
