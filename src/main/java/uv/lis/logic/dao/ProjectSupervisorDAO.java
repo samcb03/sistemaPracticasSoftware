@@ -18,11 +18,12 @@ import uv.lis.logic.exceptions.OperationException;
 
 public class ProjectSupervisorDAO implements IProjectSupervisorDAO {
     private static final Logger LOGGER = Logger.getLogger(ProjectSupervisorDAO.class.getName());
-    private MySQLConnectionManager connectionManager;
     private static final int INACTIVE_STATUS = 0;
 
+    private final MySQLConnectionManager connectionManager;
+
     public ProjectSupervisorDAO() {
-        this.connectionManager = new MySQLConnectionManager();
+        connectionManager = new MySQLConnectionManager();
     }
 
     @Override
@@ -48,32 +49,30 @@ public class ProjectSupervisorDAO implements IProjectSupervisorDAO {
     @Override
     public Optional<ProjectSupervisor> getProjectSupervisorById(int id) throws OperationException{
         Optional<ProjectSupervisor> validateSupervisor = Optional.empty();
-
         String supervisorQuery = "SELECT * FROM ResponsableProyecto WHERE idResponsableProyecto = ?";
 
         try (Connection databaseConnection = connectionManager.getConnection();
             PreparedStatement preparedStatement = databaseConnection.prepareStatement(supervisorQuery)) {
 
             preparedStatement.setInt(1, id);
-            ResultSet resultSet = preparedStatement.executeQuery();
+            try (ResultSet resultSet = preparedStatement.executeQuery()) {
 
-            if (resultSet.next()) {
-                ProjectSupervisor supervisor = new ProjectSupervisor();
-                supervisor.setId(resultSet.getInt("idResponsableProyecto"));
-                supervisor.setName(resultSet.getString("nombre"));
-                supervisor.setPosition(resultSet.getString("cargo"));
-                supervisor.setEmail(resultSet.getString("correo"));
-                validateSupervisor = Optional.of(supervisor);
-            } else {
-                LOGGER.log(Level.INFO, "No se encontró un supervisor con el id {0}.", id);
-                throw new OperationException("No se encontró un supervisor con el id: " + id, null);
+                if (resultSet.next()) {
+                    ProjectSupervisor supervisor = new ProjectSupervisor();
+                    supervisor.setId(resultSet.getInt("idResponsableProyecto"));
+                    supervisor.setName(resultSet.getString("nombre"));
+                    supervisor.setPosition(resultSet.getString("cargo"));
+                    supervisor.setEmail(resultSet.getString("correo"));
+                    validateSupervisor = Optional.of(supervisor);
+                } else {
+                    LOGGER.log(Level.INFO, "No se encontró un supervisor con el id {0}.", id);
+                    throw new OperationException("No se encontró un supervisor con el id: " + id, null);
+                }
             }
-
         } catch (SQLException e) {
             LOGGER.log(Level.SEVERE, "Error buscando al supervisor", e);
             throw new OperationException("Error al buscar al supervisor", e);
         }
-
         return validateSupervisor;
     }
 
@@ -109,7 +108,6 @@ public class ProjectSupervisorDAO implements IProjectSupervisorDAO {
     @Override
     public boolean registerProjectSupervisor(ProjectSupervisor projectSupervisor) throws OperationException {
         boolean isRegistered = false;
-
         String supervisorQuery = "INSERT INTO ResponsableProyecto(nombre, cargo," 
                                + "correo, estado, idOrganizacionVinculada) VALUES(?,?,?,?,?);";
 
@@ -129,19 +127,16 @@ public class ProjectSupervisorDAO implements IProjectSupervisorDAO {
                 LOGGER.log(Level.WARNING, "No se pudo registrar al supervisor del proyecto");
                 throw new OperationException("No se pudo registrar al supervisor del proyecto", null);
             }
-
         } catch (SQLException e) {
             LOGGER.log(Level.SEVERE, "Error de conexión con la base de datos al registrar", e);
             throw new OperationException("Error al registrar al supervisor del proyecto", e);
         }
-
         return isRegistered;
     }
 
     @Override
     public boolean modifyProjectSupervisor(ProjectSupervisor projectSupervisor) throws OperationException {
         boolean isModified = false;
-
         String supervisorQuery = "UPDATE responsableProyecto SET " 
                                + "nombre = ?, cargo = ?, correo = ? WHERE idResponsableProyecto = ?;";
 
@@ -162,12 +157,10 @@ public class ProjectSupervisorDAO implements IProjectSupervisorDAO {
                 throw new OperationException("No se pudo modificar al supervisor del proyecto con ID: " 
                     + projectSupervisor.getId(), null);
             }
-
         } catch (SQLException e) {
             LOGGER.log(Level.SEVERE, "Error al modificar al supervisor", e);
             throw new OperationException("Error al modificar al supervisor del proyecto", e);
         }
-
         return isModified;
     }
 
@@ -190,12 +183,10 @@ public class ProjectSupervisorDAO implements IProjectSupervisorDAO {
                 throw new OperationException("No se pudo dar de baja al supervisor del proyecto con ID: " 
                     + projectSupervisorName, null);
             }
-
         } catch (SQLException e) {
             LOGGER.log(Level.SEVERE, "Error al dar de baja al supervisor", e);
             throw new OperationException("Error al dar de baja al supervisor del proyecto", e);
         }
-
         return isInactive;
     }
 
@@ -240,7 +231,6 @@ public class ProjectSupervisorDAO implements IProjectSupervisorDAO {
             LOGGER.log(Level.SEVERE, "Error de conexion con la base de datos",e);
             throw new OperationException("Error al obtener el ID del responsable de proyecto", e);
         }
-
         return supervisorId;
     }
 
@@ -265,7 +255,6 @@ public class ProjectSupervisorDAO implements IProjectSupervisorDAO {
             LOGGER.log(Level.SEVERE, "Error de conexion con la base de datos al filtrar responsables", e);
             throw new OperationException("Error al filtrar los responsables por organización", e);
         }
-
         return supervisorNames;
     }
 
@@ -283,16 +272,15 @@ public class ProjectSupervisorDAO implements IProjectSupervisorDAO {
                 if (resultSet.next()) {
                     isInactive = resultSet.getInt("estado") == INACTIVE_STATUS;
                 } else {
+                    LOGGER.log(Level.WARNING, "No se encontró al supervisor con nombre: {0}", supervisorName);
                     throw new OperationException("No se encontró al profesor con número: " 
                         + supervisorName, null);
                 }
             }
-
         } catch (SQLException e) {
             LOGGER.log(Level.SEVERE, "Error al verificar el estado del profesor", e);
             throw new OperationException("No se pudo verificar al profesor. Intente más tarde", e);
         }
-
         return isInactive;
     }
 
@@ -313,12 +301,10 @@ public class ProjectSupervisorDAO implements IProjectSupervisorDAO {
             try (ResultSet resultSet = preparedStatement.executeQuery()) {
                 hasProjectActives = resultSet.next();
             }
-
         } catch (SQLException e) {
             LOGGER.log(Level.SEVERE, "Error al verificar Proyectos asignados", e);
             throw new OperationException("No se pudo verificar los proyectos activos .Intente más tarde", e);
         }
-
         return hasProjectActives;
     }
 
@@ -343,8 +329,7 @@ public class ProjectSupervisorDAO implements IProjectSupervisorDAO {
                     supervisor.setName(resultSet.getString("nombre"));
                     supervisor.setPosition(resultSet.getString("cargo"));
                     supervisor.setEmail(resultSet.getString("correo"));
-                    supervisor.setAffiliatedOrganizationName(resultSet.getString("nombreOV"));
-                    
+                    supervisor.setAffiliatedOrganizationName(resultSet.getString("nombreOV"));  
                     validateSupervisor = Optional.of(supervisor);
                 } else {
                     LOGGER.log(Level.INFO, "No se encontró un supervisor con el nombre: {0}", supervisorName);
@@ -354,7 +339,6 @@ public class ProjectSupervisorDAO implements IProjectSupervisorDAO {
             LOGGER.log(Level.SEVERE, "Error al buscar al supervisor en la base de datos", e);
             throw new OperationException("Error al buscar al supervisor", e);
         }
-
         return validateSupervisor;
     }
 }

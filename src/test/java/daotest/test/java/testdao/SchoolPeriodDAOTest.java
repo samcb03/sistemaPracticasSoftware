@@ -124,7 +124,7 @@ class SchoolPeriodDAOTest {
     }
 
     @Test
-    void getSchoolPeriodIdByName_notFound_throwsOperationException() throws SQLException {
+    void getSchoolPeriodIdByName_notFound_throwsOperationException() throws Exception {
         mockQueryExecution();
         when(resultSet.next()).thenReturn(false);
 

@@ -1,6 +1,7 @@
 package uv.lis.logic.contracts;
 
 import java.util.List;
+import java.util.Optional;
 
 import uv.lis.logic.dto.Activity;
 import uv.lis.logic.dto.FinalReport;
@@ -57,7 +58,7 @@ public interface IReportContextDAO {
      * @return the activity that matches the given name
      * @throws OperationException if the activity cannot be retrieved
      */
-    Activity getActivityByName(String studentId, String activityName) throws OperationException;
+    Optional<Activity> getActivityByName(String studentId, String activityName) throws OperationException;
 
     /**
      * Retrieves the recorded activities of a student.
