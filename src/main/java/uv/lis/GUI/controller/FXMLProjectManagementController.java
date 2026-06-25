@@ -9,25 +9,29 @@ import javafx.scene.control.Button;
 import uv.lis.GUI.WindowHandler;
 
 public class FXMLProjectManagementController extends WindowHandler {
+    
+    private static final String REGISTER_PROJECT_VIEW = "/uv/lis/GUI/view/FXMLRegisterProject.fxml";
+    private static final String CONSULT_PROJECT_VIEW = "/uv/lis/GUI/view/FXMLConsultProject.fxml";
+    private static final String ASSIGNATION_PROJECT_VIEW = "/uv/lis/GUI/view/FXMLAssignationProject.fxml";
+
     @FXML private Button buttonRegisterProject;
     @FXML private Button buttonConsultProject;
     @FXML private Button buttonAssignationProject;
     @FXML private Button buttonBack;
     
-
     @Override
     public void initialize(URL location, ResourceBundle resources) {
     }
 
     @FXML public void goToRegisterProject() { 
-        navigateTo("/uv/lis/GUI/view/FXMLRegisterProject.fxml"); 
+        navigateTo(REGISTER_PROJECT_VIEW); 
     }
 
     @FXML public void goToConsultProject() { 
-        navigateTo("/uv/lis/GUI/view/FXMLConsultProject.fxml"); 
+        navigateTo(CONSULT_PROJECT_VIEW); 
     }
 
     @FXML public void goToAssignationProject() {
-        navigateTo("/uv/lis/GUI/view/FXMLAssignationProject.fxml");
+        navigateTo(ASSIGNATION_PROJECT_VIEW);
     }
 }

@@ -5,11 +5,12 @@ import static uv.lis.logic.utils.DateValidator.validateEndDate;
 import static uv.lis.logic.utils.DateValidator.validateRecentStartDate;
 import static uv.lis.logic.utils.InputValidator.validatePositiveInteger;
 import static uv.lis.logic.utils.InputValidator.validateRegister;
-import static uv.lis.logic.utils.InputValidator.validateText;
 import static uv.lis.logic.utils.InputValidator.validateDescriptiveText;
 import static uv.lis.logic.utils.InputValidator.validateMaxHoursForDuration;
 
 import java.net.URL;
+import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
 import java.util.Optional;
 import java.util.ResourceBundle;
 import java.util.stream.Stream;
@@ -19,9 +20,6 @@ import javafx.scene.control.Button;
 import javafx.scene.control.DatePicker;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
-
-import java.time.LocalDate;
-import java.time.temporal.ChronoUnit;
 
 import uv.lis.GUI.ValidationHandler;
 import uv.lis.logic.dao.ActivityDAO;
@@ -41,21 +39,15 @@ public class FXMLRegisterActivityController extends ValidationHandler {
     private static final String START_DATE_FIELD = "La fecha de inicio";
     private static final String END_DATE_FIELD = "La fecha de finalización";
     private static final String HOURS_FIELD = "Las horas";
-    private static final int COUNT_NEXT_DAY = 1;
-    private static final int MAX_TOTAL_HOURS = 420;
     private static final String MAX_HOURS_EXCEEDED_MESSAGE =
         "No puedes superar las 420 horas acumuladas de la práctica.";
+    private static final int COUNT_NEXT_DAY = 1;
+    private static final int MAX_TOTAL_HOURS = 420;
 
     @FXML private Button buttonRegister;
     @FXML private Button buttonBack;
-    @FXML private Label labelActivityName;
-    @FXML private Label labelDescription;
-    @FXML private Label labelStartDate;
-    @FXML private Label labelFinalDate;
-    @FXML private Label labelHours;
     @FXML private Label labelProject;
     @FXML private Label labelError;
-
     @FXML private TextField textFieldActivity;
     @FXML private TextField textFieldDescription;
     @FXML private TextField textFieldHours;
@@ -66,8 +58,8 @@ public class FXMLRegisterActivityController extends ValidationHandler {
     private ProjectDAO projectDAO;
     private SchoolPeriodDAO schoolPeriodDAO;
     private SchoolPeriod studentPeriod;
-    private int currentProjectId;
     private String currentStudentId;
+    private int currentProjectId;
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
@@ -123,13 +115,13 @@ public class FXMLRegisterActivityController extends ValidationHandler {
             Student student = SessionManager.getInstance().getCurrentStudent();
             if (student != null) {
                 String studentId = student.getIdStudent();
-                this.currentStudentId = studentId;
+                currentStudentId = studentId;
                 Optional<Project> assignedProject = projectDAO.getProjectByStudentId(studentId);
 
                 if (assignedProject.isPresent()) {
-                    this.currentProjectId = assignedProject.get().getId();
+                    currentProjectId = assignedProject.get().getId();
                     labelProject.setText(assignedProject.get().getName());
-                    this.studentPeriod = schoolPeriodDAO.getSchoolPeriodByStudentId(studentId).orElse(null);
+                    studentPeriod = schoolPeriodDAO.getSchoolPeriodByStudentId(studentId).orElse(null);
                 } else {
                     showError("No tienes ningún proyecto asignado para registrar actividades.");
                     disableForm();
