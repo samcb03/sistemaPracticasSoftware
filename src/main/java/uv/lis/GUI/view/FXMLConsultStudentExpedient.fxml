@@ -5,24 +5,25 @@
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.TableColumn?>
 <?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.Pane?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane prefHeight="510.0" prefWidth="640.0" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="uv.lis.GUI.controller.FXMLConsultStudentExpedientController">
+<AnchorPane prefHeight="544.0" prefWidth="687.0" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="uv.lis.GUI.controller.FXMLConsultStudentExpedientController">
 
     <children>
 
-        <Label layoutY="-1.0" prefHeight="20.0" prefWidth="640.0" style="-fx-background-color: orange; -fx-border-color: BLACK;" text="Archivos del Alumno" />
+        <Label layoutY="-1.0" prefHeight="20.0" prefWidth="687.0" style="-fx-background-color: orange; -fx-border-color: BLACK;" text="Archivos del Alumno" />
 
-        <Label layoutX="215.0" layoutY="29.0" text="Archivos del Alumno">
+        <Label layoutX="246.0" layoutY="26.0" text="Archivos del Alumno">
             <font>
                 <Font name="System Bold" size="20.0" />
             </font>
         </Label>
 
-        <Pane layoutX="40.0" layoutY="65.0" prefHeight="425.0" prefWidth="560.0" style="-fx-background-color: #ffaf9c; -fx-background-radius: 20;">
+        <Pane layoutX="40.0" layoutY="65.0" prefHeight="450.0" prefWidth="621.0" style="-fx-background-color: #ffaf9c; -fx-background-radius: 20;">
 
             <children>
 
@@ -44,7 +45,7 @@
 
                 <Label fx:id="labelTotal" layoutX="330.0" layoutY="55.0" prefHeight="18.0" prefWidth="205.0" />
 
-                <TableView fx:id="tableViewArchives" layoutX="25.0" layoutY="90.0" prefHeight="260.0" prefWidth="510.0">
+                <TableView fx:id="tableViewArchives" layoutX="25.0" layoutY="90.0" prefHeight="260.0" prefWidth="587.0">
                     <columns>
                         <TableColumn fx:id="columnName" prefWidth="109.5999755859375" text="Nombre" />
                         <TableColumn fx:id="columnDocumentType" prefWidth="132.7999267578125" text="Tipo de Documento" />
@@ -61,6 +62,8 @@
                         <Button fx:id="buttonBack" mnemonicParsing="false" onAction="#goBack" text="Regresar" />
                     </children>
                 </HBox>
+            <Label layoutX="354.0" layoutY="420.0" text="Calificación:" />
+            <TextField fx:id="textFieldGrade" disable="true" layoutX="426.0" layoutY="416.0" />
 
             </children>
         </Pane>

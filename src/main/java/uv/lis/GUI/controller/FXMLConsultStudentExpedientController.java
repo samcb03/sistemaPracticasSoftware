@@ -2,8 +2,11 @@ package uv.lis.GUI.controller;
 
 import static uv.lis.logic.utils.InputValidator.STATUS_ASSIGNED;
 import static uv.lis.logic.utils.InputValidator.STATUS_REJECTED;
+import static uv.lis.logic.utils.InputValidator.validateMaxIntValue;
+import static uv.lis.logic.utils.InputValidator.validatePercentage;
 
 import java.awt.Desktop;
+import java.awt.TextField;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
@@ -54,6 +57,7 @@ public class FXMLConsultStudentExpedientController extends ValidationHandler {
     private static final int LIBERATION_LETTER_TYPE_ID = 13;
     private static final int AUTOEVALUATION_TYPE_ID = 1;
     private static final int OV_EVALUATION_TYPE_ID = 12;
+    private static final int MAX_CALIFICATION =  10;
 
     private static final String TOTAL_FORMAT = "Total: %d documento(s)";
     private static final String REVIEW_SUCCESS_MESSAGE = "Estatus del documento actualizado correctamente";
@@ -79,6 +83,7 @@ public class FXMLConsultStudentExpedientController extends ValidationHandler {
     @FXML private TableColumn<Expedient, String> columnStatus;
     @FXML private TableColumn<Expedient, Void> columnReview;
     @FXML private TableColumn<Expedient, Void> columnAction;
+    @FXML private TextField textFieldGrade;
 
     private ExpedientDAO expedientDAO;
     private PracticeDAO practiceDAO;
@@ -328,12 +333,15 @@ public class FXMLConsultStudentExpedientController extends ValidationHandler {
         boolean alreadyExists = practiceDAO.existsByStudent(studentId);
 
         if (!alreadyExists) {
-            TextInputDialog dialog = new TextInputDialog();
-            dialog.setTitle(GRADE_INPUT_TITLE);
-            dialog.setHeaderText(null);
-            dialog.setContentText(GRADE_INPUT_PROMPT);
+            textFieldGrade.setEnabled(true);
 
-            dialog.showAndWait().ifPresent(input -> processGradeInput(input, studentId));
+            Optional<String> firstError = validateMaxIntValue(textFieldGrade.getText(), MAX_CALIFICATION, 
+                "La calificacion ");
+            if(firstError.isPresent()) {
+                showError(firstError.get());
+            } else {
+                processGradeInput(textFieldGrade.getText(), studentId);
+            }
         }
     } catch (OperationException e) {
         LOGGER.log(Level.SEVERE, "Error al verificar calificación existente", e);
