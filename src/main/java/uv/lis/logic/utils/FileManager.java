@@ -46,7 +46,6 @@ public class FileManager {
      *                            including a path that would escape the base directory
      */
     public static String saveFile(File file, String idStudent) throws OperationException {
-        String savedFilePath = "";
         File studentDirectory = new File(BASE_PATH, idStudent);
         if (!studentDirectory.exists()) {
             boolean created = studentDirectory.mkdirs();
@@ -66,12 +65,24 @@ public class FileManager {
 
         try {
             Files.copy(file.toPath(), absoluteTarget, StandardCopyOption.REPLACE_EXISTING);
-            savedFilePath = absoluteTarget.toString();
+            String relativePath = idStudent + "/" + idStudent + "_" + file.getName();
+            return relativePath;
         } catch (IOException e) {
             LOGGER.log(Level.SEVERE, "Error al guardar el archivo en el servidor", e);
             throw new OperationException("Error al guardar el archivo en el servidor", e);
         }
-        return savedFilePath;
+    }
+
+    public static File resolveFile(String relativePath) throws OperationException {
+        Path absoluteBase = Paths.get(BASE_PATH).toAbsolutePath().normalize();
+        Path resolved = absoluteBase.resolve(relativePath).normalize();
+
+        if(!resolved.startsWith(absoluteBase)) {
+            LOGGER.log(Level.SEVERE, "Ruta de archivo no permitida", relativePath);
+            throw new OperationException("Ruta de archivo no relativa", null);
+        }
+        File fileResolver = resolved.toFile();
+        return fileResolver;
     }
 
     /**
