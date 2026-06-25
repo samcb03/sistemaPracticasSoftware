@@ -386,5 +386,4 @@ public class ReportContextDAO implements IReportContextDAO {
         }
         return activity;
     }
-
 }

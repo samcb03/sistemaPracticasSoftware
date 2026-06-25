@@ -1,6 +1,5 @@
 package uv.lis.GUI.controller;
 
-import static uv.lis.logic.utils.InputValidator.EMAIL_REGEX;
 import static uv.lis.logic.utils.InputValidator.validateComboBox;
 import static uv.lis.logic.utils.InputValidator.validateEmail;
 import static uv.lis.logic.utils.InputValidator.validateText;
