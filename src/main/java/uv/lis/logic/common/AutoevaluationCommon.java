@@ -45,15 +45,6 @@ public class AutoevaluationCommon {
         this.jasperReportsContext = buildAutoevaluationContext();
     }
 
-    private SimpleJasperReportsContext buildAutoevaluationContext() {
-        SimpleJasperReportsContext reportsContext
-            = new SimpleJasperReportsContext(DefaultJasperReportsContext.getInstance());
-        List<RepositoryService> repositoryServices = new ArrayList<>();
-        repositoryServices.add(new ClasspathImageRepositoryCommon());
-        reportsContext.setExtensions(RepositoryService.class, repositoryServices);
-        return reportsContext;
-    }
-
     public JasperPrint generateAutoevaluation(Autoevaluation autoevaluation) throws JRException, OperationException {
         Student currentStudent = SessionManager.getInstance().getCurrentStudent();
 
@@ -94,6 +85,15 @@ public class AutoevaluationCommon {
             throw new OperationException(TEMPLATE_READ_ERROR_MESSAGE, ioException);
         }
         return jasperPrint;
+    }
+
+    private SimpleJasperReportsContext buildAutoevaluationContext() {
+        SimpleJasperReportsContext reportsContext
+            = new SimpleJasperReportsContext(DefaultJasperReportsContext.getInstance());
+        List<RepositoryService> repositoryServices = new ArrayList<>();
+        repositoryServices.add(new ClasspathImageRepositoryCommon());
+        reportsContext.setExtensions(RepositoryService.class, repositoryServices);
+        return reportsContext;
     }
 
     private void mergeContextIntoEvaluation(Autoevaluation autoevaluation, String studentId) throws OperationException {

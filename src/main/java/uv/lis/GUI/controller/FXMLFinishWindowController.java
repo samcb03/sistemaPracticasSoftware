@@ -48,6 +48,19 @@ public class FXMLFinishWindowController extends ValidationHandler {
         loadSummary();
     }
 
+    @Override
+    protected void clearFields() {
+        labelStudentName.setText(EMPTY_TEXT);
+        labelProjectName.setText(EMPTY_TEXT);
+        labelOrganizationName.setText(EMPTY_TEXT);
+        labelProfessorName.setText(EMPTY_TEXT);
+        labelMethodology.setText(EMPTY_TEXT);
+        labelObjective.setText(EMPTY_TEXT);
+        labelDescription.setText(EMPTY_TEXT);
+        labelAccumulatedHours.setText(EMPTY_TEXT);
+        labelMessage.setText(EMPTY_TEXT);
+    }
+
     private void loadSummary() {
         if (currentStudent == null) {
             showError(NO_STUDENT_IN_SESSION_MESSAGE);
@@ -78,18 +91,5 @@ public class FXMLFinishWindowController extends ValidationHandler {
                 showError(e.getMessage());
             }
         }
-    }
-
-    @Override
-    protected void clearFields() {
-        labelStudentName.setText(EMPTY_TEXT);
-        labelProjectName.setText(EMPTY_TEXT);
-        labelOrganizationName.setText(EMPTY_TEXT);
-        labelProfessorName.setText(EMPTY_TEXT);
-        labelMethodology.setText(EMPTY_TEXT);
-        labelObjective.setText(EMPTY_TEXT);
-        labelDescription.setText(EMPTY_TEXT);
-        labelAccumulatedHours.setText(EMPTY_TEXT);
-        labelMessage.setText(EMPTY_TEXT);
     }
 }

@@ -19,6 +19,7 @@ public class FXMLCoordinatorMenuController extends WindowHandler{
 
     @FXML 
     public void initialize(URL location, ResourceBundle resources) {
+        /* There is no data to initialize */
     }
 
     @FXML 

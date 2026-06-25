@@ -47,6 +47,28 @@ public class FXMLAssignStudentSubjectController extends ValidationHandler {
         loadStudents();
     }
 
+    @FXML
+    public void validateFields() {
+        Subject selectedSubject = comboBoxSubjects.getSelectionModel().getSelectedItem();
+        Student selectedStudent = tableViewStudents.getSelectionModel().getSelectedItem();
+
+        Optional<String> subjectValidation = InputValidator.validateComboBox(
+            selectedSubject, "una Experiencia Educativa");
+        Optional<String> studentValidation = InputValidator.validateComboBox(
+            selectedStudent, "un alumno de la tabla");
+
+        Optional<String> validationError = subjectValidation.or(() -> studentValidation);
+
+        handleValidation(validationError, this::assignStudent);
+    }
+
+    @Override
+    protected void clearFields() {
+        comboBoxSubjects.getSelectionModel().clearSelection();
+        tableViewStudents.getItems().clear();
+        labelMessage.setText("");
+    }
+
     private void loadSubjects() {
         try {
             ArrayList<Subject> subjects = subjectDAO.getAllSubjectsNrcName();
@@ -83,21 +105,6 @@ public class FXMLAssignStudentSubjectController extends ValidationHandler {
         }
     }
 
-    @FXML
-    public void validateFields() {
-        Subject selectedSubject = comboBoxSubjects.getSelectionModel().getSelectedItem();
-        Student selectedStudent = tableViewStudents.getSelectionModel().getSelectedItem();
-
-        Optional<String> subjectValidation = InputValidator.validateComboBox(
-            selectedSubject, "una Experiencia Educativa");
-        Optional<String> studentValidation = InputValidator.validateComboBox(
-            selectedStudent, "un alumno de la tabla");
-
-        Optional<String> validationError = subjectValidation.or(() -> studentValidation);
-
-        handleValidation(validationError, this::assignStudent);
-    }
-
     private void assignStudent() {
         Subject selectedSubject = comboBoxSubjects.getSelectionModel().getSelectedItem();
         Student selectedStudent = tableViewStudents.getSelectionModel().getSelectedItem();
@@ -118,12 +125,5 @@ public class FXMLAssignStudentSubjectController extends ValidationHandler {
         } catch (OperationException e) {
             showError(e.getMessage());
         }
-    }
-
-    @Override
-    protected void clearFields() {
-        comboBoxSubjects.getSelectionModel().clearSelection();
-        tableViewStudents.getItems().clear();
-        labelMessage.setText("");
     }
 }

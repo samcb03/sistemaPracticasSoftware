@@ -24,14 +24,6 @@ public class MySQLConnectionManager {
         chargeProperties();
     }
 
-    private void chargeProperties() {
-        try (FileInputStream propertiesFile = new FileInputStream(PROPERTIES_PATH)) {
-            properties.load(propertiesFile);
-        } catch (IOException e) {
-            LOGGER.log(Level.SEVERE, "Error al cargar propiedades", e);
-        }
-    }
-
     public Connection getConnection() throws SQLException {
         String url = properties.getProperty(PROPERTY_URL);
         String user = properties.getProperty(PROPERTY_USER);
@@ -47,5 +39,13 @@ public class MySQLConnectionManager {
         }
 
         return databaseConnection;
+    }
+
+    private void chargeProperties() {
+        try (FileInputStream propertiesFile = new FileInputStream(PROPERTIES_PATH)) {
+            properties.load(propertiesFile);
+        } catch (IOException e) {
+            LOGGER.log(Level.SEVERE, "Error al cargar propiedades", e);
+        }
     }
 }

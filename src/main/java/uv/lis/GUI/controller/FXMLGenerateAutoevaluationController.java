@@ -107,6 +107,16 @@ public class FXMLGenerateAutoevaluationController extends ValidationHandler {
         loadAutomaticData(); 
     }
 
+    @Override
+    protected void clearFields() {
+        for (ToggleGroup group : groups) {
+            if (group.getSelectedToggle() != null) {
+                group.getSelectedToggle().setSelected(false);
+            }
+        }
+        labelMessage.setText("");
+    }
+
     private void setupToggleGroups() {
         groups = new ToggleGroup[NUMBER_CRITERIA]; 
         groups[0] = createGroup(radioButton1_1, radioButton1_2, radioButton1_3, radioButton1_4, radioButton1_5);
@@ -201,15 +211,5 @@ public class FXMLGenerateAutoevaluationController extends ValidationHandler {
             LOGGER.log(Level.SEVERE, "Error de JasperReports al generar la autoevaluación", e);
             showError("Error técnico al generar el documento PDF.");
         }
-    }
-
-    @Override
-    protected void clearFields() {
-        for (ToggleGroup group : groups) {
-            if (group.getSelectedToggle() != null) {
-                group.getSelectedToggle().setSelected(false);
-            }
-        }
-        labelMessage.setText("");
     }
 }

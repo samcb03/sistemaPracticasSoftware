@@ -190,6 +190,26 @@ public class FXMLGenerateMonthlyReportController extends ValidationHandler {
         }
     }
 
+    @FXML
+    public void goToRegisterActivity(ActionEvent event) {
+        FXMLLoader loader = this.navigateToWithLoader("/uv/lis/GUI/view/FXMLRegisterActivity.fxml");
+        if (loader != null) {
+            Stage registerStage = (Stage) ((Parent) loader.getRoot()).getScene().getWindow();
+            registerStage.setOnHidden(e -> loadRegisteredActivities());
+        }
+    }
+
+    @Override
+    protected void clearFields() {
+        for (Label label : activityFields) {
+            label.setText(EMPTY_TEXT);;
+        }
+        for (Label label : observationFields) {
+            label.setText(EMPTY_TEXT);;
+        }
+        labelMessage.setText(EMPTY_TEXT);
+    }
+
     private void initializeFieldArrays() {
         activityFields = new Label[] {
             labelActivity1, labelActivity2, labelActivity3,
@@ -384,15 +404,6 @@ public class FXMLGenerateMonthlyReportController extends ValidationHandler {
         return selectedMonth;
     }
 
-    @FXML
-    public void goToRegisterActivity(ActionEvent event) {
-        FXMLLoader loader = this.navigateToWithLoader("/uv/lis/GUI/view/FXMLRegisterActivity.fxml");
-        if (loader != null) {
-            Stage registerStage = (Stage) ((Parent) loader.getRoot()).getScene().getWindow();
-            registerStage.setOnHidden(e -> loadRegisteredActivities());
-        }
-    }
-
     private boolean hasAtLeastOneActivity() {
         boolean hasActivity = false;
         for (Label activityField : activityFields) {
@@ -401,16 +412,5 @@ public class FXMLGenerateMonthlyReportController extends ValidationHandler {
             }
         }
         return hasActivity;
-    }
-
-    @Override
-    protected void clearFields() {
-        for (Label label : activityFields) {
-            label.setText(EMPTY_TEXT);;
-        }
-        for (Label label : observationFields) {
-            label.setText(EMPTY_TEXT);;
-        }
-        labelMessage.setText(EMPTY_TEXT);
     }
 }

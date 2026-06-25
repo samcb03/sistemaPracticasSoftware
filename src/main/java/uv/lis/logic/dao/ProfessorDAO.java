@@ -76,8 +76,7 @@ public class ProfessorDAO extends UserDAO implements IProfessorDAO {
                     String personnelNumber = resultSet.getString("numeroPersonal");
                     validatePersonnelNumber = Optional.of(personnelNumber);
                 } else {
-                    throw new OperationException("No se encontró un profesor con el nombre: "
-                        + firstName + " " + lastName, null);
+                    throw new OperationException("No se encontró al profesor", null);
                 }
             }
 
@@ -93,8 +92,8 @@ public class ProfessorDAO extends UserDAO implements IProfessorDAO {
     public Optional<Professor> getProfessorById(int id) throws OperationException {
         Optional<Professor> validateProfessor = Optional.empty();
         String professorQuery = "SELECT p.numeroPersonal, u.nombre, u.apellidos, u.idRol "
-                                + "FROM Profesor p INNER JOIN Usuario u ON p.idUsuario = u.idUsuario "
-                                + "WHERE p.idUsuario = ? AND u.estado = 1";
+                              + "FROM Profesor p INNER JOIN Usuario u ON p.idUsuario = u.idUsuario "
+                              + "WHERE p.idUsuario = ? AND u.estado = 1";
 
         try (Connection databaseConnection = connectionManager.getConnection();
             PreparedStatement preparedStatement = databaseConnection.prepareStatement(professorQuery)) {
@@ -111,7 +110,7 @@ public class ProfessorDAO extends UserDAO implements IProfessorDAO {
                     professor.setIsCoordinator(resultSet.getInt("idRol") == IS_COORDINATOR);
                     validateProfessor = Optional.of(professor);
                 } else {
-                    throw new OperationException("No se encontró un profesor con el id: " + id, null);
+                    throw new OperationException("No se encontró ningun profesor", null);
                 }
             }
 
@@ -147,40 +146,12 @@ public class ProfessorDAO extends UserDAO implements IProfessorDAO {
         return isRegistered;
     }
 
-    private void persistProfessorRegistration(Professor professor, Connection databaseConnection) 
-        throws OperationException {
-        try {
-            int generatedUserId = registerUser(professor);
-            professor.setId(generatedUserId);
-            insertProfessor(professor, databaseConnection);
-            databaseConnection.commit();
-        } catch (SQLException e) {
-            LOGGER.log(Level.SEVERE, "Transacción de registro de alumno cancelada", e);
-            throw new OperationException("Error al guardar la informacion dell alumno. Intentelo mas tarde", e);
-        }
-    }
-
-    private void insertProfessor(Professor professor, Connection databaseConnection)
-            throws SQLException, OperationException {
-        String professorQuery = "INSERT INTO Profesor (idUsuario, numeroPersonal) VALUES (?, ?);";
-
-        try (PreparedStatement preparedStatement = databaseConnection.prepareStatement(professorQuery)) {
-            preparedStatement.setInt(1, professor.getId());
-            preparedStatement.setString(2, professor.getPersonnelNumber());
-
-            if (preparedStatement.executeUpdate() <= NO_VALUE) {
-                throw new OperationException("No se pudo registrar al profesor con número: "
-                    + professor.getPersonnelNumber(), null);
-            }
-        }
-    }
-
     @Override
     public boolean modifyProfessor(Professor professor) throws OperationException {
         if (professor.getIsCoordinator()) {
             if (isAnotherCoordinatorActive(professor.getPersonnelNumber())) {
                 throw new OperationException("No es posible asignar el cargo:" 
-                + " ya existe un coordinador activo en el sistema.", null);
+                    + " ya existe un coordinador activo en el sistema.", null);
             }
         }
 
@@ -283,8 +254,7 @@ public class ProfessorDAO extends UserDAO implements IProfessorDAO {
                 } else {
                     LOGGER.log(Level.INFO, "No se encontro un Profesor con el número de personal {0}.", 
                         personnelNumber);
-                    throw new OperationException("No se encontró un Profesor con el número de personal: " 
-                        + personnelNumber, null);
+                    throw new OperationException("No se encontró ningun profesor", null);
                 }
             }
 
@@ -400,5 +370,32 @@ public class ProfessorDAO extends UserDAO implements IProfessorDAO {
             throw new OperationException("Error al validar el coordinador ", e);
         }
         return exits;
+    }
+
+    private void persistProfessorRegistration(Professor professor, Connection databaseConnection) 
+        throws OperationException {
+        try {
+            int generatedUserId = registerUser(professor);
+            professor.setId(generatedUserId);
+            insertProfessor(professor, databaseConnection);
+            databaseConnection.commit();
+        } catch (SQLException e) {
+            LOGGER.log(Level.SEVERE, "Transacción de registro de alumno cancelada", e);
+            throw new OperationException("Error al guardar la informacion dell alumno. Intentelo mas tarde", e);
+        }
+    }
+
+    private void insertProfessor(Professor professor, Connection databaseConnection)
+        throws SQLException, OperationException {
+        String professorQuery = "INSERT INTO Profesor (idUsuario, numeroPersonal) VALUES (?, ?);";
+
+        try (PreparedStatement preparedStatement = databaseConnection.prepareStatement(professorQuery)) {
+            preparedStatement.setInt(1, professor.getId());
+            preparedStatement.setString(2, professor.getPersonnelNumber());
+
+            if (preparedStatement.executeUpdate() <= NO_VALUE) {
+                throw new OperationException("No se pudo registrar al profesor", null);
+            }
+        }
     }
 }

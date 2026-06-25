@@ -90,6 +90,36 @@ public class FXMLAssignationProjectController extends ValidationHandler {
         }
     }
 
+    @FXML
+    public void assignStudent() {
+        String selectedProject = comboBoxProjects.getValue();
+        String selectedRow = isAlternativeMode
+            ? listViewStudentsWithoutProject.getSelectionModel().getSelectedItem()
+            : listViewApplicants.getSelectionModel().getSelectedItem();
+        String reason = textAreaReason.getText();
+
+        Optional<String> validationError = validateAssignmentInput(selectedProject, selectedRow, reason);
+
+        if (validationError.isPresent()) {
+            showError(validationError.get());
+        } else {
+            processAssignment(selectedProject, selectedRow, reason);
+        }
+    }
+
+    @Override
+    protected void clearFields() {
+        listViewApplicants.getItems().clear();
+        listViewStudentsWithoutProject.getItems().clear();
+        labelOrganizationName.setText("");
+        labelMethodology.setText("");
+        labelCapacity.setText("");
+        labelObjective.setText("");
+        labelDescription.setText("");
+        textAreaReason.clear();
+        comboBoxProjects.getSelectionModel().clearSelection();
+    }
+
     private void loadProjectNames() {
         try {
             List<Project> availableProjects = requestProjectDAO.getAvailableProjects();
@@ -163,23 +193,6 @@ public class FXMLAssignationProjectController extends ValidationHandler {
             }
         } catch (OperationException e) {
             showError(e.getMessage());
-        }
-    }
-
-    @FXML
-    public void assignStudent() {
-        String selectedProject = comboBoxProjects.getValue();
-        String selectedRow = isAlternativeMode
-            ? listViewStudentsWithoutProject.getSelectionModel().getSelectedItem()
-            : listViewApplicants.getSelectionModel().getSelectedItem();
-        String reason = textAreaReason.getText();
-
-        Optional<String> validationError = validateAssignmentInput(selectedProject, selectedRow, reason);
-
-        if (validationError.isPresent()) {
-            showError(validationError.get());
-        } else {
-            processAssignment(selectedProject, selectedRow, reason);
         }
     }
 
@@ -343,18 +356,5 @@ public class FXMLAssignationProjectController extends ValidationHandler {
     private void setNodeVisibility(Node node, boolean isVisible) {
         node.setVisible(isVisible);
         node.setManaged(isVisible);
-    }
-
-    @Override
-    protected void clearFields() {
-        listViewApplicants.getItems().clear();
-        listViewStudentsWithoutProject.getItems().clear();
-        labelOrganizationName.setText("");
-        labelMethodology.setText("");
-        labelCapacity.setText("");
-        labelObjective.setText("");
-        labelDescription.setText("");
-        textAreaReason.clear();
-        comboBoxProjects.getSelectionModel().clearSelection();
     }
 }

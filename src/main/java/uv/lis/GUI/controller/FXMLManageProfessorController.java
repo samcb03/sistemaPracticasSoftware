@@ -79,6 +79,17 @@ public class FXMLManageProfessorController extends ValidationHandler {
         setupAutocomplete();
     }
 
+    @Override
+    protected void clearFields() {
+        labelPersonnelNumber.setText("");
+        labelFirstName.setText("");
+        labelLastName.setText("");
+        labelCoordinator.setText("");
+        labelStatus.setText("");
+        labelMessage.setText("");
+        listViewSubjects.getItems().clear();
+    }
+
     @FXML
     private void searchProfessor() {
         clearFields();
@@ -321,16 +332,5 @@ public class FXMLManageProfessorController extends ValidationHandler {
     private void updateInactivationState() {
         labelStatus.setText(LABEL_INACTIVE);
         buttonInactive.setDisable(true);
-    }
-
-    @Override
-    protected void clearFields() {
-        labelPersonnelNumber.setText("");
-        labelFirstName.setText("");
-        labelLastName.setText("");
-        labelCoordinator.setText("");
-        labelStatus.setText("");
-        labelMessage.setText("");
-        listViewSubjects.getItems().clear();
     }
 }
