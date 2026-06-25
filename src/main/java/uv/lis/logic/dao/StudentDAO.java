@@ -19,14 +19,15 @@ import uv.lis.logic.dto.Student;
 import uv.lis.logic.exceptions.OperationException;
 
 public class StudentDAO extends UserDAO implements IStudentDAO {
-    private static final Logger LOGGER = Logger.getLogger(UserDAO.class.getName());
+    
+    private static final Logger LOGGER = Logger.getLogger(StudentDAO.class.getName());
     private static final int STATUS_ACTIVE = 1;
     private static final int STATUS_INACTIVE = 0;
     
     private MySQLConnectionManager connectionManager;
 
     public StudentDAO() {
-        this.connectionManager = new MySQLConnectionManager();
+        connectionManager = new MySQLConnectionManager();
     }
     
     public StudentDAO(MySQLConnectionManager connectionManager) {
@@ -36,7 +37,6 @@ public class StudentDAO extends UserDAO implements IStudentDAO {
     @Override
     public Optional<Student> getStudentById(int idStudent) throws OperationException { 
         Optional<Student> validateStudent = Optional.empty();
-
         String studentQuery = "SELECT e.matricula, u.nombre, u.apellidos, e.fechaNacimiento, e.genero "
                             + "FROM Alumno e INNER JOIN Usuario u ON e.idUsuario = u.idUsuario "
                             + "WHERE e.idUsuario = ?"; 
@@ -93,7 +93,6 @@ public class StudentDAO extends UserDAO implements IStudentDAO {
             LOGGER.log(Level.SEVERE, "Database connection error", e);
             throw new OperationException("No se pudo buscar el alumno. Intentelo mas tarde", e);
         }
-        
         return validateUserId;
     }
 
@@ -121,7 +120,6 @@ public class StudentDAO extends UserDAO implements IStudentDAO {
                     students.add(student);
                 }
             }
-
         } catch (SQLException e) {
             LOGGER.log(Level.SEVERE, "Error al obtener alumnos sin EE asignada", e);
             throw new OperationException("No se pudo obtener los alumnos disponibles. Intente más tarde", e);
@@ -149,7 +147,6 @@ public class StudentDAO extends UserDAO implements IStudentDAO {
             LOGGER.log(Level.SEVERE, "Error de conexion con la base de datos", e);
             throw new OperationException("No se pudo registrar al alumno. Intentelo mas tarde", e);
         }
-
         return isRegistered;
     }
 
@@ -184,7 +181,6 @@ public class StudentDAO extends UserDAO implements IStudentDAO {
     @Override
     public boolean modifyStudent(Student student) throws OperationException {
         boolean isModified = false;
-
         String studentQuery = "UPDATE Alumno a " 
                             + "INNER JOIN Usuario u ON a.idUsuario = u.idUsuario SET u.nombre = ?, u.apellidos = ?, " 
                             + "a.fechanacimiento = ?, a.genero = ? "
@@ -211,14 +207,12 @@ public class StudentDAO extends UserDAO implements IStudentDAO {
             LOGGER.log(Level.SEVERE, "Error de conexion con la base de datos",e);
             throw new OperationException("No se pudo modificar al alumno. Intentelo mas tarde", e);
         }
-
         return isModified;
     }
 
     @Override
     public boolean inactivateStudent(String studentId) throws OperationException {
         boolean isInactive = false;
-        
         String studentQuery = "UPDATE Alumno a INNER JOIN Usuario u ON a.idUsuario = u.idUsuario SET u.estado = ?" 
                             + " WHERE a.matricula = ?;";
 
@@ -240,7 +234,6 @@ public class StudentDAO extends UserDAO implements IStudentDAO {
             LOGGER.log(Level.SEVERE, "Error de conexion con la base de datos",e);
             throw new OperationException("No se pudo inactivar al alumno. Intentelo mas tarde", e);
         }
-
         return isInactive;
     }
 

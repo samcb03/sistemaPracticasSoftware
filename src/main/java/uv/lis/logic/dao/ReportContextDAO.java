@@ -12,6 +12,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -139,6 +140,7 @@ public class ReportContextDAO implements IReportContextDAO {
                 if (resultSet.next()) {
                     fillMonthlyReportContext(monthlyReport, resultSet);
                 } else {
+                 LOGGER.log(Level.INFO, "No se encontró contexto para {0}", studentId);
                     throw new OperationException("No se encontró contexto para: " + studentId, null);
                 }
             }
@@ -212,8 +214,8 @@ public class ReportContextDAO implements IReportContextDAO {
     }
 
     @Override
-    public Activity getActivityByName(String studentId, String activityName) throws OperationException {
-        Activity activity = new Activity();
+    public Optional<Activity> getActivityByName(String studentId, String activityName) throws OperationException {
+        Optional<Activity> activity = Optional.empty();
         String reportContextQuery = "SELECT a.idActividad, a.nombreActividad, "
                                   + "a.descripcionActividad, a.FechaInicio, a.FechaFin "
                                   + "FROM Actividad a "
@@ -229,7 +231,7 @@ public class ReportContextDAO implements IReportContextDAO {
 
             try (ResultSet resultSet = preparedStatement.executeQuery()) {
                 if (resultSet.next()) {
-                    activity = mapActivity(resultSet);
+                    activity = Optional.of(mapActivity(resultSet));
                 }
             }
         } catch (SQLException e) {

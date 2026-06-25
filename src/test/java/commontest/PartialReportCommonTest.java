@@ -10,6 +10,7 @@ import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
 
 import java.lang.reflect.Field;
+import java.util.Optional;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -130,7 +131,7 @@ class PartialReportCommonTest {
     void generatePartialReport_activityNotFound_throwsOperationException() throws Exception {
         mockStudentContext();
         when(reportContextDAO.getActivityByName(STUDENT_ID, ACTIVITY_NAME))
-            .thenReturn(null);
+            .thenReturn(Optional.empty());
 
         try (MockedStatic<SessionManager> mockedSession = mockStatic(SessionManager.class)) {
             mockSession(mockedSession, currentStudent);
@@ -144,7 +145,7 @@ class PartialReportCommonTest {
     void generatePartialReport_validData_returnsJasperPrint() throws Exception {
         mockStudentContext();
         when(reportContextDAO.getActivityByName(STUDENT_ID, ACTIVITY_NAME))
-            .thenReturn(activity);
+            .thenReturn(Optional.of(activity));
 
         try (MockedStatic<SessionManager> mockedSession = mockStatic(SessionManager.class);
              MockedStatic<WorkProgressCalculator> mockedCalculator

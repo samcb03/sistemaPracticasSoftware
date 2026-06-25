@@ -20,10 +20,10 @@ import uv.lis.logic.exceptions.OperationException;
 
 public class ProjectDAO implements IProjectDAO{
     private static final Logger LOGGER = Logger.getLogger(ProjectDAO.class.getName());
-    private MySQLConnectionManager connectionManager;
+    private final MySQLConnectionManager connectionManager;
 
     public ProjectDAO() {
-        this.connectionManager = new MySQLConnectionManager();
+        connectionManager = new MySQLConnectionManager();
     }
 
     @Override
@@ -50,7 +50,6 @@ public class ProjectDAO implements IProjectDAO{
                 project.setDescription(resultSet.getString("descripcion"));
                 project.setAffiliatedOrganizationName(resultSet.getString("nombreOrganizacion"));
                 project.setActive(resultSet.getBoolean("estado"));
-                
                 projects.add(project);
             }
         } catch (SQLException e) {
@@ -97,7 +96,6 @@ public class ProjectDAO implements IProjectDAO{
     @Override
     public boolean registerProject(Project project) throws OperationException {
         boolean isRegistered = false;
-
         String projectQuery = "INSERT INTO Proyecto(nombre, "  
                             + "descripcion, cupo, metodologiaProyecto, objetivo, estado, idOrganizacionVinculada," 
                             + "idResponsableProyecto) VALUES(?, ?, ?, ?, ?, ?, ?,?);";
@@ -214,7 +212,6 @@ public class ProjectDAO implements IProjectDAO{
             LOGGER.log(Level.SEVERE, "Error de conexion con la base de datos",e);
             throw new OperationException("Error al conseguir el nombre del proyecto", e);
         }
-
         return projectNames;
     }
 
@@ -262,12 +259,10 @@ public class ProjectDAO implements IProjectDAO{
                     projectNames.add(resultSet.getString("nombre"));
                 }
             }
-    
         } catch (SQLException e) {
             LOGGER.log(Level.SEVERE, "Error al obtener proyectos por organización", e);
             throw new OperationException("Error al obtener los proyectos de la organización.", e);
         }
-    
         return projectNames;
     }
 
@@ -292,7 +287,6 @@ public class ProjectDAO implements IProjectDAO{
                     projectOptional = Optional.of(project);
                 }
             }
-
         } catch (SQLException e) {
             LOGGER.log(Level.SEVERE, "Error al obtener el proyecto del alumno", e);
             throw new OperationException("Error al obtener el proyecto del alumno.", e);
@@ -370,11 +364,9 @@ public class ProjectDAO implements IProjectDAO{
                     project.setObjective(resultSet.getString("objetivo"));
                     project.setDescription(resultSet.getString("descripcion"));
                     project.setOrganizationName(resultSet.getString("nombreOrganizacion"));
-
                     projectOptional = Optional.of(project);
                 }
             }
-
         } catch (SQLException e) {
             LOGGER.log(Level.SEVERE, "Error al obtener detalles del proyecto", e);
             throw new OperationException("Error al obtener detalles del proyecto.", e);

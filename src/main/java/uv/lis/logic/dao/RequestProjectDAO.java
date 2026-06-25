@@ -26,10 +26,11 @@ public class RequestProjectDAO implements IRequestProjectDAO {
 
     private static final String DEFAULT_NO_PROJECT_MESSAGE = "Sin proyecto asignado";
     private static final Logger LOGGER = Logger.getLogger(RequestProjectDAO.class.getName());
-    private MySQLConnectionManager connectionManager;
+
+    private final MySQLConnectionManager connectionManager;
 
     public RequestProjectDAO() {
-        this.connectionManager = new MySQLConnectionManager();
+        connectionManager = new MySQLConnectionManager();
     }
 
     public RequestProjectDAO(MySQLConnectionManager connectionManager) {
@@ -57,7 +58,6 @@ public class RequestProjectDAO implements IRequestProjectDAO {
             LOGGER.log(Level.SEVERE, "Error al contar solicitudes del practicante", e);
             throw new OperationException("Error al contar solicitudes del practicante", e);
         }
-
         return count;
     }
 
@@ -87,7 +87,6 @@ public class RequestProjectDAO implements IRequestProjectDAO {
             LOGGER.log(Level.SEVERE, "Error al obtener proyectos disponibles", e);
             throw new OperationException("Error al obtener proyectos disponibles", e);
         }
-
         return projects;
     }
 
@@ -112,7 +111,6 @@ public class RequestProjectDAO implements IRequestProjectDAO {
             LOGGER.log(Level.SEVERE, "Error al verificar solicitud existente", e);
             throw new OperationException("Error al verificar solicitud", e);
         }
-
         return hasRequested;
     }
 
@@ -143,7 +141,6 @@ public class RequestProjectDAO implements IRequestProjectDAO {
             LOGGER.log(Level.SEVERE, "Error al verificar cupo del proyecto", e);
             throw new OperationException("Error al verificar el cupo del proyecto", e);
         }
-
         return hasCapacity;
     }
 
@@ -167,7 +164,6 @@ public class RequestProjectDAO implements IRequestProjectDAO {
             LOGGER.log(Level.SEVERE, "Error al registrar solicitud de proyecto", e);
             throw new OperationException("Error al registrar solicitud", e);
         }
-
         return isRegistered;
     }
 
@@ -182,14 +178,12 @@ public class RequestProjectDAO implements IRequestProjectDAO {
         } else if (!hasAvailableCapacity(idProject)) {
             validationError = Optional.of("Este proyecto ya no tiene cupo disponible");
         }
-
         return validationError;
     }
 
     @Override
     public boolean assignStudentToProject(String idStudent, int idProject, boolean isAlternative) throws OperationException {
-        boolean isAssigned = false;
-        isAssigned = runAssignmentInTransaction(idStudent, idProject, isAlternative);
+        boolean isAssigned = runAssignmentInTransaction(idStudent, idProject, isAlternative);
         return isAssigned;
     }
 
@@ -239,7 +233,6 @@ public class RequestProjectDAO implements IRequestProjectDAO {
             LOGGER.log(Level.SEVERE, "Error al obtener los solicitantes del proyecto", e);
             throw new OperationException("Error al obtener los solicitantes del proyecto", e);
         }
-
         return applicants;
     }
 
@@ -265,7 +258,6 @@ public class RequestProjectDAO implements IRequestProjectDAO {
             LOGGER.log(Level.SEVERE, "Error al obtener el proyecto asignado al estudiante", e);
             throw new OperationException("Error al obtener el proyecto asignado al estudiante", e);
         }
-
         return projectName;
     }
 
@@ -293,7 +285,6 @@ public class RequestProjectDAO implements IRequestProjectDAO {
             LOGGER.log(Level.SEVERE, "Error al obtener alumnos asignados al proyecto", e);
             throw new OperationException("Error al obtener los alumnos asignados al proyecto", e);
         }
-
         return assignedStudents;
     }
 
@@ -433,7 +424,6 @@ public class RequestProjectDAO implements IRequestProjectDAO {
             LOGGER.log(Level.SEVERE, "Error de conexión a la base de datos", e);
             throw new OperationException("Error al asignar un proyecto", e);
         }
-
         return isAssigned;
     }
 }

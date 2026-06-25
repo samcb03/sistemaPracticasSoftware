@@ -17,11 +17,13 @@ import uv.lis.logic.dto.Subject;
 import uv.lis.logic.exceptions.OperationException;
 
 public class SubjectDAO implements ISubjectDAO {
+
     private static final Logger LOGGER = Logger.getLogger(SubjectDAO.class.getName());
-    private MySQLConnectionManager connectionManager;
+
+    private final MySQLConnectionManager connectionManager;
 
     public SubjectDAO() {
-        this.connectionManager = new MySQLConnectionManager();
+        connectionManager = new MySQLConnectionManager();
     }
 
     public SubjectDAO(MySQLConnectionManager connectionManager) {
@@ -31,11 +33,9 @@ public class SubjectDAO implements ISubjectDAO {
     @Override
     public boolean registerSubject(Subject subject) throws OperationException {
         boolean isRegistered = false;
-
         String subjectQuery = "INSERT INTO ExperienciaEducativa (NRC, nombreExperiencia, carrera, idPeriodoEscolar,"
                             + "seccion) "
                             + "VALUES (?, ?, ?, ?, ?);";
-
         String professorSubjectQuery = "INSERT INTO Profesor_Imparte_Experiencia (NRC, numeroPersonal, idPeriodo) "
                                     + "VALUES (?, ?, ?) "
                                     + "ON DUPLICATE KEY UPDATE estaActiva = TRUE, idPeriodo = VALUES(idPeriodo);";
@@ -54,12 +54,10 @@ public class SubjectDAO implements ISubjectDAO {
                 subjectStatement.setInt(4, subject.getSchoolPeriodId());
                 subjectStatement.setString(5, subject.getSection());
                 int subjectRows = subjectStatement.executeUpdate();
-
                 professorSubjectStatement.setInt(1, subject.getNrc());
                 professorSubjectStatement.setString(2, subject.getProfessorPersonnelNumber());
                 professorSubjectStatement.setInt(3, subject.getSchoolPeriodId());
                 int professorRows = professorSubjectStatement.executeUpdate();
-
                 boolean bothInserted = subjectRows != NO_VALUE && professorRows != NO_VALUE;
 
                 if (bothInserted) {
@@ -77,7 +75,6 @@ public class SubjectDAO implements ISubjectDAO {
             throw new OperationException("No se pudo registrar la Experiencia Educativa. Intentelo mas tarde",
                 e);
         }
-
         return isRegistered;
     }
     
@@ -232,7 +229,6 @@ public class SubjectDAO implements ISubjectDAO {
             throw new OperationException("No se pudo obtener la lista de alumnos. Intente más tarde",
                 sqlException);
         }
-
         return enrolledStudents;
     }
 
@@ -257,7 +253,6 @@ public class SubjectDAO implements ISubjectDAO {
             LOGGER.log(Level.SEVERE, "Error al verificar la sección en el periodo escolar", e);
             throw new OperationException("No se pudo verificar la disponibilidad de la sección", e);
         }
- 
         return isTaken;
     }
 }

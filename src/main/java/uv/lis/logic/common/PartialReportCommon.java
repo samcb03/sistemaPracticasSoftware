@@ -158,11 +158,12 @@ public class PartialReportCommon {
     }
 
     private Activity resolveActivity(String studentId, String activityName) throws OperationException {
-        Activity activity = reportContextDAO.getActivityByName(studentId, activityName);
+        Optional<Activity> validateActivity = reportContextDAO.getActivityByName(studentId, activityName);
 
-        if (activity == null) {
+        if (validateActivity.isEmpty()) {
             throw new OperationException(ACTIVITY_NOT_FOUND_MESSAGE, null);
         }
+        Activity activity = validateActivity.get();
         return activity;
     }
 

@@ -18,14 +18,15 @@ import uv.lis.logic.exceptions.OperationException;;
 
 public class SchoolPeriodDAO implements ISchoolPeriodDAO{
     private static final Logger LOGGER = Logger.getLogger(SchoolPeriodDAO.class.getName());
-    private MySQLConnectionManager connectionManager;
+
+    private final MySQLConnectionManager connectionManager;
 
     public SchoolPeriodDAO(MySQLConnectionManager connectionManager) {
         this.connectionManager = connectionManager;
     }
     
     public SchoolPeriodDAO() {
-        this.connectionManager = new MySQLConnectionManager();
+        connectionManager = new MySQLConnectionManager();
     }
 
     @Override
@@ -100,7 +101,6 @@ public class SchoolPeriodDAO implements ISchoolPeriodDAO{
             LOGGER.log(Level.SEVERE, "Error de conexion con la base de datos", e);
             throw new OperationException("Error al obtener el ID del periodo escolar", e);
         }
-
         return validatePeriodId;
     }
 

@@ -26,7 +26,6 @@ import uv.lis.logic.exceptions.OperationException;
 public class ReportDAO implements IReportDAO {
 
     private static final Logger LOGGER = Logger.getLogger(ReportDAO.class.getName());
-
     private static final String DATABASE_CONNECTION_ERROR = "Error de conexión con la base de datos";
     private static final String GET_REPORTS_ERROR = "No se pudo obtener los reportes. Inténtelo más tarde";
     private static final String GET_PARTIAL_ERROR = "Error al obtener el reporte parcial";
@@ -47,7 +46,7 @@ public class ReportDAO implements IReportDAO {
     private final MySQLConnectionManager connectionManager;
 
     public ReportDAO() {
-        this.connectionManager = new MySQLConnectionManager();
+        connectionManager = new MySQLConnectionManager();
     }
 
     public ReportDAO(MySQLConnectionManager connectionManager) {
@@ -114,7 +113,6 @@ public class ReportDAO implements IReportDAO {
             LOGGER.log(Level.SEVERE, REGISTER_PARTIAL_ERROR, e);
             throw new OperationException(REGISTER_PARTIAL_ERROR, e);
         }
-
         return isRegistered;
     }
 
@@ -130,7 +128,6 @@ public class ReportDAO implements IReportDAO {
             LOGGER.log(Level.SEVERE, MODIFY_PARTIAL_ERROR, e);
             throw new OperationException(MODIFY_PARTIAL_ERROR, e);
         }
-
         return isModified;
     }
 
@@ -174,7 +171,6 @@ public class ReportDAO implements IReportDAO {
             LOGGER.log(Level.SEVERE, REGISTER_FINAL_ERROR, e);
             throw new OperationException(REGISTER_FINAL_ERROR, e);
         }
-
         return isRegistered;
     }
 
@@ -190,7 +186,6 @@ public class ReportDAO implements IReportDAO {
             LOGGER.log(Level.SEVERE, MODIFY_FINAL_ERROR, e);
             throw new OperationException(MODIFY_FINAL_ERROR, e);
         }
-
         return isModified;
     }
 
@@ -208,7 +203,6 @@ public class ReportDAO implements IReportDAO {
             LOGGER.log(Level.SEVERE, REGISTER_MONTHLY_ERROR, e);
             throw new OperationException(REGISTER_MONTHLY_ERROR, e);
         }
-
         return isRegistered;
     }
 
@@ -319,7 +313,7 @@ public class ReportDAO implements IReportDAO {
     }
 
     private void insertPartialActivityDetails(Connection databaseConnection,
-            PartialReport partialReport) throws SQLException {
+        PartialReport partialReport) throws SQLException {
         String reportQuery = "INSERT INTO DetalleReporteParcial "
                            + "(idReporte, nombreActividad, semana, tiempoPlaneado, tiempoReal) "
                            + "VALUES (?, ?, ?, ?, ?)";
