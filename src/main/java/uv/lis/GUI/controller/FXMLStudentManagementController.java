@@ -19,7 +19,7 @@ public class FXMLStudentManagementController extends WindowHandler {
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-
+        /* No initialization required for this menu controller */
     }
 
     @FXML 

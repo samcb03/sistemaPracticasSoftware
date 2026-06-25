@@ -8,7 +8,7 @@ import javafx.scene.control.Button;
 
 import uv.lis.GUI.WindowHandler;
 
-public class FXMLSubjectManagementController extends WindowHandler{
+public class FXMLSubjectManagementController extends WindowHandler {
 
     private static final String REGISTER_SUBJECT_VIEW = "/uv/lis/GUI/view/FXMLRegisterSubject.fxml";
     private static final String ASSIGNATION_STUDENT_VIEW = "/uv/lis/GUI/view/FXMLAssignStudentSubject.fxml";
@@ -21,7 +21,7 @@ public class FXMLSubjectManagementController extends WindowHandler{
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-
+        /* No initialization required for this menu controller */
     }
 
     @FXML 

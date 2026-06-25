@@ -14,7 +14,6 @@ import java.util.logging.Logger;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.ChoiceDialog;
@@ -39,14 +38,12 @@ import uv.lis.logic.utils.SessionManager;
 public class FXMLUploadDocumentsController extends ValidationHandler {
 
     private static final Logger LOGGER = Logger.getLogger(FXMLUploadDocumentsController.class.getName());
-
     private static final int AUTOEVALUATION_TYPE_ID = 1;
     private static final int PARTIAL_REPORT_TYPE_ID = 4;
     private static final int ACCEPTANCE_LETTER_TYPE_ID = 9;
     private static final int MONTHLY_REPORT_TYPE = 3;
     private static final int ACTIVITY_CRONOGRAM_ID = 11;
     private static final int ORGANIZATION_EVALUATION = 12;
-
     private static final String NO_STUDENT_MESSAGE = "No hay alumno en sesión.";
     private static final String NO_TYPE_MESSAGE = "Seleccione un tipo de documento.";
     private static final String NO_FILE_MESSAGE = "No se seleccionó ningún archivo.";
@@ -64,6 +61,14 @@ public class FXMLUploadDocumentsController extends ValidationHandler {
     private static final String MONTHLY_DIALOG_TITLE = "Subir reporte mensual";
     private static final String MONTHLY_DIALOG_CONTENT = "Seleccione el mes del reporte a subir:";
     private static final String MONTHLY_FILE_CHOOSER_TITLE = "Seleccionar archivo del reporte mensual";
+    private static final String FILE_CHOOSER_TITLE = "Seleccionar archivo";
+    private static final String INVALID_URL_ERROR = "El documento no tiene una ruta válida";
+    private static final String FILE_NOT_FOUND_ERROR = "El documento no se encontró en la ruta registrada";
+    private static final String DESKTOP_NOT_SUPPORTED_ERROR = "La apertura de documentos no está soportada en este sistema";
+    private static final String OPEN_FAILED_ERROR = "No se pudo abrir el documento";
+    private static final String INVALID_PATH_ERROR = "La ruta del documento no es válida";
+    private static final String UNSUPPORTED_ACTION_ERROR = "Esta acción no está soportada en el sistema";
+    private static final String INSUFFICIENT_PERMISSIONS_ERROR = "No se cuenta con permisos para abrir el documento";
 
     @FXML private Button buttonUploadDocument;
     @FXML private Button buttonBack;
@@ -83,15 +88,38 @@ public class FXMLUploadDocumentsController extends ValidationHandler {
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        this.expedientDAO = new ExpedientDAO();
-        this.studentDAO = new StudentDAO();
-        this.reportDAO = new ReportDAO();
-        this.autoevaluationDAO = new AutoevaluationDAO();
+        expedientDAO = new ExpedientDAO();
+        studentDAO = new StudentDAO();
+        reportDAO = new ReportDAO();
+        autoevaluationDAO = new AutoevaluationDAO();
         setupControls(labelError, buttonBack);
-        this.student = SessionManager.getInstance().getCurrentStudent();
+        student = SessionManager.getInstance().getCurrentStudent();
         configureTableColumns();
         loadDocumentTypes();
         loadStudentDocuments();
+    }
+
+    @FXML
+    public void uploadDocument() {
+        if (student == null) {
+            showError(NO_STUDENT_MESSAGE);
+        } else {
+            String selectedDocument = comboBoxDocuments.getSelectionModel().getSelectedItem();
+            if (selectedDocument == null) {
+                showError(NO_TYPE_MESSAGE);
+            } else {
+                validateRestrictionAndUpload(selectedDocument);
+            }
+        }
+    }
+
+    @Override
+    protected void clearFields() {
+        comboBoxDocuments.getSelectionModel().clearSelection();
+        comboBoxDocuments.setPromptText("Seleccione un documento");
+        labelError.setText("");
+        buttonUploadDocument.setDisable(false);
+        comboBoxDocuments.buttonCellProperty().set(null);
     }
 
     private void configureTableColumns() {
@@ -136,19 +164,6 @@ public class FXMLUploadDocumentsController extends ValidationHandler {
         }
     }
 
-    @FXML
-    public void uploadDocument(ActionEvent event) {
-        if (student == null) {
-            showError(NO_STUDENT_MESSAGE);
-        } else {
-            String selectedDocument = comboBoxDocuments.getSelectionModel().getSelectedItem();
-            if (selectedDocument == null) {
-                showError(NO_TYPE_MESSAGE);
-            } else {
-                validateRestrictionAndUpload(selectedDocument);
-            }
-        }
-    }
 
     private void validateRestrictionAndUpload(String selectedDocument) {
         try {
@@ -186,6 +201,7 @@ public class FXMLUploadDocumentsController extends ValidationHandler {
 
     private Optional<MonthlyReport> askMonthlyReportToUpload(List<MonthlyReport> uploadableReports) {
         List<String> months = new ArrayList<>();
+
         for (MonthlyReport report : uploadableReports) {
             months.add(report.getMonth());
         }
@@ -194,7 +210,6 @@ public class FXMLUploadDocumentsController extends ValidationHandler {
         monthDialog.setTitle(MONTHLY_DIALOG_TITLE);
         monthDialog.setHeaderText(null);
         monthDialog.setContentText(MONTHLY_DIALOG_CONTENT);
-
         Optional<String> chosenMonth = monthDialog.showAndWait();
         return chosenMonth.flatMap(month -> findReportByMonth(uploadableReports, month));
     }
@@ -214,8 +229,8 @@ public class FXMLUploadDocumentsController extends ValidationHandler {
         fileChooser.setTitle(MONTHLY_FILE_CHOOSER_TITLE);
         fileChooser.getExtensionFilters().add(
             new FileChooser.ExtensionFilter("Archivos PDF", "*.pdf"));
-
         File selectedFile = fileChooser.showOpenDialog(buttonUploadDocument.getScene().getWindow());
+        
         if (selectedFile == null) {
             showError(NO_FILE_MESSAGE);
         } else {
@@ -242,6 +257,7 @@ public class FXMLUploadDocumentsController extends ValidationHandler {
         if (typeId.isPresent()) {
             int idTypeDocument = typeId.get();
             boolean isMonthlyReport = (idTypeDocument == MONTHLY_REPORT_TYPE);
+
             if (!isMonthlyReport && expedientDAO.isDocumentTypeValidated(studentId, idTypeDocument)) {
                 restriction = Optional.of(ALREADY_VALIDATED_MESSAGE);
             } else if (requiresAssignedProject(idTypeDocument) && !studentDAO.hasProjectAssigned(studentId)) {
@@ -282,11 +298,11 @@ public class FXMLUploadDocumentsController extends ValidationHandler {
 
     private void chooseFileAndUpload(String selectedDocument) {
         FileChooser fileChooser = new FileChooser();
-        fileChooser.setTitle("Seleccionar archivo para " + selectedDocument);
+        fileChooser.setTitle(FILE_CHOOSER_TITLE);
         fileChooser.getExtensionFilters().add(
             new FileChooser.ExtensionFilter("Archivos PDF", "*.pdf"));
-
         File selectedFile = fileChooser.showOpenDialog(buttonUploadDocument.getScene().getWindow());
+
         if (selectedFile == null) {
             showError(NO_FILE_MESSAGE);
         } else {
@@ -307,7 +323,7 @@ public class FXMLUploadDocumentsController extends ValidationHandler {
 
     private void openDocument(Expedient expedient) {
         if (expedient == null || expedient.getUrl() == null || expedient.getUrl().isBlank()) {
-            showError("El documento no tiene una ruta válida");
+            showError(INVALID_URL_ERROR);
         } else {
             launchDocument(expedient);
         }
@@ -317,7 +333,7 @@ public class FXMLUploadDocumentsController extends ValidationHandler {
         File documentFile = new File(expedient.getUrl());
 
         if (!documentFile.exists()) {
-            showError("El documento no se encontró en la ruta registrada");
+            showError(FILE_NOT_FOUND_ERROR);
         } else {
             tryOpenWithDesktop(documentFile);
         }
@@ -325,7 +341,7 @@ public class FXMLUploadDocumentsController extends ValidationHandler {
 
     private void tryOpenWithDesktop(File documentFile) {
         if (!Desktop.isDesktopSupported()) {
-            showError("La apertura de documentos no está soportada en este sistema");
+            showError(DESKTOP_NOT_SUPPORTED_ERROR);
         } else {
             executeDesktopOpen(documentFile);
         }
@@ -336,26 +352,17 @@ public class FXMLUploadDocumentsController extends ValidationHandler {
             Desktop.getDesktop().open(documentFile);
         } catch (IOException ioException) {
             LOGGER.log(Level.SEVERE, "Error de E/S al abrir el documento", ioException);
-            showError("No se pudo abrir el documento");
+            showError(OPEN_FAILED_ERROR);
         } catch (IllegalArgumentException illegalArgumentException) {
             LOGGER.log(Level.WARNING, "Ruta de documento inválida", illegalArgumentException);
-            showError("La ruta del documento no es válida");
+            showError(INVALID_PATH_ERROR);
         } catch (UnsupportedOperationException unsupportedOperationException) {
             LOGGER.log(Level.WARNING, "La acción de abrir documentos no está soportada",
                 unsupportedOperationException);
-            showError("Esta acción no está soportada en el sistema");
+            showError(UNSUPPORTED_ACTION_ERROR);
         } catch (SecurityException securityException) {
             LOGGER.log(Level.WARNING, "Permisos insuficientes para abrir el documento", securityException);
-            showError("No se cuenta con permisos para abrir el documento");
+            showError(INSUFFICIENT_PERMISSIONS_ERROR);
         }
-    }
-
-    @Override
-    protected void clearFields() {
-        comboBoxDocuments.getSelectionModel().clearSelection();
-        comboBoxDocuments.setPromptText("Seleccione un documento");
-        labelError.setText("");
-        buttonUploadDocument.setDisable(false);
-        comboBoxDocuments.buttonCellProperty().set(null);
     }
 }

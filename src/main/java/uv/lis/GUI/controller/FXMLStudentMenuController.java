@@ -112,6 +112,7 @@ public class FXMLStudentMenuController extends ValidationHandler {
 
     @Override
     protected void clearFields() {
+        /* No fields to clear in this detail view */
 
     }
 

@@ -7,10 +7,10 @@ import uv.lis.logic.dto.Student;
 public class StudentListCell extends ListCell<Student> {
 
     @Override
-    protected void updateItem(Student student, boolean empty) {
-        super.updateItem(student, empty);
+    protected void updateItem(Student student, boolean isEmpty) {
+        super.updateItem(student, isEmpty);
 
-        if (empty || student == null) {
+        if (isEmpty || student == null) {
             setText(null);
         } else {
             setText(student.getIdStudent() + " - "

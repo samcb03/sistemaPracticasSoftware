@@ -35,8 +35,19 @@ import uv.lis.logic.exceptions.OperationException;
 public class FXMLShowProjectDetailController extends ValidationHandler {
 
     private static final Logger LOGGER = Logger.getLogger(FXMLShowProjectDetailController.class.getName());
-
-    private static final boolean INACTIVE_PROJECT = false;
+    private static final String NO_PROJECT_LOADED_ERROR = "No hay información del proyecto cargada";
+    private static final String NO_CHANGES_ERROR = "No se realizaron cambios en el proyecto";
+    private static final String HAS_STUDENTS_ERROR = "No se puede inactivar el proyecto porque tiene alumnos asignados";
+    private static final String INACTIVATION_FAILED_ERROR = "No se pudo inactivar el proyecto";
+    private static final String PROJECT_UPDATED_MESSAGE = "Proyecto actualizado correctamente";
+    private static final String PROJECT_INACTIVATED_MESSAGE = "Proyecto inactivado correctamente";
+    private static final String CONFIRMATION_TITLE = "Confirmar inactivación";
+    private static final String CONFIRMATION_CONTENT = "¿Está seguro de que desea inactivar este proyecto?";
+    private static final String PROJECT_NAME_FIELD = "El nombre del proyecto";
+    private static final String DESCRIPTION_FIELD = "La descripción";
+    private static final String OBJECTIVE_FIELD = "El objetivo";
+    private static final String METHODOLOGY_FIELD = "La metodología";
+    private static final String CAPACITY_FIELD = "El cupo";
 
     @FXML private Label labelName;
     @FXML private Label labelDescription;
@@ -67,10 +78,15 @@ public class FXMLShowProjectDetailController extends ValidationHandler {
     }
 
     public void initializeData(Project project) {
-        this.currentProject = project;
+        currentProject = project;
         displayProjectInformation();
         loadAssignedStudents();
         disableInactiveControl(currentProject);
+    }
+
+    @Override
+    protected void clearFields() {
+        /* No fields to clear in this detail view */
     }
 
     private void configureStudentListCellFactory() {
@@ -95,28 +111,20 @@ public class FXMLShowProjectDetailController extends ValidationHandler {
             if (assignedStudents.isEmpty()) {
                 LOGGER.log(Level.INFO, "El proyecto con ID {0} no tiene alumnos asignados", currentProject.getId());
             }
-        } catch (OperationException operationException) {
-            LOGGER.log(Level.SEVERE, "Error al cargar los alumnos asignados al proyecto", operationException);
-            showError(operationException.getMessage());
+        } catch (OperationException e) {
+            LOGGER.log(Level.SEVERE, "Error al cargar los alumnos asignados al proyecto", e);
+            showError(e.getMessage());
         }
     }
 
     @FXML
     private void enableEditMode() {
         if (currentProject == null) {
-            showError("No hay información del proyecto cargada");
+            showError(NO_PROJECT_LOADED_ERROR);
         } else {
             loadCurrentDataIntoEditors();
             toggleEditMode(true);
         }
-    }
-
-    private void loadCurrentDataIntoEditors() {
-        textFieldName.setText(currentProject.getName());
-        textAreaDescription.setText(currentProject.getDescription());
-        textFieldObjective.setText(currentProject.getObjective());
-        textFieldCapacity.setText(String.valueOf(currentProject.getCapacity()));
-        textFieldMethodology.setText(currentProject.getMethodology());
     }
 
     @FXML
@@ -130,13 +138,32 @@ public class FXMLShowProjectDetailController extends ValidationHandler {
         }
     }
 
+    @FXML
+    private void handleInactivateProject() {
+        if (currentProject == null) {
+            showError(NO_PROJECT_LOADED_ERROR);
+        } else if (hasAssignedStudents()) {
+            showError(HAS_STUDENTS_ERROR);
+        } else if (confirmInactivation()){
+            executeInactivation();
+        }
+    }
+
+    private void loadCurrentDataIntoEditors() {
+        textFieldName.setText(currentProject.getName());
+        textAreaDescription.setText(currentProject.getDescription());
+        textFieldObjective.setText(currentProject.getObjective());
+        textFieldCapacity.setText(String.valueOf(currentProject.getCapacity()));
+        textFieldMethodology.setText(currentProject.getMethodology());
+    }
+
     private Optional<String> validateInputs() {
         return Stream.of(
-            validateRegister(textFieldName.getText(), "El nombre del proyecto"),
-            validateText(textAreaDescription.getText(), "La descripción"),
-            validateText(textFieldObjective.getText(), "El objetivo"),
-            validateText(textFieldMethodology.getText(), "La metodología"),
-            validatePositiveInteger(textFieldCapacity.getText(), "El cupo")
+            validateRegister(textFieldName.getText(), PROJECT_NAME_FIELD),
+            validateText(textAreaDescription.getText(), DESCRIPTION_FIELD),
+            validateText(textFieldObjective.getText(), OBJECTIVE_FIELD),
+            validateText(textFieldMethodology.getText(), METHODOLOGY_FIELD),
+            validatePositiveInteger(textFieldCapacity.getText(), CAPACITY_FIELD)
         )
         .filter(Optional::isPresent)
         .map(Optional::get)
@@ -169,12 +196,12 @@ public class FXMLShowProjectDetailController extends ValidationHandler {
 
     private void handleUpdateResult(boolean isUpdated, Project updatedProject) {
         if (!isUpdated) {
-            showError("No se realizaron cambios en el proyecto");
+            showError(NO_CHANGES_ERROR);
         } else {
             currentProject = updatedProject;
             displayProjectInformation();
             toggleEditMode(false);
-            showSuccess("Proyecto actualizado correctamente");
+            showSuccess(PROJECT_UPDATED_MESSAGE);
             LOGGER.log(Level.INFO, "Proyecto actualizado: {0}", updatedProject.getId());
         }
     }
@@ -185,13 +212,11 @@ public class FXMLShowProjectDetailController extends ValidationHandler {
         setNodeVisibility(labelObjective, !isEditing);
         setNodeVisibility(labelCapacity, !isEditing);
         setNodeVisibility(labelMethodology, !isEditing);
-
         setNodeVisibility(textFieldName, isEditing);
         setNodeVisibility(textAreaDescription, isEditing);
         setNodeVisibility(textFieldObjective, isEditing);
         setNodeVisibility(textFieldCapacity, isEditing);
         setNodeVisibility(textFieldMethodology, isEditing);
-
         setNodeVisibility(buttonModifyProject, !isEditing);
         setNodeVisibility(buttonSave, isEditing);
     }
@@ -201,27 +226,17 @@ public class FXMLShowProjectDetailController extends ValidationHandler {
         node.setManaged(isVisible);
     }
 
-    @FXML
-    private void handleInactivateProject() {
-        if (currentProject == null) {
-            showError("No hay información del proyecto cargada");
-        } else if (hasAssignedStudents()) {
-            showError("No se puede inactivar el proyecto porque tiene alumnos asignados");
-        } else if (confirmInactivation()) {
-            executeInactivation();
-        }
-    }
 
     private boolean hasAssignedStudents() {
-        boolean isEmpty = !listViewStudent.getItems().isEmpty();
-        return isEmpty;
+        boolean hasStudents = !listViewStudent.getItems().isEmpty();
+        return hasStudents;
     }
 
     private boolean confirmInactivation() {
         Alert confirmationAlert = new Alert(AlertType.CONFIRMATION);
-        confirmationAlert.setTitle("Confirmar inactivación");
+        confirmationAlert.setTitle(CONFIRMATION_TITLE);
         confirmationAlert.setHeaderText(null);
-        confirmationAlert.setContentText("¿Está seguro de que desea inactivar este proyecto?");
+        confirmationAlert.setContentText(CONFIRMATION_CONTENT);
 
         Optional<ButtonType> userChoice = confirmationAlert.showAndWait();
         return userChoice.isPresent() && userChoice.get() == ButtonType.OK;
@@ -239,9 +254,9 @@ public class FXMLShowProjectDetailController extends ValidationHandler {
 
     private void handleInactivationResult(boolean isInactivated) {
         if (!isInactivated) {
-            showError("No se pudo inactivar el proyecto");
+            showError(INACTIVATION_FAILED_ERROR);
         } else {
-            showSuccess("Proyecto inactivado correctamente");
+            showSuccess(PROJECT_INACTIVATED_MESSAGE);
             buttonInactivateProject.setDisable(true);
             buttonModifyProject.setDisable(true);
             LOGGER.log(Level.INFO, "Proyecto inactivado: {0}", currentProject.getId());
@@ -249,13 +264,9 @@ public class FXMLShowProjectDetailController extends ValidationHandler {
     }
 
     private void disableInactiveControl(Project project) {
-        if (project.isActive() == INACTIVE_PROJECT) {
+        if (!project.isActive()) {
             buttonInactivateProject.setDisable(true);
             buttonModifyProject.setDisable(true);
         }
-    }
-
-    @Override
-    protected void clearFields() {
     }
 }

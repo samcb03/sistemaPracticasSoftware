@@ -24,7 +24,6 @@ import uv.lis.logic.utils.InputValidator;
 public class FXMLVerifyCodeController extends ValidationHandler {
 
     private static final Logger LOGGER = Logger.getLogger(FXMLVerifyCodeController.class.getName());
-
     private static final String CODE_FIELD_NAME = "El código";
     private static final String INVALID_CODE_MESSAGE = "Código incorrecto o expirado. Intente de nuevo.";
 
@@ -56,6 +55,12 @@ public class FXMLVerifyCodeController extends ValidationHandler {
         return isVerified;
     }
 
+    @Override
+    protected void clearFields() {
+        textFieldCode.clear();
+        checkBoxDisableEmailAuthentication.setSelected(false);
+    }
+
     @FXML
     private void handleVerify() {
         String inputCode = textFieldCode.getText().trim();
@@ -84,14 +89,7 @@ public class FXMLVerifyCodeController extends ValidationHandler {
 
     private void confirmVerification() {
         isVerified = true;
-
         Stage stage = (Stage) buttonVerify.getScene().getWindow();
         stage.close();
-    }
-
-    @Override
-    protected void clearFields() {
-        textFieldCode.clear();
-        checkBoxDisableEmailAuthentication.setSelected(false);
     }
 }
