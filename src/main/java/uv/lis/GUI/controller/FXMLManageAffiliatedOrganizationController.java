@@ -210,7 +210,7 @@ public class FXMLManageAffiliatedOrganizationController extends ValidationHandle
     }
 
     private Optional<String> validateInputs() {
-        return Stream.of(
+        Optional<String> firstError = Stream.of(
             validateText(textFieldName.getText(), "El nombre"),
             validateText(textFieldCity.getText(), "La ciudad"),
             validateText(textFieldState.getText(), "El estado"),
@@ -220,6 +220,7 @@ public class FXMLManageAffiliatedOrganizationController extends ValidationHandle
         .filter(Optional::isPresent)
         .map(Optional::get)
         .findFirst();
+        return firstError;
     }
 
     private AffiliatedOrganization buildUpdatedOrganization() {
@@ -317,8 +318,7 @@ public class FXMLManageAffiliatedOrganizationController extends ValidationHandle
         String searchValue = newValue == null ? "" : newValue.trim();
 
         try {
-            ArrayList<String> matches = affiliatedOrganizationDAO
-                .searchActiveOrganizationsByNamePrefix(searchValue);
+            ArrayList<String> matches = affiliatedOrganizationDAO.searchActiveOrganizationsByNamePrefix(searchValue);
 
             if (matches.isEmpty()) {
                 contextMenuSuggestions.hide();
@@ -326,8 +326,9 @@ public class FXMLManageAffiliatedOrganizationController extends ValidationHandle
                 populateSuggestions(matches);
                 contextMenuSuggestions.show(textFieldOrganizationName, Side.BOTTOM, 0, 0);
             }
-        } catch (OperationException e) {
-            LOGGER.log(Level.WARNING, "Error en autocompletado", e);
+        } catch (OperationException operationException) {
+            LOGGER.log(Level.WARNING, "Error en autocompletado", operationException);
+            showError(operationException.getMessage());
             contextMenuSuggestions.hide();
         }
     }
@@ -365,8 +366,8 @@ public class FXMLManageAffiliatedOrganizationController extends ValidationHandle
     }
 
     private void toggleEditMode(boolean isEditing) {
-        setNodeVisibility(labelName,  !isEditing);
-        setNodeVisibility(labelCity,  !isEditing);
+        setNodeVisibility(labelName, !isEditing);
+        setNodeVisibility(labelCity, !isEditing);
         setNodeVisibility(labelState, !isEditing);
         setNodeVisibility(labelStreet, !isEditing);
         setNodeVisibility(labelStreetNumber, !isEditing);
@@ -377,20 +378,20 @@ public class FXMLManageAffiliatedOrganizationController extends ValidationHandle
         setNodeVisibility(labelNumberOfDirectUsers, !isEditing);
         setNodeVisibility(labelNumberOfIndirectUsers, !isEditing);
 
-        setNodeVisibility(textFieldName,  isEditing);
-        setNodeVisibility(textFieldCity,  isEditing);
+        setNodeVisibility(textFieldName, isEditing);
+        setNodeVisibility(textFieldCity, isEditing);
         setNodeVisibility(textFieldState, isEditing);
         setNodeVisibility(textFieldStreet, isEditing);
         setNodeVisibility(textFieldStreetNumber, isEditing);
         setNodeVisibility(textFieldPostalCode, isEditing);
         setNodeVisibility(textFieldEmail, isEditing);
-        setNodeVisibility(textFieldSector,  isEditing);
-        setNodeVisibility(textFieldPhoneNumber,  isEditing);
+        setNodeVisibility(textFieldSector, isEditing);
+        setNodeVisibility(textFieldPhoneNumber, isEditing);
         setNodeVisibility(textFieldNumberOfDirectUsers, isEditing);
         setNodeVisibility(textFieldNumberOfIndirectUsers, isEditing);
 
         setNodeVisibility(buttonUpdate, !isEditing);
-        setNodeVisibility(buttonSave,    isEditing);
+        setNodeVisibility(buttonSave, isEditing);
     }
 
     private void setNodeVisibility(Node node, boolean isVisible) {

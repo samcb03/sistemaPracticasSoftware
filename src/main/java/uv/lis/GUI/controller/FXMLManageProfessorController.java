@@ -174,20 +174,20 @@ public class FXMLManageProfessorController extends ValidationHandler {
             boolean isUpdated = professorDAO.modifyProfessor(updatedProfessor);
             handleUpdateResult(isUpdated, updatedProfessor);
         } catch (OperationException e) {
-            LOGGER.log(Level.WARNING, "Error al actualizar al profesor: {0}", e.getMessage());
+            LOGGER.log(Level.WARNING, "Error al actualizar al profesor: {0}", e);
             showError(e.getMessage());
         }
     }
 
     private Optional<String> validateInputs() {
-        return Stream.of(
+        Optional<String> firstError = Stream.of(
             validateText(textFieldFirstName.getText(), "El nombre"),
             validateText(textFieldLastName.getText(), "Los apellidos"),
-            validateComboBox(comboBoxCoordinator, "rol")
-        )
-        .filter(Optional::isPresent)
-        .map(Optional::get)
-        .findFirst();
+            validateComboBox(comboBoxCoordinator, "rol"))
+            .filter(Optional::isPresent)
+            .map(Optional::get)
+            .findFirst();
+        return firstError;
     }
 
     private Professor buildUpdatedProfessor() {
@@ -208,8 +208,7 @@ public class FXMLManageProfessorController extends ValidationHandler {
             displayProfessorInformation(updatedProfessor);
             toggleEditMode(false);
             showSuccess("Profesor actualizado correctamente");
-            LOGGER.log(Level.INFO, "Profesor actualizado: {0}",
-                updatedProfessor.getPersonnelNumber());
+            LOGGER.log(Level.INFO, "Profesor actualizado: {0}", updatedProfessor.getPersonnelNumber());
         }
     }
 

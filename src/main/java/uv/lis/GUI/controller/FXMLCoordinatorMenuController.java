@@ -45,5 +45,4 @@ public class FXMLCoordinatorMenuController extends WindowHandler{
     public void goToSubjectManagement() {
         navigateTo("/uv/lis/GUI/view/FXMLSubjectManagement.fxml");
     }
-
 }

@@ -12,6 +12,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javafx.collections.FXCollections;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -145,8 +146,7 @@ public class FXMLGenerateMonthlyReportController extends ValidationHandler {
         labelBlock.setText(REPORT_BLOCK);
         loadStudentData();
 
-        comboBoxMonth.getSelectionModel().selectedItemProperty().addListener(
-            (obs, oldMonth, newMonth) -> {
+        comboBoxMonth.getSelectionModel().selectedItemProperty().addListener((observableValue, oldMonth, newMonth) -> {
             if (newMonth != null) {
                 loadRegisteredActivities();
             }
@@ -240,6 +240,7 @@ public class FXMLGenerateMonthlyReportController extends ValidationHandler {
                     activityFields[i].setText(registered.get(i).getName());
                     observationFields[i].setText(registered.get(i).getDescription());
                 }
+
                 int totalHours = reportContextDAO.getSumOfReportedHours(studentId, month, year);
                 labelReportedHours.setText(String.valueOf(totalHours));
 
@@ -384,7 +385,7 @@ public class FXMLGenerateMonthlyReportController extends ValidationHandler {
     }
 
     @FXML
-    public void goToRegisterActivity(javafx.event.ActionEvent event) {
+    public void goToRegisterActivity(ActionEvent event) {
         FXMLLoader loader = this.navigateToWithLoader("/uv/lis/GUI/view/FXMLRegisterActivity.fxml");
         if (loader != null) {
             Stage registerStage = (Stage) ((Parent) loader.getRoot()).getScene().getWindow();

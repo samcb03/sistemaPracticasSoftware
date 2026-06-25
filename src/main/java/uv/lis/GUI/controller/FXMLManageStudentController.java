@@ -226,11 +226,10 @@ public class FXMLManageStudentController extends ValidationHandler {
             validateText(textFieldName.getText(), "El nombre"),
             validateText(textFieldLastName.getText(), "Los apellidos"),
             validateBirthDate(datePickerBirthDate.getValue(), "La fecha de nacimiento"),
-            validateComboBox(comboBoxGender, "genero")
-        )
-        .filter(Optional::isPresent)
-        .map(Optional::get)
-        .findFirst();
+            validateComboBox(comboBoxGender, "genero"))
+            .filter(Optional::isPresent)
+            .map(Optional::get)
+            .findFirst();
         return validateErrors;
     }
 

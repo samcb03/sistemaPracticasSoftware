@@ -81,7 +81,6 @@ public class FXMLConsultSubjectController extends WindowHandler {
 
             if(SessionManager.getInstance().getCurrentCoordinator().isPresent()) {
                 comboBoxDocumentFilter.getItems().add(FILTER_LIBERATION_LETTER);
-
             }
 
         comboBoxDocumentFilter.setValue(FILTER_ALL);
