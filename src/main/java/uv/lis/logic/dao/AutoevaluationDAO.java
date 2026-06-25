@@ -64,7 +64,7 @@ public class AutoevaluationDAO implements IAutoevaluationDAO {
                     autoevaluationData.setProjectSupervisorName(resultSet.getString("responsable"));
                 } else {
                     throw new OperationException(
-                        "No se encontró información del proyecto para la matrícula: " + studentId, null);
+                        "No se encontró información del proyecto", null);
                 }
             }
         } catch (SQLException e) {
@@ -108,8 +108,7 @@ public class AutoevaluationDAO implements IAutoevaluationDAO {
             } else {
                 LOGGER.log(Level.WARNING, "No se pudo registrar la autoevaluación para el alumno {0}", 
                     autoevaluation.getIdStudent());
-                throw new OperationException("No se pudo registrar la autoevaluación para el alumno: " 
-                    + autoevaluation.getIdStudent(), null);
+                throw new OperationException("No se pudo registrar la autoevaluación", null);
             }   
         } catch (SQLException e) {
             LOGGER.log(Level.SEVERE, "Error al registrar autoevaluación", e);

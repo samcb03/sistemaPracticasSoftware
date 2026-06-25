@@ -42,6 +42,11 @@ public class FXMLNotificationsController extends ValidationHandler {
         checkStudentAndLoad();
     }
 
+    @Override
+    protected void clearFields() {
+        listViewNotifications.getItems().clear();
+    }
+
     private void checkStudentAndLoad() {
         if (student == null) {
             showError(NO_STUDENT_IN_SESSION_MESSAGE);
@@ -87,10 +92,5 @@ public class FXMLNotificationsController extends ValidationHandler {
         } catch (OperationException e) {
             showError(e.getMessage());
         }
-    }
-
-    @Override
-    protected void clearFields() {
-        listViewNotifications.getItems().clear();
     }
 }

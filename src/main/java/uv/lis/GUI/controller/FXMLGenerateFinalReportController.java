@@ -76,6 +76,39 @@ public class FXMLGenerateFinalReportController extends ValidationHandler {
         validateFields();
     }
 
+    @FXML
+    public void goToRegisterActivity(javafx.event.ActionEvent event) {
+        FXMLLoader loader = this.navigateToWithLoader("/uv/lis/GUI/view/FXMLRegisterActivity.fxml");
+        if (loader != null) {
+            Stage registerStage = (Stage) ((Parent) loader.getRoot()).getScene().getWindow();
+            registerStage.setOnHidden(e -> loadStudentActivities());
+        }
+    }
+
+    @Override
+    protected void clearFields() {
+
+        comboBoxActivity1.getSelectionModel().clearSelection();
+        textFieldAdvance1.clear();
+        textAreaObservation1.clear();
+
+        comboBoxActivity2.getSelectionModel().clearSelection();;
+        textFieldAdvance2.clear();
+        textAreaObservation2.clear();
+
+        textFieldResult1.clear();
+        textFieldResultAdvance1.clear();
+        textAreaObservationResult1.clear();
+
+        textFieldResult2.clear();
+        textFieldResultAdvance2.clear();
+        textAreaObservationResult2.clear();
+
+        textAreaGeneralObservations.clear();
+
+        labelMessage.setText("");
+    }
+
     private void validateFields() {
         Stream<Optional<String>> validationStream = Stream.of(
             validateActivityBlocks(),
@@ -217,30 +250,6 @@ public class FXMLGenerateFinalReportController extends ValidationHandler {
         return deliverableResult;
     }
 
-    @Override
-    protected void clearFields() {
-
-        comboBoxActivity1.getSelectionModel().clearSelection();
-        textFieldAdvance1.clear();
-        textAreaObservation1.clear();
-
-        comboBoxActivity2.getSelectionModel().clearSelection();;
-        textFieldAdvance2.clear();
-        textAreaObservation2.clear();
-
-        textFieldResult1.clear();
-        textFieldResultAdvance1.clear();
-        textAreaObservationResult1.clear();
-
-        textFieldResult2.clear();
-        textFieldResultAdvance2.clear();
-        textAreaObservationResult2.clear();
-
-        textAreaGeneralObservations.clear();
-
-        labelMessage.setText("");
-    }
-
     private void loadStudentActivities() {
         Student currentStudent = SessionManager.getInstance().getCurrentStudent();
 
@@ -276,15 +285,6 @@ public class FXMLGenerateFinalReportController extends ValidationHandler {
         for (int slot = 0; slot < available; slot++) {
             int nameIndex = activityNames.size() - available + slot;
             comboBoxActivities.get(slot).setValue(activityNames.get(nameIndex));
-        }
-    }
-
-    @FXML
-    public void goToRegisterActivity(javafx.event.ActionEvent event) {
-        FXMLLoader loader = this.navigateToWithLoader("/uv/lis/GUI/view/FXMLRegisterActivity.fxml");
-        if (loader != null) {
-            Stage registerStage = (Stage) ((Parent) loader.getRoot()).getScene().getWindow();
-            registerStage.setOnHidden(e -> loadStudentActivities());
         }
     }
 }

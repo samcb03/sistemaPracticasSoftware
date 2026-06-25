@@ -87,28 +87,6 @@ public class FXMLLoginController implements Initializable {
     }
 
     @FXML
-    private void togglePasswordVisibility() {
-        if (toggleButtonShowPassword.isSelected()) {
-            passwordFieldPassword.setVisible(false);
-            textFieldPasswordVisible.setVisible(true);
-            toggleButtonShowPassword.setGraphic(createIcon(eyeOpen));
-        } else {
-            textFieldPasswordVisible.setVisible(false);
-            passwordFieldPassword.setVisible(true);
-            toggleButtonShowPassword.setGraphic(createIcon(eyeClosed));
-        }
-    }
-
-    private ImageView createIcon(Image image) {
-        ImageView imageView = new ImageView(image);
-        imageView.setFitHeight(IMAGE_FIT_HEIGHT);
-        imageView.setFitWidth(IMAGE_FIT_HEIGHT);
-        imageView.setPickOnBounds(true);
-        imageView.setPreserveRatio(true);
-        return imageView;
-    }
-
-    @FXML
     public void handleLogin() {
         String email = textFieldEmail.getText().trim();
         String password = passwordFieldPassword.getText();
@@ -130,6 +108,28 @@ public class FXMLLoginController implements Initializable {
         }
     }
 
+    @FXML
+    private void togglePasswordVisibility() {
+        if (toggleButtonShowPassword.isSelected()) {
+            passwordFieldPassword.setVisible(false);
+            textFieldPasswordVisible.setVisible(true);
+            toggleButtonShowPassword.setGraphic(createIcon(eyeOpen));
+        } else {
+            textFieldPasswordVisible.setVisible(false);
+            passwordFieldPassword.setVisible(true);
+            toggleButtonShowPassword.setGraphic(createIcon(eyeClosed));
+        }
+    }
+
+    private ImageView createIcon(Image image) {
+        ImageView imageView = new ImageView(image);
+        imageView.setFitHeight(IMAGE_FIT_HEIGHT);
+        imageView.setFitWidth(IMAGE_FIT_HEIGHT);
+        imageView.setPickOnBounds(true);
+        imageView.setPreserveRatio(true);
+        return imageView;
+    }
+    
     private void registerFailedAttempt() {
         failedAttempts++;
         if (failedAttempts >= MAX_ATTEMPTS) {

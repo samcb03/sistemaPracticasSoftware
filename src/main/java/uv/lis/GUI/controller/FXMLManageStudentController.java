@@ -134,6 +134,19 @@ public class FXMLManageStudentController extends ValidationHandler {
         }
     }
 
+    @Override
+    protected void clearFields() {
+        labelStudentId.setText("");
+        labelFirstName.setText("");
+        labelLastName.setText("");
+        labelDateBirth.setText("");
+        labelGender.setText("");
+        labelMessage.setText("");
+        labelMessage.setText("");
+        labelCompletedHours.setText("");
+        tableViewActivityDetails.getItems().clear();
+    }
+
     private void displayStudentInformation(Student student) {
         labelStudentId.setText(student.getIdStudent());
         labelFirstName.setText(student.getFirstName());
@@ -404,18 +417,5 @@ public class FXMLManageStudentController extends ValidationHandler {
             completedHours = reportContextDAO.getTotalReportedHoursByStudentId(currentStudent.getIdStudent());
         }
         return completedHours;
-    }
-
-    @Override
-    protected void clearFields() {
-        labelStudentId.setText("");
-        labelFirstName.setText("");
-        labelLastName.setText("");
-        labelDateBirth.setText("");
-        labelGender.setText("");
-        labelMessage.setText("");
-        labelMessage.setText("");
-        labelCompletedHours.setText("");
-        tableViewActivityDetails.getItems().clear();
     }
 }
