@@ -94,6 +94,14 @@ public class FXMLConsultStudentExpedientController extends ValidationHandler {
         }
     }
 
+    @Override
+    protected void clearFields() {
+        labelStudentId.setText("");
+        labelMessage.setText("");
+        labelTotal.setText("");
+        tableViewArchives.getItems().clear();
+    }
+
     private void configureFilterComboBox() {
         comboBoxFilter.getItems().addAll(FILTER_ALL, FILTER_REPORTS, FILTER_INITIAL_DOCUMENTS);
 
@@ -272,13 +280,5 @@ public class FXMLConsultStudentExpedientController extends ValidationHandler {
             LOGGER.log(Level.SEVERE, "Error de E/S al abrir el documento", ioException);
             showError("No se pudo abrir el documento");
         }
-    }
-
-    @Override
-    protected void clearFields() {
-        labelStudentId.setText("");
-        labelMessage.setText("");
-        labelTotal.setText("");
-        tableViewArchives.getItems().clear();
     }
 }

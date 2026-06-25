@@ -23,6 +23,12 @@ public abstract class WindowHandler implements Initializable {
     @FXML protected Button buttonLogOut;
     @FXML protected Button buttonBack;
 
+    @FXML
+    public void goBack() {
+        Stage currentStage = (Stage) buttonBack.getScene().getWindow();
+        currentStage.close();
+    }
+
     protected void navigateTo(String fxml) {
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource(fxml));
@@ -75,13 +81,6 @@ public abstract class WindowHandler implements Initializable {
         alert.setHeaderText(null);
         alert.setContentText(message);
         alert.showAndWait();
-    }
-
-    
-    @FXML
-    public void goBack() {
-        Stage currentStage = (Stage) buttonBack.getScene().getWindow();
-        currentStage.close();
     }
 
     private void closeAllOpenStages() {

@@ -72,6 +72,20 @@ public class FXMLManageProjectSupervisorController extends ValidationHandler {
         toggleEditMode(false);
     }
 
+    @Override
+    protected void clearFields() {
+        labelName.setText("-");
+        labelPosition.setText("-");
+        labelEmail.setText("-");
+        labelOrganization.setText("-");
+        labelStatus.setText("-");
+        labelMessage.setText("");
+        gridPaneProjectSupervisorInfo.setVisible(false);
+        buttonInactive.setDisable(true);
+        buttonUpdate.setDisable(true);
+        listViewProjects.getItems().clear();
+    }
+
     @FXML
     private void searchProjectSupervisor() {
         clearFields();
@@ -330,19 +344,5 @@ public class FXMLManageProjectSupervisorController extends ValidationHandler {
     private void setNodeVisibility(Node node, boolean isVisible) {
         node.setVisible(isVisible);
         node.setManaged(isVisible);
-    }
-
-    @Override
-    protected void clearFields() {
-        labelName.setText("-");
-        labelPosition.setText("-");
-        labelEmail.setText("-");
-        labelOrganization.setText("-");
-        labelStatus.setText("-");
-        labelMessage.setText("");
-        gridPaneProjectSupervisorInfo.setVisible(false);
-        buttonInactive.setDisable(true);
-        buttonUpdate.setDisable(true);
-        listViewProjects.getItems().clear();
     }
 }

@@ -96,6 +96,27 @@ public class FXMLManageAffiliatedOrganizationController extends ValidationHandle
         configureProjectDoubleClick();
     }
 
+    @Override
+    protected void clearFields() {
+        labelName.setText("-");
+        labelCity.setText("-");
+        labelStreet.setText("-");
+        labelStreetNumber.setText("-");
+        labelPostalCode.setText("-");
+        labelState.setText("-");
+        labelSector.setText("-");
+        labelEmail.setText("-");
+        labelPhoneNumber.setText("-");
+        labelNumberOfDirectUsers.setText("-");
+        labelNumberOfIndirectUsers.setText("-");
+        labelStatus.setText("-");
+        labelMessage.setText("");
+        listViewProjects.getItems().clear();
+        gridPaneOrganizationInfo.setVisible(false);
+        buttonInactive.setDisable(true);
+        buttonUpdate.setDisable(true);
+    }
+
     @FXML
     private void searchAffiliatedOrganization() {
         clearFields();
@@ -397,26 +418,5 @@ public class FXMLManageAffiliatedOrganizationController extends ValidationHandle
     private void setNodeVisibility(Node node, boolean isVisible) {
         node.setVisible(isVisible);
         node.setManaged(isVisible);
-    }
-
-    @Override
-    protected void clearFields() {
-        labelName.setText("-");
-        labelCity.setText("-");
-        labelStreet.setText("-");
-        labelStreetNumber.setText("-");
-        labelPostalCode.setText("-");
-        labelState.setText("-");
-        labelSector.setText("-");
-        labelEmail.setText("-");
-        labelPhoneNumber.setText("-");
-        labelNumberOfDirectUsers.setText("-");
-        labelNumberOfIndirectUsers.setText("-");
-        labelStatus.setText("-");
-        labelMessage.setText("");
-        listViewProjects.getItems().clear();
-        gridPaneOrganizationInfo.setVisible(false);
-        buttonInactive.setDisable(true);
-        buttonUpdate.setDisable(true);
     }
 }

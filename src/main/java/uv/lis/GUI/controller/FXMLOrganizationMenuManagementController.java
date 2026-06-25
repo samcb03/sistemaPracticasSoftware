@@ -15,6 +15,7 @@ public class FXMLOrganizationMenuManagementController extends WindowHandler{
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
+        /* There is no data to initialize */
     }
 
     @FXML 

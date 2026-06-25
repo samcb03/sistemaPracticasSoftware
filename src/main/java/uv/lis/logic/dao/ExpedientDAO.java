@@ -41,6 +41,7 @@ public class ExpedientDAO implements IExpedientDAO {
         "No se pudo registrar el reporte mensual en el expediente.";
 
     private MySQLConnectionManager connectionManager;
+
     public ExpedientDAO() {
         this.connectionManager = new MySQLConnectionManager();
     }
@@ -142,7 +143,7 @@ public class ExpedientDAO implements IExpedientDAO {
         Optional<Integer> validTypeDocument = getIdDocumentTypeByName(typeDocument);
 
         if (validTypeDocument.isEmpty()) {
-            throw new OperationException("Tipo de documento no válido: " + typeDocument, null);
+            throw new OperationException("Tipo de documento no válido", null);
         }
 
         int idTypeDocument = validTypeDocument.get();
@@ -183,102 +184,6 @@ public class ExpedientDAO implements IExpedientDAO {
         if (!isRegistered) {
             throw new OperationException(MONTHLY_REPORT_PERSIST_ERROR, null);
         }
-    }
-
-    private boolean persistMonthlyReportDocument(Expedient expedient) throws OperationException {
-        Optional<Expedient> rejected = getRejectedMonthlyExpedient(expedient.getIdReport());
-        boolean isSaved;
-
-        if (rejected.isPresent()) {
-            isSaved = replaceRejectedMonthlyDocument(expedient, rejected.get().getId());
-            if (isSaved && !rejected.get().getUrl().equals(expedient.getUrl())) {
-                FileManager.deleteFile(rejected.get().getUrl());
-            }
-        } else {
-            int nextEntry = countDocumentsByStudentAndType(expedient.getIdStudent(),
-                MONTHLY_REPORT_DOCUMENT_TYPE_ID) + NEXT_ENTRY_OFFSET;
-            isSaved = saveLinkedMonthlyDocument(expedient, nextEntry) > NO_VALUE;
-        }
-        return isSaved;
-    }
-
-    private Optional<Expedient> getRejectedMonthlyExpedient(int idReport) throws OperationException {
-        Optional<Expedient> rejectedExpedient = Optional.empty();
-        String expedientQuery = "SELECT idExpediente, url FROM Expediente "
-                              + "WHERE idReporte = ? AND idEstatus = ?";
-
-        try (Connection databaseConnection = connectionManager.getConnection();
-            PreparedStatement preparedStatement = databaseConnection.prepareStatement(expedientQuery)) {
-
-            preparedStatement.setInt(1, idReport);
-            preparedStatement.setInt(2, STATUS_REJECTED);
-
-            try (ResultSet resultSet = preparedStatement.executeQuery()) {
-                if (resultSet.next()) {
-                    Expedient expedient = new Expedient();
-                    expedient.setId(resultSet.getInt("idExpediente"));
-                    expedient.setUrl(resultSet.getString("url"));
-                    rejectedExpedient = Optional.of(expedient);
-                }
-            }
-        } catch (SQLException e) {
-            LOGGER.log(Level.SEVERE, "Error al consultar el reporte mensual rechazado", e);
-            throw new OperationException("Error al consultar el reporte mensual previo", e);
-        }
-        return rejectedExpedient;
-    }
-
-    private boolean replaceRejectedMonthlyDocument(Expedient expedient, int idExpedient)
-            throws OperationException {
-        boolean isReplaced = false;
-        String expedientQuery = "UPDATE Expediente SET nombre = ?, url = ?, idEstatus = ? "
-                              + "WHERE idExpediente = ?";
-
-        try (Connection databaseConnection = connectionManager.getConnection();
-            PreparedStatement preparedStatement = databaseConnection.prepareStatement(expedientQuery)) {
-
-            preparedStatement.setString(1, expedient.getName());
-            preparedStatement.setString(2, expedient.getUrl());
-            preparedStatement.setInt(3, STATUS_REQUESTED);
-            preparedStatement.setInt(4, idExpedient);
-
-            isReplaced = preparedStatement.executeUpdate() > NO_VALUE;
-        } catch (SQLException e) {
-            LOGGER.log(Level.SEVERE, "Error al reemplazar el reporte mensual rechazado", e);
-            throw new OperationException("No se pudo reemplazar el reporte mensual. Intente más tarde", e);
-        }
-        return isReplaced;
-    }
-
-    private int saveLinkedMonthlyDocument(Expedient expedient, int entryNumber) throws OperationException {
-        int generatedId = NO_GENERATED_ID;
-        String expedientQuery = "INSERT INTO Expediente "
-                              + "(nombre, url, matricula, idTipoDocumento, numeroEntrega, idReporte) "
-                              + "VALUES (?, ?, ?, ?, ?, ?)";
-
-        try (Connection databaseConnection = connectionManager.getConnection();
-            PreparedStatement preparedStatement = databaseConnection.prepareStatement(expedientQuery,
-                Statement.RETURN_GENERATED_KEYS)) {
-
-            preparedStatement.setString(1, expedient.getName());
-            preparedStatement.setString(2, expedient.getUrl());
-            preparedStatement.setString(3, expedient.getIdStudent());
-            preparedStatement.setInt(4, expedient.getIdTypeDocument());
-            preparedStatement.setInt(5, entryNumber);
-            preparedStatement.setInt(6, expedient.getIdReport());
-
-            if (preparedStatement.executeUpdate() > NO_VALUE) {
-                try (ResultSet resultSet = preparedStatement.getGeneratedKeys()) {
-                    if (resultSet.next()) {
-                        generatedId = resultSet.getInt(1);
-                    }
-                }
-            }
-        } catch (SQLException e) {
-            LOGGER.log(Level.SEVERE, "Error al guardar el reporte mensual en el expediente", e);
-            throw new OperationException("Error al guardar el documento en el expediente.", e);
-        }
-        return generatedId;
     }
 
     @Override
@@ -345,9 +250,10 @@ public class ExpedientDAO implements IExpedientDAO {
 
             int affectedRows = preparedStatement.executeUpdate();
             isUpdated = affectedRows > NO_VALUE;
-        } catch (SQLException e) {
-            LOGGER.log(Level.SEVERE, "Error al actualizar el estatus del documento", e);
-            throw new OperationException("No se pudo actualizar el estatus del documento. Intente más tarde", e);
+        } catch (SQLException sqlException) {
+            LOGGER.log(Level.SEVERE, "Error al actualizar el estatus del documento", sqlException);
+            throw new OperationException("No se pudo actualizar el estatus del documento. Intente más tarde", 
+                sqlException);
         }
         return isUpdated;
     }
@@ -487,6 +393,148 @@ public class ExpedientDAO implements IExpedientDAO {
         return studentIds;
     }
 
+    @Override
+    public int countDocumentsByStudentAndType(String studentId, int typeId) throws OperationException {
+        int count = 0;
+        String documentQuery = "SELECT COUNT(*) FROM Expediente "
+                             + "WHERE matricula = ? AND idTipoDocumento = ?";
+
+        try (Connection databaseConnection = connectionManager.getConnection();
+            PreparedStatement preparedStatement = databaseConnection.prepareStatement(documentQuery)) {
+
+            preparedStatement.setString(1, studentId);
+            preparedStatement.setInt(2, typeId);
+
+            try (ResultSet resultSet = preparedStatement.executeQuery()) {
+                if (resultSet.next()) {
+                    count = resultSet.getInt(1);
+                }
+            }
+        } catch (SQLException e) {
+            LOGGER.log(Level.SEVERE, "Error al contar documentos por tipo", e);
+            throw new OperationException("Error al verificar documentos subidos", e);
+        }
+        return count;
+    }
+
+    @Override
+    public List<String> getStudentIdsWithLiberationLetter() throws OperationException {
+        List<String> studentIds = new ArrayList<>();
+        String expedientQuery = "SELECT DISTINCT matricula FROM Expediente "
+                              + "WHERE idTipoDocumento = ?";
+
+        try (Connection databaseConnection = connectionManager.getConnection();
+            PreparedStatement preparedStatement = databaseConnection.prepareStatement(expedientQuery)) {
+
+            preparedStatement.setInt(1, LIBERATION_LETTER_TYPE_ID);
+
+            try (ResultSet resultSet = preparedStatement.executeQuery()) {
+                while (resultSet.next()) {
+                    studentIds.add(resultSet.getString("matricula"));
+                }
+            }
+        } catch (SQLException e) {
+            LOGGER.log(Level.SEVERE, "Error al obtener alumnos con carta de liberación", e);
+            throw new OperationException("Error al obtener alumnos con carta de liberación. Intente más tarde", e);
+        }
+        return studentIds;
+    }
+
+     private boolean persistMonthlyReportDocument(Expedient expedient) throws OperationException {
+        Optional<Expedient> rejected = getRejectedMonthlyExpedient(expedient.getIdReport());
+        boolean isSaved;
+
+        if (rejected.isPresent()) {
+            isSaved = replaceRejectedMonthlyDocument(expedient, rejected.get().getId());
+            if (isSaved && !rejected.get().getUrl().equals(expedient.getUrl())) {
+                FileManager.deleteFile(rejected.get().getUrl());
+            }
+        } else {
+            int nextEntry = countDocumentsByStudentAndType(expedient.getIdStudent(),
+                MONTHLY_REPORT_DOCUMENT_TYPE_ID) + NEXT_ENTRY_OFFSET;
+            isSaved = saveLinkedMonthlyDocument(expedient, nextEntry) > NO_VALUE;
+        }
+        return isSaved;
+    }
+
+    private Optional<Expedient> getRejectedMonthlyExpedient(int idReport) throws OperationException {
+        Optional<Expedient> rejectedExpedient = Optional.empty();
+        String expedientQuery = "SELECT idExpediente, url FROM Expediente "
+                              + "WHERE idReporte = ? AND idEstatus = ?";
+
+        try (Connection databaseConnection = connectionManager.getConnection();
+            PreparedStatement preparedStatement = databaseConnection.prepareStatement(expedientQuery)) {
+
+            preparedStatement.setInt(1, idReport);
+            preparedStatement.setInt(2, STATUS_REJECTED);
+
+            try (ResultSet resultSet = preparedStatement.executeQuery()) {
+                if (resultSet.next()) {
+                    Expedient expedient = new Expedient();
+                    expedient.setId(resultSet.getInt("idExpediente"));
+                    expedient.setUrl(resultSet.getString("url"));
+                    rejectedExpedient = Optional.of(expedient);
+                }
+            }
+        } catch (SQLException e) {
+            LOGGER.log(Level.SEVERE, "Error al consultar el reporte mensual rechazado", e);
+            throw new OperationException("Error al consultar el reporte mensual previo", e);
+        }
+        return rejectedExpedient;
+    }
+
+    private boolean replaceRejectedMonthlyDocument(Expedient expedient, int idExpedient) throws OperationException {
+        boolean isReplaced = false;
+        String expedientQuery = "UPDATE Expediente SET nombre = ?, url = ?, idEstatus = ? "
+                              + "WHERE idExpediente = ?";
+
+        try (Connection databaseConnection = connectionManager.getConnection();
+            PreparedStatement preparedStatement = databaseConnection.prepareStatement(expedientQuery)) {
+
+            preparedStatement.setString(1, expedient.getName());
+            preparedStatement.setString(2, expedient.getUrl());
+            preparedStatement.setInt(3, STATUS_REQUESTED);
+            preparedStatement.setInt(4, idExpedient);
+
+            isReplaced = preparedStatement.executeUpdate() > NO_VALUE;
+        } catch (SQLException e) {
+            LOGGER.log(Level.SEVERE, "Error al reemplazar el reporte mensual rechazado", e);
+            throw new OperationException("No se pudo reemplazar el reporte mensual. Intente más tarde", e);
+        }
+        return isReplaced;
+    }
+
+    private int saveLinkedMonthlyDocument(Expedient expedient, int entryNumber) throws OperationException {
+        int generatedId = NO_GENERATED_ID;
+        String expedientQuery = "INSERT INTO Expediente "
+                              + "(nombre, url, matricula, idTipoDocumento, numeroEntrega, idReporte) "
+                              + "VALUES (?, ?, ?, ?, ?, ?)";
+
+        try (Connection databaseConnection = connectionManager.getConnection();
+            PreparedStatement preparedStatement = databaseConnection.prepareStatement(expedientQuery,
+                Statement.RETURN_GENERATED_KEYS)) {
+
+            preparedStatement.setString(1, expedient.getName());
+            preparedStatement.setString(2, expedient.getUrl());
+            preparedStatement.setString(3, expedient.getIdStudent());
+            preparedStatement.setInt(4, expedient.getIdTypeDocument());
+            preparedStatement.setInt(5, entryNumber);
+            preparedStatement.setInt(6, expedient.getIdReport());
+
+            if (preparedStatement.executeUpdate() > NO_VALUE) {
+                try (ResultSet resultSet = preparedStatement.getGeneratedKeys()) {
+                    if (resultSet.next()) {
+                        generatedId = resultSet.getInt(1);
+                    }
+                }
+            }
+        } catch (SQLException e) {
+            LOGGER.log(Level.SEVERE, "Error al guardar el reporte mensual en el expediente", e);
+            throw new OperationException("Error al guardar el documento en el expediente.", e);
+        }
+        return generatedId;
+    }
+
     private Expedient buildExpedientFromResultSet(ResultSet resultSet) throws SQLException {
         Expedient expedient = new Expedient(
             resultSet.getString("nombre"),
@@ -602,53 +650,5 @@ public class ExpedientDAO implements IExpedientDAO {
             isSaved = saveDocument(expedient) > NO_VALUE;
         }
         return isSaved;
-    }
-
-
-    @Override
-    public int countDocumentsByStudentAndType(String studentId, int typeId) throws OperationException {
-        int count = 0;
-        String documentQuery = "SELECT COUNT(*) FROM Expediente "
-                             + "WHERE matricula = ? AND idTipoDocumento = ?";
-
-        try (Connection databaseConnection = connectionManager.getConnection();
-            PreparedStatement preparedStatement = databaseConnection.prepareStatement(documentQuery)) {
-
-            preparedStatement.setString(1, studentId);
-            preparedStatement.setInt(2, typeId);
-
-            try (ResultSet resultSet = preparedStatement.executeQuery()) {
-                if (resultSet.next()) {
-                    count = resultSet.getInt(1);
-                }
-            }
-        } catch (SQLException e) {
-            LOGGER.log(Level.SEVERE, "Error al contar documentos por tipo", e);
-            throw new OperationException("Error al verificar documentos subidos", e);
-        }
-        return count;
-    }
-
-    @Override
-    public List<String> getStudentIdsWithLiberationLetter() throws OperationException {
-        List<String> studentIds = new ArrayList<>();
-        String expedientQuery = "SELECT DISTINCT matricula FROM Expediente "
-                            + "WHERE idTipoDocumento = ?";
-
-        try (Connection databaseConnection = connectionManager.getConnection();
-            PreparedStatement preparedStatement = databaseConnection.prepareStatement(expedientQuery)) {
-
-            preparedStatement.setInt(1, LIBERATION_LETTER_TYPE_ID);
-
-            try (ResultSet resultSet = preparedStatement.executeQuery()) {
-                while (resultSet.next()) {
-                    studentIds.add(resultSet.getString("matricula"));
-                }
-            }
-        } catch (SQLException e) {
-            LOGGER.log(Level.SEVERE, "Error al obtener alumnos con carta de liberación", e);
-            throw new OperationException("Error al obtener alumnos con carta de liberación. Intente más tarde", e);
-        }
-        return studentIds;
     }
 }

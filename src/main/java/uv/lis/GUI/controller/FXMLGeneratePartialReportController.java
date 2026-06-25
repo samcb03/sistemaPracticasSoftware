@@ -117,6 +117,63 @@ public class FXMLGeneratePartialReportController extends ValidationHandler {
         };
     }
 
+    @FXML
+    public void validatorReport() {
+        validateFields();
+    }
+
+    @FXML
+    public void openPlannedAdvanceEditor() {
+        editingPlanned = true;
+        prepareAndShowEditor();
+    }
+
+    @FXML
+    public void openRealAdvanceEditor() {
+        editingPlanned = false;
+        prepareAndShowEditor();
+    }
+
+    @FXML
+    public void saveAdvanceEdits() {
+        Optional<String> validationError = advanceGridEditor.validateAdvances();
+
+        if (validationError.isPresent()) {
+            labelAdvanceEditorMessage.setText(validationError.get());
+        } else {
+            int[][] target = editingPlanned ? plannedAdvances : realAdvances;
+
+            advanceGridEditor.applyEditsTo(target);
+            manualAdvances = true;
+            labelAdvanceEditorMessage.setText("");
+            paneAdvanceEditor.setVisible(false);
+        }
+    }
+
+    @FXML
+    public void cancelAdvanceEdits() {
+        paneAdvanceEditor.setVisible(false);
+    }
+
+    @Override
+    protected void clearFields() {
+        for (ComboBox<String> comboBoxActivity : comboBoxActivities) {
+            comboBoxActivity.getSelectionModel().clearSelection();
+        }
+        for (TextField textFieldAdvance : textFieldAdvances) {
+            textFieldAdvance.clear();
+        }
+
+        textAreaGeneralObservations.clear();
+        textAreaResults.clear();
+        labelMessage.setText("");
+
+        plannedAdvances = new int[PartialReport.MAX_WEEKS][PartialReport.MAX_ACTIVITIES];
+        realAdvances = new int[PartialReport.MAX_WEEKS][PartialReport.MAX_ACTIVITIES];
+        manualAdvances = false;
+        paneAdvanceEditor.setVisible(false);
+    }
+
     private void loadStudentActivities() {
         Student currentStudent = SessionManager.getInstance().getCurrentStudent();
 
@@ -142,11 +199,6 @@ public class FXMLGeneratePartialReportController extends ValidationHandler {
             LOGGER.log(Level.SEVERE, LOAD_ACTIVITIES_ERROR, operationException);
             showError(operationException.getMessage());
         }
-    }
-
-    @FXML
-    public void validatorReport() {
-        validateFields();
     }
 
     private void validateFields() {
@@ -283,18 +335,6 @@ public class FXMLGeneratePartialReportController extends ValidationHandler {
         return parsedAdvance;
     }
 
-    @FXML
-    public void openPlannedAdvanceEditor() {
-        editingPlanned = true;
-        prepareAndShowEditor();
-    }
-
-    @FXML
-    public void openRealAdvanceEditor() {
-        editingPlanned = false;
-        prepareAndShowEditor();
-    }
-
     private void prepareAndShowEditor() {
         Activity[] activitiesBySlot = resolveSelectedActivities();
 
@@ -312,27 +352,6 @@ public class FXMLGeneratePartialReportController extends ValidationHandler {
         } else {
             showError(NO_ACTIVITY_SELECTED_MESSAGE);
         }
-    }
-
-    @FXML
-    public void saveAdvanceEdits() {
-        Optional<String> validationError = advanceGridEditor.validateAdvances();
-
-        if (validationError.isPresent()) {
-            labelAdvanceEditorMessage.setText(validationError.get());
-        } else {
-            int[][] target = editingPlanned ? plannedAdvances : realAdvances;
-
-            advanceGridEditor.applyEditsTo(target);
-            manualAdvances = true;
-            labelAdvanceEditorMessage.setText("");
-            paneAdvanceEditor.setVisible(false);
-        }
-    }
-
-    @FXML
-    public void cancelAdvanceEdits() {
-        paneAdvanceEditor.setVisible(false);
     }
 
     private Activity[] resolveSelectedActivities() {
@@ -405,24 +424,5 @@ public class FXMLGeneratePartialReportController extends ValidationHandler {
             partialReport.setRealAdvances(realAdvances);
             partialReport.setManualAdvances(true);
         }
-    }
-
-    @Override
-    protected void clearFields() {
-        for (ComboBox<String> comboBoxActivity : comboBoxActivities) {
-            comboBoxActivity.getSelectionModel().clearSelection();
-        }
-        for (TextField textFieldAdvance : textFieldAdvances) {
-            textFieldAdvance.clear();
-        }
-
-        textAreaGeneralObservations.clear();
-        textAreaResults.clear();
-        labelMessage.setText("");
-
-        plannedAdvances = new int[PartialReport.MAX_WEEKS][PartialReport.MAX_ACTIVITIES];
-        realAdvances = new int[PartialReport.MAX_WEEKS][PartialReport.MAX_ACTIVITIES];
-        manualAdvances = false;
-        paneAdvanceEditor.setVisible(false);
     }
 }

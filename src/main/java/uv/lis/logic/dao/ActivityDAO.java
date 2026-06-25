@@ -19,8 +19,8 @@ import uv.lis.logic.dto.Activity;
 import uv.lis.logic.exceptions.OperationException;
 
 public class ActivityDAO implements IActivityDAO {
-        private static final Logger LOGGER = Logger.getLogger(ActivityDAO.class.getName());
-        private MySQLConnectionManager connectionManager;
+    private static final Logger LOGGER = Logger.getLogger(ActivityDAO.class.getName());
+    private MySQLConnectionManager connectionManager;
 
     public ActivityDAO() {
         this.connectionManager = new MySQLConnectionManager();
@@ -94,10 +94,6 @@ public class ActivityDAO implements IActivityDAO {
                              + "FechaFin, idProyecto, horasReportadas, matricula) "
                              + "VALUES(?, ?, ?, ?, ?, ?, ?);";
 
-        if (activity == null) {
-            throw new OperationException("No se pudo registrar la actividad porque es nula", null);
-        }
-
         try (Connection databaseConnection = connectionManager.getConnection();
             PreparedStatement preparedStatement = databaseConnection.prepareStatement(activityQuery,
                 PreparedStatement.RETURN_GENERATED_KEYS)) {
@@ -136,10 +132,6 @@ public class ActivityDAO implements IActivityDAO {
         
         String activityQuery = "UPDATE Actividad SET nombreActividad = ?, descripcionActividad = ?, FechaInicio = ?, " 
                              + "FechaFin = ?, idProyecto = ?, horasReportadas = ? WHERE idActividad = ?;";
-
-        if (activity == null) {
-            throw new OperationException("No se pudo modificar la actividad porque es nula", null);
-        }
         
         try (Connection databaseConnection = connectionManager.getConnection();
             PreparedStatement preparedStatement = databaseConnection.prepareStatement(activityQuery)) {
