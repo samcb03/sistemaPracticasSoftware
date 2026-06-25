@@ -3,10 +3,8 @@ package uv.lis.GUI.controller;
 import static uv.lis.logic.utils.InputValidator.STATUS_ASSIGNED;
 import static uv.lis.logic.utils.InputValidator.STATUS_REJECTED;
 import static uv.lis.logic.utils.InputValidator.validateMaxIntValue;
-import static uv.lis.logic.utils.InputValidator.validatePercentage;
 
 import java.awt.Desktop;
-import java.awt.TextField;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
@@ -27,7 +25,7 @@ import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
-import javafx.scene.control.TextInputDialog;
+import javafx.scene.control.TextField;
 import uv.lis.GUI.ValidationHandler;
 import uv.lis.GUI.cell.ActionTableCell;
 import uv.lis.GUI.cell.DocumentReviewTableCell;
@@ -69,8 +67,6 @@ public class FXMLConsultStudentExpedientController extends ValidationHandler {
         "El documento ya está validado y no puede cambiar de estado.";
     private static final String GRADE_REGISTER_SUCCESS = "Calificación registrada correctamente";
     private static final String GRADE_REGISTER_FAILURE = "No se pudo registrar la calificación";
-    private static final String GRADE_INPUT_PROMPT = "Ingrese la calificación final del alumno (0-10):";
-    private static final String GRADE_INPUT_TITLE = "Registrar calificación";
 
     @FXML private Label labelStudentId;
     @FXML private Label labelTotal;
@@ -84,6 +80,7 @@ public class FXMLConsultStudentExpedientController extends ValidationHandler {
     @FXML private TableColumn<Expedient, Void> columnReview;
     @FXML private TableColumn<Expedient, Void> columnAction;
     @FXML private TextField textFieldGrade;
+    @FXML private Button buttonAcceptGrade;
 
     private ExpedientDAO expedientDAO;
     private PracticeDAO practiceDAO;
@@ -329,25 +326,29 @@ public class FXMLConsultStudentExpedientController extends ValidationHandler {
     }
 
     private void promptAndRegisterGrade(String studentId) {
-    try {
-        boolean alreadyExists = practiceDAO.existsByStudent(studentId);
+        try {
+            boolean alreadyExists = practiceDAO.existsByStudent(studentId);
 
-        if (!alreadyExists) {
-            textFieldGrade.setEnabled(true);
-
-            Optional<String> firstError = validateMaxIntValue(textFieldGrade.getText(), MAX_CALIFICATION, 
-                "La calificacion ");
-            if(firstError.isPresent()) {
-                showError(firstError.get());
-            } else {
-                processGradeInput(textFieldGrade.getText(), studentId);
+            if (!alreadyExists) {
+                textFieldGrade.setDisable(false);
+                buttonAcceptGrade.setDisable(false);
             }
+        } catch (OperationException e) {
+            LOGGER.log(Level.SEVERE, "Error al verificar calificación existente", e);
+            showError(e.getMessage());
         }
-    } catch (OperationException e) {
-        LOGGER.log(Level.SEVERE, "Error al verificar calificación existente", e);
-        showError(e.getMessage());
     }
-}
+
+    @FXML
+    private void addPractice() {
+        Optional<String> firstError = validateMaxIntValue(textFieldGrade.getText(), MAX_CALIFICATION, 
+            "La calificacion ");
+            if(firstError.isPresent()) {
+               showError(firstError.get());
+            } else {
+                processGradeInput(textFieldGrade.getText(), labelStudentId.getText());
+            }
+    }
 
     private void processGradeInput(String input, String studentId) {
         if (input != null) {
