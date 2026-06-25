@@ -41,8 +41,8 @@ public class FinalReportCommon {
     private final SimpleJasperReportsContext jasperReportsContext;
 
     public FinalReportCommon() {
-        this.reportContextDAO = new ReportContextDAO();
-        this.jasperReportsContext = buildReportsContext();
+        reportContextDAO = new ReportContextDAO();
+        jasperReportsContext = buildReportsContext();
     }
 
     private SimpleJasperReportsContext buildReportsContext() {
@@ -62,7 +62,8 @@ public class FinalReportCommon {
         }
 
         mergeContextIntoReport(finalReport, currentStudent.getIdStudent());
-        return fillReportTemplate(finalReport);
+        JasperPrint jasperPrint = fillReportTemplate(finalReport);
+        return jasperPrint;
     }
 
     public JasperPrint fillReportTemplate(FinalReport finalReport) throws JRException, OperationException {
@@ -87,7 +88,6 @@ public class FinalReportCommon {
 
     private void mergeContextIntoReport(FinalReport finalReport, String studentId) throws OperationException {
         FinalReport context = reportContextDAO.getFinalReportContextByStudentId(studentId);
-
         finalReport.setStudentName(context.getStudentName());
         finalReport.setProfessorName(context.getProfessorName());
         finalReport.setNrcSubject(context.getNrcSubject());
@@ -96,19 +96,16 @@ public class FinalReportCommon {
         finalReport.setProjectObjective(context.getProjectObjective());
         finalReport.setProjectMethodology(context.getProjectMethodology());
         finalReport.setAffiliatedOrganization(context.getAffiliatedOrganization());
-
         finalReport.setTotalHours(reportContextDAO.getTotalReportedHoursByStudentId(studentId));
         finalReport.setDateReport(LocalDate.now().format(DATE_FORMATTER));
     }
 
     private Map<String, Object> buildReportParameters(FinalReport finalReport) {
         Map<String, Object> parameters = new HashMap<>();
-
         addContextParameters(parameters, finalReport);
         addActivityParameters(parameters, finalReport);
         addDeliverableParameters(parameters, finalReport);
         parameters.put("generalObservations", finalReport.getGeneralObservations());
-
         return parameters;
     }
 
@@ -128,11 +125,9 @@ public class FinalReportCommon {
     private void addActivityParameters(Map<String, Object> parameters, FinalReport report) {
         ActivityProgress firstActivity = report.getFirstActivity();
         ActivityProgress secondActivity = report.getSecondActivity();
-
         parameters.put("activityName1", firstActivity.getName());
         parameters.put("advancePercentageActivity1", firstActivity.getAdvancePercentage());
         parameters.put("observationsActivity1", firstActivity.getObservations());
-
         parameters.put("activityName2", secondActivity.getName());
         parameters.put("advancePercentageActivity2", secondActivity.getAdvancePercentage());
         parameters.put("observationsActivity2", secondActivity.getObservations());
@@ -141,11 +136,9 @@ public class FinalReportCommon {
     private void addDeliverableParameters(Map<String, Object> parameters, FinalReport report) {
         DeliverableResult firstDeliverable = report.getFirstDeliverable();
         DeliverableResult secondDeliverable = report.getSecondDeliverable();
-
         parameters.put("result1", firstDeliverable.getResult());
         parameters.put("resultAdvance1", firstDeliverable.getAdvancePercentage());
         parameters.put("resultObservations1", firstDeliverable.getObservations());
-
         parameters.put("result2", secondDeliverable.getResult());
         parameters.put("resultAdvance2", secondDeliverable.getAdvancePercentage());
         parameters.put("resultObservations2", secondDeliverable.getObservations());

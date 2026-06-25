@@ -92,5 +92,12 @@ public interface IStudentDAO {
      */
     boolean hasProjectAssigned(String studentId) throws OperationException;
 
+    /**
+     * Retrieves the students identified by the given list of ids.
+     *
+     * @param studentIds the list of student identifiers to look up
+     * @return the list of matching students, empty if there are none
+     * @throws OperationException if the students cannot be retrieved
+     */
     List<Student> getStudentsByIds(List<String> studentIds) throws OperationException;
 }
