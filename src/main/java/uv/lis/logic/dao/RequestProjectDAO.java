@@ -187,9 +187,9 @@ public class RequestProjectDAO implements IRequestProjectDAO {
     }
 
     @Override
-    public boolean assignStudentToProject(String idStudent, int idProject) throws OperationException {
+    public boolean assignStudentToProject(String idStudent, int idProject, boolean isAlternative) throws OperationException {
         boolean isAssigned = false;
-        isAssigned = runAssignmentInTransaction(idStudent, idProject, false);
+        isAssigned = runAssignmentInTransaction(idStudent, idProject, isAlternative);
         return isAssigned;
     }
 
@@ -393,13 +393,6 @@ public class RequestProjectDAO implements IRequestProjectDAO {
             throw new OperationException("Error al obtener alumnos sin proyecto asignado", e);
         }
         return students;
-    }
-
-    @Override
-    public boolean assignStudentToProjectAlternative(String idStudent, int idProject) throws OperationException {
-        boolean isAssigned = false;
-        isAssigned = runAssignmentInTransaction(idStudent, idProject, true);
-        return isAssigned;
     }
 
     private void insertAssignment(Connection databaseConnection, String idStudent, int idProject) throws SQLException {

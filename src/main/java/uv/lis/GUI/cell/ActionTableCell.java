@@ -21,9 +21,9 @@ public class ActionTableCell extends TableCell<Expedient, Void> {
     }
 
     @Override
-    protected void updateItem(Void item, boolean empty) {
-        super.updateItem(item, empty);
-        setGraphic(empty ? null : openButton);
+    protected void updateItem(Void item, boolean isEmpty) {
+        super.updateItem(item, isEmpty);
+        setGraphic(isEmpty ? null : openButton);
     }
 
     private void notifyOpenRequested() {

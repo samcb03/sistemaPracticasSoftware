@@ -34,10 +34,10 @@ public class DocumentReviewTableCell extends TableCell<Expedient, Void> {
     }
 
     @Override
-    protected void updateItem(Void item, boolean empty) {
-        super.updateItem(item, empty);
+    protected void updateItem(Void item, boolean isEmpty) {
+        super.updateItem(item, isEmpty);
 
-        if (empty) {
+        if (isEmpty) {
             setGraphic(null);
         } else {
             Expedient expedient = getTableView().getItems().get(getIndex());

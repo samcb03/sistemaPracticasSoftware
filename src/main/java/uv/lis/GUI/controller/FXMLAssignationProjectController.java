@@ -228,8 +228,8 @@ public class FXMLAssignationProjectController extends ValidationHandler {
 
     private boolean applyAssignment(Project project, String idStudent, String reason) throws OperationException {
         boolean isAssigned = isAlternativeMode
-            ? requestProjectDAO.assignStudentToProjectAlternative(idStudent, project.getId())
-            : requestProjectDAO.assignStudentToProject(idStudent, project.getId());
+            ? requestProjectDAO.assignStudentToProject(idStudent, project.getId(), true)
+            : requestProjectDAO.assignStudentToProject(idStudent, project.getId(), false);
 
         if (isAssigned) {
             showSuccess("Asignación exitosa para " + idStudent);

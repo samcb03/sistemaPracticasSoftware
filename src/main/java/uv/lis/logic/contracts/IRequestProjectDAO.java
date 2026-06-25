@@ -77,7 +77,7 @@ public interface IRequestProjectDAO {
      * @return true if the student was assigned, false otherwise
      * @throws OperationException if the student cannot be assigned
      */
-    boolean assignStudentToProject(String idStudent, int idProject) throws OperationException;
+    boolean assignStudentToProject(String idStudent, int idProject, boolean isAlternative) throws OperationException;
 
     /**
      * Retrieves the students that applied to a project.
@@ -121,14 +121,4 @@ public interface IRequestProjectDAO {
      * @throws OperationException if the students cannot be retrieved
      */
     ArrayList<Student> getStudentsWithoutAssignedProject() throws OperationException;
-
-    /**
-     * Assigns a student to a project using the alternative assignment flow.
-     *
-     * @param idStudent the identifier of the student to assign
-     * @param idProject the identifier of the project to assign the student to
-     * @return true if the student was assigned, false otherwise
-     * @throws OperationException if the student cannot be assigned
-     */
-    boolean assignStudentToProjectAlternative(String idStudent, int idProject) throws OperationException;
 }

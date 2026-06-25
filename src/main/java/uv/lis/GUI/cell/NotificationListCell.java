@@ -31,10 +31,10 @@ public class NotificationListCell extends ListCell<Notification> {
     }
 
     @Override
-    protected void updateItem(Notification notification, boolean empty) {
-        super.updateItem(notification, empty);
+    protected void updateItem(Notification notification, boolean isEmpty) {
+        super.updateItem(notification, isEmpty);
 
-        if (empty || notification == null) {
+        if (isEmpty || notification == null) {
             setText(null);
             setGraphic(null);
         } else {
