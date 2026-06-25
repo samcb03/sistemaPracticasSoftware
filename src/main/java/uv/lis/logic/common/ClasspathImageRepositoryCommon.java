@@ -29,7 +29,8 @@ public final class ClasspathImageRepositoryCommon implements RepositoryService {
 
     @Override
     public Resource getResource(String uri) {
-        return getResource(uri, InputStreamResource.class);
+        Resource resource = getResource(uri, InputStreamResource.class);
+        return resource;
     }
 
     @Override

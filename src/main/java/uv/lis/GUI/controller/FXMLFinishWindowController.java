@@ -57,7 +57,7 @@ public class FXMLFinishWindowController extends ValidationHandler {
                 labelStudentName.setText(currentStudent.getFirstName() + " " + currentStudent.getLastName());
 
                 Optional<Project> assignedProject = projectDAO.getProjectByStudentId(studentId);
-                Optional<ProjectSummary> projectDetails = projectDAO.getDetailsProjectByStudentId(studentId);
+                Optional<ProjectSummary> projectDetails = projectDAO.getProjectDetailsByStudentId(studentId);
 
                 if (assignedProject.isEmpty() || projectDetails.isEmpty()) {
                     showError(NO_PROJECT_ASSIGNED_MESSAGE);

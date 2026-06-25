@@ -505,7 +505,7 @@ class ProjectDAOTest {
     }
 
     @Test
-    void getDetailsProjectByStudentId_found_returnsProjectSummary() throws Exception {
+    void getProjectDetailsByStudentId_found_returnsProjectSummary() throws Exception {
         when(databaseConnection.prepareStatement(anyString())).thenReturn(preparedStatement);
         when(preparedStatement.executeQuery()).thenReturn(resultSet);
         when(resultSet.next()).thenReturn(true);
@@ -518,23 +518,23 @@ class ProjectDAOTest {
         when(resultSet.getString(COLUMN_ORGANIZATION_NAME)).thenReturn(ORGANIZATION_NAME);
 
         assertEquals(Optional.of(builderProjectSummary()),
-            projectDAO.getDetailsProjectByStudentId(STUDENT_ID));
+            projectDAO.getProjectDetailsByStudentId(STUDENT_ID));
     }
 
     @Test
-    void getDetailsProjectByStudentId_notFound_returnsEmpty() throws Exception {
+    void getProjectDetailsByStudentId_notFound_returnsEmpty() throws Exception {
         when(databaseConnection.prepareStatement(anyString())).thenReturn(preparedStatement);
         when(preparedStatement.executeQuery()).thenReturn(resultSet);
         when(resultSet.next()).thenReturn(false);
 
-        assertFalse(projectDAO.getDetailsProjectByStudentId(STUDENT_ID).isPresent());
+        assertFalse(projectDAO.getProjectDetailsByStudentId(STUDENT_ID).isPresent());
     }
 
     @Test
-    void getDetailsProjectByStudentId_sqlError_throwsOperationException() throws Exception {
+    void getProjectDetailsByStudentId_sqlError_throwsOperationException() throws Exception {
         when(connectionManager.getConnection()).thenThrow(new SQLException(CONNECTION_ERROR));
 
         assertThrows(OperationException.class,
-            () -> projectDAO.getDetailsProjectByStudentId(STUDENT_ID));
+            () -> projectDAO.getProjectDetailsByStudentId(STUDENT_ID));
     }
 }

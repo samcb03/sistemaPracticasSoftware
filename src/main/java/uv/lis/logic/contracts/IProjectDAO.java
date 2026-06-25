@@ -107,5 +107,5 @@ public interface IProjectDAO {
      * @return the project summary if the student has one assigned, empty otherwise
      * @throws OperationException if the project summary cannot be retrieved
      */
-    Optional<ProjectSummary> getDetailsProjectByStudentId(String studentId) throws OperationException;
+    Optional<ProjectSummary> getProjectDetailsByStudentId(String studentId) throws OperationException;
 }
