@@ -87,17 +87,7 @@ public class FXMLConsultStudentExpedientController extends ValidationHandler {
         labelStudentId.setText(studentId);
         try {
             allDocuments = expedientDAO.getDocumentsByStudentId(studentId);
-            if (SessionManager.getInstance().getCurrentCoordinator().isPresent()) {
-                allDocuments = allDocuments.stream()
-                    .filter(expedient -> expedient.getIdTypeDocument() == LIBERATION_LETTER_TYPE_ID)
-                    .collect(Collectors.toList());
-            } else {
-                allDocuments = allDocuments.stream()
-                    .filter(expedient -> expedient.getIdTypeDocument() != LIBERATION_LETTER_TYPE_ID)
-                    .collect(Collectors.toList());
-            }
-            
-        applyCurrentFilter();
+            applyCurrentFilter();
         } catch (OperationException e) {
             LOGGER.log(Level.SEVERE, "Error al cargar los documentos del alumno", e);
             showError(e.getMessage());

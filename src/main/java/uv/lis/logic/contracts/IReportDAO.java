@@ -86,14 +86,6 @@ public interface IReportDAO {
     boolean registerMonthlyReport(MonthlyReport monthlyReport) throws OperationException;
 
     /**
-     * Saves the evaluation results of a report.
-     *
-     * @param report the report that holds the evaluation results to save
-     * @throws OperationException if the evaluation cannot be saved
-     */
-    void evaluationReport(Report report) throws OperationException;
-
-    /**
      * Indicates whether a student has a saved report of the given document type.
      *
      * @param idStudent the identifier of the student to verify

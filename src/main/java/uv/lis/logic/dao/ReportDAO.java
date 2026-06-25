@@ -57,7 +57,7 @@ public class ReportDAO implements IReportDAO {
     @Override
     public List<Report> getAllReports() throws OperationException {
         List<Report> reports = new ArrayList<>();
-        String reportQuery = "SELECT idReporte, descripcion, observaciones, actividad, matricula FROM Reporte";
+        String reportQuery = "SELECT idReporte, matricula FROM Reporte";
 
         try (Connection databaseConnection = connectionManager.getConnection();
                 PreparedStatement preparedStatement = databaseConnection.prepareStatement(reportQuery);
@@ -76,8 +76,7 @@ public class ReportDAO implements IReportDAO {
     @Override
     public Optional<PartialReport> getPartialReportById(int idPartialReport) throws OperationException {
         Optional<PartialReport> validReport = Optional.empty();
-        String reportQuery = "SELECT r.idReporte, r.descripcion, r.observaciones, r.actividad, "
-                           + "r.matricula, rp.tiempoPlaneado, rp.tiempoReal "
+        String reportQuery = "SELECT r.idReporte, r.matricula, rp.observaciones "
                            + "FROM ReporteParcial rp "
                            + "INNER JOIN Reporte r ON rp.idReporte = r.idReporte "
                            + "WHERE rp.idReporte = ?";
@@ -91,7 +90,7 @@ public class ReportDAO implements IReportDAO {
                 if (resultSet.next()) {
                     validReport = Optional.of(mapPartialReport(resultSet));
                 } else {
-                    LOGGER.log(Level.INFO,"No se encontró un reporte parcial con id {0}", idPartialReport);
+                    LOGGER.log(Level.INFO, "No se encontró un reporte parcial con id {0}", idPartialReport);
                 }
             }
         } catch (SQLException e) {
@@ -125,7 +124,6 @@ public class ReportDAO implements IReportDAO {
 
         try (Connection databaseConnection = connectionManager.getConnection()) {
             databaseConnection.setAutoCommit(false);
-            updateReportRow(databaseConnection, partialReport);
             isModified = updatePartialDetail(databaseConnection, partialReport);
             commitOrRollback(databaseConnection, isModified);
         } catch (SQLException e) {
@@ -139,8 +137,7 @@ public class ReportDAO implements IReportDAO {
     @Override
     public Optional<FinalReport> getFinalReportById(int idFinalReport) throws OperationException {
         Optional<FinalReport> validReport = Optional.empty();
-        String reportQuery = "SELECT r.idReporte, r.descripcion, r.observaciones, r.actividad, "
-                           + "r.matricula, rf.observacionesGenerales "
+        String reportQuery = "SELECT r.idReporte, r.matricula, rf.observacionesGenerales "
                            + "FROM ReporteFinal rf "
                            + "INNER JOIN Reporte r ON rf.idReporte = r.idReporte "
                            + "WHERE rf.idReporte = ?";
@@ -187,7 +184,6 @@ public class ReportDAO implements IReportDAO {
 
         try (Connection databaseConnection = connectionManager.getConnection()) {
             databaseConnection.setAutoCommit(false);
-            updateReportRow(databaseConnection, finalReport);
             isModified = updateFinalDetail(databaseConnection, finalReport);
             commitOrRollback(databaseConnection, isModified);
         } catch (SQLException e) {
@@ -214,22 +210,6 @@ public class ReportDAO implements IReportDAO {
         }
 
         return isRegistered;
-    }
-
-    @Override
-    public void evaluationReport(Report report) throws OperationException {
-        String reportQuery = "UPDATE Reporte SET calificacion = ? WHERE idReporte = ?";
-
-        try (Connection databaseConnection = connectionManager.getConnection();
-            PreparedStatement preparedStatement = databaseConnection.prepareStatement(reportQuery)) {
-
-            preparedStatement.setFloat(1, report.getCalification());
-            preparedStatement.setInt(2, report.getId());
-            preparedStatement.executeUpdate();
-        } catch (SQLException e) {
-            LOGGER.log(Level.SEVERE, DATABASE_CONNECTION_ERROR, e);
-            throw new OperationException(DATABASE_CONNECTION_ERROR, e);
-        }
     }
 
     @Override
@@ -291,8 +271,7 @@ public class ReportDAO implements IReportDAO {
     private PartialReport mapPartialReport(ResultSet resultSet) throws SQLException {
         PartialReport report = new PartialReport();
         populateBaseReport(resultSet, report);
-        report.setPlannedAdvanceWeek(resultSet.getInt("tiempoPlaneado"));
-        report.setRealAdvanceWeek(resultSet.getInt("tiempoReal"));
+        report.setObservations(resultSet.getString("observaciones"));
         return report;
     }
 
@@ -302,18 +281,14 @@ public class ReportDAO implements IReportDAO {
         report.setGeneralObservations(resultSet.getString("observacionesGenerales"));
         return report;
     }
-    
+
     private void insertReportRow(Connection databaseConnection, Report report) throws SQLException {
-        String reportQuery = "INSERT INTO Reporte (descripcion, observaciones, actividad, matricula) "
-                           + "VALUES (?, ?, ?, ?)";
+        String reportQuery = "INSERT INTO Reporte (matricula) VALUES (?)";
 
         try (PreparedStatement preparedStatement = databaseConnection.prepareStatement(reportQuery,
             PreparedStatement.RETURN_GENERATED_KEYS)) {
 
-            preparedStatement.setString(1, report.getDescription());
-            preparedStatement.setString(2, report.getObservations());
-            preparedStatement.setString(3, report.getActivity());
-            preparedStatement.setString(4, report.getStudentId());
+            preparedStatement.setString(1, report.getStudentId());
             preparedStatement.executeUpdate();
 
             try (ResultSet generatedKeys = preparedStatement.getGeneratedKeys()) {
@@ -326,32 +301,15 @@ public class ReportDAO implements IReportDAO {
         }
     }
 
-    private void updateReportRow(Connection databaseConnection, Report report) throws SQLException {
-        String reportQuery = "UPDATE Reporte SET descripcion = ?, observaciones = ?, "
-                           + "actividad = ?, matricula = ? WHERE idReporte = ?";
-
-        try (PreparedStatement preparedStatement = databaseConnection.prepareStatement(reportQuery)) {
-
-            preparedStatement.setString(1, report.getDescription());
-            preparedStatement.setString(2, report.getObservations());
-            preparedStatement.setString(3, report.getActivity());
-            preparedStatement.setString(4, report.getStudentId());
-            preparedStatement.setInt(5, report.getId());
-            preparedStatement.executeUpdate();
-        }
-    }
-
     private boolean insertPartialDetail(Connection databaseConnection, PartialReport partialReport)
         throws SQLException {
         boolean isInserted = false;
-        String reportQuery = "INSERT INTO ReporteParcial (idReporte, tiempoPlaneado, tiempoReal) "
-                           + "VALUES (?, ?, ?)";
+        String reportQuery = "INSERT INTO ReporteParcial (idReporte, observaciones) VALUES (?, ?)";
 
         try (PreparedStatement preparedStatement = databaseConnection.prepareStatement(reportQuery)) {
 
             preparedStatement.setInt(1, partialReport.getId());
-            preparedStatement.setInt(2, partialReport.getPlannedAdvanceWeek());
-            preparedStatement.setInt(3, partialReport.getRealAdvanceWeek());
+            preparedStatement.setString(2, partialReport.getObservations());
 
             if (preparedStatement.executeUpdate() > NO_VALUE) {
                 isInserted = true;
@@ -405,14 +363,12 @@ public class ReportDAO implements IReportDAO {
     private boolean updatePartialDetail(Connection databaseConnection, PartialReport partialReport)
         throws SQLException {
         boolean isUpdated = false;
-        String reportQuery = "UPDATE ReporteParcial SET tiempoPlaneado = ?, tiempoReal = ? "
-                           + "WHERE idReporte = ?";
+        String reportQuery = "UPDATE ReporteParcial SET observaciones = ? WHERE idReporte = ?";
 
         try (PreparedStatement preparedStatement = databaseConnection.prepareStatement(reportQuery)) {
 
-            preparedStatement.setInt(1, partialReport.getPlannedAdvanceWeek());
-            preparedStatement.setInt(2, partialReport.getRealAdvanceWeek());
-            preparedStatement.setInt(3, partialReport.getId());
+            preparedStatement.setString(1, partialReport.getObservations());
+            preparedStatement.setInt(2, partialReport.getId());
 
             if (preparedStatement.executeUpdate() > NO_VALUE) {
                 isUpdated = true;
@@ -423,8 +379,7 @@ public class ReportDAO implements IReportDAO {
 
     private boolean insertFinalDetail(Connection databaseConnection, FinalReport finalReport) throws SQLException {
         boolean isInserted = false;
-        String reportQuery = "INSERT INTO ReporteFinal (idReporte, observacionesGenerales) "
-                           + "VALUES (?, ?)";
+        String reportQuery = "INSERT INTO ReporteFinal (idReporte, observacionesGenerales) VALUES (?, ?)";
 
         try (PreparedStatement preparedStatement = databaseConnection.prepareStatement(reportQuery)) {
 
@@ -438,7 +393,7 @@ public class ReportDAO implements IReportDAO {
         return isInserted;
     }
 
-    private void insertFinalActivityDetails(Connection databaseConnection, FinalReport finalReport) 
+    private void insertFinalActivityDetails(Connection databaseConnection, FinalReport finalReport)
         throws SQLException {
         String reportQuery = "INSERT INTO ActividadReporteFinal "
                            + "(idReporte, nombreActividad, porcentajeAvance, observaciones) "
@@ -491,8 +446,7 @@ public class ReportDAO implements IReportDAO {
 
     private boolean updateFinalDetail(Connection databaseConnection, FinalReport finalReport) throws SQLException {
         boolean isUpdated = false;
-        String reportQuery = "UPDATE ReporteFinal SET observacionesGenerales = ? "
-                           + "WHERE idReporte = ?";
+        String reportQuery = "UPDATE ReporteFinal SET observacionesGenerales = ? WHERE idReporte = ?";
 
         try (PreparedStatement preparedStatement = databaseConnection.prepareStatement(reportQuery)) {
 
@@ -528,7 +482,7 @@ public class ReportDAO implements IReportDAO {
         return isInserted;
     }
 
-    private void insertMonthlyActivityDetails(Connection databaseConnection, MonthlyReport monthlyReport) 
+    private void insertMonthlyActivityDetails(Connection databaseConnection, MonthlyReport monthlyReport)
         throws SQLException {
         String reportQuery = "INSERT INTO DetalleReporteMensual "
                            + "(idReporte, periodo, actividad, observaciones) "
@@ -552,9 +506,6 @@ public class ReportDAO implements IReportDAO {
 
     private void populateBaseReport(ResultSet resultSet, Report report) throws SQLException {
         report.setId(resultSet.getInt("idReporte"));
-        report.setDescription(resultSet.getString("descripcion"));
-        report.setObservations(resultSet.getString("observaciones"));
-        report.setActivity(resultSet.getString("actividad"));
         report.setStudentId(resultSet.getString("matricula"));
     }
 
@@ -583,18 +534,20 @@ public class ReportDAO implements IReportDAO {
     public int countMonthlyReportsByStudent(String studentId) throws OperationException {
         int count = 0;
         String reportQuery = "SELECT COUNT(*) FROM Reporte r "
-                            + "INNER JOIN ReporteMensual rm ON r.idReporte = rm.idReporte "
-                            + "WHERE r.matricula = ?";
-        try(Connection databaseConnection = connectionManager.getConnection();
-            PreparedStatement preparedStatement = databaseConnection.prepareStatement(reportQuery)) {
-                preparedStatement.setString(1, studentId);
+                           + "INNER JOIN ReporteMensual rm ON r.idReporte = rm.idReporte "
+                           + "WHERE r.matricula = ?";
 
-            try(ResultSet resultSet = preparedStatement.executeQuery()) {
-                if(resultSet.next()) {
+        try (Connection databaseConnection = connectionManager.getConnection();
+            PreparedStatement preparedStatement = databaseConnection.prepareStatement(reportQuery)) {
+
+            preparedStatement.setString(1, studentId);
+
+            try (ResultSet resultSet = preparedStatement.executeQuery()) {
+                if (resultSet.next()) {
                     count = resultSet.getInt(1);
                 }
             }
-        } catch(SQLException e) {
+        } catch (SQLException e) {
             LOGGER.log(Level.SEVERE, "Error al contar reportes mensuales del alumno", e);
             throw new OperationException(CHECK_REPORT_ERROR, e);
         }
@@ -605,19 +558,20 @@ public class ReportDAO implements IReportDAO {
     public List<MonthlyReport> getUploadableMonthlyReports(String studentId) throws OperationException {
         List<MonthlyReport> uploadableReports = new ArrayList<>();
         String reportQuery = "SELECT r.idReporte, rm.mes "
-                            + "FROM Reporte r "
-                            + "INNER JOIN ReporteMensual rm ON r.idReporte = rm.idReporte "
-                            + "LEFT JOIN Expediente e ON e.idReporte = r.idReporte "
-                            + "WHERE r.matricula = ? "
-                            + "AND (e.idExpediente IS NULL OR e.idEstatus = ?) "
-                            + "AND r.idReporte = (SELECT MAX(r2.idReporte) "
-                            + "FROM Reporte r2 "
-                            + "INNER JOIN ReporteMensual rm2 ON r2.idReporte = rm2.idReporte "
-                            + "WHERE r2.matricula = r.matricula AND rm2.mes = rm.mes) "
-                            + "ORDER BY r.idReporte";
+                           + "FROM Reporte r "
+                           + "INNER JOIN ReporteMensual rm ON r.idReporte = rm.idReporte "
+                           + "LEFT JOIN Expediente e ON e.idReporte = r.idReporte "
+                           + "WHERE r.matricula = ? "
+                           + "AND (e.idExpediente IS NULL OR e.idEstatus = ?) "
+                           + "AND r.idReporte = (SELECT MAX(r2.idReporte) "
+                           + "FROM Reporte r2 "
+                           + "INNER JOIN ReporteMensual rm2 ON r2.idReporte = rm2.idReporte "
+                           + "WHERE r2.matricula = r.matricula AND rm2.mes = rm.mes) "
+                           + "ORDER BY r.idReporte";
 
         try (Connection databaseConnection = connectionManager.getConnection();
             PreparedStatement preparedStatement = databaseConnection.prepareStatement(reportQuery)) {
+
             preparedStatement.setString(1, studentId);
             preparedStatement.setInt(2, STATUS_REJECTED);
 
