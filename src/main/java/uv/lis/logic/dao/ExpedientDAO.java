@@ -330,7 +330,7 @@ public class ExpedientDAO implements IExpedientDAO {
 
             try (ResultSet resultSet = preparedStatement.executeQuery()) {
                 if (resultSet.next()) {
-                    isValidated = resultSet.getInt(1) > 0;
+                    isValidated = resultSet.getInt(1) > NO_VALUE;
                 }
             }
         } catch (SQLException e) {

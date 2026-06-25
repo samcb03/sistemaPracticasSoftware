@@ -9,6 +9,7 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.ResourceBundle;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -23,13 +24,16 @@ import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
-
+import javafx.scene.control.TextInputDialog;
 import uv.lis.GUI.ValidationHandler;
 import uv.lis.GUI.cell.ActionTableCell;
 import uv.lis.GUI.cell.DocumentReviewTableCell;
 import uv.lis.logic.dao.ExpedientDAO;
+import uv.lis.logic.dao.PracticeDAO;
 import uv.lis.logic.dto.Expedient;
+import uv.lis.logic.dto.Practice;
 import uv.lis.logic.exceptions.OperationException;
+import uv.lis.logic.utils.InputValidator;
 import uv.lis.logic.utils.SessionManager;
 
 public class FXMLConsultStudentExpedientController extends ValidationHandler {
@@ -48,7 +52,8 @@ public class FXMLConsultStudentExpedientController extends ValidationHandler {
     private static final int FIRST_INITIAL_DOCUMENT_TYPE_ID = 5;
     private static final int LAST_INITIAL_DOCUMENT_TYPE_ID = 11;
     private static final int LIBERATION_LETTER_TYPE_ID = 13;
-
+    private static final int AUTOEVALUATION_TYPE_ID = 1;
+    private static final int OV_EVALUATION_TYPE_ID = 12;
 
     private static final String TOTAL_FORMAT = "Total: %d documento(s)";
     private static final String REVIEW_SUCCESS_MESSAGE = "Estatus del documento actualizado correctamente";
@@ -56,8 +61,12 @@ public class FXMLConsultStudentExpedientController extends ValidationHandler {
     private static final String CONFIRM_VALIDATE_MESSAGE = "¿Desea validar este documento?";
     private static final String CONFIRM_REJECT_MESSAGE = "¿Desea rechazar este documento?";
     private static final String CONFIRM_TITLE = "Confirmación";
-    private static final String ALREADY_VALIDATED_MESSAGE =
+    private static final String ALREADY_VALIDATED_MESSAGE = 
         "El documento ya está validado y no puede cambiar de estado.";
+    private static final String GRADE_REGISTER_SUCCESS = "Calificación registrada correctamente";
+    private static final String GRADE_REGISTER_FAILURE = "No se pudo registrar la calificación";
+    private static final String GRADE_INPUT_PROMPT = "Ingrese la calificación final del alumno (0-10):";
+    private static final String GRADE_INPUT_TITLE = "Registrar calificación";
 
     @FXML private Label labelStudentId;
     @FXML private Label labelTotal;
@@ -72,11 +81,13 @@ public class FXMLConsultStudentExpedientController extends ValidationHandler {
     @FXML private TableColumn<Expedient, Void> columnAction;
 
     private ExpedientDAO expedientDAO;
+    private PracticeDAO practiceDAO;
     private List<Expedient> allDocuments;
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         expedientDAO = new ExpedientDAO();
+        practiceDAO = new PracticeDAO();
         allDocuments = new ArrayList<>();
         setupControls(labelMessage, buttonBack);
         configureTableColumns();
@@ -157,15 +168,6 @@ public class FXMLConsultStudentExpedientController extends ValidationHandler {
             LOGGER.log(Level.SEVERE, "Error al actualizar el estatus del documento", e);
             showError(e.getMessage());
         }
-    }
-
-    private void confirmReviewChange(Expedient expedient, int idStatus) {
-        expedient.setIdStatus(idStatus);
-        expedient.setStatusName(resolveStatusName(idStatus));
-        tableViewArchives.refresh();
-        showSuccess(REVIEW_SUCCESS_MESSAGE);
-        LOGGER.log(Level.INFO, "Documento con id {0} actualizado al estatus {1}",
-            new Object[] { expedient.getId(), idStatus });
     }
 
     private String resolveStatusName(int idStatus) {
@@ -279,6 +281,96 @@ public class FXMLConsultStudentExpedientController extends ValidationHandler {
         } catch (IOException ioException) {
             LOGGER.log(Level.SEVERE, "Error de E/S al abrir el documento", ioException);
             showError("No se pudo abrir el documento");
+        }
+    }
+
+    private void confirmReviewChange(Expedient expedient, int idStatus) {
+        expedient.setIdStatus(idStatus);
+        expedient.setStatusName(resolveStatusName(idStatus));
+        tableViewArchives.refresh();
+        showSuccess(REVIEW_SUCCESS_MESSAGE);
+        LOGGER.log(Level.INFO, "Documento con id {0} actualizado al estatus {1}",
+            new Object[] { expedient.getId(), idStatus });
+
+        if (idStatus == STATUS_ASSIGNED) {
+            checkAndRegisterGradeIfComplete(labelStudentId.getText());
+        }
+    }
+
+    private void checkAndRegisterGradeIfComplete(String studentId) {
+        boolean allFinalDocsValidated = areFinalDocumentsValidated();
+
+        if (allFinalDocsValidated) {
+            promptAndRegisterGrade(studentId);
+        }
+    }
+
+    private boolean areFinalDocumentsValidated() {
+        boolean isFinished = false;
+        boolean autoevaluationValidated = allDocuments.stream()
+            .filter(doc -> doc.getIdTypeDocument() == AUTOEVALUATION_TYPE_ID)
+            .anyMatch(Expedient::isValidated);
+
+        boolean ovEvaluationValidated = allDocuments.stream()
+            .filter(doc -> doc.getIdTypeDocument() == OV_EVALUATION_TYPE_ID)
+            .anyMatch(Expedient::isValidated);
+
+        boolean liberationLetterValidated = allDocuments.stream()
+            .filter(doc -> doc.getIdTypeDocument() == LIBERATION_LETTER_TYPE_ID)
+            .anyMatch(Expedient::isValidated);
+
+        isFinished = autoevaluationValidated && ovEvaluationValidated && liberationLetterValidated;
+        return isFinished;
+    }
+
+    private void promptAndRegisterGrade(String studentId) {
+    try {
+        boolean alreadyExists = practiceDAO.existsByStudent(studentId);
+
+        if (!alreadyExists) {
+            TextInputDialog dialog = new TextInputDialog();
+            dialog.setTitle(GRADE_INPUT_TITLE);
+            dialog.setHeaderText(null);
+            dialog.setContentText(GRADE_INPUT_PROMPT);
+
+            dialog.showAndWait().ifPresent(input -> processGradeInput(input, studentId));
+        }
+    } catch (OperationException e) {
+        LOGGER.log(Level.SEVERE, "Error al verificar calificación existente", e);
+        showError(e.getMessage());
+    }
+}
+
+    private void processGradeInput(String input, String studentId) {
+        if (input != null) {
+            Optional<String> validationError = InputValidator.validateGrade(input.trim(), "La calificación");
+
+            if (validationError.isPresent()) {
+                showError(validationError.get());
+            } else {
+                saveGrade(studentId, Integer.parseInt(input.trim()));
+            }
+        }   
+    }
+
+    private void saveGrade(String studentId, int grade) {
+        try {
+            Practice practice = new Practice();
+            practice.setidStudent(studentId);
+            practice.setCalification(grade);
+
+            boolean isRegistered = practiceDAO.registerPractice(practice);
+
+            if (isRegistered) {
+                showSuccess(GRADE_REGISTER_SUCCESS);
+                LOGGER.log(Level.INFO, "Calificación {0} registrada para el alumno {1}",
+                    new Object[] { grade, studentId });
+            } else {
+                showError(GRADE_REGISTER_FAILURE);
+            }
+        } catch (OperationException e) {
+            LOGGER.log(Level.SEVERE, "Error al registrar la calificación", e);
+            showError(e.getMessage());
         }
     }
 }

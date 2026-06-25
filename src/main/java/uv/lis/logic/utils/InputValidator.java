@@ -14,6 +14,7 @@ import java.util.stream.Stream;
 public final class InputValidator {
     public static final int IS_COORDINATOR = 3;
     public static final int NO_VALUE = 0;
+    public static final int MAX_GRADE = 10;
     public static final int MAX_REQUESTS = 3;
     public static final int STATUS_REQUESTED = 1;
     public static final int STATUS_ASSIGNED = 2;
@@ -601,6 +602,37 @@ public final class InputValidator {
                 );
             }
         }
+        return validationResult;
+    }
+
+    /**
+     * Verifies that a grade value is a valid integer between 0 and 10 inclusive.
+     *
+     * @param gradeValue the value to evaluate
+     *
+     * @param fieldName the field label used in the error message
+     *
+     * @return an error message if the value is empty, not an integer, or out of range, empty otherwise
+     */
+    public static Optional<String> validateGrade(String gradeValue, String fieldName) {
+        Optional<String> validationResult = validateNotEmpty(gradeValue, fieldName);
+
+        if (validationResult.isEmpty() && !gradeValue.matches(INTEGER_REGEX)) {
+            validationResult = Optional.of(fieldName + " debe ser un número entero válido");
+        }
+
+        if (validationResult.isEmpty()) {
+            BigInteger value = new BigInteger(gradeValue);
+
+            if (value.compareTo(BigInteger.valueOf(NO_VALUE)) < NO_VALUE) {
+                validationResult = Optional.of(fieldName + " no puede ser menor a " + NO_VALUE);
+            } else if (value.compareTo(BigInteger.valueOf(MAX_GRADE)) > NO_VALUE) {
+                validationResult = Optional.of(fieldName + " no puede ser mayor a " + MAX_GRADE);
+            } else {
+                validationResult = Optional.empty();
+            }
+        }
+
         return validationResult;
     }
 }
