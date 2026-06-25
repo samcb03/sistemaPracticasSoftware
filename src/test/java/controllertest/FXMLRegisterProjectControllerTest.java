@@ -45,7 +45,7 @@ public class FXMLRegisterProjectControllerTest extends ApplicationTest {
     private static final String OBJECTIVE_FIELD_SELECTOR = "#textFieldObjective";
     private static final String DESCRIPTION_AREA_SELECTOR = "#textAreaDescription";
     private static final String ORGANIZATION_COMBO_SELECTOR = "#comboBoxOrganizationName";
-    private static final String SUPERVISOR_COMBO_SELECTOR = "#comboBoxResponsableName";
+    private static final String SUPERVISOR_COMBO_SELECTOR = "#comboBoxSupervisorName";
     private static final String REGISTER_BUTTON_TEXT = "Registrar Proyecto";
     private static final String MESSAGE_LABEL_SELECTOR = "#labelError";
 
