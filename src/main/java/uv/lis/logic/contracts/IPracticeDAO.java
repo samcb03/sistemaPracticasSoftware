@@ -34,4 +34,13 @@ public interface IPracticeDAO {
      * @throws OperationException if the verification cannot be completed
      */
     boolean existsByStudent(String idStudent) throws OperationException;
+
+    /**
+     * Retrieves the final grade of a student's internship practice as a formatted string.
+     *
+     * @param idStudent the identifier of the student whose grade is retrieved
+     * @return the final grade as a string for display purposes
+     * @throws OperationException if the grade cannot be retrieved or does not exist
+     */
+    String getFinalGrade(String idStudent) throws OperationException;
 }

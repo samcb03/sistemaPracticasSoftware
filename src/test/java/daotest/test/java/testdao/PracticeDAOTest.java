@@ -150,4 +150,30 @@ class PracticeDAOTest {
         assertThrows(OperationException.class,
             () -> practiceDAO.existsByStudent(STUDENT_ID));
     }
+
+    @Test
+    void getFinalGrade_gradeFound_returnsGradeAsString() throws Exception {
+        mockQueryExecution();
+        when(resultSet.next()).thenReturn(true);
+        when(resultSet.getInt(COLUMN_GRADE)).thenReturn(GRADE);
+
+        assertEquals(String.valueOf(GRADE), practiceDAO.getFinalGrade(STUDENT_ID));
+    }
+
+    @Test
+    void getFinalGrade_gradeNotFound_throwsOperationException() throws Exception {
+        mockQueryExecution();
+        when(resultSet.next()).thenReturn(false);
+
+        assertThrows(OperationException.class,
+            () -> practiceDAO.getFinalGrade(STUDENT_ID));
+    }
+
+    @Test
+    void getFinalGrade_sqlError_throwsOperationException() throws SQLException {
+        when(connectionManager.getConnection()).thenThrow(new SQLException(DATABASE_ERROR_MESSAGE));
+
+        assertThrows(OperationException.class,
+            () -> practiceDAO.getFinalGrade(STUDENT_ID));
+    }
 }

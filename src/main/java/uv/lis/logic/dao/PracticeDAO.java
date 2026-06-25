@@ -108,4 +108,34 @@ public class PracticeDAO implements IPracticeDAO {
 
         return exists;
     }
+
+    @Override
+    public String getFinalGrade(String idStudent) throws OperationException {
+        String finalGrade = "";
+
+        String practiceQuery = "SELECT calificacion "
+                             + "FROM Practica "
+                             + "WHERE matricula = ? "
+                             + "LIMIT 1;";
+
+        try (Connection connection = connectionManager.getConnection();
+            PreparedStatement preparedStatement = connection.prepareStatement(practiceQuery)) {
+
+            preparedStatement.setString(1, idStudent);
+
+            try (ResultSet resultSet = preparedStatement.executeQuery()) {
+                if (resultSet.next()) {
+                    finalGrade = String.valueOf(resultSet.getInt("calificacion"));
+                } else {
+                    throw new OperationException(
+                        "No se encontró calificación para el alumno indicado", null);
+                }
+            }
+        } catch (SQLException e) {
+            LOGGER.log(Level.SEVERE, "Error al recuperar la calificación final del alumno", e);
+            throw new OperationException("Error al recuperar la calificación final del alumno", e);
+        }
+
+        return finalGrade;
+    }
 }
