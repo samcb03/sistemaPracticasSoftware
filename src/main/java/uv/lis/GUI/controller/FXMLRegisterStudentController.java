@@ -32,6 +32,16 @@ import uv.lis.logic.exceptions.OperationException;
 
 public class FXMLRegisterStudentController extends ValidationHandler {
 
+    private static final String FIRST_NAME_FIELD = "El nombre";
+    private static final String LAST_NAMES_FIELD = "Los apellidos";
+    private static final String EMAIL_FIELD = "El correo electrónico";
+    private static final String PASSWORD_FIELD = "La contraseña";
+    private static final String STUDENT_ID_FIELD = "La matrícula";
+    private static final String BIRTHDAY_DATE_FIELD = "La fecha de nacimiento";
+    private static final String GENERE_FIELD = "Un género";
+    private static final String INVALID_FORMAT_ID_STUDENT = "La matrícula no tiene un formato válido";
+    private static final String SUCCESSFUL_STUDENT_REGISTER_MESSAGE = "Estudiante registrado correctamente";
+    private static final String ERROR_STUDENT_REGISTER_MESSAGE = "Error al registrar al estudiante";
     private static final int USER_TYPE_STUDENT = 1;
 
     @FXML private Button buttonBack;
@@ -62,14 +72,14 @@ public class FXMLRegisterStudentController extends ValidationHandler {
     private Optional<String> getFirstValidationError() {
         String studentId = textFieldStudentId.getText().trim();
         Stream<Optional<String>> validationStream = Stream.of(
-            validateText(textFieldFirstName.getText(), "El nombre"),
-            validateText(textFieldLastName.getText(), "Los apellidos"),
-            validateEmail(textFieldEmail.getText().trim(), "El correo electrónico"),
-            validatePassword(passwordFieldPassword.getText().trim(), "La contraseña"),
-            validateExactLength(textFieldStudentId.getText().trim(), STUDENT_ID_LENGTH, "La matrícula"),
-            validateIdStudent(studentId, STUDENT_ID_LENGTH, "La matricula"),
-            validateBirthDate(datePickerBirthDate.getValue(), "La fecha de nacimiento"),
-            validateComboBox(comboBoxGender.getValue(), "un género")
+            validateText(textFieldFirstName.getText(), FIRST_NAME_FIELD),
+            validateText(textFieldLastName.getText(), LAST_NAMES_FIELD),
+            validateEmail(textFieldEmail.getText().trim(), EMAIL_FIELD),
+            validatePassword(passwordFieldPassword.getText().trim(), PASSWORD_FIELD),
+            validateExactLength(textFieldStudentId.getText().trim(), STUDENT_ID_LENGTH, STUDENT_ID_FIELD),
+            validateIdStudent(studentId, STUDENT_ID_LENGTH, STUDENT_ID_FIELD),
+            validateBirthDate(datePickerBirthDate.getValue(), BIRTHDAY_DATE_FIELD),
+            validateComboBox(comboBoxGender.getValue(), GENERE_FIELD)
         );
         Optional<String> firstError = validationStream
             .filter(Optional::isPresent)
@@ -82,14 +92,14 @@ public class FXMLRegisterStudentController extends ValidationHandler {
         Student student = buildStudent();
 
         if (!student.getIdStudent().matches(STUDENT_ENROLLMENT)) {
-            showError("La matrícula no tiene un formato válido");
+            showError(INVALID_FORMAT_ID_STUDENT);
         } else {
             try {
                 if (studentDAO.registerStudent(student)) {
-                    showSuccess("Estudiante registrado correctamente");
+                    showSuccess(SUCCESSFUL_STUDENT_REGISTER_MESSAGE);
                     clearFields();
                 } else {
-                    showError("Error al registrar al estudiante");
+                    showError(ERROR_STUDENT_REGISTER_MESSAGE);
                 }
             } catch (OperationException operationException) {
                 showError(operationException.getMessage());

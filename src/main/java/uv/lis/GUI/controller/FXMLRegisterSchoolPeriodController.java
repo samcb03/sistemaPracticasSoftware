@@ -25,8 +25,10 @@ import uv.lis.logic.exceptions.OperationException;
 
 public class FXMLRegisterSchoolPeriodController extends ValidationHandler {
 
-    private static final String TERM_FIELD = "el término del periodo";
+    private static final String TERM_FIELD = "El término del periodo";
     private static final String START_DATE_FIELD = "La fecha de inicio";
+    private static final String SUCCESSFUL_SCHOOL_PERIOD_REGISTER_MESSAGE = "Periodo escolar registrado correctamente";
+    private static final String ERROR_SCHOOL_PERIOD_REGISTER_MESSAGE = "Error al registrar el periodo escolar";
 
     @FXML private Button buttonBack;
     @FXML private Label labelError;
@@ -69,10 +71,10 @@ public class FXMLRegisterSchoolPeriodController extends ValidationHandler {
             boolean isRegistered = schoolPeriodDAO.registerSchoolPeriod(schoolPeriod);
 
             if (isRegistered) {
-                showSuccess("Periodo escolar registrado correctamente");
+                showSuccess(SUCCESSFUL_SCHOOL_PERIOD_REGISTER_MESSAGE);
                 clearFields();
             } else {
-                showError("Error al registrar el periodo escolar");
+                showError(ERROR_SCHOOL_PERIOD_REGISTER_MESSAGE);
             }
         } catch (OperationException operationException) {
             showError(operationException.getMessage());
@@ -82,7 +84,6 @@ public class FXMLRegisterSchoolPeriodController extends ValidationHandler {
     private SchoolPeriod buildSchoolPeriod() {
         int startYear = datePickerStartDate.getValue().getYear();
         String periodCode = startYear + comboBoxTerm.getValue();
-
         SchoolPeriod schoolPeriod = new SchoolPeriod();
         schoolPeriod.setName(periodCode);
         schoolPeriod.setStartDate(Date.valueOf(datePickerStartDate.getValue()));
@@ -95,7 +96,6 @@ public class FXMLRegisterSchoolPeriodController extends ValidationHandler {
         comboBoxTerm.getSelectionModel().clearSelection();
         datePickerStartDate.setValue(null);
         datePickerEndDate.setValue(null);
-
         comboBoxTerm.requestFocus();
     }
 }
