@@ -25,6 +25,20 @@ import uv.lis.logic.exceptions.OperationException;
 
 public class FXMLRegisterAffiliatedOrganizationController extends ValidationHandler {
 
+    private static final String NAME_FIELD = "El nombre";
+    private static final String CITY_FIELD = "La ciudad";
+    private static final String STATE_FIELD = "El estado";
+    private static final String SECTOR_FIELD = "El sector";
+    private static final String STREET_FIELD = "La calle";
+    private static final String STREET_NUMBER_FIELD = "El número de calle";
+    private static final String POSTAL_CODE_FIELD = "El código postal";
+    private static final String EMAIL_FIELD = "El correo electrónico";
+    private static final String PHONE_NUMBER_FIELD = "El número de teléfono";
+    private static final String NUMBER_OF_DIRECT_USERS = "El número de usuarios directos";
+    private static final String NUMBER_OF_INDIRECT_USERS = "El número de usuarios indirectos";
+    private static final String SUCCESSFUL_ORGANIZATION_REGISTER_MESSAGE = "Organización registrada correctamente";
+    private static final String ERROR_ORGANIZATION_REGISTER_MESSAGE = "Error al registrar la organización";
+
     @FXML private Button buttonBack;
     @FXML private Label labelError;
     @FXML private TextField textFieldName;
@@ -55,19 +69,17 @@ public class FXMLRegisterAffiliatedOrganizationController extends ValidationHand
     
     private Optional<String> getFirstValidationError() {
         Stream<Optional<String>> validationStream = Stream.of(
-            validateRegister(textFieldName.getText(), "El nombre"),
-            validateText(textFieldCity.getText(), "La ciudad"),
-            validateText(textFieldState.getText(), "El estado"),
-            validateText(textFieldSector.getText(), "El sector"),
-            validateText(textFieldStreet.getText(), "La calle"),
-            validateAddressNumber(textFieldStreetNumber.getText().trim(), "El número de calle"),
-            validatePostalCode(textFieldPostalCode.getText(), "El código postal"),
-            validateEmail(textFieldEmail.getText().trim(), "El correo electrónico"),
-            validatePhoneNumber(textFieldPhoneNumber.getText().trim(), "El número de teléfono"),
-            validatePositiveInteger(textFieldNumberOfDirectUsers.getText().trim(), 
-                "El número de usuarios directos"),
-            validatePositiveInteger(textFieldNumberOfIndirectUsers.getText().trim(), 
-                "El número de usuarios indirectos")
+            validateRegister(textFieldName.getText(), NAME_FIELD),
+            validateText(textFieldCity.getText(), CITY_FIELD),
+            validateText(textFieldState.getText(), STATE_FIELD),
+            validateText(textFieldSector.getText(), SECTOR_FIELD),
+            validateText(textFieldStreet.getText(), STREET_FIELD),
+            validateAddressNumber(textFieldStreetNumber.getText().trim(), STREET_NUMBER_FIELD),
+            validatePostalCode(textFieldPostalCode.getText(), POSTAL_CODE_FIELD),
+            validateEmail(textFieldEmail.getText().trim(), EMAIL_FIELD),
+            validatePhoneNumber(textFieldPhoneNumber.getText().trim(), PHONE_NUMBER_FIELD),
+            validatePositiveInteger(textFieldNumberOfDirectUsers.getText().trim(), NUMBER_OF_DIRECT_USERS),
+            validatePositiveInteger(textFieldNumberOfIndirectUsers.getText().trim(), NUMBER_OF_INDIRECT_USERS)
         );
         Optional<String> firstError = validationStream
             .filter(Optional::isPresent)
@@ -81,10 +93,10 @@ public class FXMLRegisterAffiliatedOrganizationController extends ValidationHand
         try {
             boolean registrationSuccessful = affiliatedOrganizationDAO.registerOrganization(organization);
             if (registrationSuccessful) {
-                showSuccess("Organización registrada correctamente");
+                showSuccess(SUCCESSFUL_ORGANIZATION_REGISTER_MESSAGE);
                 clearFields();
             } else {
-                showError("Error al registrar la organización");
+                showError(ERROR_ORGANIZATION_REGISTER_MESSAGE);
             }
         } catch (OperationException operationException) {
             showError(operationException.getMessage());
