@@ -2,7 +2,6 @@ package controllertest;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -87,16 +86,16 @@ public class FXMLGenerateAutoevaluationControllerTest extends ApplicationTest {
         SessionManager.getInstance().setCurrentStudent(buildStudent());
 
         autoevaluationCommonMock = mock(AutoevaluationCommon.class);
-        autoevaluationDAOMock    = mock(AutoevaluationDAO.class);
-        expedientDAOMock         = mock(ExpedientDAO.class);
+        autoevaluationDAOMock = mock(AutoevaluationDAO.class);
+        expedientDAOMock = mock(ExpedientDAO.class);
 
         FXMLLoader loader = new FXMLLoader(getClass().getResource(AUTOEVALUATION_VIEW_FXML));
         Parent root = loader.load();
 
         controller = loader.getController();
         injectField(AUTOEVALUATION_COMMON_FIELD, autoevaluationCommonMock);
-        injectField(AUTOEVALUATION_DAO_FIELD,    autoevaluationDAOMock);
-        injectField(EXPEDIENT_DAO_FIELD,         expedientDAOMock);
+        injectField(AUTOEVALUATION_DAO_FIELD, autoevaluationDAOMock);
+        injectField(EXPEDIENT_DAO_FIELD, expedientDAOMock);
 
         stage.setScene(new Scene(root));
         stage.show();
