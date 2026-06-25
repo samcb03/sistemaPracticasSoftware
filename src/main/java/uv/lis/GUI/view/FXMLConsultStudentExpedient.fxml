@@ -64,6 +64,7 @@
                 </HBox>
             <Label layoutX="354.0" layoutY="420.0" text="Calificación:" />
             <TextField fx:id="textFieldGrade" disable="true" layoutX="426.0" layoutY="416.0" />
+            <Button fx:id="buttonAcceptGrade" disable="true" layoutX="575.0" layoutY="416.0" mnemonicParsing="false" onAction="#addPractice" prefHeight="25.0" prefWidth="39.0" text="Bien" />
 
             </children>
         </Pane>
