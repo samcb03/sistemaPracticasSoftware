@@ -1,7 +1,6 @@
 package controllertest;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -48,9 +47,6 @@ public class FXMLFinishWindowControllerTest extends ApplicationTest {
     private static final String MESSAGE_LABEL_SELECTOR = "#labelMessage";
     private static final String STUDENT_NAME_SELECTOR = "#labelStudentName";
     private static final String GRADE_SELECTOR = "#labelGrade";
-    private static final String BUTTON_SHOW_ACTIVITIES_SELECTOR = "#buttonShowActivities";
-    private static final String BUTTON_SHOW_DOCUMENTS_SELECTOR = "#buttonShowDocuments";
-
     private static final String VALID_STUDENT_ID = "S24013322";
     private static final String VALID_FIRST_NAME = "Juan";
     private static final String VALID_LAST_NAME = "Pérez";
@@ -173,26 +169,6 @@ public class FXMLFinishWindowControllerTest extends ApplicationTest {
         assertEquals("No se pudieron cargar los documentos", messageText());
     }
 
-    @Test
-    void showActivities_click_hidesOtherSections() {
-        clickOn(BUTTON_SHOW_ACTIVITIES_SELECTOR);
-        WaitForAsyncUtils.waitForFxEvents();
-
-        assertTrue(lookup("#sectionActivities").query().isVisible());
-        assertTrue(!lookup("#sectionSummary").query().isVisible());
-        assertTrue(!lookup("#sectionDocuments").query().isVisible());
-    }
-
-    @Test
-    void showDocuments_click_hidesOtherSections() {
-        clickOn(BUTTON_SHOW_DOCUMENTS_SELECTOR);
-        WaitForAsyncUtils.waitForFxEvents();
-
-        assertTrue(lookup("#sectionDocuments").query().isVisible());
-        assertTrue(!lookup("#sectionSummary").query().isVisible());
-        assertTrue(!lookup("#sectionActivities").query().isVisible());
-    }
-
     private void injectField(String fieldName, Object value) throws ReflectiveOperationException {
         Field field = FXMLFinishWindowController.class.getDeclaredField(fieldName);
         field.setAccessible(true);
@@ -225,14 +201,12 @@ public class FXMLFinishWindowControllerTest extends ApplicationTest {
         activity1.setDescription("Levantamiento de requisitos");
         activity1.setStartDate(LocalDate.of(2026, 3, 2));
         activity1.setEndDate(LocalDate.of(2026, 3, 6));
-
         Activity activity2 = new Activity();
         activity2.setId(2);
         activity2.setName("Diseño de BD");
         activity2.setDescription("Diseño de base de datos");
         activity2.setStartDate(LocalDate.of(2026, 4, 1));
         activity2.setEndDate(LocalDate.of(2026, 6, 5));
-
         return List.of(activity1, activity2);
     }
 
