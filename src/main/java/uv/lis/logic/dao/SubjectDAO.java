@@ -246,7 +246,7 @@ public class SubjectDAO implements ISubjectDAO {
  
             try (ResultSet resultSet = preparedStatement.executeQuery()) {
                 if (resultSet.next()) {
-                    isTaken = resultSet.getInt(1) > 0;
+                    isTaken = resultSet.getInt(1) > NO_VALUE;
                 }
             }
         } catch (SQLException e) {
@@ -254,5 +254,32 @@ public class SubjectDAO implements ISubjectDAO {
             throw new OperationException("No se pudo verificar la disponibilidad de la sección", e);
         }
         return isTaken;
+    }
+
+    @Override
+    public boolean isProfessorTeachingStudent(String personnelNumber, String studentId) throws OperationException {
+        boolean isTeaching = false;
+        String subjectQuery = "SELECT COUNT(*) FROM alumno_esta_ee aee "
+                            + "INNER JOIN Profesor_Imparte_Experiencia pie "
+                            + "ON aee.NRC = pie.NRC AND aee.idPeriodo = pie.idPeriodo "
+                            + "WHERE aee.matricula = ? AND pie.numeroPersonal = ? AND pie.estaActiva = ?";
+
+        try (Connection databaseConnection = connectionManager.getConnection();
+            PreparedStatement preparedStatement = databaseConnection.prepareStatement(subjectQuery)) {
+
+            preparedStatement.setString(1, studentId);
+            preparedStatement.setString(2, personnelNumber);
+            preparedStatement.setBoolean(3, true);
+
+            try (ResultSet resultSet = preparedStatement.executeQuery()) {
+                if (resultSet.next()) {
+                    isTeaching = resultSet.getInt(1) > NO_VALUE;
+                }
+            }
+        } catch (SQLException e) {
+            LOGGER.log(Level.SEVERE, "Error al verificar si el profesor imparte clase al alumno", e);
+            throw new OperationException("No se pudo verificar la relación profesor-alumno", e);
+        }
+        return isTeaching;
     }
 }

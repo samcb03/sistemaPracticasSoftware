@@ -35,6 +35,37 @@ public class StudentDAO extends UserDAO implements IStudentDAO {
     }
 
     @Override
+    public ArrayList<Student> getAllActiveStudents() throws OperationException {
+        ArrayList<Student> students = new ArrayList<>();
+        String studentQuery = "SELECT a.matricula, u.nombre, u.apellidos, a.fechaNacimiento, a.genero "
+                            + "FROM Alumno a "
+                            + "JOIN Usuario u ON a.idUsuario = u.idUsuario "
+                            + "WHERE u.estado = ?";
+
+        try (Connection databaseConnection = connectionManager.getConnection();
+            PreparedStatement preparedStatement = databaseConnection.prepareStatement(studentQuery)) {
+            
+            preparedStatement.setInt(1, STATUS_ACTIVE);
+
+            try (ResultSet resultSet = preparedStatement.executeQuery()) {
+                while (resultSet.next()) {
+                    Student student = new Student();
+                    student.setIdStudent(resultSet.getString("matricula"));
+                    student.setFirstName(resultSet.getString("nombre"));
+                    student.setLastName(resultSet.getString("apellidos"));
+                    student.setBirthDate(resultSet.getDate("fechaNacimiento"));
+                    student.setGender(resultSet.getString("genero"));
+                    students.add(student);
+                }
+            }
+        } catch (SQLException e) {
+            LOGGER.log(Level.SEVERE, "Error al obtener alumnos sin EE asignada", e);
+            throw new OperationException("No se pudo obtener los alumnos disponibles. Intente más tarde", e);
+        }
+        return students;
+    }
+
+    @Override
     public Optional<Student> getStudentById(int idStudent) throws OperationException { 
         Optional<Student> validateStudent = Optional.empty();
         String studentQuery = "SELECT e.matricula, u.nombre, u.apellidos, e.fechaNacimiento, e.genero "

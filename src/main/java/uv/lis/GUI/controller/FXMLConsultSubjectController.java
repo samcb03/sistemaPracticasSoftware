@@ -175,7 +175,7 @@ public class FXMLConsultSubjectController extends WindowHandler {
 
         if (loader != null) {
             FXMLManageStudentController controller = loader.getController();
-            controller.loadStudentData(student.getIdStudent());
+            controller.initializeData(student);
         }
     }
 

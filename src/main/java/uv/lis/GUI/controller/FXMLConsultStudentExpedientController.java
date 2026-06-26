@@ -31,8 +31,10 @@ import uv.lis.GUI.cell.ActionTableCell;
 import uv.lis.GUI.cell.DocumentReviewTableCell;
 import uv.lis.logic.dao.ExpedientDAO;
 import uv.lis.logic.dao.PracticeDAO;
+import uv.lis.logic.dao.SubjectDAO;
 import uv.lis.logic.dto.Expedient;
 import uv.lis.logic.dto.Practice;
+import uv.lis.logic.dto.Professor;
 import uv.lis.logic.exceptions.OperationException;
 import uv.lis.logic.utils.SessionManager;
 
@@ -61,6 +63,10 @@ public class FXMLConsultStudentExpedientController extends ValidationHandler {
     private static final String STATUS_NAME_VALIDATED = "Validado";
     private static final String STATUS_NAME_REJECTED = "Rechazado";
     private static final String TOTAL_FORMAT = "Total: %d documento(s)";
+    private static final String REVIEW_FORBIDDEN_MESSAGE 
+        = "No tiene permisos para validar o rechazar documentos de este alumno.";
+    private static final String GRADE_FORBIDDEN_MESSAGE
+        = "No tiene permisos para registrar la calificación de este alumno.";
 
     private static final String FILTER_ALL = "Todos";
     private static final String FILTER_REPORTS = "Reportes";
@@ -90,12 +96,15 @@ public class FXMLConsultStudentExpedientController extends ValidationHandler {
 
     private ExpedientDAO expedientDAO;
     private PracticeDAO practiceDAO;
+    private SubjectDAO subjectDAO;
     private List<Expedient> allDocuments;
+    private boolean canReviewAndGrade;
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         expedientDAO = new ExpedientDAO();
         practiceDAO = new PracticeDAO();
+        subjectDAO = new SubjectDAO();
         allDocuments = new ArrayList<>();
         setupControls(labelMessage, buttonBack);
         configureTableColumns();
@@ -104,6 +113,8 @@ public class FXMLConsultStudentExpedientController extends ValidationHandler {
 
     public void loadStudentArchives(String studentId) {
         labelStudentId.setText(studentId);
+        resolveReviewAndGradePermissions(studentId);
+
         try {
             allDocuments = expedientDAO.getDocumentsByStudentId(studentId);
             applyCurrentFilter();
@@ -114,15 +125,62 @@ public class FXMLConsultStudentExpedientController extends ValidationHandler {
         }
     }
 
+    @Override
+    protected void clearFields() {
+        labelStudentId.setText("");
+        labelMessage.setText("");
+        labelTotal.setText("");
+        tableViewArchives.getItems().clear();
+    }
+
+    private void resolveReviewAndGradePermissions(String studentId) {
+        Professor currentProfessor = SessionManager.getInstance().getCurrentProfessor();
+
+        if (currentProfessor == null) {
+            LOGGER.log(Level.WARNING, "No hay profesor en sesión al cargar el expediente del alumno");
+            canReviewAndGrade = false;
+        } else if (!currentProfessor.getIsCoordinator()) {
+            canReviewAndGrade = true;
+        } else {
+            canReviewAndGrade = checkIfCoordinatorTeachesStudent(currentProfessor.getPersonnelNumber(), studentId);
+        }
+
+        applyReviewAndGradeRestrictions();
+    }
+
+    private boolean checkIfCoordinatorTeachesStudent(String personnelNumber, String studentId) {
+        boolean isTeaching = false;
+
+        try {
+            isTeaching = subjectDAO.isProfessorTeachingStudent(personnelNumber, studentId);
+        } catch (OperationException e) {
+            LOGGER.log(Level.SEVERE, "Error al verificar si el coordinador imparte clase al alumno", e);
+            showError(e.getMessage());
+        }
+        return isTeaching;
+    }
+
+    private void applyReviewAndGradeRestrictions() {
+        columnReview.setVisible(canReviewAndGrade);
+        textFieldGrade.setVisible(canReviewAndGrade);
+        textFieldGrade.setManaged(canReviewAndGrade);
+        buttonAcceptGrade.setVisible(canReviewAndGrade);
+        buttonAcceptGrade.setManaged(canReviewAndGrade);
+    }
+
     @FXML
     private void addPractice() {
-        String gradeInput = textFieldGrade.getText().trim();
-        Optional<String> validationError = validateGrade(gradeInput, GRADE_FIELD_NAME);
-
-        if (validationError.isPresent()) {
-            showError(validationError.get());
+        if (canReviewAndGrade) {
+            showError(GRADE_FORBIDDEN_MESSAGE);
         } else {
-            saveGrade(labelStudentId.getText(), Integer.parseInt(gradeInput));
+            String gradeInput = textFieldGrade.getText().trim();
+            Optional<String> validationError = validateGrade(gradeInput, GRADE_FIELD_NAME);
+
+            if (validationError.isPresent()) {
+                showError(validationError.get());
+            } else {
+                saveGrade(labelStudentId.getText(), Integer.parseInt(gradeInput));
+            }
         }
     }
 
@@ -198,7 +256,9 @@ public class FXMLConsultStudentExpedientController extends ValidationHandler {
     }
 
     private void reviewDocument(Expedient expedient, int idStatus) {
-        if (expedient.isValidated()) {
+        if (canReviewAndGrade) {
+            showError(REVIEW_FORBIDDEN_MESSAGE);
+        } else if (expedient.isValidated()) {
             showError(ALREADY_VALIDATED_MESSAGE);
         } else {
             confirmAndApplyReview(expedient, idStatus);
@@ -268,16 +328,18 @@ public class FXMLConsultStudentExpedientController extends ValidationHandler {
     }
 
     private void enableGradeInputIfNotRegistered(String studentId) {
-        try {
-            boolean alreadyExists = practiceDAO.existsByStudent(studentId);
+        if (!canReviewAndGrade) {
+            try {
+                boolean alreadyExists = practiceDAO.existsByStudent(studentId);
 
-            if (!alreadyExists) {
-                textFieldGrade.setDisable(false);
-                buttonAcceptGrade.setDisable(false);
+                if (!alreadyExists) {
+                    textFieldGrade.setDisable(false);
+                    buttonAcceptGrade.setDisable(false);
+                }
+            } catch (OperationException e) {
+                LOGGER.log(Level.SEVERE, "Error al verificar calificación existente", e);
+                showError(e.getMessage());
             }
-        } catch (OperationException e) {
-            LOGGER.log(Level.SEVERE, "Error al verificar calificación existente", e);
-            showError(e.getMessage());
         }
     }
 
@@ -357,13 +419,5 @@ public class FXMLConsultStudentExpedientController extends ValidationHandler {
 
     private void updateTotalLabel(int totalDocuments) {
         labelTotal.setText(String.format(TOTAL_FORMAT, totalDocuments));
-    }
-
-    @Override
-    protected void clearFields() {
-        labelStudentId.setText("");
-        labelMessage.setText("");
-        labelTotal.setText("");
-        tableViewArchives.getItems().clear();
     }
 }
