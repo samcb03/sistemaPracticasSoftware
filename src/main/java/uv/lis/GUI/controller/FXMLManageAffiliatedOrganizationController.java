@@ -28,6 +28,7 @@ import javafx.scene.layout.GridPane;
 
 import uv.lis.GUI.ValidationHandler;
 import uv.lis.logic.dao.AffiliatedOrganizationDAO;
+import uv.lis.logic.dao.ProjectDAO;
 import uv.lis.logic.dto.AffiliatedOrganization;
 import uv.lis.logic.dto.Project;
 import uv.lis.logic.exceptions.OperationException;
@@ -78,12 +79,14 @@ public class FXMLManageAffiliatedOrganizationController extends ValidationHandle
 
     private ContextMenu contextMenuSuggestions;
     private AffiliatedOrganizationDAO affiliatedOrganizationDAO;
+    private ProjectDAO projectDAO;
     private AffiliatedOrganization currentOrganization;
     private ArrayList<Project> currentProjects;
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         affiliatedOrganizationDAO = new AffiliatedOrganizationDAO();
+        projectDAO = new ProjectDAO();
         contextMenuSuggestions = new ContextMenu();
 
         setupControls(labelMessage, buttonBack);
@@ -170,11 +173,11 @@ public class FXMLManageAffiliatedOrganizationController extends ValidationHandle
         labelStatus.setText(isInactive ? LABEL_INACTIVE : LABEL_ACTIVE);
         buttonInactive.setDisable(isInactive);
 
-        ArrayList<String> projects = affiliatedOrganizationDAO.getProjectsByOrganization(currentOrganization.getName());
+        ArrayList<String> projects = projectDAO.getProjectsByOrganization(currentOrganization.getName());
         ObservableList<String> items = FXCollections.observableArrayList(projects);
         listViewProjects.setItems(items);
 
-        currentProjects = affiliatedOrganizationDAO.getCompleteProjectsByOrganization(currentOrganization.getName());
+        currentProjects = projectDAO.getCompleteProjectsByOrganization(currentOrganization.getName());
     }
 
     private void resetOrganizationView() {
@@ -304,7 +307,7 @@ public class FXMLManageAffiliatedOrganizationController extends ValidationHandle
 
         if (!confirmed) {
             showError("Inactivación cancelada");
-        } else if (affiliatedOrganizationDAO.hasActiveProjects(organizationName)) {
+        } else if (projectDAO.hasActiveProjects(organizationName)) {
             showError("La organización cuenta con Proyectos activos");
         } else {
             affiliatedOrganizationDAO.inactivateOrganization(organizationName);

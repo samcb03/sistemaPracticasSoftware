@@ -21,6 +21,8 @@ import uv.lis.logic.exceptions.OperationException;;
 
 public class ProfessorDAO extends UserDAO implements IProfessorDAO {
     private static final int IS_PROFESSOR = 2;
+    private static final int INACTIVE_STATUS = 0;
+    private static final int ACTIVE_STATUS = 1;
     private static final Logger LOGGER = Logger.getLogger(ProfessorDAO.class.getName());
     private MySQLConnectionManager connectionManager;
 
@@ -186,13 +188,14 @@ public class ProfessorDAO extends UserDAO implements IProfessorDAO {
     @Override
     public boolean inactivateProfessor(String personalNumber) throws OperationException {
         boolean isInactived = false;
-        String professorQuery = "UPDATE Profesor p INNER JOIN Usuario u ON p.idUsuario = u.idUsuario SET u.estado = 0 " 
+        String professorQuery = "UPDATE Profesor p INNER JOIN Usuario u ON p.idUsuario = u.idUsuario SET u.estado = ? " 
                               + "WHERE p.numeroPersonal = ?;";
 
         try (Connection databaseConnection = connectionManager.getConnection();
             PreparedStatement preparedStatement = databaseConnection.prepareStatement(professorQuery)) {
 
             preparedStatement.setString(1, personalNumber);
+            preparedStatement.setInt(2, INACTIVE_STATUS);
 
             if (preparedStatement.executeUpdate() > NO_VALUE) {
                 isInactived = true;
@@ -223,7 +226,7 @@ public class ProfessorDAO extends UserDAO implements IProfessorDAO {
 
             try (ResultSet resultSet = preparedStatement.executeQuery()) {
                 if (resultSet.next()) {
-                    isInactive = resultSet.getInt("estado") == 0;
+                    isInactive = resultSet.getInt("estado") == NO_VALUE;
                 } else {
                     throw new OperationException("No se encontró al profesor con número: "
                         + personnelNumber, null);
@@ -295,12 +298,13 @@ public class ProfessorDAO extends UserDAO implements IProfessorDAO {
     public boolean hasSubjectAssigned(String personnelNumber) throws OperationException {
         boolean hasSubject = false;
         String professorQuery = "SELECT 1 FROM Profesor_Imparte_Experiencia"
-                              + " WHERE numeroPersonal = ? AND estaActiva = TRUE";
+                              + " WHERE numeroPersonal = ? AND estaActiva = ?";
 
         try (Connection databaseConnection = connectionManager.getConnection();
             PreparedStatement preparedStatement = databaseConnection.prepareStatement(professorQuery)) {
 
             preparedStatement.setString(1, personnelNumber);
+            preparedStatement.setInt(2, ACTIVE_STATUS);
 
             try (ResultSet resultSet = preparedStatement.executeQuery()) {
                 hasSubject = resultSet.next();
@@ -353,12 +357,14 @@ public class ProfessorDAO extends UserDAO implements IProfessorDAO {
         String professorQuery = "SELECT COUNT(*) "
                               + "FROM Usuario u "
                               + "INNER JOIN Profesor p ON u.idUsuario = p.idUsuario "
-                              + "WHERE u.idRol = 3 AND u.estado = 1 AND p.numeroPersonal <> ?;";
+                              + "WHERE u.idRol = ? AND u.estado = ? AND p.numeroPersonal <> ?;";
         
         try (Connection databaseConnection = connectionManager.getConnection();
             PreparedStatement preparedStatement = databaseConnection.prepareStatement(professorQuery)) {
             
             preparedStatement.setString(1, personnelNumber);
+            preparedStatement.setInt(2, IS_COORDINATOR);
+            preparedStatement.setInt(3, ACTIVE_STATUS);
 
             try (ResultSet resultSet = preparedStatement.executeQuery()) {
                 if (resultSet.next()) {

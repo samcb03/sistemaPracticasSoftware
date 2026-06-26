@@ -27,6 +27,7 @@ import org.testfx.util.WaitForAsyncUtils;
 
 import uv.lis.GUI.controller.FXMLManageAffiliatedOrganizationController;
 import uv.lis.logic.dao.AffiliatedOrganizationDAO;
+import uv.lis.logic.dao.ProjectDAO;
 import uv.lis.logic.dto.AffiliatedOrganization;
 import uv.lis.logic.dto.Project;
 import uv.lis.logic.exceptions.OperationException;
@@ -35,6 +36,7 @@ public class FXMLManageAffiliatedOrganizationControllerTest extends ApplicationT
 
     private static final String MANAGE_VIEW_FXML = "/uv/lis/GUI/view/FXMLManageAffiliatedOrganization.fxml";
     private static final String ORGANIZATION_DAO_FIELD = "affiliatedOrganizationDAO";
+    private static final String PROJECT_DAO_FIELD = "projectDAO";
 
     private static final String SEARCH_FIELD_SELECTOR = "#textFieldOrganizationName";
     private static final String EMAIL_FIELD_SELECTOR = "#textFieldEmail";
@@ -66,6 +68,7 @@ public class FXMLManageAffiliatedOrganizationControllerTest extends ApplicationT
     private Stage primaryStage;
     private FXMLManageAffiliatedOrganizationController manageController;
     private AffiliatedOrganizationDAO organizationDAOMock;
+    private ProjectDAO projectDAOMock;
 
     @Override
     public void start(Stage stage) throws Exception {
@@ -89,6 +92,8 @@ public class FXMLManageAffiliatedOrganizationControllerTest extends ApplicationT
     void setUpMocks() throws Exception {
         organizationDAOMock = mock(AffiliatedOrganizationDAO.class);
         injectField(ORGANIZATION_DAO_FIELD, organizationDAOMock);
+        projectDAOMock = mock(ProjectDAO.class);
+        injectField(PROJECT_DAO_FIELD, projectDAOMock);
         when(organizationDAOMock.searchActiveOrganizationsByNamePrefix(anyString())).thenReturn(new ArrayList<>());
     }
 
@@ -172,8 +177,8 @@ public class FXMLManageAffiliatedOrganizationControllerTest extends ApplicationT
     private void stubFoundSearch() throws OperationException {
         when(organizationDAOMock.getOrganizationByName(anyString())).thenReturn(Optional.of(buildOrganization()));
         when(organizationDAOMock.isOrganizationInactive(anyString())).thenReturn(false);
-        when(organizationDAOMock.getProjectsByOrganization(anyString())).thenReturn(new ArrayList<>());
-        when(organizationDAOMock.getCompleteProjectsByOrganization(anyString()))
+        when(projectDAOMock.getProjectsByOrganization(anyString())).thenReturn(new ArrayList<>());
+        when(projectDAOMock.getCompleteProjectsByOrganization(anyString()))
             .thenReturn(new ArrayList<Project>());
     }
 

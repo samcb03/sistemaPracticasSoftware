@@ -14,7 +14,6 @@ import java.util.logging.Logger;
 import uv.lis.dataaccess.MySQLConnectionManager;
 import uv.lis.logic.contracts.IAffiliatedOrganizationDAO;
 import uv.lis.logic.dto.AffiliatedOrganization;
-import uv.lis.logic.dto.Project;
 import uv.lis.logic.exceptions.OperationException;
 
 public class AffiliatedOrganizationDAO implements IAffiliatedOrganizationDAO {
@@ -98,7 +97,8 @@ public class AffiliatedOrganizationDAO implements IAffiliatedOrganizationDAO {
                     affiliatedOrganization.getId());
             } else {
                 LOGGER.log(Level.WARNING,
-                    "No se pudo registrar la organización vinculada con nombre {0}.", affiliatedOrganization.getName());
+                    "No se pudo registrar la organización vinculada con nombre {0}.", 
+                    affiliatedOrganization.getName());
                 throw new OperationException(
                     "No se pudo registrar la organización vinculada con nombre: " + affiliatedOrganization.getName(), 
                         null);
@@ -325,87 +325,6 @@ public class AffiliatedOrganizationDAO implements IAffiliatedOrganizationDAO {
         return validateOrganization;
     }
 
-    @Override
-    public ArrayList<String> getProjectsByOrganization(String organizationName) throws OperationException {
-        ArrayList<String> projectList = new ArrayList<>();
-        String projectQuery = "SELECT p.idProyecto, p.nombre, p.descripcion "
-                            + "FROM Proyecto p "
-                            + "JOIN OrganizacionVinculada ov "
-                            + "ON p.idOrganizacionVinculada = ov.idOrganizacionVinculada "
-                            + "WHERE ov.nombreOV = ? "
-                            + "ORDER BY p.nombre ASC";
-
-        try (Connection databaseConnection = connectionManager.getConnection();
-            PreparedStatement preparedStatement = databaseConnection.prepareStatement(projectQuery)) {
-
-            preparedStatement.setString(1, organizationName);
-
-            try (ResultSet resultSet = preparedStatement.executeQuery()) {
-                while (resultSet.next()) {
-                    String entry = "ID: " + resultSet.getInt("idProyecto")
-                        + " — " + resultSet.getString("nombre")
-                        + " (" + resultSet.getString("descripcion") + ")";
-                    projectList.add(entry);
-                }
-            }
-        } catch (SQLException e) {
-            LOGGER.log(Level.SEVERE, "Error al obtener proyectos de la organización", e);
-            throw new OperationException("No se pudo obtener la lista de proyectos de la organización.", e);
-        }
-        return projectList;
-    }
-
-    @Override
-    public boolean hasActiveProjects(String organizationName) throws OperationException {
-        boolean hasProjectsActives = false;
-        String projectQuery = "SELECT 1 FROM Proyecto p "
-                            + "JOIN OrganizacionVinculada ov "
-                            + "ON p.idOrganizacionVinculada = ov.idOrganizacionVinculada "
-                            + "WHERE ov.nombreOV = ? LIMIT 1";
-
-        try (Connection databaseConnection = connectionManager.getConnection();
-            PreparedStatement preparedStatement = databaseConnection.prepareStatement(projectQuery)) {
-
-            preparedStatement.setString(1, organizationName);
-
-            try (ResultSet resultSet = preparedStatement.executeQuery()) {
-                hasProjectsActives = resultSet.next();
-            }
-        } catch (SQLException e) {
-            LOGGER.log(Level.SEVERE, "Error al verificar Proyectos asignados", e);
-            throw new OperationException("No se pudo verificar los proyectos activos. Intente más tarde", e);
-        }
-        return hasProjectsActives;
-    }
-
-    @Override
-    public ArrayList<Project> getCompleteProjectsByOrganization(String organizationName) throws OperationException {
-        ArrayList<Project> projectList = new ArrayList<>();
-        String projectQuery = "SELECT p.idProyecto, p.nombre, p.descripcion, p.objetivo, "
-                            + "p.cupo, p.metodologiaProyecto, p.estado, ov.nombreOV "
-                            + "FROM Proyecto p "
-                            + "JOIN OrganizacionVinculada ov "
-                            + "ON p.idOrganizacionVinculada = ov.idOrganizacionVinculada "
-                            + "WHERE ov.nombreOV = ? "
-                            + "ORDER BY p.nombre ASC";
-
-        try (Connection databaseConnection = connectionManager.getConnection();
-            PreparedStatement preparedStatement = databaseConnection.prepareStatement(projectQuery)) {
-
-            preparedStatement.setString(1, organizationName);
-
-            try (ResultSet resultSet = preparedStatement.executeQuery()) {
-                while (resultSet.next()) {
-                    projectList.add(mapProject(resultSet));
-                }
-            }
-        } catch (SQLException e) {
-            LOGGER.log(Level.SEVERE, "Error al obtener proyectos de la organización", e);
-            throw new OperationException( "No se pudo obtener la lista de proyectos de la organización.", e);
-        }
-        return projectList;
-    }
-
     private AffiliatedOrganization mapAffiliatedOrganization(ResultSet resultSet) throws SQLException {
         AffiliatedOrganization affiliatedOrganization = new AffiliatedOrganization();
         affiliatedOrganization.setId(resultSet.getInt("idOrganizacionVinculada"));
@@ -418,23 +337,9 @@ public class AffiliatedOrganizationDAO implements IAffiliatedOrganizationDAO {
         affiliatedOrganization.setSector(resultSet.getString("sector"));
         affiliatedOrganization.setEmail(resultSet.getString("correo"));
         affiliatedOrganization.setPhoneNumber(resultSet.getString("telefono"));
-        affiliatedOrganization.setNumberOfDirectUsers(resultSet.getInt("num n         UsuariosDirectos"));
+        affiliatedOrganization.setNumberOfDirectUsers(resultSet.getInt("numUsuariosDirectos"));
         affiliatedOrganization.setNumberOfIndirectUsers(resultSet.getInt("numUsuariosIndirectos"));
 
         return affiliatedOrganization;
-    }
-
-    private Project mapProject(ResultSet resultSet) throws SQLException {
-        Project project = new Project();
-        project.setId(resultSet.getInt("idProyecto"));
-        project.setName(resultSet.getString("nombre"));
-        project.setDescription(resultSet.getString("descripcion"));
-        project.setObjective(resultSet.getString("objetivo"));
-        project.setCapacity(resultSet.getInt("cupo"));
-        project.setMethodology(resultSet.getString("metodologiaProyecto"));
-        project.setActive(resultSet.getBoolean("estado"));
-        project.setAffiliatedOrganizationName(resultSet.getString("nombreOV"));
-
-        return project;
     }
 }

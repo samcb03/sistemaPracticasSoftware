@@ -20,6 +20,7 @@ import uv.lis.logic.exceptions.OperationException;
 public class ProjectSupervisorDAO implements IProjectSupervisorDAO {
     private static final Logger LOGGER = Logger.getLogger(ProjectSupervisorDAO.class.getName());
     private static final int INACTIVE_STATUS = 0;
+    private static final int ACTIVE_STATUS = 1;
 
     private final MySQLConnectionManager connectionManager;
 
@@ -247,7 +248,7 @@ public class ProjectSupervisorDAO implements IProjectSupervisorDAO {
              PreparedStatement preparedStatement = databaseConnection.prepareStatement(projectSupervisorQuery)) {
 
             preparedStatement.setInt(1, organizationId);
-            preparedStatement.setBoolean(2, true);
+            preparedStatement.setInt(2, ACTIVE_STATUS);
 
             try (ResultSet resultSet = preparedStatement.executeQuery()) {
                 while (resultSet.next()) {
