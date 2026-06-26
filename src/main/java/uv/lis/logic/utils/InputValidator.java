@@ -406,12 +406,11 @@ public final class InputValidator {
      */
     public static Optional<String> validateMaxIntValue(String integerValue, int maxInt, String fieldName) {
         Optional<String> validationResult = validateNotEmpty(integerValue, fieldName);
+        validationResult = validateIntegerRange(integerValue, fieldName);
         if (validationResult.isEmpty()) {
             if (exceedsMaximum(integerValue, maxInt)) {
                 validationResult = Optional.of(fieldName + " no puede tener un valor mayor a " + maxInt);
-            } else if (!integerValue.matches(INTEGER_REGEX)) {
-                validationResult = Optional.of(fieldName + " debe ser un número entero válido");
-            }
+            } 
         }
         return validationResult;
     }

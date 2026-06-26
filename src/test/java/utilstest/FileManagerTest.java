@@ -70,7 +70,7 @@ class FileManagerTest {
     void saveFile_validFile_createsFileOnDisk() throws OperationException {
         savedFilePath = FileManager.saveFile(sourceFile, TEST_STUDENT_ID);
 
-        assertTrue(new File(savedFilePath).exists());
+        assertTrue(FileManager.resolveFile(savedFilePath).exists());
     }
 
     @Test
