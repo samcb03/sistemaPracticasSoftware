@@ -27,17 +27,17 @@ public final class ClasspathImageRepositoryCommon implements RepositoryService {
      * the classpath, or null if the URI is null or the requested type is not
      * InputStreamResource.
      *
-     * @param uri the image URI as it appears in the report template
+     * @param UniformResourceIdentifier the image URI as it appears in the report template
      * @param resourceType the resource type requested by JasperReports
      * @return the image wrapped in an InputStreamResource, or null if the
      * resource cannot be resolved
      */
     @Override
-    public <Key extends Resource> Key getResource(String uri, Class<Key> resourceType) {
+    public <Key extends Resource> Key getResource(String UniformResourceIdentifier, Class<Key> resourceType) {
         Key resource = null;
 
-        if (uri != null && InputStreamResource.class.equals(resourceType)) {
-            resource = resourceType.cast(buildImageResource(uri));
+        if (UniformResourceIdentifier != null && InputStreamResource.class.equals(resourceType)) {
+            resource = resourceType.cast(buildImageResource(UniformResourceIdentifier));
         }
         return resource;
     }
@@ -46,13 +46,13 @@ public final class ClasspathImageRepositoryCommon implements RepositoryService {
      * Returns the image at the given URI as a Resource loaded from the
      * classpath, or null if the image is not found.
      *
-     * @param uri the image URI as it appears in the report template
+     * @param UniformResourceIdentifier the image URI as it appears in the report template
      * @return the image wrapped in an InputStreamResource, or null if the
      *         resource cannot be resolved
      */
     @Override
-    public Resource getResource(String uri) {
-        Resource resource = getResource(uri, InputStreamResource.class);
+    public Resource getResource(String UniformResourceIdentifier) {
+        Resource resource = getResource(UniformResourceIdentifier, InputStreamResource.class);
         return resource;
     }
 
@@ -60,17 +60,17 @@ public final class ClasspathImageRepositoryCommon implements RepositoryService {
      * Not supported. This repository is read-only; calling this method logs a
      * warning and performs no action.
      *
-     * @param uri the URI where the resource would be saved
+     * @param UniformResourceIdentifier the URI where the resource would be saved
      * @param resource the resource to save
      */
     @Override
-    public void saveResource(String uri, Resource resource) {
-        LOGGER.log(Level.WARNING, "Operación de guardado no soportada para {0}", uri);
+    public void saveResource(String UniformResourceIdentifier, Resource resource) {
+        LOGGER.log(Level.WARNING, "Operación de guardado no soportada para {0}", UniformResourceIdentifier);
     }
 
-    private InputStreamResource buildImageResource(String uri) {
+    private InputStreamResource buildImageResource(String UniformResourceIdentifier) {
         InputStreamResource imageResource = null;
-        String imageName = extractFileName(uri);
+        String imageName = extractFileName(UniformResourceIdentifier);
         InputStream imageStream = getClass().getResourceAsStream(IMAGES_CLASSPATH + imageName);
 
         if (imageStream == null) {
@@ -82,11 +82,11 @@ public final class ClasspathImageRepositoryCommon implements RepositoryService {
         return imageResource;
     }
 
-    private String extractFileName(String uri) {
-        int lastWindowsSeparator = uri.lastIndexOf(WINDOWS_SEPARATOR);
-        int lastUnixSeparator = uri.lastIndexOf(UNIX_SEPARATOR);
+    private String extractFileName(String UniformResourceIdentifier) {
+        int lastWindowsSeparator = UniformResourceIdentifier.lastIndexOf(WINDOWS_SEPARATOR);
+        int lastUnixSeparator = UniformResourceIdentifier.lastIndexOf(UNIX_SEPARATOR);
         int lastSeparator = Math.max(lastWindowsSeparator, lastUnixSeparator);
-        String fileName = uri.substring(lastSeparator + FILE_NAME_START_OFFSET);
+        String fileName = UniformResourceIdentifier.substring(lastSeparator + FILE_NAME_START_OFFSET);
         return fileName;
     }
 }

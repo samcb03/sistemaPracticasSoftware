@@ -9,6 +9,20 @@ public class ProjectSummary {
     private String objective;
     private String methodology;
 
+    public ProjectSummary() {
+    }
+
+    public ProjectSummary(String professorName, String organizationName, String projectName,
+            String studentName, String description, String objective, String methodology) {
+        this.professorName = professorName;
+        this.organizationName = organizationName;
+        this.projectName = projectName;
+        this.studentName = studentName;
+        this.description = description;
+        this.objective = objective;
+        this.methodology = methodology;
+    }
+
     public String getProfessorName() {
         return professorName;
     }
