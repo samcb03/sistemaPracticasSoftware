@@ -489,10 +489,11 @@ public final class InputValidator {
      * @return an error message if the value is empty or does not match the required length, empty otherwise
      */
     public static Optional<String> validatePostalCode(String postalCodeValue, String fieldName) {
-        return firstError(
+        Optional<String> firstError = firstError(
             validateNotEmpty(postalCodeValue, fieldName),
             validatePositiveInteger(postalCodeValue, fieldName),
             validateExactLength(postalCodeValue, POSTAL_CODE_LENGTH, fieldName));
+        return firstError;
     }
 
     /**

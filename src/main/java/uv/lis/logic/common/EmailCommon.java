@@ -97,7 +97,8 @@ public class EmailCommon {
 
     private String generateCode() {
         int code = secureRandom.nextInt(MIN_CODE_VALUE, MAX_CODE_VALUE);
-        return String.valueOf(code);
+        String finalCode = String.valueOf(code);
+        return finalCode;
     }
 
     private void sendVerificationEmail(String email, String code) throws EmailException {

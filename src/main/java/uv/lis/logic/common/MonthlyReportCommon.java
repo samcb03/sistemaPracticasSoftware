@@ -79,7 +79,7 @@ public class MonthlyReportCommon {
 
             Map<String, Object> parameters = buildReportParameters(monthlyReport);
             jasperPrint = JasperFillManager.getInstance(jasperReportsContext)
-                    .fill(templateStream, parameters, new JREmptyDataSource());
+                .fill(templateStream, parameters, new JREmptyDataSource());
 
         } catch (IOException ioException) {
             LOGGER.log(Level.SEVERE, "Error al leer la plantilla del reporte mensual", ioException);
