@@ -24,6 +24,7 @@ import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
 
 import uv.lis.logic.common.EmailCommon;
+import uv.lis.logic.dao.ExpedientDAO;
 import uv.lis.logic.dao.ProfessorDAO;
 import uv.lis.logic.dao.StudentDAO;
 import uv.lis.logic.dao.UserDAO;
@@ -46,6 +47,11 @@ public class FXMLLoginController implements Initializable {
     private static final int USER_TYPE_ADMINISTRATOR = 4;
     private static final int MAX_ATTEMPTS = 5;
     private static final int IMAGE_FIT_HEIGHT = 20;
+    private static final int AUTOEVALUATION_DOCUMENT_TYPE = 1;
+    private static final int EVALUATION_DOCUMENT_TYPE = 12;
+    private static final int LIBERATION_LETTER_DOCUMENT_TYPE = 13;
+
+    private static final String FINISH_WINDOW_VIEW = "/uv/lis/GUI/view/FXMLFinishWindow.fxml";
     private static final String MESSAGE_INVALID_CREDENTIALS = "Credenciales inválidas. Intentos restantes: ";
     private static final String MESSAGE_TOO_MANY_ATTEMPTS =  "Demasiados intentos fallidos. Reinicie la aplicación.";
     private static final String MESSAGE_USER_DATA_NOT_FOUND = "No se encontraron los datos.";
@@ -293,7 +299,8 @@ public class FXMLLoginController implements Initializable {
 
         switch (userRoleId) {
             case USER_TYPE_STUDENT:
-                fxml = STUDENT_MENU_VIEW;
+                Student currentStudent = SessionManager.getInstance().getCurrentStudent();
+                fxml = shouldGoToFinishWindow(currentStudent) ? FINISH_WINDOW_VIEW : STUDENT_MENU_VIEW;
                 break;
             case USER_TYPE_PROFESSOR:
                 fxml = PROFESSOR_MENU_VIEW;
@@ -322,5 +329,21 @@ public class FXMLLoginController implements Initializable {
                 showError("Error al cargar la pantalla.");
             }
         } 
+    }
+
+    private boolean shouldGoToFinishWindow(Student student) {
+        try {
+            ExpedientDAO expedientDAO = new ExpedientDAO();
+            boolean isAutoevaluationValidated = expedientDAO.isDocumentTypeValidated(
+                student.getIdStudent(), AUTOEVALUATION_DOCUMENT_TYPE);
+            boolean isOrganizationEvaluationValidated = expedientDAO.isDocumentTypeValidated(
+                student.getIdStudent(), EVALUATION_DOCUMENT_TYPE);
+            boolean isLiberationLetterValidated = expedientDAO.isDocumentTypeValidated(
+                student.getIdStudent(), LIBERATION_LETTER_DOCUMENT_TYPE);
+            return isAutoevaluationValidated && isOrganizationEvaluationValidated && isLiberationLetterValidated;
+        } catch (OperationException e) {
+            LOGGER.log(Level.SEVERE, "Error al verificar documentos finales", e);
+            return false;
+        }
     }
 }

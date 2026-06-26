@@ -58,6 +58,7 @@ public class FXMLFinishWindowController extends ValidationHandler {
     @FXML private Button buttonShowSummary;
     @FXML private Button buttonShowDocuments;
     @FXML private Button buttonShowActivities;
+    @FXML private Button buttonLogOut;
     @FXML private Label labelStudentName;
     @FXML private Label labelProjectName;
     @FXML private Label labelOrganizationName;

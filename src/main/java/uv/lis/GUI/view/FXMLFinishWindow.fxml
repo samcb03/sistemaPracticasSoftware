@@ -16,7 +16,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="530.0" prefWidth="559.0" xmlns="http://javafx.com/javafx/26" xmlns:fx="http://javafx.com/fxml/1" fx:controller="uv.lis.GUI.controller.FXMLFinishWindowController">
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="530.0" prefWidth="559.0" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="uv.lis.GUI.controller.FXMLFinishWindowController">
    <children>
 
       <Label cache="true" layoutX="190.0" layoutY="14.0" prefHeight="22.0" prefWidth="220.0" text="Práctica Finalizada">
@@ -39,7 +39,6 @@
                </children>
             </HBox>
 
-            <!-- SECCIÓN RESUMEN -->
             <VBox fx:id="sectionSummary" layoutX="16.0" layoutY="56.0" prefWidth="435.0" spacing="6.0">
                <children>
 
@@ -88,10 +87,7 @@
                   </Label>
 
                   <HBox alignment="CENTER">
-                     <Button mnemonicParsing="false" onAction="#navigateToLogOut"
-                             style="-fx-background-color: #a11515; -fx-text-fill: white;"
-                             text="Cerrar Sesión"
-                             prefHeight="40.0" prefWidth="209.0" />
+                     <Button fx:id="buttonLogOut" mnemonicParsing="false" onAction="#navigateToLogOut" prefHeight="40.0" prefWidth="209.0" style="-fx-background-color: #a11515; -fx-text-fill: white;" text="Cerrar Sesión" />
                   </HBox>
 
                </children>
@@ -113,16 +109,13 @@
                   </TableView>
 
                   <HBox alignment="CENTER">
-                     <Button mnemonicParsing="false" onAction="#navigateToLogOut"
-                             style="-fx-background-color: #a11515; -fx-text-fill: white;"
-                             text="Cerrar Sesión"
-                             prefHeight="40.0" prefWidth="209.0" />
+                     <Button mnemonicParsing="false" onAction="#navigateToLogOut" prefHeight="40.0" prefWidth="209.0" style="-fx-background-color: #a11515; -fx-text-fill: white;" text="Cerrar Sesión" />
                   </HBox>
 
                </children>
             </VBox>
 
-            <VBox fx:id="sectionActivities" layoutX="16.0" layoutY="56.0" managed="false" prefWidth="435.0" prefHeight="400.0" spacing="10.0" visible="false">
+            <VBox fx:id="sectionActivities" layoutX="16.0" layoutY="56.0" managed="false" prefHeight="400.0" prefWidth="435.0" spacing="10.0" visible="false">
                <children>
 
                   <Label text="Actividades">
@@ -134,8 +127,7 @@
                      <Label fx:id="labelCompletedHours" text="-" />
                   </HBox>
 
-                  <ScrollPane fitToWidth="true" prefHeight="280.0" prefWidth="435.0"
-                              style="-fx-background-color: transparent; -fx-background: transparent;">
+                  <ScrollPane fitToWidth="true" prefHeight="280.0" prefWidth="435.0" style="-fx-background-color: transparent; -fx-background: transparent;">
                      <content>
                         <TableView fx:id="tableViewActivityDetails" prefWidth="415.0">
                            <columns>
@@ -149,10 +141,7 @@
                   </ScrollPane>
 
                   <HBox alignment="CENTER">
-                     <Button mnemonicParsing="false" onAction="#navigateToLogOut"
-                             style="-fx-background-color: #a11515; -fx-text-fill: white;"
-                             text="Cerrar Sesión"
-                             prefHeight="40.0" prefWidth="209.0" />
+                     <Button mnemonicParsing="false" onAction="#navigateToLogOut" prefHeight="40.0" prefWidth="209.0" style="-fx-background-color: #a11515; -fx-text-fill: white;" text="Cerrar Sesión" />
                   </HBox>
 
                </children>
