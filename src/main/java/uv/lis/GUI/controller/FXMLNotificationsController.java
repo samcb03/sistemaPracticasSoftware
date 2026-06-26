@@ -32,13 +32,11 @@ public class FXMLNotificationsController extends ValidationHandler {
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
+        setupControls(labelMessage, buttonBack);
         notificationDAO = new NotificationDAO();
         student = SessionManager.getInstance().getCurrentStudent();
-
-        setupControls(labelMessage, buttonBack);
         setupNotificationCells();
         setupSelectionListener();
-
         checkStudentAndLoad();
     }
 
@@ -62,6 +60,7 @@ public class FXMLNotificationsController extends ValidationHandler {
     private void setupSelectionListener() {
         listViewNotifications.getSelectionModel().selectedItemProperty().addListener(
             (observable, oldValue, newValue) -> {
+                
                 if (newValue != null && !newValue.isRead()) {
                     markSelectedAsRead(newValue);
                 }

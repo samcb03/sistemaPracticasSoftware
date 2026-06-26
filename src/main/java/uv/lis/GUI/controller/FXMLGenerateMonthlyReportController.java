@@ -37,8 +37,8 @@ import uv.lis.logic.utils.SessionManager;
 
 public class FXMLGenerateMonthlyReportController extends ValidationHandler {
 
+    private static final String REGISTER_ACTIVITY_VIEW = "/uv/lis/GUI/view/FXMLRegisterActivity.fxml";
     private static final Logger LOGGER = Logger.getLogger(FXMLGenerateMonthlyReportController.class.getName());
-
     private static final String NO_STUDENT_IN_SESSION_MESSAGE = "No hay alumno en sesión";
     private static final String REPORT_GENERATED_MESSAGE = "Reporte generado correctamente.";
     private static final String REPORT_GENERATION_ERROR = "Error al generar el reporte.";
@@ -71,16 +71,13 @@ public class FXMLGenerateMonthlyReportController extends ValidationHandler {
     private static final int MONTH_UNKNOWN = -1;
     private static final int INITIAL_REPORTED_HOURS = 0;
     private static final int MAX_ACCUMULATED_HOURS = 420;
-
     private static final List<String> MONTH_NAMES_FIRST_PERIOD = List.of(
         "Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio",
         "Julio"
     );
-
     private static final List<String> MONTH_NAMES_SECOND_PERIOD = List.of(
         "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"
     );
-
     private static final Map<String, Integer> MONTH_NUMBERS_BY_NAME = Map.ofEntries(
         Map.entry("enero", MONTH_JANUARY),
         Map.entry("febrero", MONTH_FEBRUARY),
@@ -127,7 +124,6 @@ public class FXMLGenerateMonthlyReportController extends ValidationHandler {
 
     private Label[] activityFields;
     private Label[] observationFields;
-
     private MonthlyReportCommon monthlyReportCommon;
     private Student currentStudent;
     private ReportContextDAO reportContextDAO;
@@ -141,11 +137,9 @@ public class FXMLGenerateMonthlyReportController extends ValidationHandler {
         currentStudent = SessionManager.getInstance().getCurrentStudent();
         reportContextDAO = new ReportContextDAO();
         advanceDAO = new AdvanceDAO();
-
         initializeFieldArrays();
         labelBlock.setText(REPORT_BLOCK);
         loadStudentData();
-
         comboBoxMonth.getSelectionModel().selectedItemProperty().addListener((observableValue, oldMonth, newMonth) -> {
             if (newMonth != null) {
                 loadRegisteredActivities();
@@ -175,7 +169,9 @@ public class FXMLGenerateMonthlyReportController extends ValidationHandler {
             } else if (!reportedText.isEmpty() && hoursReported >= MAX_HOURS_PER_PARTIAL_REPORT) {
                 showError(PARTIAL_HOURS_LIMITED);
             } else {
+
                 boolean duplicated = false;
+
                 try {
                     duplicated = reportContextDAO.hasReportAlreadyBeenGenerated(studentId, currentMonth);
                     if (duplicated) {
@@ -192,7 +188,8 @@ public class FXMLGenerateMonthlyReportController extends ValidationHandler {
 
     @FXML
     public void goToRegisterActivity(ActionEvent event) {
-        FXMLLoader loader = this.navigateToWithLoader("/uv/lis/GUI/view/FXMLRegisterActivity.fxml");
+        FXMLLoader loader = this.navigateToWithLoader(REGISTER_ACTIVITY_VIEW);
+
         if (loader != null) {
             Stage registerStage = (Stage) ((Parent) loader.getRoot()).getScene().getWindow();
             registerStage.setOnHidden(e -> loadRegisteredActivities());
@@ -204,9 +201,11 @@ public class FXMLGenerateMonthlyReportController extends ValidationHandler {
         for (Label label : activityFields) {
             label.setText(EMPTY_TEXT);;
         }
+
         for (Label label : observationFields) {
             label.setText(EMPTY_TEXT);;
         }
+
         labelMessage.setText(EMPTY_TEXT);
     }
 
@@ -263,7 +262,6 @@ public class FXMLGenerateMonthlyReportController extends ValidationHandler {
 
                 int totalHours = reportContextDAO.getSumOfReportedHours(studentId, month, year);
                 labelReportedHours.setText(String.valueOf(totalHours));
-
                 int accumulatedHours = resolveAccumulatedHours(currentStudent.getIdStudent(),
                     selectedMonth.get(), totalHours);
                 labelAccumulatedHours.setText(String.valueOf(accumulatedHours));
@@ -306,6 +304,7 @@ public class FXMLGenerateMonthlyReportController extends ValidationHandler {
         if(selectedMonthOpt.isEmpty()) {
             showError("Seleccione un mes antes de generar el reporte");
         } else {
+
             try {
 
                 String selectedMonth = selectedMonthOpt.get();
@@ -356,8 +355,8 @@ public class FXMLGenerateMonthlyReportController extends ValidationHandler {
         report.setMonth(selectedMonth);
         report.setBlock(REPORT_BLOCK);
         report.setSection(labelSection.getText());
-
         int totalReportedHours = INITIAL_REPORTED_HOURS;
+
         for (int index = 0; index < MAX_ACTIVITY_INPUTS; index++) {
             String activityText = activityFields[index].getText().trim();
             String observationText = observationFields[index].getText().trim();
@@ -365,12 +364,14 @@ public class FXMLGenerateMonthlyReportController extends ValidationHandler {
         }
 
         String hoursText = labelReportedHours.getText();
+
         if (!hoursText.isEmpty()) {
             totalReportedHours = Integer.parseInt(hoursText);
         }
+
         report.setReportedHours(totalReportedHours);
-        
         String accumulatedHoursText = labelAccumulatedHours.getText();
+
         if (!accumulatedHoursText.isEmpty()) {
             report.setAccumulatedHours(Integer.parseInt(accumulatedHoursText));
         }
@@ -396,6 +397,7 @@ public class FXMLGenerateMonthlyReportController extends ValidationHandler {
     private Optional<String> getSelectedMonth() {
         Optional<String> selectedMonth;
         String selected = comboBoxMonth.getSelectionModel().getSelectedItem();
+
         if (selected == null || selected.isBlank()) {
             selectedMonth = Optional.empty();
         } else {
@@ -406,6 +408,7 @@ public class FXMLGenerateMonthlyReportController extends ValidationHandler {
 
     private boolean hasAtLeastOneActivity() {
         boolean hasActivity = false;
+        
         for (Label activityField : activityFields) {
             if (!activityField.getText().trim().isEmpty()) {
                 hasActivity = true;

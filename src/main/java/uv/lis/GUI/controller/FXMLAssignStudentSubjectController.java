@@ -38,9 +38,9 @@ public class FXMLAssignStudentSubjectController extends ValidationHandler {
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
+        setupControls(labelMessage, buttonBack);
         subjectDAO = new SubjectDAO();
         studentDAO = new StudentDAO();
-        setupControls(labelMessage, buttonBack);
         setupTable();
         setupComboBoxListener();
         loadSubjects();

@@ -51,6 +51,7 @@ public class FXMLManageProjectSupervisorController extends ValidationHandler {
     @FXML private TextField textFieldEmail;
     @FXML private GridPane  gridPaneProjectSupervisorInfo;
     @FXML private ListView<String> listViewProjects;
+
     private ContextMenu contextMenuSuggestions;
     private ProjectSupervisorDAO projectSupervisorDAO;
     private ProjectSupervisor currentSupervisor;
@@ -58,15 +59,12 @@ public class FXMLManageProjectSupervisorController extends ValidationHandler {
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
+        setupControls(labelMessage, buttonBack);
         projectSupervisorDAO = new ProjectSupervisorDAO();
         contextMenuSuggestions = new ContextMenu();
-
-        setupControls(labelMessage, buttonBack);
         gridPaneProjectSupervisorInfo.setVisible(false);
         buttonUpdate.setDisable(true);
-        buttonUpdate.setDisable(true);
         setNodeVisibility(buttonSave, false);
-
         setupAutocomplete();
         toggleEditMode(false);
     }
@@ -131,7 +129,6 @@ public class FXMLManageProjectSupervisorController extends ValidationHandler {
         boolean isInactive = projectSupervisorDAO.isSupervisorInactive(supervisorName);
         labelStatus.setText(isInactive ? LABEL_INACTIVE : LABEL_ACTIVE);
         buttonInactive.setDisable(isInactive);
-
         ArrayList<String> projects = projectSupervisorDAO.getProjectsBySupervisorName(supervisorName);
         ObservableList<String> items = FXCollections.observableArrayList(projects);
         listViewProjects.setItems(items);
@@ -140,6 +137,7 @@ public class FXMLManageProjectSupervisorController extends ValidationHandler {
     @FXML
     private void saveSupervisor() {
         Optional<String> validationError = validateInputs();
+
         if (validationError.isPresent()) {
             showError(validationError.get());
         } else {
@@ -177,6 +175,7 @@ public class FXMLManageProjectSupervisorController extends ValidationHandler {
             toggleEditMode(true);
         } else {
             Optional<String> validationError = validateInputs();
+
             if (validationError.isPresent()) {
                 showError(validationError.get());
             } else {
@@ -235,15 +234,17 @@ public class FXMLManageProjectSupervisorController extends ValidationHandler {
         String supervisorName = labelName.getText().trim();
         Optional<String> validateError = validateText(supervisorName, 
             "El nombre del Supervisor");
-            if(validateError.isPresent()) {
-                showError(validateError.get());
-            } else {
-                executeInactivationCheck(supervisorName);
-            }
+
+        if(validateError.isPresent()) {
+            showError(validateError.get());
+        } else {
+            executeInactivationCheck(supervisorName);
+        }
     }
 
     private void executeInactivationCheck(String supervisorName) {
         try {
+
             if (projectSupervisorDAO.isSupervisorInactive(supervisorName)) {
                 showError("El Supervisor ya se encuentra inactiva");
             } else {
@@ -256,9 +257,8 @@ public class FXMLManageProjectSupervisorController extends ValidationHandler {
     }
 
     private void confirmAndInactivate(String supervisorName) throws OperationException {
-        boolean confirmed = showConfirmation(
-            "Confirmar inactivación",
-            "¿Está seguro que desea inactivar al Supervisor?"
+        boolean confirmed = showConfirmation("Confirmar inactivación",
+             "¿Está seguro que desea inactivar al Supervisor?"
         );
 
         if (!confirmed) {
@@ -324,19 +324,15 @@ public class FXMLManageProjectSupervisorController extends ValidationHandler {
 
     private void toggleEditMode(boolean isEditing) {
         this.isEditing = isEditing;
-        
         setNodeVisibility(labelName,!isEditing);
         setNodeVisibility(labelPosition,!isEditing);
         setNodeVisibility(labelEmail,!isEditing);
-        
         setNodeVisibility(textFieldName,isEditing);
         setNodeVisibility(textFieldPosition,isEditing);
         setNodeVisibility(textFieldEmail,isEditing);
-
         setNodeVisibility(buttonUpdate, !isEditing);
-        buttonUpdate.setDisable(isEditing); 
-        
         setNodeVisibility(buttonSave, isEditing);
+        buttonUpdate.setDisable(isEditing); 
         buttonSave.setDisable(!isEditing); 
     }
 }

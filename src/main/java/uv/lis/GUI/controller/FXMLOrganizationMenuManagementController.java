@@ -8,7 +8,13 @@ import javafx.scene.control.Button;
 
 import uv.lis.GUI.WindowHandler;
 
-public class FXMLOrganizationMenuManagementController extends WindowHandler{
+public class FXMLOrganizationMenuManagementController extends WindowHandler {
+
+    private static final String REGISTER_ORGANIZATION_VIEW = 
+    "/uv/lis/GUI/view/FXMLRegisterAffiliatedOrganization.fxml";
+    private static final String CONSULT_ORGANIZATION_VIEW = 
+    "/uv/lis/GUI/view/FXMLManageAffiliatedOrganization.fxml";
+
     @FXML private Button buttonRegisterOrganization;
     @FXML private Button buttonConsultOrganization;
     @FXML private Button buttonBack;
@@ -20,11 +26,11 @@ public class FXMLOrganizationMenuManagementController extends WindowHandler{
 
     @FXML 
     public void goToRegisterOrganization() { 
-        navigateTo("/uv/lis/GUI/view/FXMLRegisterAffiliatedOrganization.fxml"); 
+        navigateTo(REGISTER_ORGANIZATION_VIEW); 
     }
 
     @FXML 
     public void goToConsultOrganization() { 
-        navigateTo("/uv/lis/GUI/view/FXMLManageAffiliatedOrganization.fxml"); 
+        navigateTo(CONSULT_ORGANIZATION_VIEW); 
     }
 }

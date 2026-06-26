@@ -42,7 +42,6 @@ import uv.lis.logic.utils.WorkProgressCalculator;
 public class FXMLGeneratePartialReportController extends ValidationHandler {
 
     private static final Logger LOGGER = Logger.getLogger(FXMLGeneratePartialReportController.class.getName());
-
     private static final String REPORT_GENERATED_MESSAGE = "Reporte generado correctamente.";
     private static final String REPORT_GENERATION_ERROR = "Error al generar el reporte";
     private static final String NO_STUDENT_MESSAGE = "No hay un estudiante en sesión";
@@ -55,7 +54,6 @@ public class FXMLGeneratePartialReportController extends ValidationHandler {
     private static final String NO_ACTIVITY_SELECTED_MESSAGE 
         = "Selecciona al menos una actividad antes de editar el avance.";
     private static final String ADVANCE_FIELD_LABEL = "Porcentaje de Avance de Actividad ";
-
     private static final int DEFAULT_REPORT_NUMBER = 1;
     private static final int INVALID_ADVANCE = 0;
     private static final int ROW_LABEL_OFFSET = 1;
@@ -66,21 +64,18 @@ public class FXMLGeneratePartialReportController extends ValidationHandler {
 
     @FXML private Label labelMessage;
     @FXML private Button buttonBack;
-
     @FXML private ComboBox<String> comboBoxActivity1;
     @FXML private ComboBox<String> comboBoxActivity2;
     @FXML private ComboBox<String> comboBoxActivity3;
     @FXML private ComboBox<String> comboBoxActivity4;
     @FXML private ComboBox<String> comboBoxActivity5;
     @FXML private ComboBox<String> comboBoxActivity6;
-
     @FXML private TextField textFieldAdvance1;
     @FXML private TextField textFieldAdvance2;
     @FXML private TextField textFieldAdvance3;
     @FXML private TextField textFieldAdvance4;
     @FXML private TextField textFieldAdvance5;
     @FXML private TextField textFieldAdvance6;
-
     @FXML private TextArea textAreaGeneralObservations;
     @FXML private TextArea textAreaResults;
     @FXML private AnchorPane paneAdvanceEditor;
@@ -103,18 +98,6 @@ public class FXMLGeneratePartialReportController extends ValidationHandler {
         groupComponents();
         advanceGridEditor = new WeeklyAdvanceGridEditor(gridAdvanceEditor);
         loadStudentActivities();
-    }
-
-    @SuppressWarnings("unchecked")
-    private void groupComponents() {
-        comboBoxActivities = new ComboBox[] {
-            comboBoxActivity1, comboBoxActivity2, comboBoxActivity3,
-            comboBoxActivity4, comboBoxActivity5, comboBoxActivity6
-        };
-        textFieldAdvances = new TextField[] {
-            textFieldAdvance1, textFieldAdvance2, textFieldAdvance3,
-            textFieldAdvance4, textFieldAdvance5, textFieldAdvance6
-        };
     }
 
     @FXML
@@ -142,7 +125,6 @@ public class FXMLGeneratePartialReportController extends ValidationHandler {
             labelAdvanceEditorMessage.setText(validationError.get());
         } else {
             int[][] target = editingPlanned ? plannedAdvances : realAdvances;
-
             advanceGridEditor.applyEditsTo(target);
             manualAdvances = true;
             labelAdvanceEditorMessage.setText("");
@@ -155,11 +137,24 @@ public class FXMLGeneratePartialReportController extends ValidationHandler {
         paneAdvanceEditor.setVisible(false);
     }
 
+    @SuppressWarnings("unchecked")
+    private void groupComponents() {
+        comboBoxActivities = new ComboBox[] {
+            comboBoxActivity1, comboBoxActivity2, comboBoxActivity3,
+            comboBoxActivity4, comboBoxActivity5, comboBoxActivity6
+        };
+        textFieldAdvances = new TextField[] {
+            textFieldAdvance1, textFieldAdvance2, textFieldAdvance3,
+            textFieldAdvance4, textFieldAdvance5, textFieldAdvance6
+        };
+    }
+
     @Override
     protected void clearFields() {
         for (ComboBox<String> comboBoxActivity : comboBoxActivities) {
             comboBoxActivity.getSelectionModel().clearSelection();
         }
+
         for (TextField textFieldAdvance : textFieldAdvances) {
             textFieldAdvance.clear();
         }
@@ -167,7 +162,6 @@ public class FXMLGeneratePartialReportController extends ValidationHandler {
         textAreaGeneralObservations.clear();
         textAreaResults.clear();
         labelMessage.setText("");
-
         plannedAdvances = new int[PartialReport.MAX_WEEKS][PartialReport.MAX_ACTIVITIES];
         realAdvances = new int[PartialReport.MAX_WEEKS][PartialReport.MAX_ACTIVITIES];
         manualAdvances = false;
@@ -230,8 +224,10 @@ public class FXMLGeneratePartialReportController extends ValidationHandler {
             if (selectedActivity != null && !selectedActivities.add(selectedActivity)) {
                 duplicateError = Optional.of(DUPLICATE_ACTIVITY_MESSAGE);
             }
+
             index++;
         }
+
         return duplicateError;
     }
 
@@ -243,6 +239,7 @@ public class FXMLGeneratePartialReportController extends ValidationHandler {
             percentageError = validateRowPercentage(index);
             index++;
         }
+
         return percentageError;
     }
 
@@ -254,6 +251,7 @@ public class FXMLGeneratePartialReportController extends ValidationHandler {
             rowError = InputValidator.validatePercentage(
                 textFieldAdvances[rowIndex].getText(), fieldName);
         }
+
         return rowError;
     }
 
@@ -262,7 +260,6 @@ public class FXMLGeneratePartialReportController extends ValidationHandler {
             PartialReport partialReport = buildPartialReport();
             JasperPrint jasperPrint = partialReportCommon.generatePartialReport(partialReport);
             persistReport(partialReport);
- 
             showSuccess(REPORT_GENERATED_MESSAGE);
             displayReport(jasperPrint);
             clearFields();
@@ -296,8 +293,8 @@ public class FXMLGeneratePartialReportController extends ValidationHandler {
         partialReport.setActivityName(comboBoxActivity1.getValue());
         partialReport.setResult(textAreaResults.getText().trim());
         partialReport.setObservations(textAreaGeneralObservations.getText().trim());
- 
         Student currentStudent = SessionManager.getInstance().getCurrentStudent();
+
         if (currentStudent != null) {
             partialReport.setStudentId(currentStudent.getIdStudent());
         }
@@ -387,9 +384,11 @@ public class FXMLGeneratePartialReportController extends ValidationHandler {
         int index = 0;
 
         while (index < activitiesBySlot.length && !hasActivity) {
+
             if (activitiesBySlot[index] != null) {
                 hasActivity = true;
             }
+            
             index++;
         }
         return hasActivity;
