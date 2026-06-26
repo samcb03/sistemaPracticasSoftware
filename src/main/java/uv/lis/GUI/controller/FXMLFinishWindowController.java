@@ -68,13 +68,13 @@ public class FXMLFinishWindowController extends ValidationHandler {
     @FXML private Label labelAccumulatedHours;
     @FXML private Label labelGrade;
     @FXML private Label labelMessage;
+    @FXML private Label labelCompletedHours;
     @FXML private Button buttonBack;
     @FXML private TableView<Expedient> tableDocuments;
+    @FXML private TableView<Activity> tableViewActivityDetails;
     @FXML private TableColumn<Expedient, String> columnName;
     @FXML private TableColumn<Expedient, String> columnType;
     @FXML private TableColumn<Expedient, Void> columnAction;
-    @FXML private Label labelCompletedHours;
-    @FXML private TableView<Activity> tableViewActivityDetails;
     @FXML private TableColumn<Activity, String> tableColumnActivityName;
     @FXML private TableColumn<Activity, String> tableColumnActivityDescription;
     @FXML private TableColumn<Activity, LocalDate> tableColumnActivityStartDate;

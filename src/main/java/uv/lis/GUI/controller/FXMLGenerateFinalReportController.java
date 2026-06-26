@@ -39,8 +39,8 @@ import uv.lis.logic.utils.SessionManager;
 
 public class FXMLGenerateFinalReportController extends ValidationHandler {
 
+    private static final String REGISTER_ACTIVITY_VIEW = "/uv/lis/GUI/view/FXMLRegisterActivity.fxml";
     private static final Logger LOGGER = Logger.getLogger(FXMLGenerateFinalReportController.class.getName());
-
     private static final String REPORT_GENERATED_MESSAGE = "Reporte generado correctamente.";
     private static final String REPORT_GENERATION_ERROR = "Error al generar el reporte";
 
@@ -78,7 +78,8 @@ public class FXMLGenerateFinalReportController extends ValidationHandler {
 
     @FXML
     public void goToRegisterActivity(javafx.event.ActionEvent event) {
-        FXMLLoader loader = this.navigateToWithLoader("/uv/lis/GUI/view/FXMLRegisterActivity.fxml");
+        FXMLLoader loader = this.navigateToWithLoader(REGISTER_ACTIVITY_VIEW);
+
         if (loader != null) {
             Stage registerStage = (Stage) ((Parent) loader.getRoot()).getScene().getWindow();
             registerStage.setOnHidden(e -> loadStudentActivities());
@@ -87,25 +88,19 @@ public class FXMLGenerateFinalReportController extends ValidationHandler {
 
     @Override
     protected void clearFields() {
-
         comboBoxActivity1.getSelectionModel().clearSelection();
         textFieldAdvance1.clear();
         textAreaObservation1.clear();
-
         comboBoxActivity2.getSelectionModel().clearSelection();;
         textFieldAdvance2.clear();
         textAreaObservation2.clear();
-
         textFieldResult1.clear();
         textFieldResultAdvance1.clear();
         textAreaObservationResult1.clear();
-
         textFieldResult2.clear();
         textFieldResultAdvance2.clear();
         textAreaObservationResult2.clear();
-
         textAreaGeneralObservations.clear();
-
         labelMessage.setText("");
     }
 
@@ -203,14 +198,13 @@ public class FXMLGenerateFinalReportController extends ValidationHandler {
 
     private FinalReport buildFinalReport() {
         FinalReport finalReport = new FinalReport();
- 
         finalReport.setFirstActivity(buildFirstActivity());
         finalReport.setSecondActivity(buildSecondActivity());
         finalReport.setFirstDeliverable(buildFirstDeliverable());
         finalReport.setSecondDeliverable(buildSecondDeliverable());
         finalReport.setGeneralObservations(textAreaGeneralObservations.getText().trim());
- 
         Student currentStudent = SessionManager.getInstance().getCurrentStudent();
+        
         if (currentStudent != null) {
             finalReport.setStudentId(currentStudent.getIdStudent());
         }

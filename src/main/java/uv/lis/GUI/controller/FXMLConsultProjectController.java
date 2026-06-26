@@ -48,6 +48,16 @@ public class FXMLConsultProjectController extends WindowHandler {
         loadOrganizations();
     }
 
+    @FXML
+    private void handleProjectRowClicked(MouseEvent mouseEvent) {
+        boolean isDoubleClick = mouseEvent.getClickCount() == DOUBLE_CLICK_COUNT;
+        Project selectedProject = tableViewProjects.getSelectionModel().getSelectedItem();
+
+        if (isDoubleClick && selectedProject != null) {
+            navigateToConsultProjectView(selectedProject);
+        }
+    }
+
     private void configureTableColumns() {
         tableColumnProjectName.setCellValueFactory(new PropertyValueFactory<>("name"));
         tableColumnOrganization.setCellValueFactory(new PropertyValueFactory<>("affiliatedOrganizationName"));
@@ -60,16 +70,6 @@ public class FXMLConsultProjectController extends WindowHandler {
 
     private void configureRowDoubleClick() {
         tableViewProjects.setOnMouseClicked(this::handleProjectRowClicked);
-    }
-
-    @FXML
-    private void handleProjectRowClicked(MouseEvent mouseEvent) {
-        boolean isDoubleClick = mouseEvent.getClickCount() == DOUBLE_CLICK_COUNT;
-        Project selectedProject = tableViewProjects.getSelectionModel().getSelectedItem();
-
-        if (isDoubleClick && selectedProject != null) {
-            navigateToConsultProjectView(selectedProject);
-        }
     }
 
     private void navigateToConsultProjectView(Project project) {

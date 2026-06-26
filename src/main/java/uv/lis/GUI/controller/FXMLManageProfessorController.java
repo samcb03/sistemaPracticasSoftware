@@ -64,17 +64,14 @@ public class FXMLManageProfessorController extends ValidationHandler {
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
+        setupControls(labelMessage, buttonBack);
         professorDAO = new ProfessorDAO();
         contextMenuSuggestions = new ContextMenu();
-        setupControls(labelMessage, buttonBack);
-
         gridPaneProfessorInfo.setVisible(false);
         buttonInactive.setDisable(true);
         buttonUpdate.setDisable(true);
         setNodeVisibility(buttonSave, false);
-
         comboBoxCoordinator.getItems().addAll(ROLE_PROFESSOR, ROLE_COORDINATOR);
-
         setupAutocomplete();
     }
 
@@ -138,7 +135,6 @@ public class FXMLManageProfessorController extends ValidationHandler {
         boolean isInactive = professorDAO.isProfessorInactive(personnelNumber);
         labelStatus.setText(isInactive ? LABEL_INACTIVE : LABEL_ACTIVE);
         buttonInactive.setDisable(isInactive);
-
         ArrayList<String> subjects = professorDAO.getSubjectsByProfessor(personnelNumber);
         ObservableList<String> subjectItems = FXCollections.observableArrayList(subjects);
         listViewSubjects.setItems(subjectItems);
@@ -164,7 +160,8 @@ public class FXMLManageProfessorController extends ValidationHandler {
     private void loadCurrentDataIntoEditors() {
         textFieldFirstName.setText(currentProfessor.getFirstName());
         textFieldLastName.setText(currentProfessor.getLastName());
-        comboBoxCoordinator.setValue(currentProfessor.getIsCoordinator() ? ROLE_COORDINATOR : ROLE_PROFESSOR);
+        comboBoxCoordinator.setValue(currentProfessor.getIsCoordinator() 
+        ? ROLE_COORDINATOR : ROLE_PROFESSOR);
     }
 
     @FXML
@@ -226,11 +223,9 @@ public class FXMLManageProfessorController extends ValidationHandler {
         setNodeVisibility(labelFirstName, !isEditing);
         setNodeVisibility(labelLastName, !isEditing);
         setNodeVisibility(labelCoordinator, !isEditing);
-
         setNodeVisibility(textFieldFirstName, isEditing);
         setNodeVisibility(textFieldLastName, isEditing);
         setNodeVisibility(comboBoxCoordinator, isEditing);
-
         setNodeVisibility(buttonUpdate, !isEditing);
         setNodeVisibility(buttonSave, isEditing);
     }
@@ -307,9 +302,8 @@ public class FXMLManageProfessorController extends ValidationHandler {
     }
 
     private void confirmAndInactivate(String personnelNumber) throws OperationException {
-        boolean confirmed = showConfirmation(
-            "Confirmar inactivación",
-            "¿Está seguro que desea inactivar al profesor?"
+        boolean confirmed = showConfirmation("Confirmar inactivación",
+        "¿Está seguro que desea inactivar al profesor?"
         );
 
         if (!confirmed) {
