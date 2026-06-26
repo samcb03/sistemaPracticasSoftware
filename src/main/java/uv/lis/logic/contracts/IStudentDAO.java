@@ -13,6 +13,14 @@ import uv.lis.logic.exceptions.OperationException;
 public interface IStudentDAO {
 
     /**
+     * Retrieves all active students registered in the system.
+     *
+     * @return the list of active students, empty if there are none
+     * @throws OperationException if the students cannot be retrieved
+     */
+    public ArrayList<Student> getAllActiveStudents() throws OperationException;
+
+    /**
      * Retrieves the student identified by the given id.
      *
      * @param idStudent the identifier of the student to retrieve

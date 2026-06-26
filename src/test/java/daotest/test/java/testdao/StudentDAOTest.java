@@ -39,7 +39,7 @@ class StudentDAOTest {
     private static final int DEFAULT_HOURS = 5;
     private static final boolean INACTIVE_USER = false;
     private static final String FIRST_STUDENT_ID = "S12345678";
-    private static final String SECOND_STUDENT_ID = "S124DDDa";
+    private static final String SECOND_STUDENT_ID = "S24013305";
     private static final String INVALID_STUDENT_ID = "Z99";
     private static final String FIRST_NAME = "Denisse";
     private static final String LAST_NAME = "Reyes";
@@ -51,9 +51,7 @@ class StudentDAOTest {
     private static final String CONNECTION_MANAGER_FIELD = "connectionManager";
 
     private static final String DEFAULT_PASSWORD = "Dsokgm02";
-    private static final String DEFAULT_EMAIL = null;
-    private static final String DEFAULT_GENDER = null;
-    private static final Date DEFAULT_BIRTH_DATE = null;
+    private static final String DEFAULT_EMAIL = "cbsam575@gmail.com";
 
     private static final boolean EMAIL_AUTHENTICATION_ACTIVE = true;
 
@@ -118,26 +116,64 @@ class StudentDAOTest {
         when(resultSet.getString(COLUMN_STUDENT_ID)).thenReturn(FIRST_STUDENT_ID, SECOND_STUDENT_ID);
         when(resultSet.getString(COLUMN_NAME)).thenReturn(FIRST_NAME, SECOND_FIRST_NAME);
         when(resultSet.getString(COLUMN_LAST_NAME)).thenReturn(LAST_NAME, SECOND_LAST_NAME);
+        when(resultSet.getString(COLUMN_GENDER)).thenReturn(GENDER, GENDER);
     }
 
     private Student builderFirstStudent() {
-        return new Student(DEFAULT_ID_USER, FIRST_NAME,
+        Student student = new Student(DEFAULT_ID_USER, FIRST_NAME,
             LAST_NAME, DEFAULT_PASSWORD, DEFAULT_EMAIL,
             DEFAULT_ROLE_ID, INACTIVE_USER, FIRST_STUDENT_ID,
-            DEFAULT_BIRTH_DATE, DEFAULT_HOURS, DEFAULT_GENDER, EMAIL_AUTHENTICATION_ACTIVE
+            BIRTH_DATE, DEFAULT_HOURS, GENDER, EMAIL_AUTHENTICATION_ACTIVE
         );
+        return student;
     }
 
     private Student builderSecondStudent() {
-        return new Student(DEFAULT_ID_USER, SECOND_FIRST_NAME,
+        Student student = new Student(DEFAULT_ID_USER, SECOND_FIRST_NAME,
             SECOND_LAST_NAME, DEFAULT_PASSWORD, DEFAULT_EMAIL,
             DEFAULT_ROLE_ID, INACTIVE_USER, SECOND_STUDENT_ID,
-            DEFAULT_BIRTH_DATE, DEFAULT_HOURS, DEFAULT_GENDER, EMAIL_AUTHENTICATION_ACTIVE
+            BIRTH_DATE, DEFAULT_HOURS, GENDER, EMAIL_AUTHENTICATION_ACTIVE
         );
+        return student;
+    }
+
+    private Student builderMinimalStudent(String idStudent, String firstName, String lastName) {
+        Student student = new Student();
+        student.setIdStudent(idStudent);
+        student.setFirstName(firstName);
+        student.setLastName(lastName);
+        return student;
     }
 
     private List<Student> builderExpectedStudents() {
         return List.of(builderFirstStudent(), builderSecondStudent());
+    }
+
+    @Test
+    void getAllActiveStudents_withResults_returnsStudentList() throws Exception {
+        mockQueryExecution();
+        mockResultSetTwoStudents();
+        when(resultSet.getDate(COLUMN_BIRTH_DATE)).thenReturn(BIRTH_DATE, BIRTH_DATE);
+        when(resultSet.getString(COLUMN_GENDER)).thenReturn(GENDER, GENDER);
+        List<Student> expectedStudents = builderExpectedStudents();
+
+        assertEquals(expectedStudents, studentDAO.getAllActiveStudents());
+    }
+
+    @Test
+    void getAllActiveStudents_emptyResultSet_returnsEmptyList() throws Exception {
+        mockQueryExecution();
+        when(resultSet.next()).thenReturn(false);
+
+        assertTrue(studentDAO.getAllActiveStudents().isEmpty());
+    }
+
+    @Test
+    void getAllActiveStudents_sqlError_throwsOperationException() throws SQLException {
+        when(connectionManager.getConnection()).thenThrow(new SQLException(DATABASE_ERROR_MESSAGE));
+
+        assertThrows(OperationException.class,
+            () -> studentDAO.getAllActiveStudents());
     }
 
     @Test
@@ -206,7 +242,11 @@ class StudentDAOTest {
     void getActiveStudentsNotInSubject_withResults_returnsStudentList() throws Exception {
         mockQueryExecution();
         mockResultSetTwoStudents();
-        List<Student> expectedStudents = builderExpectedStudents();
+
+        List<Student> expectedStudents = List.of(
+            builderMinimalStudent(FIRST_STUDENT_ID, FIRST_NAME, LAST_NAME),
+            builderMinimalStudent(SECOND_STUDENT_ID, SECOND_FIRST_NAME, SECOND_LAST_NAME)
+        );
 
         assertEquals(expectedStudents, studentDAO.getActiveStudentsNotInSubject());
     }

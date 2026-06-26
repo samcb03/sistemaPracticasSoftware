@@ -82,4 +82,6 @@ public interface ISubjectDAO {
      * @throws OperationException if the check cannot be performed
      */
     boolean isSectionTakenInPeriod(int periodId, String section) throws OperationException;
+
+    boolean isProfessorTeachingStudent(String personnelNumber, String studentId) throws OperationException;
 }
