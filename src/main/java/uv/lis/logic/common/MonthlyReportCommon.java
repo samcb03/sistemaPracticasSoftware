@@ -24,6 +24,13 @@ import uv.lis.logic.dto.Student;
 import uv.lis.logic.exceptions.OperationException;
 import uv.lis.logic.utils.SessionManager;
 
+/**
+ * Fills and registers the monthly internship report. Fetches the academic
+ * context of the student in session, merges it into the report, persists the
+ * record through ReportDAO, and produces a JasperPrint ready for export.
+ * Images in the template are resolved from the classpath through
+ * ClasspathImageRepositoryCommon.
+ */
 public class MonthlyReportCommon {
 
     private static final Logger LOGGER = Logger.getLogger(MonthlyReportCommon.class.getName());
@@ -45,15 +52,18 @@ public class MonthlyReportCommon {
         this.reportDAO = new ReportDAO();
     }
 
-    private SimpleJasperReportsContext buildReportsContext() {
-        SimpleJasperReportsContext reportsContext
-            = new SimpleJasperReportsContext(DefaultJasperReportsContext.getInstance());
-        List<RepositoryService> repositoryServices = new ArrayList<>();
-        repositoryServices.add(new ClasspathImageRepositoryCommon());
-        reportsContext.setExtensions(RepositoryService.class, repositoryServices);
-        return reportsContext;
-    }
-
+    /**
+     * Fetches the academic context for the student in session, merges it into
+     * the report, registers the report in the database, and returns a filled
+     * JasperPrint ready for export.
+     *
+     * @param monthlyReport the report populated by the controller with the
+     * student-provided data
+     * @return a JasperPrint ready to be exported as PDF
+     * @throws JRException if JasperReports fails to fill the template
+     * @throws OperationException if no student is in session or a database
+     * error occurs
+     */
     public JasperPrint generateMonthlyReport(MonthlyReport monthlyReport) throws JRException, OperationException {
         Student currentStudent = SessionManager.getInstance().getCurrentStudent();
 
@@ -67,6 +77,16 @@ public class MonthlyReportCommon {
         return jasperPrint;
     }
 
+    /**
+     * Loads the monthly report template from the classpath and fills it with
+     * the data from the given report.
+     *
+     * @param monthlyReport the report whose data is injected into the template
+     * parameters
+     * @return a JasperPrint ready to be exported as PDF
+     * @throws JRException if JasperReports fails to fill the template
+     * @throws OperationException if the template is not found or cannot be read
+     */
     public JasperPrint fillReportTemplate(MonthlyReport monthlyReport) throws JRException, OperationException {
         JasperPrint jasperPrint;
 
@@ -86,6 +106,15 @@ public class MonthlyReportCommon {
             throw new OperationException(TEMPLATE_READ_ERROR_MESSAGE, ioException);
         }
         return jasperPrint;
+    }
+
+    private SimpleJasperReportsContext buildReportsContext() {
+        SimpleJasperReportsContext reportsContext
+            = new SimpleJasperReportsContext(DefaultJasperReportsContext.getInstance());
+        List<RepositoryService> repositoryServices = new ArrayList<>();
+        repositoryServices.add(new ClasspathImageRepositoryCommon());
+        reportsContext.setExtensions(RepositoryService.class, repositoryServices);
+        return reportsContext;
     }
 
     private void mergeContextIntoMonthlyReport(MonthlyReport report, String studentId) throws OperationException {

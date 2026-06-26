@@ -27,6 +27,13 @@ import uv.lis.logic.dto.Student;
 import uv.lis.logic.exceptions.OperationException;
 import uv.lis.logic.utils.SessionManager;
 
+/**
+ * Fills the final internship report template with the academic context of the
+ * student in session. Context data such as professor, project, and accumulated
+ * hours are fetched from ReportContextDAO and merged into the report before
+ * the template is filled. Images in the template are resolved from the
+ * classpath through ClasspathImageRepositoryCommon.
+ */
 public class FinalReportCommon {
 
     private static final Logger LOGGER = Logger.getLogger(FinalReportCommon.class.getName());
@@ -45,15 +52,17 @@ public class FinalReportCommon {
         jasperReportsContext = buildReportsContext();
     }
 
-    private SimpleJasperReportsContext buildReportsContext() {
-        SimpleJasperReportsContext reportsContext
-            = new SimpleJasperReportsContext(DefaultJasperReportsContext.getInstance());
-        List<RepositoryService> repositoryServices = new ArrayList<>();
-        repositoryServices.add(new ClasspathImageRepositoryCommon());
-        reportsContext.setExtensions(RepositoryService.class, repositoryServices);
-        return reportsContext;
-    }
-
+    /**
+     * Fetches the academic context for the student in session, merges it into
+     * the report, and returns a filled JasperPrint ready for export.
+     *
+     * @param finalReport the report populated by the controller with the
+     * student-provided data
+     * @return a JasperPrint ready to be exported as PDF
+     * @throws JRException if JasperReports fails to fill the template
+     * @throws OperationException if no student is in session or a database
+     * error occurs while fetching the context
+     */
     public JasperPrint generateFinalReport(FinalReport finalReport) throws JRException, OperationException {
         Student currentStudent = SessionManager.getInstance().getCurrentStudent();
 
@@ -66,6 +75,16 @@ public class FinalReportCommon {
         return jasperPrint;
     }
 
+    /**
+     * Loads the final report template from the classpath and fills it with the
+     * data from the given report.
+     *
+     * @param finalReport the report whose data is injected into the template
+     * parameters
+     * @return a JasperPrint ready to be exported as PDF
+     * @throws JRException if JasperReports fails to fill the template
+     * @throws OperationException if the template is not found or cannot be read
+     */
     public JasperPrint fillReportTemplate(FinalReport finalReport) throws JRException, OperationException {
         JasperPrint jasperPrint;
 
@@ -84,6 +103,15 @@ public class FinalReportCommon {
             throw new OperationException(TEMPLATE_READ_ERROR_MESSAGE, ioException);
         }
         return jasperPrint;
+    }
+
+    private SimpleJasperReportsContext buildReportsContext() {
+        SimpleJasperReportsContext reportsContext
+            = new SimpleJasperReportsContext(DefaultJasperReportsContext.getInstance());
+        List<RepositoryService> repositoryServices = new ArrayList<>();
+        repositoryServices.add(new ClasspathImageRepositoryCommon());
+        reportsContext.setExtensions(RepositoryService.class, repositoryServices);
+        return reportsContext;
     }
 
     private void mergeContextIntoReport(FinalReport finalReport, String studentId) throws OperationException {
