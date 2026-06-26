@@ -11,7 +11,7 @@ import uv.lis.GUI.WindowHandler;
 public class FXMLStudentManagementController extends WindowHandler {
 
     private static final String REGISTER_STUDENT_VIEW = "/uv/lis/GUI/view/FXMLRegisterStudent.fxml";
-    private static final String CONSULT_STUDENT_VIEW = "/uv/lis/GUI/view/FXMLManageStudent.fxml";
+    private static final String CONSULT_STUDENT_VIEW = "/uv/lis/GUI/view/FXMLConsultStudent.fxml";
 
     @FXML private Button buttonRegisterStudent;
     @FXML private Button buttonConsultStudent;
