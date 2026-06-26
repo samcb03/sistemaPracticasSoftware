@@ -47,12 +47,17 @@ public class NotificationDAO implements INotificationDAO {
             preparedStatement.setString(3, notification.getMessage());
             preparedStatement.setTimestamp(4, notification.getCreationDate());
             preparedStatement.setBoolean(5, notification.isRead());
-            preparedStatement.executeUpdate();
 
-            try (ResultSet resultSet = preparedStatement.getGeneratedKeys()) {
-                if (resultSet.next()) {
-                    generatedId = resultSet.getInt(FIRST_INDEX);
+            if (preparedStatement.executeUpdate() > NO_VALUE) {
+                try (ResultSet resultSet = preparedStatement.getGeneratedKeys()) {
+                    if (resultSet.next()) {
+                        generatedId = resultSet.getInt(FIRST_INDEX);
+                    }
                 }
+            } else {
+                LOGGER.log(Level.WARNING,
+                    "No se pudo registrar la notificación para la matrícula {0}.", notification.getIdStudent());
+                throw new OperationException("No se pudo registrar la notificación", null);
             }
         } catch (SQLException e) {
             LOGGER.log(Level.SEVERE, "Error al registrar la notificación", e);

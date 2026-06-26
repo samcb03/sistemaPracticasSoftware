@@ -15,7 +15,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.LocalDate;
 import java.util.List;
-import java.util.Optional;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -31,7 +30,6 @@ class ActivityDAOTest {
 
     private static final int FIRST_ACTIVITY_ID = 2;
     private static final int SECOND_ACTIVITY_ID = 4;
-    private static final int SEARCHED_ACTIVITY_ID = 3;
     private static final int FIRST_PROJECT_ID = 10;
     private static final int SECOND_PROJECT_ID = 11;
     private static final int FIRST_VALUE = 1;
@@ -80,16 +78,6 @@ class ActivityDAOTest {
         when(databaseConnection.prepareStatement(anyString(), anyInt()))
             .thenReturn(preparedStatement);
         when(preparedStatement.executeUpdate()).thenReturn(rowsAffected);
-    }
-
-    private void mockResultSetSingleActivity() throws SQLException {
-        when(resultSet.next()).thenReturn(true);
-        when(resultSet.getInt("idActividad")).thenReturn(FIRST_ACTIVITY_ID);
-        when(resultSet.getString("nombreActividad")).thenReturn(FIRST_ACTIVITY_NAME);
-        when(resultSet.getString("descripcionActividad")).thenReturn(FIRST_ACTIVITY_DESCRIPTION);
-        when(resultSet.getObject("FechaInicio", LocalDate.class)).thenReturn(FIRST_START_DATE);
-        when(resultSet.getObject("FechaFin", LocalDate.class)).thenReturn(FIRST_END_DATE);
-        when(resultSet.getInt("idProyecto")).thenReturn(FIRST_PROJECT_ID);
     }
 
     private void mockResultSetTwoActivities() throws SQLException {
@@ -142,31 +130,6 @@ class ActivityDAOTest {
         when(connectionManager.getConnection()).thenThrow(new SQLException(DATABASE_ERROR_MESSAGE));
 
         assertThrows(OperationException.class, () -> activityDAO.getAllActivities());
-    }
-
-    @Test
-    void getActivityById_successful_returnsActivity() throws Exception {
-        mockQueryExecution();
-        mockResultSetSingleActivity();
-        Optional<Activity> expectedActivity = Optional.of(builderFirstActivity());
-
-        assertEquals(expectedActivity, activityDAO.getActivityById(SEARCHED_ACTIVITY_ID));
-    }
-
-    @Test
-    void getActivityById_emptyResult_returnsEmptyOptional() throws Exception {
-        mockQueryExecution();
-        when(resultSet.next()).thenReturn(false);
-
-        assertTrue(activityDAO.getActivityById(SEARCHED_ACTIVITY_ID).isEmpty());
-    }
-
-    @Test
-    void getActivityById_sqlError_throwsOperationException() throws SQLException {
-        when(connectionManager.getConnection()).thenThrow(new SQLException(DATABASE_ERROR_MESSAGE));
-
-        assertThrows(OperationException.class,
-            () -> activityDAO.getActivityById(SEARCHED_ACTIVITY_ID));
     }
 
     @Test

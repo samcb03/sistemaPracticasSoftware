@@ -28,7 +28,6 @@ import uv.lis.logic.dao.ActivityDAO;
 import uv.lis.logic.dao.ExpedientDAO;
 import uv.lis.logic.dao.PracticeDAO;
 import uv.lis.logic.dao.ProjectDAO;
-import uv.lis.logic.dao.ReportContextDAO;
 import uv.lis.logic.dto.Activity;
 import uv.lis.logic.dto.Expedient;
 import uv.lis.logic.dto.ProjectSummary;
@@ -83,7 +82,6 @@ public class FXMLFinishWindowController extends ValidationHandler {
 
     private ProjectDAO projectDAO = new ProjectDAO();
     private PracticeDAO practiceDAO = new PracticeDAO();
-    private ReportContextDAO reportContextDAO = new ReportContextDAO();
     private ExpedientDAO expedientDAO = new ExpedientDAO();
     private ActivityDAO activityDAO = new ActivityDAO();
 

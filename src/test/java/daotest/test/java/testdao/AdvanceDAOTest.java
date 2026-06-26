@@ -33,7 +33,6 @@ class AdvanceDAOTest {
     private static final int WEEK_NUMBER = 3;
     private static final int ACCUMULATED_HOURS = 8;
     private static final int LATEST_ACCUMULATED_HOURS = 48;
-    private static final int ZERO_ACCUMULATED_HOURS = 0;
     private static final int FIRST_VALUE = 1;
     private static final int ADVANCE_COUNT = 12;
 
@@ -188,7 +187,7 @@ class AdvanceDAOTest {
 
         int result = advanceDAO.getAccumulatedHoursByProject(PROJECT_ID);
 
-        assertEquals(ZERO_ACCUMULATED_HOURS, result);
+        assertEquals(NO_VALUE, result);
     }
 
     @Test
