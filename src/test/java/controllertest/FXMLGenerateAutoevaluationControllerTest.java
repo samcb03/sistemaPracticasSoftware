@@ -95,6 +95,7 @@ public class FXMLGenerateAutoevaluationControllerTest extends ApplicationTest {
 
         stage.setScene(new Scene(root));
         stage.show();
+        enableGenerateButton(root);
     }
 
     @BeforeEach
@@ -218,4 +219,7 @@ public class FXMLGenerateAutoevaluationControllerTest extends ApplicationTest {
         return lookup(MESSAGE_LABEL_SELECTOR).queryAs(Label.class).getText();
     }
 
+    private void enableGenerateButton(Parent root) {
+        root.lookup(GENERATE_BUTTON_SELECTOR).setDisable(false);
+    }
 }

@@ -157,7 +157,7 @@ public class FXMLShowProjectDetailController extends ValidationHandler {
     }
 
     private Optional<String> validateInputs() {
-        return Stream.of(
+        Optional<String> firstError = Stream.of(
             validateRegister(textFieldName.getText(), PROJECT_NAME_FIELD),
             validateText(textAreaDescription.getText(), DESCRIPTION_FIELD),
             validateText(textFieldObjective.getText(), OBJECTIVE_FIELD),
@@ -167,6 +167,7 @@ public class FXMLShowProjectDetailController extends ValidationHandler {
         .filter(Optional::isPresent)
         .map(Optional::get)
         .findFirst();
+        return firstError;
     }
 
     private void executeProjectUpdate() {
