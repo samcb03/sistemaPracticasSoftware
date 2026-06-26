@@ -7,10 +7,8 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import java.awt.EventQueue;
 import java.io.IOException;
 import java.lang.reflect.Field;
-import java.util.Arrays;
 import java.util.List;
 
 import javafx.fxml.FXMLLoader;
@@ -118,8 +116,7 @@ public class FXMLGeneratePartialReportControllerTest extends ApplicationTest {
             .forEach(Window::hide));
         WaitForAsyncUtils.waitForFxEvents();
 
-        EventQueue.invokeLater(() ->
-            Arrays.stream(java.awt.Window.getWindows()).forEach(java.awt.Window::dispose));
+        JasperViewerTestCleaner.disposeOpenWindows();
     }
 
     @Test

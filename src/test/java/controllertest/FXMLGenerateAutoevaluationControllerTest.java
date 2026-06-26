@@ -8,11 +8,9 @@ import static org.mockito.Mockito.when;
 
 import java.io.IOException;
 import java.lang.reflect.Field;
-import java.util.Arrays;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.awt.EventQueue;
 import javafx.stage.Window;
 import net.sf.jasperreports.engine.JRException;
 import net.sf.jasperreports.engine.JasperPrint;
@@ -112,8 +110,7 @@ public class FXMLGenerateAutoevaluationControllerTest extends ApplicationTest {
             .forEach(Window::hide));
         WaitForAsyncUtils.waitForFxEvents();
 
-        EventQueue.invokeLater(() ->
-            Arrays.stream(java.awt.Window.getWindows()).forEach(java.awt.Window::dispose));
+        JasperViewerTestCleaner.disposeOpenWindows();
     }
 
     @Test
