@@ -39,7 +39,6 @@ public class FXMLGenerateMonthlyReportController extends ValidationHandler {
 
     private static final String REGISTER_ACTIVITY_VIEW = "/uv/lis/GUI/view/FXMLRegisterActivity.fxml";
     private static final Logger LOGGER = Logger.getLogger(FXMLGenerateMonthlyReportController.class.getName());
-    private static final String NO_STUDENT_IN_SESSION_MESSAGE = "No hay alumno en sesión";
     private static final String REPORT_GENERATED_MESSAGE = "Reporte generado correctamente.";
     private static final String REPORT_GENERATION_ERROR = "Error al generar el reporte.";
     private static final String LOAD_ACTIVITIES = "Error al cargar actividades";
@@ -140,9 +139,7 @@ public class FXMLGenerateMonthlyReportController extends ValidationHandler {
         initializeFieldArrays();
         labelBlock.setText(REPORT_BLOCK);
         loadStudentData();
-        comboBoxMonth.getSelectionModel().selectedItemProperty().addListener((observableValue, 
-            oldMonth, newMonth) -> {
-                
+        comboBoxMonth.getSelectionModel().selectedItemProperty().addListener((observableValue, oldMonth, newMonth) -> {
             if (newMonth != null) {
                 loadRegisteredActivities();
             }
@@ -226,7 +223,7 @@ public class FXMLGenerateMonthlyReportController extends ValidationHandler {
 
     private void loadStudentData() {
         if (currentStudent == null) {
-            showError(NO_STUDENT_IN_SESSION_MESSAGE);
+            showError(SessionManager.NO_STUDENT_IN_SESSION_MESSAGE);
         } else {
             fetchAndDisplayContext();
         }

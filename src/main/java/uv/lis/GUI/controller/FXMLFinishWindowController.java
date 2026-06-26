@@ -38,7 +38,6 @@ import uv.lis.logic.utils.SessionManager;
 public class FXMLFinishWindowController extends ValidationHandler {
 
     private static final Logger LOGGER = Logger.getLogger(FXMLFinishWindowController.class.getName());
-    private static final String NO_STUDENT_IN_SESSION_MESSAGE = "No hay alumno en sesión";
     private static final String NO_PROJECT_ASSIGNED_MESSAGE = "No se encontró un proyecto asignado";
     private static final String LOAD_ERROR_MESSAGE = "Error al cargar el resumen final";
     private static final String NO_DOCUMENTS_MESSAGE = "No tienes documentos registrados";
@@ -150,7 +149,7 @@ public class FXMLFinishWindowController extends ValidationHandler {
 
     private void loadSummary() {
         if (currentStudent == null) {
-            showError(NO_STUDENT_IN_SESSION_MESSAGE);
+            showError(SessionManager.NO_STUDENT_IN_SESSION_MESSAGE);
         } else {
             try {
                 String studentId = currentStudent.getIdStudent();

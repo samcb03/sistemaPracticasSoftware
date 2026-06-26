@@ -44,7 +44,6 @@ public class FXMLGeneratePartialReportController extends ValidationHandler {
     private static final Logger LOGGER = Logger.getLogger(FXMLGeneratePartialReportController.class.getName());
     private static final String REPORT_GENERATED_MESSAGE = "Reporte generado correctamente.";
     private static final String REPORT_GENERATION_ERROR = "Error al generar el reporte";
-    private static final String NO_STUDENT_MESSAGE = "No hay un estudiante en sesión";
     private static final String LOAD_ACTIVITIES_ERROR = "No se pudieron cargar las actividades";
     private static final String PARTIAL_REPORT_TITLE = "Reporte Parcial";
     private static final String DUPLICATE_ACTIVITY_MESSAGE
@@ -172,7 +171,7 @@ public class FXMLGeneratePartialReportController extends ValidationHandler {
         Student currentStudent = SessionManager.getInstance().getCurrentStudent();
 
         if (currentStudent == null) {
-            showError(NO_STUDENT_MESSAGE);
+            showError(SessionManager.NO_STUDENT_IN_SESSION_MESSAGE);
         } else {
             populateActivityComboBoxes(currentStudent.getIdStudent());
         }

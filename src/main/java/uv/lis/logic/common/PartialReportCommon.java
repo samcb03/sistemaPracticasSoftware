@@ -42,7 +42,6 @@ public class PartialReportCommon {
     private static final String REPORT_TEMPLATE_PATH = "/uv/lis/GUI/view/templates/partialReport.jasper";
     private static final String DATE_PATTERN = "dd/MM/yyyy";
     private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern(DATE_PATTERN);
-    private static final String NO_STUDENT_IN_SESSION_MESSAGE = "No hay un estudiante en sesión";
     private static final String ACTIVITY_NOT_FOUND_MESSAGE = "No se encontró la actividad seleccionada para el alumno";
     private static final String TEMPLATE_NOT_FOUND_MESSAGE = "No se encontró la plantilla del reporte parcial.";
     private static final String TEMPLATE_READ_ERROR_MESSAGE = "Error al cargar la plantilla del reporte parcial.";
@@ -78,7 +77,7 @@ public class PartialReportCommon {
         Student currentStudent = SessionManager.getInstance().getCurrentStudent();
 
         if (currentStudent == null) {
-            throw new OperationException(NO_STUDENT_IN_SESSION_MESSAGE, null);
+            throw new OperationException(SessionManager.NO_STUDENT_IN_SESSION_MESSAGE, null);
         }
 
         mergeContextIntoReport(partialReport, currentStudent.getIdStudent());
