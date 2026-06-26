@@ -2,121 +2,128 @@
 
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.effect.SepiaTone?>
+<?import javafx.scene.effect.Shadow?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.ColumnConstraints?>
 <?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Pane?>
 <?import javafx.scene.layout.RowConstraints?>
+<?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane prefHeight="650.0" prefWidth="700.0" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="uv.lis.GUI.controller.FXMLFinishWindowController">
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="530.0" prefWidth="559.0" xmlns="http://javafx.com/javafx/26" xmlns:fx="http://javafx.com/fxml/1" fx:controller="uv.lis.GUI.controller.FXMLFinishWindowController">
    <children>
 
-      <Label layoutX="0.0" layoutY="0.0" prefHeight="20.0" prefWidth="700.0" style="-fx-background-color: #a8c8e8; -fx-border-color: BLACK;" text="Resumen Final de Prácticas" />
-
-      <Label layoutX="236.0" layoutY="36.0" prefHeight="59.0" prefWidth="246.0" text="Resumen de Práctica">
-         <font><Font name="System Bold" size="24.0" /></font>
+      <Label cache="true" layoutX="190.0" layoutY="14.0" prefHeight="22.0" prefWidth="220.0" text="Práctica Finalizada">
+         <font><Font size="20.0" /></font>
+         <effect>
+            <Shadow height="0.0" radius="0.0" width="0.0">
+               <input><SepiaTone /></input>
+            </Shadow>
+         </effect>
       </Label>
 
-      <AnchorPane layoutX="60.0" layoutY="110.0" prefHeight="460.0" prefWidth="580.0" style="-fx-background-color: #cce4f7; -fx-background-radius: 20; -fx-border-radius: 20;">
+      <Pane layoutX="46.0" layoutY="49.0" prefHeight="465.0" prefWidth="467.0" style="-fx-background-color: #ffaf9c; -fx-background-radius: 20;">
          <children>
 
-            <GridPane hgap="15.0" layoutX="30.0" layoutY="30.0" prefHeight="393.0" prefWidth="520.0" vgap="14.0">
-               <columnConstraints>
-                  <ColumnConstraints halignment="RIGHT" hgrow="SOMETIMES" maxWidth="160.0" minWidth="10.0" prefWidth="150.0" />
-                  <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="370.0" />
-               </columnConstraints>
-               <rowConstraints>
-                  <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                  <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                  <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                  <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                  <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                  <RowConstraints maxHeight="45.60001220703123" minHeight="10.0" prefHeight="42.39999999999998" vgrow="SOMETIMES" />
-                  <RowConstraints maxHeight="65.59995117187503" minHeight="10.0" prefHeight="39.19999999999999" vgrow="SOMETIMES" />
-                  <RowConstraints maxHeight="69.60001220703123" minHeight="10.0" prefHeight="41.80003662109374" vgrow="SOMETIMES" />
-                  <RowConstraints maxHeight="114.39999999999998" minHeight="10.0" prefHeight="68.19996337890626" vgrow="SOMETIMES" />
-               </rowConstraints>
+            <HBox alignment="CENTER" layoutX="0.0" layoutY="10.0" prefWidth="467.0" spacing="4.0">
+               <children>
+                  <Button fx:id="buttonShowSummary" mnemonicParsing="false" onAction="#showSummary" prefHeight="36.0" prefWidth="209.0" text="Resumen" />
+                  <Button fx:id="buttonShowDocuments" mnemonicParsing="false" onAction="#showDocuments" prefHeight="36.0" prefWidth="234.0" text="Documentos" />
+               </children>
+            </HBox>
+
+            <VBox fx:id="sectionSummary" layoutX="16.0" layoutY="56.0" prefWidth="435.0" spacing="6.0">
                <children>
 
-                  <Label text="Alumno:" textFill="GREY">
-                     <font><Font name="System Bold" size="14.0" /></font>
-                  </Label>
-                  <Label fx:id="labelStudentName" text="[Nombre Alumno]" GridPane.columnIndex="1">
-                     <font><Font size="14.0" /></font>
+                  <Label text="Detalles práctica">
+                     <font><Font size="19.0" /></font>
                   </Label>
 
-                  <Label text="Proyecto:" textFill="GREY" GridPane.rowIndex="1">
-                     <font><Font name="System Bold" size="14.0" /></font>
-                  </Label>
-                  <Label fx:id="labelProjectName" text="[Nombre Proyecto]" wrapText="true" GridPane.columnIndex="1" GridPane.rowIndex="1">
-                     <font><Font size="14.0" /></font>
+                  <GridPane prefWidth="435.0">
+                     <columnConstraints>
+                        <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="150.0" />
+                        <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="285.0" />
+                     </columnConstraints>
+                     <rowConstraints>
+                        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                     </rowConstraints>
+                     <children>
+                        <Label text="Alumno" />
+                        <Label text="Proyecto" GridPane.rowIndex="1" />
+                        <Label text="Organización" GridPane.rowIndex="2" />
+                        <Label text="Maestro" GridPane.rowIndex="3" />
+                        <Label text="Metodología" GridPane.rowIndex="4" />
+                        <Label text="Objetivo" GridPane.rowIndex="5" />
+                        <Label text="Descripción" GridPane.rowIndex="6" />
+                        <Label text="Horas acumuladas" GridPane.rowIndex="7" />
+                        <Label text="Calificación" GridPane.rowIndex="8" />
+
+                        <Label fx:id="labelStudentName" text="-" wrapText="true" GridPane.columnIndex="1" />
+                        <Label fx:id="labelProjectName" text="-" wrapText="true" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+                        <Label fx:id="labelOrganizationName" text="-" wrapText="true" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+                        <Label fx:id="labelProfessorName" text="-" wrapText="true" GridPane.columnIndex="1" GridPane.rowIndex="3" />
+                        <Label fx:id="labelMethodology" text="-" wrapText="true" GridPane.columnIndex="1" GridPane.rowIndex="4" />
+                        <Label fx:id="labelObjective" text="-" wrapText="true" GridPane.columnIndex="1" GridPane.rowIndex="5" />
+                        <Label fx:id="labelDescription" text="-" wrapText="true" GridPane.columnIndex="1" GridPane.rowIndex="6" />
+                        <Label fx:id="labelAccumulatedHours" text="-" GridPane.columnIndex="1" GridPane.rowIndex="7" />
+                        <Label fx:id="labelGrade" text="-" GridPane.columnIndex="1" GridPane.rowIndex="8" />
+                     </children>
+                  </GridPane>
+
+                  <Label fx:id="labelMessage" prefWidth="435.0" textFill="#d31414" wrapText="true">
+                     <font><Font name="System Bold" size="12.0" /></font>
                   </Label>
 
-                  <Label text="Organización:" textFill="GREY" GridPane.rowIndex="2">
-                     <font><Font name="System Bold" size="14.0" /></font>
-                  </Label>
-                  <Label fx:id="labelOrganizationName" text="[Organización Vinculada]" wrapText="true" GridPane.columnIndex="1" GridPane.rowIndex="2">
-                     <font><Font size="14.0" /></font>
-                  </Label>
-
-                  <Label text="Maestro a cargo:" textFill="GREY" GridPane.rowIndex="3">
-                     <font><Font name="System Bold" size="14.0" /></font>
-                  </Label>
-                  <Label fx:id="labelProfessorName" text="[Nombre Profesor]" wrapText="true" GridPane.columnIndex="1" GridPane.rowIndex="3">
-                     <font><Font size="14.0" /></font>
-                  </Label>
-
-                  <Label text="Metodología:" textFill="GREY" GridPane.rowIndex="4">
-                     <font><Font name="System Bold" size="14.0" /></font>
-                  </Label>
-                  <Label fx:id="labelMethodology" text="[Metodología]" wrapText="true" GridPane.columnIndex="1" GridPane.rowIndex="4">
-                     <font><Font size="14.0" /></font>
-                  </Label>
-
-                  <Label text="Objetivo:" textFill="GREY" GridPane.rowIndex="5" GridPane.valignment="TOP">
-                     <font><Font name="System Bold" size="14.0" /></font>
-                  </Label>
-                  <Label fx:id="labelObjective" text="[Objetivo]" wrapText="true" GridPane.columnIndex="1" GridPane.rowIndex="5" GridPane.valignment="TOP">
-                     <font><Font size="14.0" /></font>
-                  </Label>
-
-                  <Label text="Descripción:" textFill="GREY" GridPane.rowIndex="6" GridPane.valignment="TOP">
-                     <font><Font name="System Bold" size="14.0" /></font>
-                  </Label>
-                  <Label fx:id="labelDescription" text="[Descripción]" wrapText="true" GridPane.columnIndex="1" GridPane.rowIndex="6" GridPane.valignment="TOP">
-                     <font><Font size="14.0" /></font>
-                  </Label>
-
-                  <Label text="Horas Acumuladas:" textFill="GREY" GridPane.rowIndex="7" GridPane.valignment="TOP">
-                     <font><Font name="System Bold" size="14.0" /></font>
-                  </Label>
-                  <Label fx:id="labelAccumulatedHours" text="[Horas]" wrapText="true" GridPane.columnIndex="1" GridPane.rowIndex="7" GridPane.valignment="TOP">
-                     <font><Font size="14.0" /></font>
-                  </Label>
-                  <Label layoutX="25.0" layoutY="296.0" text="Calificación Final" textFill="GREY" GridPane.rowIndex="8" GridPane.valignment="TOP">
-                     <font>
-                        <Font name="System Bold" size="14.0" />
-                     </font>
-                  </Label>
-                  <Label fx:id="labelGrade" prefHeight="22.0" prefWidth="255.0" text="[Calificacion]" GridPane.columnIndex="1" GridPane.rowIndex="8" GridPane.valignment="TOP">
-                     <font>
-                        <Font size="14.0" />
-                     </font>
-                  </Label>
+                  <HBox alignment="CENTER">
+                     <Button mnemonicParsing="false" onAction="#navigateToLogOut"
+                             style="-fx-background-color: #a11515; -fx-text-fill: white;"
+                             text="Cerrar Sesión"
+                             prefHeight="40.0" prefWidth="209.0" />
+                  </HBox>
 
                </children>
-            </GridPane>
+            </VBox>
+
+            <VBox fx:id="sectionDocuments" layoutX="16.0" layoutY="56.0" managed="false" prefWidth="435.0" spacing="10.0" visible="false">
+               <children>
+
+                  <Label text="Documentos">
+                     <font><Font size="19.0" /></font>
+                  </Label>
+
+                  <TableView fx:id="tableDocuments" prefHeight="300.0" prefWidth="435.0">
+                     <columns>
+                        <TableColumn fx:id="columnName" prefWidth="148.0" text="Nombre" />
+                        <TableColumn fx:id="columnType" prefWidth="153.0" text="Tipo documento" />
+                        <TableColumn fx:id="columnAction" prefWidth="128.0" text="Acción" />
+                     </columns>
+                  </TableView>
+
+                  <HBox alignment="CENTER">
+                     <Button mnemonicParsing="false" onAction="#navigateToLogOut"
+                             style="-fx-background-color: #a11515; -fx-text-fill: white;"
+                             text="Cerrar Sesión"
+                             prefHeight="40.0" prefWidth="209.0" />
+                  </HBox>
+
+               </children>
+            </VBox>
 
          </children>
-      </AnchorPane>
-
-      <Label fx:id="labelMessage" layoutX="100.0" layoutY="585.0" prefWidth="500.0" textAlignment="CENTER" textFill="#d31414" wrapText="true">
-         <font><Font name="System Bold" size="14.0" /></font>
-      </Label>
-
-      <Button fx:id="buttonLogOut" layoutX="290.0" layoutY="610.0" mnemonicParsing="false" onAction="#navigateToLogOut" prefHeight="35.0" prefWidth="120.0" style="-fx-background-color: #4CAF50; -fx-text-fill: white;" text="Cerrar Sesión">
-         <font><Font name="System Bold" size="14.0" /></font>
-      </Button>
+      </Pane>
 
    </children>
 </AnchorPane>
