@@ -59,7 +59,7 @@ public class FileManager {
         Path absoluteTarget = absoluteBase.resolve(idStudent + "_" + file.getName()).normalize();
 
         if (!absoluteTarget.startsWith(absoluteBase)) {
-            LOGGER.log(Level.SEVERE, "Intento de path traversal detectado para el alumno {0}", idStudent);
+            LOGGER.log(Level.SEVERE, "Ruta de archivo no permitida", idStudent);
             throw new OperationException("Ruta de archivo no permitida", null);
         } 
 

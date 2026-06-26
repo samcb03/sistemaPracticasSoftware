@@ -63,11 +63,7 @@ public class NotificationListCell extends ListCell<Notification> {
     }
 
     private void applyReadStyle(boolean isRead) {
-        if (isRead) {
-            labelTitle.setStyle(READ_TITLE_STYLE);
-        } else {
-            labelTitle.setStyle(UNREAD_TITLE_STYLE);
-        }
+        labelTitle.setStyle(isRead ? READ_TITLE_STYLE : UNREAD_TITLE_STYLE);
     }
 
     private String formatDate(Timestamp creationDate) {
