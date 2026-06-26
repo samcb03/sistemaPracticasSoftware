@@ -23,6 +23,13 @@ import uv.lis.logic.dto.Student;
 import uv.lis.logic.exceptions.OperationException;
 import uv.lis.logic.utils.SessionManager;
 
+/**
+ * Fills and registers the student autoevaluation form. Fetches the academic
+ * context of the student in session, validates the score range, persists the
+ * record through AutoevaluationDAO, and produces a JasperPrint ready for
+ * export. Images in the template are resolved from the classpath through
+ * ClasspathImageRepositoryCommon.
+ */
 public class AutoevaluationCommon {
 
     private static final Logger LOGGER = Logger.getLogger(AutoevaluationCommon.class.getName());
@@ -47,6 +54,18 @@ public class AutoevaluationCommon {
         this.jasperReportsContext = buildAutoevaluationContext();
     }
 
+    /**
+     * Fetches the academic context for the student in session, validates the
+     * scores, persists the autoevaluation, and returns a filled JasperPrint.
+     *
+     * @param autoevaluation the autoevaluation populated by the controller with
+     * the scores entered by the student
+     * @return a JasperPrint ready to be exported as PDF
+     * @throws JRException if JasperReports fails to fill the template
+     * @throws OperationException if no student is in session, any score is out
+     * of range, the student already has a registered
+     * autoevaluation, or a database error occurs
+     */
     public JasperPrint generateAutoevaluation(Autoevaluation autoevaluation) throws JRException, OperationException {
         Student currentStudent = SessionManager.getInstance().getCurrentStudent();
 
@@ -70,6 +89,16 @@ public class AutoevaluationCommon {
 
     }
 
+    /**
+     * Loads the autoevaluation template from the classpath and fills it with
+     * the data from the given autoevaluation.
+     *
+     * @param autoevaluation the autoevaluation whose data is injected into the
+     * template parameters
+     * @return a JasperPrint ready to be exported as PDF
+     * @throws JRException if JasperReports fails to fill the template
+     * @throws OperationException if the template is not found or cannot be read
+     */
     public JasperPrint fillAutoevaluation(Autoevaluation autoevaluation) throws JRException, OperationException {
         JasperPrint jasperPrint;
 
@@ -87,7 +116,7 @@ public class AutoevaluationCommon {
             LOGGER.log(Level.SEVERE, "Error al leer la plantilla de la autoevaluación", ioException);
             throw new OperationException(TEMPLATE_READ_ERROR_MESSAGE, ioException);
         }
-        
+
         return jasperPrint;
     }
 

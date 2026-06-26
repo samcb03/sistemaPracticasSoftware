@@ -140,7 +140,9 @@ public class FXMLGenerateMonthlyReportController extends ValidationHandler {
         initializeFieldArrays();
         labelBlock.setText(REPORT_BLOCK);
         loadStudentData();
-        comboBoxMonth.getSelectionModel().selectedItemProperty().addListener((observableValue, oldMonth, newMonth) -> {
+        comboBoxMonth.getSelectionModel().selectedItemProperty().addListener((observableValue, 
+            oldMonth, newMonth) -> {
+                
             if (newMonth != null) {
                 loadRegisteredActivities();
             }
