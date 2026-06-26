@@ -332,6 +332,7 @@ public class FXMLLoginController implements Initializable {
     }
 
     private boolean shouldGoToFinishWindow(Student student) {
+        boolean hasToGo = false;
         try {
             ExpedientDAO expedientDAO = new ExpedientDAO();
             boolean isAutoevaluationValidated = expedientDAO.isDocumentTypeValidated(
@@ -340,10 +341,10 @@ public class FXMLLoginController implements Initializable {
                 student.getIdStudent(), EVALUATION_DOCUMENT_TYPE);
             boolean isLiberationLetterValidated = expedientDAO.isDocumentTypeValidated(
                 student.getIdStudent(), LIBERATION_LETTER_DOCUMENT_TYPE);
-            return isAutoevaluationValidated && isOrganizationEvaluationValidated && isLiberationLetterValidated;
+            hasToGo = isAutoevaluationValidated && isOrganizationEvaluationValidated && isLiberationLetterValidated;
         } catch (OperationException e) {
             LOGGER.log(Level.SEVERE, "Error al verificar documentos finales", e);
-            return false;
         }
+        return hasToGo;
     }
 }

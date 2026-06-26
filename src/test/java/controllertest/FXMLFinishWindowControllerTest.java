@@ -237,6 +237,7 @@ public class FXMLFinishWindowControllerTest extends ApplicationTest {
     }
 
     private String messageText() {
-        return lookup(MESSAGE_LABEL_SELECTOR).queryAs(Label.class).getText();
+        String message = lookup(MESSAGE_LABEL_SELECTOR).queryAs(Label.class).getText();
+        return message;
     }
 }
