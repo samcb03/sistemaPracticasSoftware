@@ -15,7 +15,6 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.geometry.Side;
-import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Label;
@@ -339,10 +338,5 @@ public class FXMLManageProjectSupervisorController extends ValidationHandler {
         
         setNodeVisibility(buttonSave, isEditing);
         buttonSave.setDisable(!isEditing); 
-    }
-
-    private void setNodeVisibility(Node node, boolean isVisible) {
-        node.setVisible(isVisible);
-        node.setManaged(isVisible);
     }
 }

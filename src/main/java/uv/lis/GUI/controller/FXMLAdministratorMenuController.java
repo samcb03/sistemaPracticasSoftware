@@ -8,7 +8,11 @@ import javafx.scene.control.Button;
 
 import uv.lis.GUI.WindowHandler;
 
-public class FXMLAdministratorMenuController extends WindowHandler  {
+public class FXMLAdministratorMenuController extends WindowHandler {
+
+    private static final String REGISTER_PROFESSOR_VIEW = "/uv/lis/GUI/view/FXMLRegisterProfessor.fxml";
+    private static final String CONSULT_PROFESSOR_VIEW = "/uv/lis/GUI/view/FXMLManageProfessor.fxml";
+    private static final String REGISTER_SCHOOL_PERIOD_VIEW = "/uv/lis/GUI/view/FXMLRegisterSchoolPeriod.fxml";
 
     @FXML private Button buttonRegisterProfessor;
     @FXML private Button buttonConsultProfessor;
@@ -22,17 +26,16 @@ public class FXMLAdministratorMenuController extends WindowHandler  {
 
     @FXML
     public void goToRegisterProfessor() {
-        navigateTo("/uv/lis/GUI/view/FXMLRegisterProfessor.fxml");
+        navigateTo(REGISTER_PROFESSOR_VIEW);
     }
 
     @FXML
     public void goToConsultProfessor() {
-        navigateTo("/uv/lis/GUI/view/FXMLManageProfessor.fxml");
+        navigateTo(CONSULT_PROFESSOR_VIEW);
     }
 
     @FXML
     public void goToRegisterSchoolPeriod() {
-        navigateTo("/uv/lis/GUI/view/FXMLRegisterSchoolPeriod.fxml");
+        navigateTo(REGISTER_SCHOOL_PERIOD_VIEW);
     }
-
 }

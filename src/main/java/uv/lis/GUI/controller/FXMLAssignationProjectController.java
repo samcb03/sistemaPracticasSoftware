@@ -11,7 +11,6 @@ import java.util.stream.Collectors;
 
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
-import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
@@ -35,6 +34,14 @@ import uv.lis.logic.utils.SessionManager;
 
 public class FXMLAssignationProjectController extends ValidationHandler {
 
+    private static final String APPLICANT_SEPARATOR = " - ";
+    private static final String REASON_FIELD = "El motivo de asignación";
+    private static final String ASSIGNMENT_NOTIFICATION_TITLE = "Proyecto asignado";
+    private static final String ASSIGNMENT_MESSAGE_PREFIX = "Se te asignó el proyecto: ";
+    private static final String ASSIGNMENT_MESSAGE_REASON = ". Motivo: ";
+    private static final String ALTERNATIVE_MODE_LABEL = "Asignación alternativa";
+    private static final String NORMAL_MODE_LABEL = "Modo normal";
+
     @FXML private ComboBox<String> comboBoxProjects;
     @FXML private Button buttonAssignProject;
     @FXML private Button buttonBack;
@@ -57,25 +64,16 @@ public class FXMLAssignationProjectController extends ValidationHandler {
     private AffiliatedOrganizationDAO affiliatedOrganizationDAO;
     private NotificationDAO notificationDAO;
     private Professor coordinator;
-    private static final String APPLICANT_SEPARATOR = " - ";
-    private static final String REASON_FIELD = "El motivo de asignación";
-    private static final String ASSIGNMENT_NOTIFICATION_TITLE = "Proyecto asignado";
-    private static final String ASSIGNMENT_MESSAGE_PREFIX = "Se te asignó el proyecto: ";
-    private static final String ASSIGNMENT_MESSAGE_REASON = ". Motivo: ";
-    private static final String ALTERNATIVE_MODE_LABEL = "Asignación alternativa";
-    private static final String NORMAL_MODE_LABEL = "Modo normal";
     private boolean isAlternativeMode = false;
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
+        setupControls(labelError, buttonBack);
         requestProjectDAO = new RequestProjectDAO();
         projectDAO = new ProjectDAO();
         studentDAO = new StudentDAO();
         affiliatedOrganizationDAO = new AffiliatedOrganizationDAO();
         notificationDAO = new NotificationDAO();
-
-        setupControls(labelError, buttonBack);
-
         coordinator = SessionManager.getInstance().getCurrentProfessor();
 
         if (coordinator == null || !coordinator.getIsCoordinator()) {
@@ -97,7 +95,6 @@ public class FXMLAssignationProjectController extends ValidationHandler {
             ? listViewStudentsWithoutProject.getSelectionModel().getSelectedItem()
             : listViewApplicants.getSelectionModel().getSelectedItem();
         String reason = textAreaReason.getText();
-
         Optional<String> validationError = validateAssignmentInput(selectedProject, selectedRow, reason);
 
         if (validationError.isPresent()) {
@@ -154,9 +151,9 @@ public class FXMLAssignationProjectController extends ValidationHandler {
                 labelDescription.setText(project.getDescription());
                 loadOrganizationName(project.getIdAffiliatedOrganization());
 
-                    if (!isAlternativeMode) {
-                        loadApplicantsForProject(project.getId());
-                    }
+                if (!isAlternativeMode) {
+                    loadApplicantsForProject(project.getId());
+                }
 
             } else {
                 showError("Proyecto no encontrado");
@@ -180,8 +177,9 @@ public class FXMLAssignationProjectController extends ValidationHandler {
     private void loadApplicantsForProject(int idProject) {
         try {
             List<Student> applicants = requestProjectDAO.getApplicantsByProjectId(idProject);
-            List<String> applicantNames = applicants.stream().map(student -> student.getFirstName() 
-                + " " + student.getLastName() + APPLICANT_SEPARATOR + student.getIdStudent())
+            List<String> applicantNames = applicants.stream()
+                .map(student -> student.getFirstName() + " " + student.getLastName() 
+                + APPLICANT_SEPARATOR + student.getIdStudent())
                 .collect(Collectors.toList());
 
             listViewApplicants.setItems(FXCollections.observableArrayList(applicantNames));
@@ -240,9 +238,8 @@ public class FXMLAssignationProjectController extends ValidationHandler {
     }
 
     private boolean applyAssignment(Project project, String idStudent, String reason) throws OperationException {
-        boolean isAssigned = isAlternativeMode
-            ? requestProjectDAO.assignStudentToProject(idStudent, project.getId(), true)
-            : requestProjectDAO.assignStudentToProject(idStudent, project.getId(), false);
+        boolean isAssigned = requestProjectDAO.assignStudentToProject(idStudent, 
+            project.getId(), isAlternativeMode);
 
         if (isAssigned) {
             showSuccess("Asignación exitosa para " + idStudent);
@@ -281,11 +278,13 @@ public class FXMLAssignationProjectController extends ValidationHandler {
             listViewStudentsWithoutProject.getItems().remove(selectedRow);
             loadAvailableProjects();
             loadStudentsWithoutProject();
+
             if (listViewStudentsWithoutProject.getItems().isEmpty()) {
                 clearFields();
             }
         } else {
             listViewApplicants.getItems().remove(selectedRow);
+
             if (listViewApplicants.getItems().isEmpty()) {
                 loadProjectNames();
                 clearFields();
@@ -353,8 +352,4 @@ public class FXMLAssignationProjectController extends ValidationHandler {
         }
     }
 
-    private void setNodeVisibility(Node node, boolean isVisible) {
-        node.setVisible(isVisible);
-        node.setManaged(isVisible);
-    }
 }

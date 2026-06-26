@@ -20,7 +20,6 @@ import java.util.stream.Stream;
 
 import javafx.fxml.FXML;
 import javafx.geometry.Side;
-import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.ContextMenu;
@@ -282,11 +281,6 @@ public class FXMLManageStudentController extends ValidationHandler {
 
         setNodeVisibility(buttonUpdate, !isEditing);
         setNodeVisibility(buttonSave, isEditing);
-    }
-
-    private void setNodeVisibility(Node node, boolean isVisible) {
-        node.setVisible(isVisible);
-        node.setManaged(isVisible);
     }
 
     private void setupAutocomplete() {
