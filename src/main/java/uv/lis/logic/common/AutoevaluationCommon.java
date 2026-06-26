@@ -24,6 +24,7 @@ import uv.lis.logic.exceptions.OperationException;
 import uv.lis.logic.utils.SessionManager;
 
 public class AutoevaluationCommon {
+
     private static final Logger LOGGER = Logger.getLogger(AutoevaluationCommon.class.getName());
     private static final String TEMPLATE_PATH = "/uv/lis/GUI/view/templates/Autoevaluation.jasper";
     private static final String NO_STUDENT_IN_SESSION_MESSAGE = "No hay un estudiante en sesión";
@@ -38,6 +39,7 @@ public class AutoevaluationCommon {
     private static final String UNMARKED_OPTION = "";
 
     private final AutoevaluationDAO autoevaluationDAO;
+
     private SimpleJasperReportsContext jasperReportsContext;
 
     public AutoevaluationCommon() {
@@ -65,6 +67,7 @@ public class AutoevaluationCommon {
         autoevaluationDAO.registerAutoevaluation(autoevaluation);
         JasperPrint jasperPrint = fillAutoevaluation(autoevaluation);
         return jasperPrint;
+
     }
 
     public JasperPrint fillAutoevaluation(Autoevaluation autoevaluation) throws JRException, OperationException {
@@ -84,6 +87,7 @@ public class AutoevaluationCommon {
             LOGGER.log(Level.SEVERE, "Error al leer la plantilla de la autoevaluación", ioException);
             throw new OperationException(TEMPLATE_READ_ERROR_MESSAGE, ioException);
         }
+        
         return jasperPrint;
     }
 
@@ -107,15 +111,13 @@ public class AutoevaluationCommon {
 
     private Map<String, Object> buildParameters(Autoevaluation autoevaluation) {
         Map<String, Object> parameters = new HashMap<>();
-
         parameters.put("nombreAlumno", autoevaluation.getStudentName());
         parameters.put("matricula", autoevaluation.getIdStudent());
         parameters.put("organizacion", autoevaluation.getOrganizationName());
         parameters.put("responsableProyecto", autoevaluation.getProjectSupervisorName());
         parameters.put("departamento", NO_DEPARTMENT);
         parameters.put("nombreProyecto", autoevaluation.getProjectName());
-        parameters.put("puntuacion", String.format("%.1f%%", autoevaluation.getFinalScore()));
-
+        parameters.put("puntuacion", String.format("%.0f", autoevaluation.getFinalScore()));
         int[] scores = {
             autoevaluation.getProductiveParticipation(),
             autoevaluation.getAppliedKnowledge(),
@@ -150,11 +152,13 @@ public class AutoevaluationCommon {
             autoevaluation.getSupervisorGuidance(), autoevaluation.getEffectiveMonitoring(),
             autoevaluation.getCareerAlignment(), autoevaluation.getInternshipImportance()
         };
+
         for (int score : scores) {
             if (score < MINIMUM_SCORE || score > MAXIMUM_SCORE) {
                 isValid = false;
             }
         }
+
         return isValid;
     }
 }

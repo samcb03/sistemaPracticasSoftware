@@ -56,7 +56,7 @@ public class EmailCommon {
      * properties file.
      */
     public EmailCommon() {
-        chargeProperties();
+        loadProperties();
     }
 
     /**
@@ -133,7 +133,7 @@ public class EmailCommon {
         return mailProperties;
     }
 
-    private void chargeProperties() {
+    private void loadProperties() {
         try (FileInputStream propertiesFile = new FileInputStream(PROPERTIES_FILE)) {
             properties.load(propertiesFile);
         } catch (IOException e) {

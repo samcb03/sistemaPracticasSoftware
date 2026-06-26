@@ -28,6 +28,14 @@ import uv.lis.logic.exceptions.OperationException;
 import uv.lis.logic.utils.SessionManager;
 import uv.lis.logic.utils.WorkProgressCalculator;
 
+/**
+ * Fills the partial internship report template with the academic context of
+ * the student in session and computes the planned and real advance matrix from
+ * the selected activities. Context data is fetched from ReportContextDAO.
+ * When automatic advances are enabled, weekly planned and real values are
+ * derived from WorkProgressCalculator. Images in the template are resolved
+ * from the classpath through ClasspathImageRepositoryCommon.
+ */
 public class PartialReportCommon {
 
     private static final Logger LOGGER = Logger.getLogger(PartialReportCommon.class.getName());
@@ -53,15 +61,19 @@ public class PartialReportCommon {
         jasperReportsContext = buildReportsContext();
     }
 
-    private SimpleJasperReportsContext buildReportsContext() {
-        SimpleJasperReportsContext reportsContext 
-            = new SimpleJasperReportsContext(DefaultJasperReportsContext.getInstance());
-        List<RepositoryService> repositoryServices = new ArrayList<>();
-        repositoryServices.add(new ClasspathImageRepositoryCommon());
-        reportsContext.setExtensions(RepositoryService.class, repositoryServices);
-        return reportsContext;
-    }
-
+    /**
+     * Fetches the academic context for the student in session, merges it into
+     * the report, fills the advance matrix for the selected activities, and
+     * returns a filled JasperPrint ready for export.
+     *
+     * @param partialReport the report populated by the controller with the
+     * selected activities and optional manual advances
+     * @return a JasperPrint ready to be exported as PDF
+     * @throws JRException if JasperReports fails to fill the template
+     * @throws OperationException if no student is in session, a selected
+     * activity is not found, or a database error
+     * occurs
+     */
     public JasperPrint generatePartialReport(PartialReport partialReport) throws JRException, OperationException {
         Student currentStudent = SessionManager.getInstance().getCurrentStudent();
 
@@ -75,6 +87,16 @@ public class PartialReportCommon {
         return jasperPrint;
     }
 
+    /**
+     * Loads the partial report template from the classpath and fills it with
+     * the data from the given report.
+     *
+     * @param partialReport the report whose data is injected into the template
+     * parameters
+     * @return a JasperPrint ready to be exported as PDF
+     * @throws JRException if JasperReports fails to fill the template
+     * @throws OperationException if the template is not found or cannot be read
+     */
     public JasperPrint fillReportTemplate(PartialReport partialReport) throws JRException, OperationException {
         JasperPrint jasperPrint;
 
@@ -93,6 +115,15 @@ public class PartialReportCommon {
             throw new OperationException(TEMPLATE_READ_ERROR_MESSAGE, ioException);
         }
         return jasperPrint;
+    }
+
+    private SimpleJasperReportsContext buildReportsContext() {
+        SimpleJasperReportsContext reportsContext 
+            = new SimpleJasperReportsContext(DefaultJasperReportsContext.getInstance());
+        List<RepositoryService> repositoryServices = new ArrayList<>();
+        repositoryServices.add(new ClasspathImageRepositoryCommon());
+        reportsContext.setExtensions(RepositoryService.class, repositoryServices);
+        return reportsContext;
     }
 
     private void mergeContextIntoReport(PartialReport partialReport, String studentId) throws OperationException {
