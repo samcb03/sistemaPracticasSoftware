@@ -344,4 +344,38 @@ class SubjectDAOTest {
         assertThrows(OperationException.class,
             () -> subjectDAO.isSectionTakenInPeriod(SCHOOL_PERIOD_ID, "1"));
     }
+
+    @Test
+    void isProfessorTeachingStudent_isTeaching_returnsTrue() throws Exception {
+        mockQueryExecution();
+        when(resultSet.next()).thenReturn(true);
+        when(resultSet.getInt(FIRST_VALUE)).thenReturn(FIRST_VALUE);
+
+        assertTrue(subjectDAO.isProfessorTeachingStudent(PERSONNEL_NUMBER, VALID_STUDENT_ID));
+    }
+
+    @Test
+    void isProfessorTeachingStudent_notTeaching_returnsFalse() throws Exception {
+        mockQueryExecution();
+        when(resultSet.next()).thenReturn(true);
+        when(resultSet.getInt(FIRST_VALUE)).thenReturn(NO_VALID);
+
+        assertFalse(subjectDAO.isProfessorTeachingStudent(PERSONNEL_NUMBER, INVALID_STUDENT_ID));
+    }
+
+    @Test
+    void isProfessorTeachingStudent_emptyResultSet_returnsFalse() throws Exception {
+        mockQueryExecution();
+        when(resultSet.next()).thenReturn(false);
+
+        assertFalse(subjectDAO.isProfessorTeachingStudent(PERSONNEL_NUMBER, VALID_STUDENT_ID));
+    }
+
+    @Test
+    void isProfessorTeachingStudent_sqlError_throwsOperationException() throws SQLException {
+        when(connectionManager.getConnection()).thenThrow(new SQLException(CONNECTION_ERROR));
+
+        assertThrows(OperationException.class,
+            () -> subjectDAO.isProfessorTeachingStudent(PERSONNEL_NUMBER, VALID_STUDENT_ID));
+    }
 }

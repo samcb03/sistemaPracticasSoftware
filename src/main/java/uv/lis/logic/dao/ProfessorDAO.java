@@ -350,13 +350,13 @@ public class ProfessorDAO extends UserDAO implements IProfessorDAO {
     @Override
     public boolean isAnotherCoordinatorActive(String personnelNumber) throws OperationException {
         boolean exits = false;
-        String coordinatorQuery = "SELECT COUNT(*) "
-                                + "FROM Usuario u "
-                                + "INNER JOIN Profesor p ON u.idUsuario = p.idUsuario "
-                                + "WHERE u.idRol = 3 AND u.estado = 1 AND p.numeroPersonal <> ?;";
+        String professorQuery = "SELECT COUNT(*) "
+                              + "FROM Usuario u "
+                              + "INNER JOIN Profesor p ON u.idUsuario = p.idUsuario "
+                              + "WHERE u.idRol = 3 AND u.estado = 1 AND p.numeroPersonal <> ?;";
         
         try (Connection databaseConnection = connectionManager.getConnection();
-            PreparedStatement preparedStatement = databaseConnection.prepareStatement(coordinatorQuery)) {
+            PreparedStatement preparedStatement = databaseConnection.prepareStatement(professorQuery)) {
             
             preparedStatement.setString(1, personnelNumber);
 
@@ -379,9 +379,10 @@ public class ProfessorDAO extends UserDAO implements IProfessorDAO {
             professor.setId(generatedUserId);
             insertProfessor(professor, databaseConnection);
             databaseConnection.commit();
-        } catch (SQLException e) {
-            LOGGER.log(Level.SEVERE, "Transacción de registro de alumno cancelada", e);
-            throw new OperationException("Error al guardar la informacion dell alumno. Intentelo mas tarde", e);
+        } catch (SQLException sqlException) {
+            LOGGER.log(Level.SEVERE, "Transacción de registro de alumno cancelada", sqlException);
+            throw new OperationException("Error al guardar la informacion del profesor. Intentelo mas tarde", 
+                sqlException);
         }
     }
 

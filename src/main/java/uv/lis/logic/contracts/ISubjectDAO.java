@@ -64,6 +64,16 @@ public interface ISubjectDAO {
     ArrayList<Student> getEnrolledStudentsBySubject(int nrc) throws OperationException;
 
     /**
+     * Checks whether a professor is currently teaching the subject a student is enrolled in.
+     *
+     * @param personnelNumber the personnel number of the professor to check
+     * @param studentId the identifier of the student to query
+     * @return true if the professor teaches the subject the student is enrolled in, false otherwise
+     * @throws OperationException if the check cannot be performed
+     */
+    boolean isProfessorTeachingStudent(String personnelNumber, String studentId) throws OperationException;
+
+    /**
      * Enrolls a student in a subject.
      *
      * @param studentId the identifier of the student to enroll
@@ -82,6 +92,4 @@ public interface ISubjectDAO {
      * @throws OperationException if the check cannot be performed
      */
     boolean isSectionTakenInPeriod(int periodId, String section) throws OperationException;
-
-    boolean isProfessorTeachingStudent(String personnelNumber, String studentId) throws OperationException;
 }

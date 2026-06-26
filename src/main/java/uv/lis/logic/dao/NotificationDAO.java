@@ -20,6 +20,7 @@ import uv.lis.logic.exceptions.OperationException;
 public class NotificationDAO implements INotificationDAO {
 
     private static final Logger LOGGER = Logger.getLogger(NotificationDAO.class.getName());
+    private static final int FIRST_INDEX = 1;
     private MySQLConnectionManager connectionManager;
 
     public NotificationDAO() {
@@ -50,7 +51,7 @@ public class NotificationDAO implements INotificationDAO {
 
             try (ResultSet resultSet = preparedStatement.getGeneratedKeys()) {
                 if (resultSet.next()) {
-                    generatedId = resultSet.getInt(1);
+                    generatedId = resultSet.getInt(FIRST_INDEX);
                 }
             }
         } catch (SQLException e) {

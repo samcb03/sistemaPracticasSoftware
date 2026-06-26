@@ -59,7 +59,7 @@ public class PracticeDAO implements IPracticeDAO {
     }
 
     @Override
-    public boolean registerPractice(Practice Practice) throws OperationException {
+    public boolean registerPractice(Practice practice) throws OperationException {
         boolean isRegistered = false;
 
         String practiceQuery = "INSERT INTO Practica (calificacion, matricula) "
@@ -68,16 +68,16 @@ public class PracticeDAO implements IPracticeDAO {
         try (Connection databaseConnection = connectionManager.getConnection();
             PreparedStatement preparedStatement = databaseConnection.prepareStatement(practiceQuery)) {
 
-            preparedStatement.setInt(1, Practice.getCalification());
-            preparedStatement.setString(2, Practice.getIdStudent());
+            preparedStatement.setInt(1, practice.getCalification());
+            preparedStatement.setString(2, practice.getIdStudent());
 
             if (preparedStatement.executeUpdate() > NO_VALUE) {
                 isRegistered = true;
                 LOGGER.log(Level.INFO, "Práctica registrada para el alumno {0}",
-                    Practice.getIdStudent());
+                    practice.getIdStudent());
             } else {
                 LOGGER.log(Level.WARNING, "No se pudo registrar la práctica para el alumno {0}",
-                    Practice.getIdStudent());
+                    practice.getIdStudent());
                 throw new OperationException("No se pudo registrar la práctica", null);
             }
         } catch (SQLException e) {

@@ -65,8 +65,7 @@ public class ProjectDAO implements IProjectDAO{
         String projectQuery = "SELECT * FROM Proyecto WHERE nombre = ?;";
 
         try (Connection databaseConnection = connectionManager.getConnection();
-            PreparedStatement preparedStatement = databaseConnection.prepareStatement(projectQuery, 
-                PreparedStatement.RETURN_GENERATED_KEYS)) {
+            PreparedStatement preparedStatement = databaseConnection.prepareStatement(projectQuery)) {
 
             preparedStatement.setString(1, projectName);
             
@@ -151,7 +150,7 @@ public class ProjectDAO implements IProjectDAO{
             preparedStatement.setInt(3, project.getCapacity());
             preparedStatement.setString(4, project.getMethodology());
             preparedStatement.setString(5, project.getObjective());
-            preparedStatement.setBoolean(6, true); 
+            preparedStatement.setBoolean(6, project.isActive()); 
             preparedStatement.setInt(7, project.getId());
 
             if (preparedStatement.executeUpdate() > NO_VALUE) {

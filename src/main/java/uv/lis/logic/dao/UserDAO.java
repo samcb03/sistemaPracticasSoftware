@@ -1,5 +1,7 @@
 package uv.lis.logic.dao;
 
+import static uv.lis.logic.utils.InputValidator.INVALID_ID;
+import static uv.lis.logic.utils.InputValidator.IS_COORDINATOR;
 import static uv.lis.logic.utils.InputValidator.NO_VALUE;
 
 import java.sql.Connection;
@@ -18,7 +20,6 @@ import uv.lis.logic.exceptions.OperationException;
 import uv.lis.logic.utils.PasswordHasher;
 
 public class UserDAO implements IUserDAO {
-    private static final int ROL_COORDINATOR = 3;
     private static final int STATUS_ACTIVE = 1;
     private static final Logger LOGGER = Logger.getLogger(UserDAO.class.getName());
     private MySQLConnectionManager connectionManager;
@@ -46,9 +47,9 @@ public class UserDAO implements IUserDAO {
     }
 
     private int insertUser(User user, Connection databaseConnection) throws SQLException, OperationException {
-        int generatedId = -1;
+        int generatedId = INVALID_ID;
 
-        if (user.getRoleId() == ROL_COORDINATOR && existActiveCoordinator()) {
+        if (user.getRoleId() == IS_COORDINATOR && existActiveCoordinator()) {
             throw new OperationException("Ya existe un coordinador activo en el sistema", null);
         }
 
@@ -129,7 +130,7 @@ public class UserDAO implements IUserDAO {
         try (Connection databaseConnection = connectionManager.getConnection();
             PreparedStatement preparedStatement = databaseConnection.prepareStatement(userQuery)) {
 
-            preparedStatement.setInt(1, ROL_COORDINATOR);
+            preparedStatement.setInt(1, IS_COORDINATOR);
             preparedStatement.setInt(2, STATUS_ACTIVE);
 
             try (ResultSet resultSet = preparedStatement.executeQuery()) {

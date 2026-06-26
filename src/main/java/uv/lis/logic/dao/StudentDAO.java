@@ -21,6 +21,7 @@ import uv.lis.logic.exceptions.OperationException;
 public class StudentDAO extends UserDAO implements IStudentDAO {
     
     private static final Logger LOGGER = Logger.getLogger(StudentDAO.class.getName());
+    private static final int FIRST_INDEX = 1;
     private static final int STATUS_ACTIVE = 1;
     private static final int STATUS_INACTIVE = 0;
     
@@ -181,34 +182,6 @@ public class StudentDAO extends UserDAO implements IStudentDAO {
         return isRegistered;
     }
 
-    private void persistStudentRegistration(Student student, Connection databaseConnection) throws OperationException {
-        try {
-            int generatedUserId = registerUser(student);
-            student.setId(generatedUserId);
-            insertStudent(student, databaseConnection);
-            databaseConnection.commit();
-        } catch (SQLException e) {
-            LOGGER.log(Level.SEVERE, "Transacción de registro de alumno cancelada", e);
-            throw new OperationException("Error al guardar la informacion dell alumno. Intentelo mas tarde", e);
-        }
-    }
-
-    private void insertStudent(Student student, Connection databaseConnection) throws SQLException, OperationException {
-        String studentQuery = "INSERT INTO Alumno (idUsuario, matricula, fechaNacimiento, genero)"
-                            + " VALUES (?, ?, ?, ?);";
-
-        try (PreparedStatement preparedStatement = databaseConnection.prepareStatement(studentQuery)) {
-            preparedStatement.setInt(1, student.getId());
-            preparedStatement.setString(2, student.getIdStudent());
-            preparedStatement.setDate(3, student.getBirthDate());
-            preparedStatement.setString(4, student.getGender());
-
-            if (preparedStatement.executeUpdate() <= NO_VALUE) {
-                throw new OperationException("El registro del alumno no afectó ninguna fila", null);
-            }
-        }
-    }
-
     @Override
     public boolean modifyStudent(Student student) throws OperationException {
         boolean isModified = false;
@@ -318,22 +291,23 @@ public class StudentDAO extends UserDAO implements IStudentDAO {
     @Override
     public boolean hasProjectAssigned(String studentId) throws OperationException {
         boolean hasProject = false;
-        String studentQuery = "SELECT COUNT(*) FROM Solicita_Proyecto WHERE matricula = ? AND estatus = " 
-                            + STATUS_ASSIGNED + ";";
+        String studentQuery = "SELECT COUNT(*) FROM Solicita_Proyecto WHERE matricula = ? AND estatus = ?;";
 
         try (Connection databaseConnection = connectionManager.getConnection();
             PreparedStatement preparedStatement = databaseConnection.prepareStatement(studentQuery)) {
             
             preparedStatement.setString(1, studentId);
+            preparedStatement.setInt(2, STATUS_ASSIGNED);
 
             try (ResultSet resultSet = preparedStatement.executeQuery()) {
                 if (resultSet.next()) {
-                    hasProject = resultSet.getInt(1) > NO_VALUE;
+                    hasProject = resultSet.getInt(FIRST_INDEX) > NO_VALUE;
                 }
             }
-        } catch (SQLException e) {
-            LOGGER.log(Level.SEVERE, "Error al verificar asignacion de proyecto", e);
-            throw new OperationException("No se pudo verificar la asignación de proyecto. Intente más tarde", e);
+        } catch (SQLException sqlException) {
+            LOGGER.log(Level.SEVERE, "Error al verificar asignacion de proyecto", sqlException);
+            throw new OperationException("No se pudo verificar la asignación de proyecto. Intente más tarde", 
+                sqlException);
         }
         return hasProject;
     }
@@ -367,5 +341,33 @@ public class StudentDAO extends UserDAO implements IStudentDAO {
             throw new OperationException("No se pudieron obtener los alumnos. Intente más tarde", e);
         }
         return students;
+    }
+
+    private void persistStudentRegistration(Student student, Connection databaseConnection) throws OperationException {
+        try {
+            int generatedUserId = registerUser(student);
+            student.setId(generatedUserId);
+            insertStudent(student, databaseConnection);
+            databaseConnection.commit();
+        } catch (SQLException e) {
+            LOGGER.log(Level.SEVERE, "Transacción de registro de alumno cancelada", e);
+            throw new OperationException("Error al guardar la informacion dell alumno. Intentelo mas tarde", e);
+        }
+    }
+
+    private void insertStudent(Student student, Connection databaseConnection) throws SQLException, OperationException {
+        String studentQuery = "INSERT INTO Alumno (idUsuario, matricula, fechaNacimiento, genero)"
+                            + " VALUES (?, ?, ?, ?);";
+
+        try (PreparedStatement preparedStatement = databaseConnection.prepareStatement(studentQuery)) {
+            preparedStatement.setInt(1, student.getId());
+            preparedStatement.setString(2, student.getIdStudent());
+            preparedStatement.setDate(3, student.getBirthDate());
+            preparedStatement.setString(4, student.getGender());
+
+            if (preparedStatement.executeUpdate() <= NO_VALUE) {
+                throw new OperationException("El registro del alumno no afectó ninguna fila", null);
+            }
+        }
     }
 }

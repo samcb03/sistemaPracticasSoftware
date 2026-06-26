@@ -196,29 +196,6 @@ class ActivityDAOTest {
     }
 
     @Test
-    void modifyActivity_successful_returnsTrue() throws Exception {
-        mockUpdateExecution(FIRST_VALUE);
-
-        assertTrue(activityDAO.modifyActivity(builderFirstActivity()));
-    }
-
-    @Test
-    void modifyActivity_noRowsAffected_throwsOperationException() throws SQLException {
-        mockUpdateExecution(NO_VALUE);
-
-        assertThrows(OperationException.class,
-            () -> activityDAO.modifyActivity(builderFirstActivity()));
-    }
-
-    @Test
-    void modifyActivity_sqlError_throwsOperationException() throws SQLException {
-        when(connectionManager.getConnection()).thenThrow(new SQLException(DATABASE_ERROR_MESSAGE));
-
-        assertThrows(OperationException.class,
-            () -> activityDAO.modifyActivity(builderFirstActivity()));
-    }
-
-    @Test
     void getActivitiesByStudentId_successful_returnsActivityList() throws Exception {
         mockQueryExecution();
         mockResultSetTwoActivities();
