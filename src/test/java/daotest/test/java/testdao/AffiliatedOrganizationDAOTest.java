@@ -24,7 +24,6 @@ import org.mockito.MockitoAnnotations;
 import uv.lis.dataaccess.MySQLConnectionManager;
 import uv.lis.logic.dao.AffiliatedOrganizationDAO;
 import uv.lis.logic.dto.AffiliatedOrganization;
-import uv.lis.logic.dto.Project;
 import uv.lis.logic.exceptions.OperationException;
 
 class AffiliatedOrganizationDAOTest {
@@ -36,8 +35,6 @@ class AffiliatedOrganizationDAOTest {
     private static final int GENERATED_ID = 2;
     private static final int INACTIVE_STATE_VALUE = 0;
     private static final int ACTIVE_STATE_VALUE = 1;
-    private static final int PROJECT_ID = 100;
-    private static final int PROJECT_CAPACITY = 5;
 
     private static final String ORGANIZATION_NAME = "Tech Corp";
     private static final String SECOND_ORGANIZATION_NAME = "Tech Solutions";
@@ -48,15 +45,8 @@ class AffiliatedOrganizationDAOTest {
     private static final String ORGANIZATION_EMAIL = "tech@corp.com";
     private static final String ORGANIZATION_PHONE = "2281234567";
     private static final String SUPERVISOR_NAME = "Juan Pérez";
-    private static final String PROJECT_NAME = "Proyecto X";
-    private static final String PROJECT_DESCRIPTION = "Descripción del proyecto";
-    private static final String PROJECT_OBJECTIVE = "Objetivo general";
-    private static final String PROJECT_METHODOLOGY = "Scrum";
     private static final String DATABASE_ERROR_MESSAGE = "DB error";
-    private static final String EXPECTED_PROJECT_ENTRY =
-        "ID: " + PROJECT_ID + " — " + PROJECT_NAME + " (" + PROJECT_DESCRIPTION + ")";
 
-    private static final boolean PROJECT_ACTIVE = true;
 
     @Mock private MySQLConnectionManager connectionManager;
     @Mock private Connection connection;
@@ -107,25 +97,6 @@ class AffiliatedOrganizationDAOTest {
             .thenReturn(ORGANIZATION_NAME, SECOND_ORGANIZATION_NAME);
     }
 
-    private void mockResultSetProjectEntry() throws SQLException {
-        when(resultSet.next()).thenReturn(true, false);
-        when(resultSet.getInt("idProyecto")).thenReturn(PROJECT_ID);
-        when(resultSet.getString("nombre")).thenReturn(PROJECT_NAME);
-        when(resultSet.getString("descripcion")).thenReturn(PROJECT_DESCRIPTION);
-    }
-
-    private void mockResultSetCompleteProject() throws SQLException {
-        when(resultSet.next()).thenReturn(true, false);
-        when(resultSet.getInt("idProyecto")).thenReturn(PROJECT_ID);
-        when(resultSet.getString("nombre")).thenReturn(PROJECT_NAME);
-        when(resultSet.getString("descripcion")).thenReturn(PROJECT_DESCRIPTION);
-        when(resultSet.getString("objetivo")).thenReturn(PROJECT_OBJECTIVE);
-        when(resultSet.getInt("cupo")).thenReturn(PROJECT_CAPACITY);
-        when(resultSet.getString("metodologiaProyecto")).thenReturn(PROJECT_METHODOLOGY);
-        when(resultSet.getBoolean("estado")).thenReturn(PROJECT_ACTIVE);
-        when(resultSet.getString("nombreOV")).thenReturn(ORGANIZATION_NAME);
-    }
-
     private AffiliatedOrganization builderExpectedOrganization() {
         AffiliatedOrganization expectedOrganization = new AffiliatedOrganization();
         expectedOrganization.setId(ORGANIZATION_ID);
@@ -138,19 +109,6 @@ class AffiliatedOrganizationDAOTest {
         expectedOrganization.setNumberOfDirectUsers(DIRECT_USERS);
         expectedOrganization.setNumberOfIndirectUsers(INDIRECT_USERS);
         return expectedOrganization;
-    }
-
-    private Project builderExpectedProject() {
-        Project expectedProject = new Project();
-        expectedProject.setId(PROJECT_ID);
-        expectedProject.setName(PROJECT_NAME);
-        expectedProject.setDescription(PROJECT_DESCRIPTION);
-        expectedProject.setObjective(PROJECT_OBJECTIVE);
-        expectedProject.setCapacity(PROJECT_CAPACITY);
-        expectedProject.setMethodology(PROJECT_METHODOLOGY);
-        expectedProject.setActive(PROJECT_ACTIVE);
-        expectedProject.setAffiliatedOrganizationName(ORGANIZATION_NAME);
-        return expectedProject;
     }
 
     @Test
@@ -430,85 +388,5 @@ class AffiliatedOrganizationDAOTest {
 
         assertThrows(OperationException.class,
             () -> affiliatedOrganizationDAO.getOrganizationByName(ORGANIZATION_NAME));
-    }
-
-    @Test
-    void getProjectsByOrganization_projectsExist_returnsProjectEntryList() throws Exception {
-        mockQueryExecution();
-        mockResultSetProjectEntry();
-        List<String> expectedEntries = List.of(EXPECTED_PROJECT_ENTRY);
-
-        assertEquals(expectedEntries,
-            affiliatedOrganizationDAO.getProjectsByOrganization(ORGANIZATION_NAME));
-    }
-
-    @Test
-    void getProjectsByOrganization_noProjects_returnsEmptyList() throws Exception {
-        mockQueryExecution();
-        when(resultSet.next()).thenReturn(false);
-
-        assertTrue(affiliatedOrganizationDAO.getProjectsByOrganization(ORGANIZATION_NAME).isEmpty());
-    }
-
-    @Test
-    void getProjectsByOrganization_sqlError_throwsOperationException() throws SQLException {
-        when(connection.prepareStatement(anyString()))
-            .thenThrow(new SQLException(DATABASE_ERROR_MESSAGE));
-
-        assertThrows(OperationException.class,
-            () -> affiliatedOrganizationDAO.getProjectsByOrganization(ORGANIZATION_NAME));
-    }
-
-    @Test
-    void hasActiveProjects_projectsExist_returnsTrue() throws Exception {
-        mockQueryExecution();
-        when(resultSet.next()).thenReturn(true);
-
-        assertTrue(affiliatedOrganizationDAO.hasActiveProjects(ORGANIZATION_NAME));
-    }
-
-    @Test
-    void hasActiveProjects_noProjects_returnsFalse() throws Exception {
-        mockQueryExecution();
-        when(resultSet.next()).thenReturn(false);
-
-        assertFalse(affiliatedOrganizationDAO.hasActiveProjects(ORGANIZATION_NAME));
-    }
-
-    @Test
-    void hasActiveProjects_sqlError_throwsOperationException() throws SQLException {
-        when(connection.prepareStatement(anyString()))
-            .thenThrow(new SQLException(DATABASE_ERROR_MESSAGE));
-
-        assertThrows(OperationException.class,
-            () -> affiliatedOrganizationDAO.hasActiveProjects(ORGANIZATION_NAME));
-    }
-
-    @Test
-    void getCompleteProjectsByOrganization_projectsExist_returnsProjectList() throws Exception {
-        mockQueryExecution();
-        mockResultSetCompleteProject();
-        List<Project> expectedProjects = List.of(builderExpectedProject());
-
-        assertEquals(expectedProjects,
-            affiliatedOrganizationDAO.getCompleteProjectsByOrganization(ORGANIZATION_NAME));
-    }
-
-    @Test
-    void getCompleteProjectsByOrganization_noProjects_returnsEmptyList() throws Exception {
-        mockQueryExecution();
-        when(resultSet.next()).thenReturn(false);
-
-        assertTrue(affiliatedOrganizationDAO
-            .getCompleteProjectsByOrganization(ORGANIZATION_NAME).isEmpty());
-    }
-
-    @Test
-    void getCompleteProjectsByOrganization_sqlError_throwsOperationException() throws SQLException{
-        when(connection.prepareStatement(anyString()))
-            .thenThrow(new SQLException(DATABASE_ERROR_MESSAGE));
-
-        assertThrows(OperationException.class,
-            () -> affiliatedOrganizationDAO.getCompleteProjectsByOrganization(ORGANIZATION_NAME));
     }
 }

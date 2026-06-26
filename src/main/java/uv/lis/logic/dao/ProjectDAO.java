@@ -97,7 +97,7 @@ public class ProjectDAO implements IProjectDAO{
         boolean isRegistered = false;
         String projectQuery = "INSERT INTO Proyecto(nombre, "  
                             + "descripcion, cupo, metodologiaProyecto, objetivo, estado, idOrganizacionVinculada," 
-                            + "idResponsableProyecto) VALUES(?, ?, ?, ?, ?, ?, ?,?);";
+                            + "idResponsableProyecto) VALUES(?, ?, ?, ?, ?, ?, ?, ?);";
 
         try (Connection databaseConnection = connectionManager.getConnection();
             PreparedStatement preparedStatement = databaseConnection.prepareStatement(projectQuery, 
@@ -271,12 +271,13 @@ public class ProjectDAO implements IProjectDAO{
         String projectQuery = "SELECT p.idProyecto, p.nombre FROM Proyecto p"
                             + " JOIN Solicita_Proyecto sp ON p.idProyecto = sp.idProyecto"
                             + " WHERE sp.matricula = ? "
-                            + " AND sp.estatus = 2";
+                            + " AND sp.estatus = ?";
 
         try (Connection databaseConnection = connectionManager.getConnection();
             PreparedStatement preparedStatement = databaseConnection.prepareStatement(projectQuery)) {
 
             preparedStatement.setString(1, studentId);
+            preparedStatement.setInt(2, STATUS_ASSIGNED);
 
             try (ResultSet resultSet = preparedStatement.executeQuery()) {
                 if (resultSet.next()) {
@@ -346,12 +347,13 @@ public class ProjectDAO implements IProjectDAO{
                             + "TRUE INNER JOIN Profesor prof ON pie.numeroPersonal = prof.numeroPersonal "
                             + "INNER JOIN Usuario uProf ON prof.idUsuario = uProf.idUsuario "
                             + "WHERE sp.matricula = ? "
-                            + "AND sp.estatus = 2";
+                            + "AND sp.estatus = ?";
 
         try (Connection databaseConnection = connectionManager.getConnection();
             PreparedStatement preparedStatement = databaseConnection.prepareStatement(projectQuery)) {
 
             preparedStatement.setString(1, studentId);
+            preparedStatement.setInt(2, STATUS_ASSIGNED);
 
             try (ResultSet resultSet = preparedStatement.executeQuery()) {
                 if (resultSet.next()) {
@@ -373,4 +375,98 @@ public class ProjectDAO implements IProjectDAO{
         return projectOptional;
     }
 
+    @Override
+    public ArrayList<String> getProjectsByOrganization(String organizationName) throws OperationException {
+        ArrayList<String> projectList = new ArrayList<>();
+        String projectQuery = "SELECT p.idProyecto, p.nombre, p.descripcion "
+                            + "FROM Proyecto p "
+                            + "JOIN OrganizacionVinculada ov "
+                            + "ON p.idOrganizacionVinculada = ov.idOrganizacionVinculada "
+                            + "WHERE ov.nombreOV = ? "
+                            + "ORDER BY p.nombre ASC";
+
+        try (Connection databaseConnection = connectionManager.getConnection();
+            PreparedStatement preparedStatement = databaseConnection.prepareStatement(projectQuery)) {
+
+            preparedStatement.setString(1, organizationName);
+
+            try (ResultSet resultSet = preparedStatement.executeQuery()) {
+                while (resultSet.next()) {
+                    String entry = "ID: " + resultSet.getInt("idProyecto")
+                                 + " — " + resultSet.getString("nombre")
+                                 + " (" + resultSet.getString("descripcion") + ")";
+                    projectList.add(entry);
+                }
+            }
+        } catch (SQLException e) {
+            LOGGER.log(Level.SEVERE, "Error al obtener proyectos de la organización", e);
+            throw new OperationException("No se pudo obtener la lista de proyectos de la organización.", e);
+        }
+        return projectList;
+    }
+
+    @Override
+    public boolean hasActiveProjects(String organizationName) throws OperationException {
+        boolean hasProjectsActives = false;
+        String projectQuery = "SELECT 1 FROM Proyecto p "
+                            + "JOIN OrganizacionVinculada ov "
+                            + "ON p.idOrganizacionVinculada = ov.idOrganizacionVinculada "
+                            + "WHERE ov.nombreOV = ? LIMIT 1";
+
+        try (Connection databaseConnection = connectionManager.getConnection();
+            PreparedStatement preparedStatement = databaseConnection.prepareStatement(projectQuery)) {
+
+            preparedStatement.setString(1, organizationName);
+
+            try (ResultSet resultSet = preparedStatement.executeQuery()) {
+                hasProjectsActives = resultSet.next();
+            }
+        } catch (SQLException e) {
+            LOGGER.log(Level.SEVERE, "Error al verificar Proyectos asignados", e);
+            throw new OperationException("No se pudo verificar los proyectos activos. Intente más tarde", e);
+        }
+        return hasProjectsActives;
+    }
+
+    @Override
+    public ArrayList<Project> getCompleteProjectsByOrganization(String organizationName) throws OperationException {
+        ArrayList<Project> projectList = new ArrayList<>();
+        String projectQuery = "SELECT p.idProyecto, p.nombre, p.descripcion, p.objetivo, "
+                            + "p.cupo, p.metodologiaProyecto, p.estado, ov.nombreOV "
+                            + "FROM Proyecto p "
+                            + "JOIN OrganizacionVinculada ov "
+                            + "ON p.idOrganizacionVinculada = ov.idOrganizacionVinculada "
+                            + "WHERE ov.nombreOV = ? "
+                            + "ORDER BY p.nombre ASC";
+
+        try (Connection databaseConnection = connectionManager.getConnection();
+            PreparedStatement preparedStatement = databaseConnection.prepareStatement(projectQuery)) {
+
+            preparedStatement.setString(1, organizationName);
+
+            try (ResultSet resultSet = preparedStatement.executeQuery()) {
+                while (resultSet.next()) {
+                    projectList.add(mapProject(resultSet));
+                }
+            }
+        } catch (SQLException e) {
+            LOGGER.log(Level.SEVERE, "Error al obtener proyectos de la organización", e);
+            throw new OperationException("No se pudo obtener la lista de proyectos de la organización.", e);
+        }
+        return projectList;
+    }
+
+    private Project mapProject(ResultSet resultSet) throws SQLException {
+        Project project = new Project();
+        project.setId(resultSet.getInt("idProyecto"));
+        project.setName(resultSet.getString("nombre"));
+        project.setDescription(resultSet.getString("descripcion"));
+        project.setObjective(resultSet.getString("objetivo"));
+        project.setCapacity(resultSet.getInt("cupo"));
+        project.setMethodology(resultSet.getString("metodologiaProyecto"));
+        project.setActive(resultSet.getBoolean("estado"));
+        project.setAffiliatedOrganizationName(resultSet.getString("nombreOV"));
+
+        return project;
+    }
 }

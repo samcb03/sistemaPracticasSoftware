@@ -19,6 +19,7 @@ import uv.lis.logic.exceptions.OperationException;
 public class SubjectDAO implements ISubjectDAO {
 
     private static final Logger LOGGER = Logger.getLogger(SubjectDAO.class.getName());
+    private static final int FIRST_INDEX = 1;
 
     private final MySQLConnectionManager connectionManager;
 
@@ -37,8 +38,8 @@ public class SubjectDAO implements ISubjectDAO {
                             + "seccion) "
                             + "VALUES (?, ?, ?, ?, ?);";
         String professorSubjectQuery = "INSERT INTO Profesor_Imparte_Experiencia (NRC, numeroPersonal, idPeriodo) "
-                                    + "VALUES (?, ?, ?) "
-                                    + "ON DUPLICATE KEY UPDATE estaActiva = TRUE, idPeriodo = VALUES(idPeriodo);";
+                                     + "VALUES (?, ?, ?) "
+                                     + "ON DUPLICATE KEY UPDATE estaActiva = TRUE, idPeriodo = VALUES(idPeriodo);";
 
         try (Connection databaseConnection = connectionManager.getConnection()) {
 
@@ -110,7 +111,7 @@ public class SubjectDAO implements ISubjectDAO {
     @Override
     public boolean assignStudentToSubject(String studentId, int subjectNrc, int periodId) throws OperationException {
         boolean isAssigned = false;
-        String subjectQuery = "INSERT INTO alumno_esta_ee (matricula, NRC, idPeriodo) VALUES (?, ?,?);";
+        String subjectQuery = "INSERT INTO alumno_esta_ee (matricula, NRC, idPeriodo) VALUES (?, ?, ?);";
 
         try (Connection databaseConnection = connectionManager.getConnection();
             PreparedStatement preparedStatement = databaseConnection.prepareStatement(subjectQuery)) {
@@ -246,7 +247,7 @@ public class SubjectDAO implements ISubjectDAO {
  
             try (ResultSet resultSet = preparedStatement.executeQuery()) {
                 if (resultSet.next()) {
-                    isTaken = resultSet.getInt(1) > NO_VALUE;
+                    isTaken = resultSet.getInt(FIRST_INDEX) > NO_VALUE;
                 }
             }
         } catch (SQLException e) {

@@ -108,4 +108,31 @@ public interface IProjectDAO {
      * @throws OperationException if the project summary cannot be retrieved
      */
     Optional<ProjectSummary> getProjectDetailsByStudentId(String studentId) throws OperationException;
+
+    /**
+     * Retrieves a textual summary of each project that belongs to an organization.
+     *
+     * @param organizationName the name of the organization to query
+     * @return the list of project entries, empty if there are none
+     * @throws OperationException if the projects cannot be retrieved
+     */
+    ArrayList<String> getProjectsByOrganization(String organizationName) throws OperationException;
+
+    /**
+     * Checks whether an organization has at least one project associated.
+     *
+     * @param organizationName the name of the organization to query
+     * @return true if the organization has projects, false otherwise
+     * @throws OperationException if the projects cannot be verified
+     */
+    boolean hasActiveProjects(String organizationName) throws OperationException;
+
+    /**
+     * Retrieves the complete project data for every project of an organization.
+     *
+     * @param organizationName the name of the organization to query
+     * @return the list of projects, empty if there are none
+     * @throws OperationException if the projects cannot be retrieved
+     */
+    ArrayList<Project> getCompleteProjectsByOrganization(String organizationName) throws OperationException;
 }

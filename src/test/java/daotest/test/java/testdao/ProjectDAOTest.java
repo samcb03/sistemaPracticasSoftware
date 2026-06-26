@@ -64,6 +64,9 @@ class ProjectDAOTest {
     private static final String COLUMN_DESCRIPTION = "descripcion";
     private static final String COLUMN_ORGANIZATION_NAME = "nombreOrganizacion";
     private static final String COLUMN_STATUS = "estado";
+    private static final String COLUMN_ORGANIZATION_OV = "nombreOV";
+    private static final String EXPECTED_PROJECT_ENTRY =
+        "ID: " + PROJECT_ID + " — " + PROJECT_NAME + " (" + PROJECT_DESCRIPTION + ")";
     private static final String COLUMN_PROFESSOR_NAME = "nombreProfesor";
     private static final String COLUMN_PROFESSOR_LAST_NAME = "apellidosProfesor";
 
@@ -192,10 +195,10 @@ class ProjectDAOTest {
 
         assertThrows(OperationException.class, () -> projectDAO.getAllProjects());
     }
-    //FIXME test falla
+
     @Test
     void getProjectByName_succesfull_returnsProject() throws Exception {
-        when(databaseConnection.prepareStatement(anyString(), anyInt())).thenReturn(preparedStatement);
+        when(databaseConnection.prepareStatement(anyString())).thenReturn(preparedStatement);
         when(preparedStatement.executeQuery()).thenReturn(resultSet);
         when(resultSet.next()).thenReturn(true);
         when(resultSet.getInt(COLUMN_PROJECT_ID)).thenReturn(PROJECT_ID);
@@ -207,14 +210,14 @@ class ProjectDAOTest {
 
         assertEquals(Optional.of(expected), projectDAO.getProjectByName(PROJECT_NAME));
     }
-    //FIXME test falla
+
     @Test
     void getProjectByName_notFound_throwsOperationException() throws SQLException {
-        when(databaseConnection.prepareStatement(anyString(), anyInt())).thenReturn(preparedStatement);
+        when(databaseConnection.prepareStatement(anyString())).thenReturn(preparedStatement);
         when(preparedStatement.executeQuery()).thenReturn(resultSet);
         when(resultSet.next()).thenReturn(false);
 
-        assertThrows(OperationException.class, 
+        assertThrows(OperationException.class,
             () -> projectDAO.getProjectByName(PROJECT_NAME));
     }
 
@@ -536,5 +539,98 @@ class ProjectDAOTest {
 
         assertThrows(OperationException.class,
             () -> projectDAO.getProjectDetailsByStudentId(STUDENT_ID));
+    }
+
+    private void mockResultSetProjectEntry() throws SQLException {
+        when(resultSet.next()).thenReturn(true, false);
+        when(resultSet.getInt(COLUMN_PROJECT_ID)).thenReturn(PROJECT_ID);
+        when(resultSet.getString(COLUMN_NAME)).thenReturn(PROJECT_NAME);
+        when(resultSet.getString(COLUMN_DESCRIPTION)).thenReturn(PROJECT_DESCRIPTION);
+    }
+
+    private void mockResultSetCompleteProject() throws SQLException {
+        when(resultSet.next()).thenReturn(true, false);
+        when(resultSet.getInt(COLUMN_PROJECT_ID)).thenReturn(PROJECT_ID);
+        when(resultSet.getString(COLUMN_NAME)).thenReturn(PROJECT_NAME);
+        when(resultSet.getString(COLUMN_DESCRIPTION)).thenReturn(PROJECT_DESCRIPTION);
+        when(resultSet.getString(COLUMN_OBJECTIVE)).thenReturn(OBJECTIVE);
+        when(resultSet.getInt(COLUMN_CAPACITY)).thenReturn(CAPACITY);
+        when(resultSet.getString(COLUMN_METHODOLOGY)).thenReturn(METHODOLOGY);
+        when(resultSet.getBoolean(COLUMN_STATUS)).thenReturn(true);
+        when(resultSet.getString(COLUMN_ORGANIZATION_OV)).thenReturn(ORGANIZATION_NAME);
+    }
+
+    @Test
+    void getProjectsByOrganization_projectsExist_returnsProjectEntryList() throws Exception {
+        mockQueryExecution();
+        mockResultSetProjectEntry();
+        List<String> expectedEntries = List.of(EXPECTED_PROJECT_ENTRY);
+
+        assertEquals(expectedEntries, projectDAO.getProjectsByOrganization(ORGANIZATION_NAME));
+    }
+
+    @Test
+    void getProjectsByOrganization_noProjects_returnsEmptyList() throws Exception {
+        mockQueryExecution();
+        when(resultSet.next()).thenReturn(false);
+
+        assertTrue(projectDAO.getProjectsByOrganization(ORGANIZATION_NAME).isEmpty());
+    }
+
+    @Test
+    void getProjectsByOrganization_sqlError_throwsOperationException() throws SQLException {
+        when(databaseConnection.prepareStatement(anyString())).thenThrow(new SQLException(CONNECTION_ERROR));
+
+        assertThrows(OperationException.class,
+            () -> projectDAO.getProjectsByOrganization(ORGANIZATION_NAME));
+    }
+
+    @Test
+    void hasActiveProjects_projectsExist_returnsTrue() throws Exception {
+        mockQueryExecution();
+        when(resultSet.next()).thenReturn(true);
+
+        assertTrue(projectDAO.hasActiveProjects(ORGANIZATION_NAME));
+    }
+
+    @Test
+    void hasActiveProjects_noProjects_returnsFalse() throws Exception {
+        mockQueryExecution();
+        when(resultSet.next()).thenReturn(false);
+
+        assertFalse(projectDAO.hasActiveProjects(ORGANIZATION_NAME));
+    }
+
+    @Test
+    void hasActiveProjects_sqlError_throwsOperationException() throws SQLException {
+        when(databaseConnection.prepareStatement(anyString())).thenThrow(new SQLException(CONNECTION_ERROR));
+
+        assertThrows(OperationException.class,
+            () -> projectDAO.hasActiveProjects(ORGANIZATION_NAME));
+    }
+
+    @Test
+    void getCompleteProjectsByOrganization_projectsExist_returnsProjectList() throws Exception {
+        mockQueryExecution();
+        mockResultSetCompleteProject();
+        List<Project> expectedProjects = List.of(builderFirstFullProject());
+
+        assertEquals(expectedProjects, projectDAO.getCompleteProjectsByOrganization(ORGANIZATION_NAME));
+    }
+
+    @Test
+    void getCompleteProjectsByOrganization_noProjects_returnsEmptyList() throws Exception {
+        mockQueryExecution();
+        when(resultSet.next()).thenReturn(false);
+
+        assertTrue(projectDAO.getCompleteProjectsByOrganization(ORGANIZATION_NAME).isEmpty());
+    }
+
+    @Test
+    void getCompleteProjectsByOrganization_sqlError_throwsOperationException() throws SQLException {
+        when(databaseConnection.prepareStatement(anyString())).thenThrow(new SQLException(CONNECTION_ERROR));
+
+        assertThrows(OperationException.class,
+            () -> projectDAO.getCompleteProjectsByOrganization(ORGANIZATION_NAME));
     }
 }

@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.Optional;
 
 import uv.lis.logic.dto.AffiliatedOrganization;
-import uv.lis.logic.dto.Project;
 import uv.lis.logic.exceptions.OperationException;
 
 /**
@@ -100,31 +99,4 @@ public interface IAffiliatedOrganizationDAO {
      * @throws OperationException if the organization cannot be retrieved
      */
     Optional<AffiliatedOrganization> getOrganizationByName(String organizationName) throws OperationException;
-
-    /**
-     * Retrieves the names of the projects that belong to an organization.
-     *
-     * @param organizationName the name of the organization to query
-     * @return the list of project names, empty if there are none
-     * @throws OperationException if the project names cannot be retrieved
-     */
-    ArrayList<String> getProjectsByOrganization(String organizationName) throws OperationException;
-
-    /**
-     * Indicates whether an affiliated organization has active projects.
-     *
-     * @param organizationName the name of the organization to verify
-     * @return true if the organization has active projects, false otherwise
-     * @throws OperationException if the verification cannot be completed
-     */
-    boolean hasActiveProjects(String organizationName) throws OperationException;
-
-    /**
-     * Retrieves the complete projects that belong to an organization.
-     *
-     * @param organizationName the name of the organization to query
-     * @return the list of projects, empty if there are none
-     * @throws OperationException if the projects cannot be retrieved
-     */
-    ArrayList<Project> getCompleteProjectsByOrganization(String organizationName) throws OperationException;
 }

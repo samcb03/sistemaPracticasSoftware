@@ -80,10 +80,10 @@ public class AutoevaluationDAO implements IAutoevaluationDAO {
         boolean isRegistered = false;
 
         String autoevaluationQuery = "INSERT INTO Autoevaluacion (matricula, participacionProductiva, "
-                                    + "conocimientoAplicado, confianzaEnActividades, interesEnActividades, " 
-                                    + "apoyoOrganizacional, conocimientoDeReglas, orientacionSupervisor, " 
-                                    + "seguimientoEfectivo, alineacionCarrera, importanciaPracticas, " 
-                                    + "puntuacionFinal) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);";
+                                   + "conocimientoAplicado, confianzaEnActividades, interesEnActividades, " 
+                                   + "apoyoOrganizacional, conocimientoDeReglas, orientacionSupervisor, " 
+                                   + "seguimientoEfectivo, alineacionCarrera, importanciaPracticas, " 
+                                   + "puntuacionFinal) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);";
 
         try (Connection databaseConnection = connectionManager.getConnection();
             PreparedStatement preparedStatement = databaseConnection.prepareStatement(autoevaluationQuery)) {
