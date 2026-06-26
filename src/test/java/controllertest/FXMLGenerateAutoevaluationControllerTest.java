@@ -35,7 +35,6 @@ import uv.lis.GUI.controller.FXMLGenerateAutoevaluationController;
 import uv.lis.logic.common.AutoevaluationCommon;
 import uv.lis.logic.dao.AutoevaluationDAO;
 import uv.lis.logic.dao.ExpedientDAO;
-import uv.lis.logic.dto.Autoevaluation;
 import uv.lis.logic.dto.Student;
 import uv.lis.logic.exceptions.OperationException;
 import uv.lis.logic.utils.SessionManager;
@@ -63,9 +62,6 @@ public class FXMLGenerateAutoevaluationControllerTest extends ApplicationTest {
     private static final String VALID_STUDENT_ID = "S24013322";
     private static final String VALID_STUDENT_NAME = "Denisse";
     private static final String VALID_STUDENT_LASTNAME = "Reyes";
-    private static final String VALID_ORGANIZATION = "Universidad Veracruzana";
-    private static final String VALID_PROJECT = "Analisis de requerimientos";
-    private static final String VALID_SUPERVISOR = "Sandra Paola Gutierrez";
 
     private static final String EXPECTED_NOT_ALL_ANSWERED_MESSAGE = "Por favor, responda todas las preguntas" 
         + " antes de generar.";
@@ -179,14 +175,6 @@ public class FXMLGenerateAutoevaluationControllerTest extends ApplicationTest {
         student.setFirstName(VALID_STUDENT_NAME);
         student.setLastName(VALID_STUDENT_LASTNAME);
         return student;
-    }
-
-    private Autoevaluation buildAutoevaluation() {
-        Autoevaluation autoevaluation = new Autoevaluation();
-        autoevaluation.setOrganizationName(VALID_ORGANIZATION);
-        autoevaluation.setProjectName(VALID_PROJECT);
-        autoevaluation.setProjectSupervisorName(VALID_SUPERVISOR);
-        return autoevaluation;
     }
 
     private void injectField(String fieldName, Object value) {

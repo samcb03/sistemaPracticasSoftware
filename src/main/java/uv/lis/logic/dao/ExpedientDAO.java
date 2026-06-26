@@ -168,12 +168,16 @@ public class ExpedientDAO implements IExpedientDAO {
     public void uploadMonthlyReport(String idStudent, File file, int idReport) throws OperationException {
         FileValidator.validateFile(file);
         String url = FileManager.saveFile(file, idStudent);
-        Expedient expedient = new Expedient(file.getName(), MONTHLY_REPORT_TYPE_NAME, url, idStudent,
-            MONTHLY_REPORT_DOCUMENT_TYPE_ID);
-        expedient.setIdReport(idReport);
         boolean isRegistered = false;
 
         try {
+            Expedient expedient = new Expedient();
+            expedient.setName(file.getName());
+            expedient.setTypeDocument(MONTHLY_REPORT_TYPE_NAME);
+            expedient.setUrl(url);
+            expedient.setIdStudent(idStudent);
+            expedient.setIdTypeDocument(MONTHLY_REPORT_DOCUMENT_TYPE_ID);
+            expedient.setIdReport(idReport);
             isRegistered = persistMonthlyReportDocument(expedient);
         } finally {
             if (!isRegistered) {
@@ -433,9 +437,10 @@ public class ExpedientDAO implements IExpedientDAO {
                     studentIds.add(resultSet.getString("matricula"));
                 }
             }
-        } catch (SQLException e) {
-            LOGGER.log(Level.SEVERE, "Error al obtener alumnos con carta de liberación", e);
-            throw new OperationException("Error al obtener alumnos con carta de liberación. Intente más tarde", e);
+        } catch (SQLException sqlException) {
+            LOGGER.log(Level.SEVERE, "Error al obtener alumnos con carta de liberación", sqlException);
+            throw new OperationException("Error al obtener alumnos con carta de liberación. Intente más tarde", 
+                sqlException);
         }
         return studentIds;
     }

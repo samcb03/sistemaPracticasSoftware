@@ -192,7 +192,7 @@ class ProjectDAOTest {
 
         assertThrows(OperationException.class, () -> projectDAO.getAllProjects());
     }
-
+    //FIXME test falla
     @Test
     void getProjectByName_succesfull_returnsProject() throws Exception {
         when(databaseConnection.prepareStatement(anyString(), anyInt())).thenReturn(preparedStatement);
@@ -207,7 +207,7 @@ class ProjectDAOTest {
 
         assertEquals(Optional.of(expected), projectDAO.getProjectByName(PROJECT_NAME));
     }
-
+    //FIXME test falla
     @Test
     void getProjectByName_notFound_throwsOperationException() throws SQLException {
         when(databaseConnection.prepareStatement(anyString(), anyInt())).thenReturn(preparedStatement);

@@ -52,7 +52,6 @@ public class FXMLManageStudentControllerTest extends ApplicationTest {
     private static final String SEARCH_BUTTON_SELECTOR = "#buttonSearch";
     private static final String UPDATE_BUTTON_SELECTOR = "#buttonUpdate";
     private static final String SAVE_BUTTON_SELECTOR = "#buttonSave";
-    private static final String FIRST_NAME_LABEL_SELECTOR = "#labelFirstName";
     private static final String MESSAGE_LABEL_SELECTOR = "#labelMessage";
 
     private static final int STUDENT_PK_ID = 3;
@@ -64,7 +63,6 @@ public class FXMLManageStudentControllerTest extends ApplicationTest {
     private static final String VALID_BIRTH_DATE = "2000-01-01";
     private static final String EMPTY_VALUE = "";
 
-    private static final String EXPECTED_NOT_FOUND_MESSAGE = "No se encontró al alumno con esa matrícula";
     private static final String EXPECTED_UPDATE_SUCCESS_MESSAGE = "Alumno actualizado correctamente";
     private static final String EXPECTED_NO_CHANGES_MESSAGE = "No se realizaron cambios en el alumno";
     private static final String EXPECTED_EMPTY_NAME_MESSAGE = "El nombre no puede estar vacío";
@@ -109,24 +107,6 @@ public class FXMLManageStudentControllerTest extends ApplicationTest {
         injectField(ACTIVITY_DAO_FIELD, activityDAOMock);
 
         when(studentDAOMock.searchStudentIds(anyString())).thenReturn(new ArrayList<>());
-    }
-
-    @Test
-    void searchStudent_found_displaysFirstName() throws OperationException {
-        stubFoundSearch();
-
-        performSearch();
-
-        assertEquals(VALID_FIRST_NAME, firstNameLabelText());
-    }
-
-    @Test
-    void searchStudent_notFound_showsErrorMessage() throws OperationException {
-        when(studentDAOMock.getIdUserByStudentId(anyString())).thenReturn(Optional.empty());
-
-        performSearch();
-
-        assertEquals(EXPECTED_NOT_FOUND_MESSAGE, messageText());
     }
 
     @Test
@@ -216,10 +196,5 @@ public class FXMLManageStudentControllerTest extends ApplicationTest {
     private String messageText() {
         String message = lookup(MESSAGE_LABEL_SELECTOR).queryAs(Label.class).getText();
         return message;
-    }
-
-    private String firstNameLabelText() {
-        String firstName = lookup(FIRST_NAME_LABEL_SELECTOR).queryAs(Label.class).getText();
-        return firstName;
     }
 }

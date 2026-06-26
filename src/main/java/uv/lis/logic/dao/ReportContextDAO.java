@@ -143,7 +143,7 @@ public class ReportContextDAO implements IReportContextDAO {
                     fillMonthlyReportContext(monthlyReport, resultSet);
                 } else {
                  LOGGER.log(Level.INFO, "No se encontró contexto para {0}", studentId);
-                    throw new OperationException("No se encontró contexto para: " + studentId, null);
+                    throw new OperationException("No se encontró contexto para el alumno", null);
                 }
             }
         } catch (SQLException e) {
@@ -323,7 +323,8 @@ public class ReportContextDAO implements IReportContextDAO {
     }
 
     private void fillFinalReportContext(FinalReport finalReport, ResultSet resultSet) throws SQLException {
-        String studentFullName = resultSet.getString("nombreAlumno") + " "  + resultSet.getString("apellidosAlumno");
+        String studentFullName = resultSet.getString("nombreAlumno") + " "  + resultSet.getString(
+            "apellidosAlumno");
         String professorFullName = resultSet.getString("nombreProfesor") + " " 
             + resultSet.getString("apellidosProfesor");
 
@@ -338,7 +339,8 @@ public class ReportContextDAO implements IReportContextDAO {
     }
 
     private void fillPartialReportContext(PartialReport partialReport, ResultSet resultSet) throws SQLException {
-        String studentFullName = resultSet.getString("nombreAlumno") + " " + resultSet.getString("apellidosAlumno");
+        String studentFullName = resultSet.getString("nombreAlumno") + " " + resultSet.getString(
+            "apellidosAlumno");
         String professorFullName = resultSet.getString("nombreProfesor") 
             + " " + resultSet.getString("apellidosProfesor");
 
@@ -354,7 +356,8 @@ public class ReportContextDAO implements IReportContextDAO {
     }
 
     private void fillMonthlyReportContext(MonthlyReport monthlyReport, ResultSet resultSet) throws SQLException {
-        String studentFullName = resultSet.getString("nombreAlumno") + " " + resultSet.getString("apellidosAlumno");
+        String studentFullName = resultSet.getString("nombreAlumno") + " " + resultSet.getString(
+            "apellidosAlumno");
         String professorFullName = resultSet.getString("nombreAcademico") + " "
             + resultSet.getString("apellidosAcademico");
         monthlyReport.setStudentName(studentFullName);

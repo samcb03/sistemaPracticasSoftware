@@ -10,7 +10,6 @@ import java.sql.SQLException;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -38,56 +37,16 @@ public class ActivityDAO implements IActivityDAO {
         try (Connection databaseConnection = connectionManager.getConnection();
             PreparedStatement preparedStatement = databaseConnection.prepareStatement(activityQuery)) {
              
-            ResultSet resultSet = preparedStatement.executeQuery();
-            
-            while (resultSet.next()) {
-                int idActivity = resultSet.getInt("idActividad");
-                String activityName = resultSet.getString("nombreActividad");
-                String activityDescription = resultSet.getString("descripcionActividad");
-                LocalDate startDate = resultSet.getObject("FechaInicio", LocalDate.class);
-                LocalDate endDate = resultSet.getObject("FechaFin", LocalDate.class);
-                int idProject = resultSet.getInt("idProyecto"); 
-                
-                activities.add(new Activity(idActivity, activityName, activityDescription, startDate, endDate, 
-                    idProject));
+            try (ResultSet resultSet = preparedStatement.executeQuery()) {
+                while (resultSet.next()) {
+                    activities.add(mapActivity(resultSet));
+                }
             }
         } catch (SQLException e) {
             LOGGER.log(Level.SEVERE, "Error de conexion con la base de datos", e);
             throw new OperationException("Error al obtener las actividades", e);
         }
         return activities;
-    }
-
-    @Override
-    public Optional<Activity> getActivityById(int idActivity) throws OperationException {
-        Optional<Activity> activityOptional = Optional.empty();
-        String activityQuery = "SELECT * FROM Actividad WHERE idActividad = ?;";
-
-        try (Connection databaseConnection = connectionManager.getConnection();
-            PreparedStatement preparedStatement = databaseConnection.prepareStatement(activityQuery)) {
-             
-            preparedStatement.setInt(1, idActivity);
-            ResultSet resultSet = preparedStatement.executeQuery();
-            
-            if (resultSet.next()) { 
-                int id = resultSet.getInt("idActividad");
-                
-                String activityName = resultSet.getString("nombreActividad"); 
-                String activityDescription = resultSet.getString("descripcionActividad"); 
-                
-                LocalDate startDate = resultSet.getObject("FechaInicio", LocalDate.class); 
-                LocalDate endDate = resultSet.getObject("FechaFin", LocalDate.class); 
-                
-                int idProject = resultSet.getInt("idProyecto");
-                
-                activityOptional = Optional.of(new Activity(id, activityName, activityDescription, startDate, endDate, 
-                    idProject));
-            }
-        } catch (SQLException e) {
-            LOGGER.log(Level.SEVERE, "Error de conexion con la base de datos", e);
-            throw new OperationException("Error al obtener la actividad", e);
-        }
-        return activityOptional;
     }
 
     @Override

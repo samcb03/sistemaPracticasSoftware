@@ -343,8 +343,8 @@ public class AffiliatedOrganizationDAO implements IAffiliatedOrganizationDAO {
             try (ResultSet resultSet = preparedStatement.executeQuery()) {
                 while (resultSet.next()) {
                     String entry = "ID: " + resultSet.getInt("idProyecto")
-                                 + " — " + resultSet.getString("nombre")
-                                 + " (" + resultSet.getString("descripcion") + ")";
+                        + " — " + resultSet.getString("nombre")
+                        + " (" + resultSet.getString("descripcion") + ")";
                     projectList.add(entry);
                 }
             }
@@ -418,7 +418,7 @@ public class AffiliatedOrganizationDAO implements IAffiliatedOrganizationDAO {
         affiliatedOrganization.setSector(resultSet.getString("sector"));
         affiliatedOrganization.setEmail(resultSet.getString("correo"));
         affiliatedOrganization.setPhoneNumber(resultSet.getString("telefono"));
-        affiliatedOrganization.setNumberOfDirectUsers(resultSet.getInt("numUsuariosDirectos"));
+        affiliatedOrganization.setNumberOfDirectUsers(resultSet.getInt("num n         UsuariosDirectos"));
         affiliatedOrganization.setNumberOfIndirectUsers(resultSet.getInt("numUsuariosIndirectos"));
 
         return affiliatedOrganization;
