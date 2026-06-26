@@ -13,7 +13,9 @@ import uv.lis.logic.dto.Student;
  * Only one session exists at a time, shared across the entire application.
  */
 public class SessionManager {
+
     private static final SessionManager INSTANCE = new SessionManager();
+
     private Student currentStudent;
     private Professor currentProfessor;
 
