@@ -2,7 +2,7 @@ package uv.lis.GUI.controller;
 
 import static uv.lis.logic.utils.InputValidator.STATUS_ASSIGNED;
 import static uv.lis.logic.utils.InputValidator.STATUS_REJECTED;
-import static uv.lis.logic.utils.InputValidator.validateMaxIntValue;
+import static uv.lis.logic.utils.InputValidator.validateGrade;
 
 import java.awt.Desktop;
 import java.io.File;
@@ -34,15 +34,33 @@ import uv.lis.logic.dao.PracticeDAO;
 import uv.lis.logic.dto.Expedient;
 import uv.lis.logic.dto.Practice;
 import uv.lis.logic.exceptions.OperationException;
-import uv.lis.logic.utils.InputValidator;
 import uv.lis.logic.utils.SessionManager;
 
 public class FXMLConsultStudentExpedientController extends ValidationHandler {
 
-    private static final Logger LOGGER = Logger.getLogger(FXMLConsultStudentExpedientController.class.getName());
+    private static final Logger LOGGER = Logger.getLogger(
+        FXMLConsultStudentExpedientController.class.getName());
 
     private static final String NO_DOCUMENTS_MESSAGE = "El alumno no tiene documentos registrados";
     private static final String NO_DOCUMENTS_FOR_FILTER_MESSAGE = "No hay documentos en esta categoría";
+    private static final String INVALID_URL_MESSAGE = "El documento no tiene una ruta válida";
+    private static final String FILE_NOT_FOUND_MESSAGE = "El documento no se encontró en la ruta registrada";
+    private static final String DESKTOP_NOT_SUPPORTED_MESSAGE = "La apertura de documentos no está soportada en" 
+        + " este sistema";
+    private static final String DOCUMENT_OPENED_MESSAGE = "Documento abierto correctamente";
+    private static final String REVIEW_SUCCESS_MESSAGE = "Estatus del documento actualizado correctamente";
+    private static final String REVIEW_FAILURE_MESSAGE = "No se pudo actualizar el estatus del documento";
+    private static final String CONFIRM_VALIDATE_MESSAGE = "¿Desea validar este documento?";
+    private static final String CONFIRM_REJECT_MESSAGE = "¿Desea rechazar este documento?";
+    private static final String CONFIRM_TITLE = "Confirmación";
+    private static final String ALREADY_VALIDATED_MESSAGE = "El documento ya está validado y no puede"  
+        + " cambiar de estado.";
+    private static final String GRADE_FIELD_NAME = "La calificación";
+    private static final String GRADE_REGISTER_SUCCESS = "Calificación registrada correctamente";
+    private static final String GRADE_REGISTER_FAILURE = "No se pudo registrar la calificación";
+    private static final String STATUS_NAME_VALIDATED = "Validado";
+    private static final String STATUS_NAME_REJECTED = "Rechazado";
+    private static final String TOTAL_FORMAT = "Total: %d documento(s)";
 
     private static final String FILTER_ALL = "Todos";
     private static final String FILTER_REPORTS = "Reportes";
@@ -55,18 +73,6 @@ public class FXMLConsultStudentExpedientController extends ValidationHandler {
     private static final int LIBERATION_LETTER_TYPE_ID = 13;
     private static final int AUTOEVALUATION_TYPE_ID = 1;
     private static final int OV_EVALUATION_TYPE_ID = 12;
-    private static final int MAX_CALIFICATION =  10;
-
-    private static final String TOTAL_FORMAT = "Total: %d documento(s)";
-    private static final String REVIEW_SUCCESS_MESSAGE = "Estatus del documento actualizado correctamente";
-    private static final String REVIEW_FAILURE_MESSAGE = "No se pudo actualizar el estatus del documento";
-    private static final String CONFIRM_VALIDATE_MESSAGE = "¿Desea validar este documento?";
-    private static final String CONFIRM_REJECT_MESSAGE = "¿Desea rechazar este documento?";
-    private static final String CONFIRM_TITLE = "Confirmación";
-    private static final String ALREADY_VALIDATED_MESSAGE = 
-        "El documento ya está validado y no puede cambiar de estado.";
-    private static final String GRADE_REGISTER_SUCCESS = "Calificación registrada correctamente";
-    private static final String GRADE_REGISTER_FAILURE = "No se pudo registrar la calificación";
 
     @FXML private Label labelStudentId;
     @FXML private Label labelTotal;
@@ -101,18 +107,23 @@ public class FXMLConsultStudentExpedientController extends ValidationHandler {
         try {
             allDocuments = expedientDAO.getDocumentsByStudentId(studentId);
             applyCurrentFilter();
+            checkIfAllFinalDocumentsValidated(studentId);
         } catch (OperationException e) {
             LOGGER.log(Level.SEVERE, "Error al cargar los documentos del alumno", e);
             showError(e.getMessage());
         }
     }
 
-    @Override
-    protected void clearFields() {
-        labelStudentId.setText("");
-        labelMessage.setText("");
-        labelTotal.setText("");
-        tableViewArchives.getItems().clear();
+    @FXML
+    private void addPractice() {
+        String gradeInput = textFieldGrade.getText().trim();
+        Optional<String> validationError = validateGrade(gradeInput, GRADE_FIELD_NAME);
+
+        if (validationError.isPresent()) {
+            showError(validationError.get());
+        } else {
+            saveGrade(labelStudentId.getText(), Integer.parseInt(gradeInput));
+        }
     }
 
     private void configureFilterComboBox() {
@@ -140,6 +151,52 @@ public class FXMLConsultStudentExpedientController extends ValidationHandler {
             -> new ActionTableCell(this::openDocument));
     }
 
+    private void applyCurrentFilter() {
+        String selectedFilter = comboBoxFilter.getValue();
+        List<Expedient> filteredDocuments = filterDocuments(selectedFilter);
+        populateTable(filteredDocuments);
+        updateTotalLabel(filteredDocuments.size());
+    }
+
+    private List<Expedient> filterDocuments(String filter) {
+        List<Expedient> filtered;
+
+        if (FILTER_REPORTS.equals(filter)) {
+            filtered = allDocuments.stream()
+                .filter(this::isReport)
+                .collect(Collectors.toList());
+        } else if (FILTER_INITIAL_DOCUMENTS.equals(filter)) {
+            filtered = allDocuments.stream()
+                .filter(this::isInitialDocument)
+                .collect(Collectors.toList());
+        } else if (FILTER_LIBERATION_LETTER.equals(filter)) {
+            filtered = allDocuments.stream()
+                .filter(this::isLiberationLetter)
+                .collect(Collectors.toList());
+        } else {
+            filtered = new ArrayList<>(allDocuments);
+        }
+
+        return filtered;
+    }
+
+    private boolean isReport(Expedient expedient) {
+        boolean isReportType = expedient.getIdTypeDocument() <= LAST_REPORT_TYPE_ID;
+        return isReportType;
+    }
+
+    private boolean isInitialDocument(Expedient expedient) {
+        int idTypeDocument = expedient.getIdTypeDocument();
+        boolean isInitialDocumentType = idTypeDocument >= FIRST_INITIAL_DOCUMENT_TYPE_ID
+            && idTypeDocument <= LAST_INITIAL_DOCUMENT_TYPE_ID;
+        return isInitialDocumentType;
+    }
+
+    private boolean isLiberationLetter(Expedient expedient) {
+        boolean isLiberationLetterType = expedient.getIdTypeDocument() == LIBERATION_LETTER_TYPE_ID;
+        return isLiberationLetterType;
+    }
+
     private void reviewDocument(Expedient expedient, int idStatus) {
         if (expedient.isValidated()) {
             showError(ALREADY_VALIDATED_MESSAGE);
@@ -149,8 +206,9 @@ public class FXMLConsultStudentExpedientController extends ValidationHandler {
     }
 
     private void confirmAndApplyReview(Expedient expedient, int idStatus) {
-        boolean isRejection = idStatus == STATUS_REJECTED;
-        String confirmationMessage = isRejection ? CONFIRM_REJECT_MESSAGE : CONFIRM_VALIDATE_MESSAGE;
+        String confirmationMessage = idStatus == STATUS_REJECTED
+            ? CONFIRM_REJECT_MESSAGE
+            : CONFIRM_VALIDATE_MESSAGE;
 
         if (showConfirmation(CONFIRM_TITLE, confirmationMessage)) {
             applyReview(expedient, idStatus);
@@ -172,63 +230,118 @@ public class FXMLConsultStudentExpedientController extends ValidationHandler {
         }
     }
 
-    private String resolveStatusName(int idStatus) {
-        String statusName = "Rechazado";
+    private void confirmReviewChange(Expedient expedient, int idStatus) {
+        String statusName = idStatus == STATUS_ASSIGNED ? STATUS_NAME_VALIDATED : STATUS_NAME_REJECTED;
+        expedient.setIdStatus(idStatus);
+        expedient.setStatusName(statusName);
+        tableViewArchives.refresh();
+        showSuccess(REVIEW_SUCCESS_MESSAGE);
+        LOGGER.log(Level.INFO, "Documento con id {0} actualizado al estatus {1}",
+            new Object[] { expedient.getId(), idStatus });
 
         if (idStatus == STATUS_ASSIGNED) {
-            statusName = "Validado";
+            checkIfAllFinalDocumentsValidated(labelStudentId.getText());
         }
-        return statusName;
     }
 
-    private void applyCurrentFilter() {
-        String selectedFilter = comboBoxFilter.getValue();
-        List<Expedient> filteredDocuments = filterDocuments(selectedFilter);
-        populateTable(filteredDocuments);
-        updateTotalLabel(filteredDocuments.size());
+    private void checkIfAllFinalDocumentsValidated(String studentId) {
+        boolean allFinalDocsValidated = areFinalDocumentsValidated();
+
+        if (allFinalDocsValidated) {
+            enableGradeInputIfNotRegistered(studentId);
+        }
     }
 
-    private List<Expedient> filterDocuments(String filter) {
-        List<Expedient> filtered;
+    private boolean areFinalDocumentsValidated() {
+        boolean autoevaluationValidated = hasValidatedDocumentOfType(AUTOEVALUATION_TYPE_ID);
+        boolean ovEvaluationValidated = hasValidatedDocumentOfType(OV_EVALUATION_TYPE_ID);
+        boolean liberationLetterValidated = hasValidatedDocumentOfType(LIBERATION_LETTER_TYPE_ID);
+        boolean allValidated = autoevaluationValidated && ovEvaluationValidated && liberationLetterValidated;
+        return allValidated;
+    }
 
-        if (FILTER_REPORTS.equals(filter)) {
-            filtered = allDocuments.stream()
-                .filter(this::isReport)
-                .collect(Collectors.toList());
-        } else if (FILTER_INITIAL_DOCUMENTS.equals(filter)) {
-            filtered = allDocuments.stream()
-                .filter(this::isInitialDocument)
-                .collect(Collectors.toList());
-        } else if(FILTER_LIBERATION_LETTER.equals(filter)) {
-            filtered = allDocuments.stream()
-                .filter(this::isLiberationLetter)
-                .collect(Collectors.toList());
+    private boolean hasValidatedDocumentOfType(int typeId) {
+        boolean hasValidated = allDocuments.stream()
+            .filter(doc -> doc.getIdTypeDocument() == typeId)
+            .anyMatch(Expedient::isValidated);
+        return hasValidated;
+    }
+
+    private void enableGradeInputIfNotRegistered(String studentId) {
+        try {
+            boolean alreadyExists = practiceDAO.existsByStudent(studentId);
+
+            if (!alreadyExists) {
+                textFieldGrade.setDisable(false);
+                buttonAcceptGrade.setDisable(false);
+            }
+        } catch (OperationException e) {
+            LOGGER.log(Level.SEVERE, "Error al verificar calificación existente", e);
+            showError(e.getMessage());
+        }
+    }
+
+    private void saveGrade(String studentId, int grade) {
+        try {
+            Practice practice = new Practice();
+            practice.setIdStudent(studentId);
+            practice.setCalification(grade);
+
+            boolean isRegistered = practiceDAO.registerPractice(practice);
+
+            if (isRegistered) {
+                showSuccess(GRADE_REGISTER_SUCCESS);
+                LOGGER.log(Level.INFO, "Calificación {0} registrada para el alumno {1}",
+                    new Object[] { grade, studentId });
+                textFieldGrade.setDisable(true);
+                buttonAcceptGrade.setDisable(true);
+            } else {
+                showError(GRADE_REGISTER_FAILURE);
+            }
+        } catch (OperationException e) {
+            LOGGER.log(Level.SEVERE, "Error al registrar la calificación", e);
+            showError(e.getMessage());
+        }
+    }
+
+    private void openDocument(Expedient expedient) {
+        if (expedient == null || expedient.getUrl() == null || expedient.getUrl().isBlank()) {
+            showError(INVALID_URL_MESSAGE);
         } else {
-            filtered = new ArrayList<>(allDocuments);
+            launchDocument(expedient);
         }
-        return filtered;
     }
 
-    private boolean isReport(Expedient expedient) {
-        boolean isReportType = expedient.getIdTypeDocument() <= LAST_REPORT_TYPE_ID;
-        return isReportType;
+    private void launchDocument(Expedient expedient) {
+        File documentFile = new File(expedient.getUrl());
+
+        if (!documentFile.exists()) {
+            showError(FILE_NOT_FOUND_MESSAGE);
+        } else {
+            tryOpenWithDesktop(documentFile);
+        }
     }
 
-    private boolean isInitialDocument(Expedient expedient) {
-        int idTypeDocument = expedient.getIdTypeDocument();
-        boolean isInitialDocumentType = idTypeDocument >= FIRST_INITIAL_DOCUMENT_TYPE_ID
-            && idTypeDocument <= LAST_INITIAL_DOCUMENT_TYPE_ID;
-        return isInitialDocumentType;
+    private void tryOpenWithDesktop(File documentFile) {
+        if (!Desktop.isDesktopSupported()) {
+            showError(DESKTOP_NOT_SUPPORTED_MESSAGE);
+        } else {
+            executeDesktopOpen(documentFile);
+        }
     }
 
-    private boolean isLiberationLetter(Expedient expedient) {
-        int idTypeDocument = expedient.getIdTypeDocument();
-        boolean isFinalDocumentType = idTypeDocument == LIBERATION_LETTER_TYPE_ID;
-        return isFinalDocumentType;
+    private void executeDesktopOpen(File documentFile) {
+        try {
+            Desktop.getDesktop().open(documentFile);
+            showSuccess(DOCUMENT_OPENED_MESSAGE);
+        } catch (IOException ioException) {
+            LOGGER.log(Level.SEVERE, "Error de E/S al abrir el documento", ioException);
+            showError("No se pudo abrir el documento");
+        }
     }
 
     private void populateTable(List<Expedient> documents) {
-        clearMessage();
+        labelMessage.setText("");
 
         if (allDocuments.isEmpty()) {
             showError(NO_DOCUMENTS_MESSAGE);
@@ -246,140 +359,11 @@ public class FXMLConsultStudentExpedientController extends ValidationHandler {
         labelTotal.setText(String.format(TOTAL_FORMAT, totalDocuments));
     }
 
-    private void clearMessage() {
+    @Override
+    protected void clearFields() {
+        labelStudentId.setText("");
         labelMessage.setText("");
-    }
-
-    private void openDocument(Expedient expedient) {
-        if (expedient == null || expedient.getUrl() == null || expedient.getUrl().isBlank()) {
-            showError("El documento no tiene una ruta válida");
-        } else {
-            launchDocument(expedient);
-        }
-    }
-
-    private void launchDocument(Expedient expedient) {
-        File documentFile = new File(expedient.getUrl());
-
-        if (!documentFile.exists()) {
-            showError("El documento no se encontró en la ruta registrada");
-        } else {
-            tryOpenWithDesktop(documentFile);
-        }
-    }
-
-    private void tryOpenWithDesktop(File documentFile) {
-        if (!Desktop.isDesktopSupported()) {
-            showError("La apertura de documentos no está soportada en este sistema");
-        } else {
-            executeDesktopOpen(documentFile);
-        }
-    }
-
-    private void executeDesktopOpen(File documentFile) {
-        try {
-            Desktop.getDesktop().open(documentFile);
-            showSuccess("Documento abierto correctamente");
-        } catch (IOException ioException) {
-            LOGGER.log(Level.SEVERE, "Error de E/S al abrir el documento", ioException);
-            showError("No se pudo abrir el documento");
-        }
-    }
-
-    private void confirmReviewChange(Expedient expedient, int idStatus) {
-        expedient.setIdStatus(idStatus);
-        expedient.setStatusName(resolveStatusName(idStatus));
-        tableViewArchives.refresh();
-        showSuccess(REVIEW_SUCCESS_MESSAGE);
-        LOGGER.log(Level.INFO, "Documento con id {0} actualizado al estatus {1}",
-            new Object[] { expedient.getId(), idStatus });
-
-        if (idStatus == STATUS_ASSIGNED) {
-            checkAndRegisterGradeIfComplete(labelStudentId.getText());
-        }
-    }
-
-    private void checkAndRegisterGradeIfComplete(String studentId) {
-        boolean allFinalDocsValidated = areFinalDocumentsValidated();
-
-        if (allFinalDocsValidated) {
-            promptAndRegisterGrade(studentId);
-        }
-    }
-
-    private boolean areFinalDocumentsValidated() {
-        boolean isFinished = false;
-        boolean autoevaluationValidated = allDocuments.stream()
-            .filter(doc -> doc.getIdTypeDocument() == AUTOEVALUATION_TYPE_ID)
-            .anyMatch(Expedient::isValidated);
-
-        boolean ovEvaluationValidated = allDocuments.stream()
-            .filter(doc -> doc.getIdTypeDocument() == OV_EVALUATION_TYPE_ID)
-            .anyMatch(Expedient::isValidated);
-
-        boolean liberationLetterValidated = allDocuments.stream()
-            .filter(doc -> doc.getIdTypeDocument() == LIBERATION_LETTER_TYPE_ID)
-            .anyMatch(Expedient::isValidated);
-
-        isFinished = autoevaluationValidated && ovEvaluationValidated && liberationLetterValidated;
-        return isFinished;
-    }
-
-    private void promptAndRegisterGrade(String studentId) {
-        try {
-            boolean alreadyExists = practiceDAO.existsByStudent(studentId);
-
-            if (!alreadyExists) {
-                textFieldGrade.setDisable(false);
-                buttonAcceptGrade.setDisable(false);
-            }
-        } catch (OperationException e) {
-            LOGGER.log(Level.SEVERE, "Error al verificar calificación existente", e);
-            showError(e.getMessage());
-        }
-    }
-
-    @FXML
-    private void addPractice() {
-        Optional<String> firstError = validateMaxIntValue(textFieldGrade.getText(), MAX_CALIFICATION, 
-            "La calificacion ");
-            if(firstError.isPresent()) {
-               showError(firstError.get());
-            } else {
-                processGradeInput(textFieldGrade.getText(), labelStudentId.getText());
-            }
-    }
-
-    private void processGradeInput(String input, String studentId) {
-        if (input != null) {
-            Optional<String> validationError = InputValidator.validateGrade(input.trim(), "La calificación");
-
-            if (validationError.isPresent()) {
-                showError(validationError.get());
-            } else {
-                saveGrade(studentId, Integer.parseInt(input.trim()));
-            }
-        }   
-    }
-
-    private void saveGrade(String studentId, int grade) {
-        try {
-            Practice practice = new Practice();
-            practice.setIdStudent(studentId);
-            practice.setCalification(grade);
-
-            boolean isRegistered = practiceDAO.registerPractice(practice);
-
-            if (isRegistered) {
-                showSuccess(GRADE_REGISTER_SUCCESS);
-                LOGGER.log(Level.INFO, "Calificación {0} registrada para el alumno {1}",
-                    new Object[] { grade, studentId });
-            } else {
-                showError(GRADE_REGISTER_FAILURE);
-            }
-        } catch (OperationException e) {
-            LOGGER.log(Level.SEVERE, "Error al registrar la calificación", e);
-            showError(e.getMessage());
-        }
+        labelTotal.setText("");
+        tableViewArchives.getItems().clear();
     }
 }
