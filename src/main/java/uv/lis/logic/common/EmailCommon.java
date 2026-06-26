@@ -26,29 +26,27 @@ import uv.lis.logic.utils.PasswordHasher;
  * hash and expiration time are kept in a {@link VerificationChallenge}.
  */
 public class EmailCommon {
-    private static final Logger LOGGER = Logger.getLogger(EmailCommon.class.getName());
 
+    private static final Logger LOGGER = Logger.getLogger(EmailCommon.class.getName());
     private static final int MIN_CODE_VALUE = 100000;
     private static final int MAX_CODE_VALUE = 1000000;
     private static final int CODE_EXPIRATION_MINUTES = 10;
-
     private static final String PROPERTIES_FILE = "emailConfig/email.properties";
     private static final String KEY_HOST = "mail.host";
     private static final String KEY_PORT = "mail.port";
     private static final String KEY_USER = "mail.user";
     private static final String KEY_PASSWORD = "mail.password";
-
     private static final String SMTP_AUTH_PROPERTY = "mail.smtp.auth";
     private static final String SMTP_STARTTLS_PROPERTY = "mail.smtp.starttls.enable";
     private static final String SMTP_HOST_PROPERTY = "mail.smtp.host";
     private static final String SMTP_PORT_PROPERTY = "mail.smtp.port";
     private static final String SMTP_ENABLED_VALUE = "true";
-
     private static final String CHARSET_UTF8 = "UTF-8";
     private static final String EMAIL_SUBJECT = "Código de verificación";
     private static final String EMAIL_BODY_TEMPLATE = "Su código de verificación es: {0}. Vigencia de {1} minutos.";
 
     private final SecureRandom secureRandom = new SecureRandom();
+    
     private Properties properties = new Properties();
 
     /**
