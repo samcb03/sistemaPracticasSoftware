@@ -407,10 +407,10 @@ public final class InputValidator {
     public static Optional<String> validateMaxIntValue(String integerValue, int maxInt, String fieldName) {
         Optional<String> validationResult = validateNotEmpty(integerValue, fieldName);
         if (validationResult.isEmpty()) {
-            if (!integerValue.matches(INTEGER_REGEX)) {
-                validationResult = Optional.of(fieldName + " debe ser un número entero válido");
-            } else if (exceedsMaximum(integerValue, maxInt)) {
+            if (exceedsMaximum(integerValue, maxInt)) {
                 validationResult = Optional.of(fieldName + " no puede tener un valor mayor a " + maxInt);
+            } else if (!integerValue.matches(INTEGER_REGEX)) {
+                validationResult = Optional.of(fieldName + " debe ser un número entero válido");
             }
         }
         return validationResult;
@@ -617,10 +617,6 @@ public final class InputValidator {
     public static Optional<String> validateGrade(String gradeValue, String fieldName) {
         Optional<String> validationResult = validateNotEmpty(gradeValue, fieldName);
 
-        if (validationResult.isEmpty() && !gradeValue.matches(INTEGER_REGEX)) {
-            validationResult = Optional.of(fieldName + " debe ser un número entero válido");
-        }
-
         if (validationResult.isEmpty()) {
             BigInteger value = new BigInteger(gradeValue);
 
@@ -632,7 +628,6 @@ public final class InputValidator {
                 validationResult = Optional.empty();
             }
         }
-
         return validationResult;
     }
 }
