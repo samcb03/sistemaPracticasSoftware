@@ -204,7 +204,7 @@ public class SubjectDAO implements ISubjectDAO {
     @Override
     public ArrayList<Student> getEnrolledStudentsBySubject(int nrc) throws OperationException {
         ArrayList<Student> enrolledStudents = new ArrayList<>();
-        String subjectQuery = "SELECT a.matricula, u.nombre, u.apellidos "
+        String subjectQuery = "SELECT a.matricula, u.nombre, u.apellidos, a.fechaNacimiento, a.genero "
                             + "FROM Alumno a "
                             + "INNER JOIN Usuario u ON a.idUsuario = u.idUsuario "
                             + "INNER JOIN alumno_esta_ee aee ON a.matricula = aee.matricula "
@@ -222,6 +222,8 @@ public class SubjectDAO implements ISubjectDAO {
                     student.setIdStudent(resultSet.getString("matricula"));
                     student.setFirstName(resultSet.getString("nombre"));
                     student.setLastName(resultSet.getString("apellidos"));
+                    student.setBirthDate(resultSet.getDate("fechaNacimiento"));
+                    student.setGender(resultSet.getString("genero"));
                     enrolledStudents.add(student);
                 }
             }

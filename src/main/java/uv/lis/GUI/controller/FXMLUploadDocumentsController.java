@@ -45,7 +45,6 @@ public class FXMLUploadDocumentsController extends ValidationHandler {
     private static final int MONTHLY_REPORT_TYPE = 3;
     private static final int ACTIVITY_CRONOGRAM_ID = 11;
     private static final int ORGANIZATION_EVALUATION = 12;
-    private static final String NO_STUDENT_MESSAGE = "No hay alumno en sesión.";
     private static final String NO_TYPE_MESSAGE = "Seleccione un tipo de documento.";
     private static final String NO_FILE_MESSAGE = "No se seleccionó ningún archivo.";
     private static final String SUCCESS_MESSAGE = "Documento subido exitosamente.";
@@ -103,7 +102,7 @@ public class FXMLUploadDocumentsController extends ValidationHandler {
     @FXML
     public void uploadDocument() {
         if (student == null) {
-            showError(NO_STUDENT_MESSAGE);
+            showError(SessionManager.NO_STUDENT_IN_SESSION_MESSAGE);
         } else {
             String selectedDocument = comboBoxDocuments.getSelectionModel().getSelectedItem();
             if (selectedDocument == null) {

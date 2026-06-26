@@ -34,7 +34,6 @@ public class AutoevaluationCommon {
 
     private static final Logger LOGGER = Logger.getLogger(AutoevaluationCommon.class.getName());
     private static final String TEMPLATE_PATH = "/uv/lis/GUI/view/templates/Autoevaluation.jasper";
-    private static final String NO_STUDENT_IN_SESSION_MESSAGE = "No hay un estudiante en sesión";
     private static final String TEMPLATE_NOT_FOUND_MESSAGE = "No se encontró la plantilla del reporte.";
     private static final String TEMPLATE_READ_ERROR_MESSAGE = "Error al cargar la plantilla del reporte.";
     private static final String INVALID_RANGE_MESSAGE = "Las respuestas deben estar entre 1 y 5.";
@@ -70,7 +69,7 @@ public class AutoevaluationCommon {
         Student currentStudent = SessionManager.getInstance().getCurrentStudent();
 
         if (currentStudent == null) {
-            throw new OperationException(NO_STUDENT_IN_SESSION_MESSAGE, null);
+            throw new OperationException(SessionManager.NO_STUDENT_IN_SESSION_MESSAGE, null);
         }
 
         mergeContextIntoEvaluation(autoevaluation, currentStudent.getIdStudent());
@@ -89,7 +88,7 @@ public class AutoevaluationCommon {
 
     }
 
-    /**
+        /**
      * Loads the autoevaluation template from the classpath and fills it with
      * the data from the given autoevaluation.
      *
@@ -116,7 +115,7 @@ public class AutoevaluationCommon {
             LOGGER.log(Level.SEVERE, "Error al leer la plantilla de la autoevaluación", ioException);
             throw new OperationException(TEMPLATE_READ_ERROR_MESSAGE, ioException);
         }
-
+        
         return jasperPrint;
     }
 

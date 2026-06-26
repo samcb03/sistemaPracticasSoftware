@@ -13,9 +13,9 @@ import uv.lis.logic.dto.Student;
  * Only one session exists at a time, shared across the entire application.
  */
 public class SessionManager {
+    public static final String NO_STUDENT_IN_SESSION_MESSAGE = "No hay un estudiante en sesión";
 
     private static final SessionManager INSTANCE = new SessionManager();
-
     private Student currentStudent;
     private Professor currentProfessor;
 

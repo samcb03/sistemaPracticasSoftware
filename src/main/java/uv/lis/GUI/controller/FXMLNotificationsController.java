@@ -20,7 +20,6 @@ import uv.lis.logic.utils.SessionManager;
 
 public class FXMLNotificationsController extends ValidationHandler {
 
-    private static final String NO_STUDENT_IN_SESSION_MESSAGE = "No hay un estudiante en sesión";
     private static final String NO_NOTIFICATIONS_MESSAGE = "No tienes notificaciones por el momento";
 
     @FXML private ListView<Notification> listViewNotifications;
@@ -47,7 +46,7 @@ public class FXMLNotificationsController extends ValidationHandler {
 
     private void checkStudentAndLoad() {
         if (student == null) {
-            showError(NO_STUDENT_IN_SESSION_MESSAGE);
+            showError(SessionManager.NO_STUDENT_IN_SESSION_MESSAGE);
         } else {
             loadNotifications();
         }

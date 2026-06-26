@@ -37,7 +37,6 @@ public class MonthlyReportCommon {
     private static final String TEMPLATE_PATH = "/uv/lis/GUI/view/templates/MonthlyReport.jasper";
     private static final String TEMPLATE_NOT_FOUND_MESSAGE = "No se encontró la plantilla del reporte mensual.";
     private static final String TEMPLATE_READ_ERROR_MESSAGE = "Error al cargar la plantilla del reporte mensual.";
-    private static final String NO_STUDENT_IN_SESSION_MESSAGE = "No hay un estudiante en sesión";
     private static final int MAX_ACTIVITIES = 7;
     private static final int YEAR_DIGITS = 4;
     private static final int FIRST_INDEX = 0;
@@ -68,7 +67,7 @@ public class MonthlyReportCommon {
         Student currentStudent = SessionManager.getInstance().getCurrentStudent();
 
         if (currentStudent == null) {
-            throw new OperationException(NO_STUDENT_IN_SESSION_MESSAGE, null);
+            throw new OperationException(SessionManager.NO_STUDENT_IN_SESSION_MESSAGE, null);
         }
 
         mergeContextIntoMonthlyReport(monthlyReport, currentStudent.getIdStudent());
