@@ -133,11 +133,13 @@ public class FXMLGenerateAutoevaluationController extends ValidationHandler {
 
     private ToggleGroup createGroup(RadioButton... parameters) {
         ToggleGroup group = new ToggleGroup(); 
-        int value = 1;                        
+        int value = 1;    
+
         for (RadioButton radioButton : parameters) {
             radioButton.setToggleGroup(group);
             radioButton.setUserData(value++); 
         }
+
         return group;
     }
 
@@ -155,6 +157,7 @@ public class FXMLGenerateAutoevaluationController extends ValidationHandler {
                     buttonGenerate.setDisable(true);
 
                 }
+                
                 Autoevaluation contextData = autoevaluationDAO.getAutoevaluationData(currentStudent.getIdStudent());
 
                 labelOrganization.setText(contextData.getOrganizationName());

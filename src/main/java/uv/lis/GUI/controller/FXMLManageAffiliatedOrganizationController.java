@@ -35,13 +35,12 @@ import uv.lis.logic.exceptions.OperationException;
 public class FXMLManageAffiliatedOrganizationController extends ValidationHandler {
 
     private static final Logger LOGGER = Logger.getLogger(FXMLManageAffiliatedOrganizationController.class.getName());
-
     private static final String LABEL_INACTIVE = "Inactivo";
     private static final String LABEL_ACTIVE   = "Activo";
+    private static final String CONSULT_PROJECT_VIEW = "/uv/lis/GUI/view/FXMLShowProjectDetail.fxml";
     private static final int POSTAL_CODE = 5;
     private static final int DOUBLE_CLICK_COUNT = 2;
     private static final int NO_SELECTION = -1;
-    private static final String CONSULT_PROJECT_VIEW = "/uv/lis/GUI/view/FXMLShowProjectDetail.fxml";
 
     @FXML private Button buttonBack;
     @FXML private Button buttonSearch;
@@ -83,10 +82,9 @@ public class FXMLManageAffiliatedOrganizationController extends ValidationHandle
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
+        setupControls(labelMessage, buttonBack);
         affiliatedOrganizationDAO = new AffiliatedOrganizationDAO();
         contextMenuSuggestions = new ContextMenu();
-
-        setupControls(labelMessage, buttonBack);
         gridPaneOrganizationInfo.setVisible(false);
         buttonInactive.setDisable(true);
         buttonUpdate.setDisable(true);
@@ -169,11 +167,9 @@ public class FXMLManageAffiliatedOrganizationController extends ValidationHandle
         boolean isInactive = affiliatedOrganizationDAO.isOrganizationInactive(organizationName);
         labelStatus.setText(isInactive ? LABEL_INACTIVE : LABEL_ACTIVE);
         buttonInactive.setDisable(isInactive);
-
         ArrayList<String> projects = affiliatedOrganizationDAO.getProjectsByOrganization(currentOrganization.getName());
         ObservableList<String> items = FXCollections.observableArrayList(projects);
         listViewProjects.setItems(items);
-
         currentProjects = affiliatedOrganizationDAO.getCompleteProjectsByOrganization(currentOrganization.getName());
     }
 
@@ -211,6 +207,7 @@ public class FXMLManageAffiliatedOrganizationController extends ValidationHandle
     @FXML
     private void saveOrganization() {
         Optional<String> validationError = validateInputs();
+
         if (validationError.isPresent()) {
             showError(validationError.get());
         } else {
@@ -277,6 +274,7 @@ public class FXMLManageAffiliatedOrganizationController extends ValidationHandle
         String organizationName = labelName.getText().trim();
         Optional<String> validateError = validateText(organizationName, 
             "El nombre de la Organizacion Vinculada");
+
             if (validateError.isPresent()) {
                 showError(validateError.get());
             } else {
@@ -286,6 +284,7 @@ public class FXMLManageAffiliatedOrganizationController extends ValidationHandle
 
     private void executeInactivationCheck(String organizationName) {
         try {
+
             if (affiliatedOrganizationDAO.isOrganizationInactive(organizationName)) {
                 showError("La organización ya se encuentra inactiva");
             } else {
@@ -318,7 +317,6 @@ public class FXMLManageAffiliatedOrganizationController extends ValidationHandle
         buttonInactive.setDisable(true);
         buttonUpdate.setDisable(true);
     }
-
 
     private void setupAutocomplete() {
         textFieldOrganizationName.textProperty().addListener(
@@ -397,7 +395,6 @@ public class FXMLManageAffiliatedOrganizationController extends ValidationHandle
         setNodeVisibility(labelPhoneNumber,!isEditing);
         setNodeVisibility(labelNumberOfDirectUsers, !isEditing);
         setNodeVisibility(labelNumberOfIndirectUsers, !isEditing);
-
         setNodeVisibility(textFieldName, isEditing);
         setNodeVisibility(textFieldCity, isEditing);
         setNodeVisibility(textFieldState, isEditing);
@@ -409,7 +406,6 @@ public class FXMLManageAffiliatedOrganizationController extends ValidationHandle
         setNodeVisibility(textFieldPhoneNumber, isEditing);
         setNodeVisibility(textFieldNumberOfDirectUsers, isEditing);
         setNodeVisibility(textFieldNumberOfIndirectUsers, isEditing);
-
         setNodeVisibility(buttonUpdate, !isEditing);
         setNodeVisibility(buttonSave, isEditing);
     }

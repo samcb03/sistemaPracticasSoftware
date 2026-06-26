@@ -28,7 +28,6 @@ import uv.lis.logic.dao.ActivityDAO;
 import uv.lis.logic.dao.ExpedientDAO;
 import uv.lis.logic.dao.PracticeDAO;
 import uv.lis.logic.dao.ProjectDAO;
-import uv.lis.logic.dao.ReportContextDAO;
 import uv.lis.logic.dto.Activity;
 import uv.lis.logic.dto.Expedient;
 import uv.lis.logic.dto.ProjectSummary;
@@ -69,13 +68,13 @@ public class FXMLFinishWindowController extends ValidationHandler {
     @FXML private Label labelAccumulatedHours;
     @FXML private Label labelGrade;
     @FXML private Label labelMessage;
+    @FXML private Label labelCompletedHours;
     @FXML private Button buttonBack;
     @FXML private TableView<Expedient> tableDocuments;
+    @FXML private TableView<Activity> tableViewActivityDetails;
     @FXML private TableColumn<Expedient, String> columnName;
     @FXML private TableColumn<Expedient, String> columnType;
     @FXML private TableColumn<Expedient, Void> columnAction;
-    @FXML private Label labelCompletedHours;
-    @FXML private TableView<Activity> tableViewActivityDetails;
     @FXML private TableColumn<Activity, String> tableColumnActivityName;
     @FXML private TableColumn<Activity, String> tableColumnActivityDescription;
     @FXML private TableColumn<Activity, LocalDate> tableColumnActivityStartDate;
@@ -83,7 +82,6 @@ public class FXMLFinishWindowController extends ValidationHandler {
 
     private ProjectDAO projectDAO = new ProjectDAO();
     private PracticeDAO practiceDAO = new PracticeDAO();
-    private ReportContextDAO reportContextDAO = new ReportContextDAO();
     private ExpedientDAO expedientDAO = new ExpedientDAO();
     private ActivityDAO activityDAO = new ActivityDAO();
 

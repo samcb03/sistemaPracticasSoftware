@@ -40,7 +40,7 @@ import uv.lis.logic.utils.SessionManager;
 public class FXMLManageStudentController extends ValidationHandler {
 
     private static final Logger LOGGER = Logger.getLogger(FXMLManageStudentController.class.getName());
-
+    private static final String CONSULT_STUDENT_EXPEDIENT = "/uv/lis/GUI/view/FXMLConsultStudentExpedient.fxml";
     private static final String LABEL_INACTIVE = "Inactivo";
     private static final String LABEL_ACTIVE = "Activo";
     private static final String GENDER_MALE = "Hombre";
@@ -106,24 +106,6 @@ public class FXMLManageStudentController extends ValidationHandler {
         // No fields to clear in this detail view
     }
 
-    private void displayStudentInformation(Student student) {
-        labelStudentId.setText(student.getIdStudent());
-        labelFirstName.setText(student.getFirstName());
-        labelLastName.setText(student.getLastName());
-        labelDateBirth.setText(student.getBirthDate().toString());
-        labelGender.setText(student.getGender());
-    }
-
-    private void loadStudentAcademicInformation(String studentId) throws OperationException {
-        labelSubject.setText(subjectDAO.getSubjectNrcByStudentID(studentId));
-        labelProject.setText(requestProjectDAO.getProjectAssignedToStudent(studentId));
-        labelIsInactive.setText(studentDAO.isStudentInactive(studentId) ? LABEL_INACTIVE : LABEL_ACTIVE);
-
-        List<Activity> activities = activityDAO.getActivitiesByStudentId(studentId);
-        tableViewActivityDetails.setItems(FXCollections.observableArrayList(activities));
-        labelCompletedHours.setText(resolveCompletedHours(activities));
-    }
-
     @FXML
     private void enableEditMode() {
         if (currentStudent == null) {
@@ -167,6 +149,37 @@ public class FXMLManageStudentController extends ValidationHandler {
             LOGGER.log(Level.SEVERE, "Error al inactivar al alumno", e);
             showError(e.getMessage());
         }
+    }
+
+    @FXML
+    private void goToStudentExpedient() {
+        if (currentStudent == null) {
+            showError("No hay alumno cargado");
+        } else {
+            FXMLLoader loader = navigateToWithLoader(CONSULT_STUDENT_EXPEDIENT);
+
+            if (loader != null) {
+                FXMLConsultStudentExpedientController controller = loader.getController();
+                controller.loadStudentArchives(currentStudent.getIdStudent());
+            }
+        }
+    }
+
+    private void displayStudentInformation(Student student) {
+        labelStudentId.setText(student.getIdStudent());
+        labelFirstName.setText(student.getFirstName());
+        labelLastName.setText(student.getLastName());
+        labelDateBirth.setText(student.getBirthDate().toString());
+        labelGender.setText(student.getGender());
+    }
+
+    private void loadStudentAcademicInformation(String studentId) throws OperationException {
+        labelSubject.setText(subjectDAO.getSubjectNrcByStudentID(studentId));
+        labelProject.setText(requestProjectDAO.getProjectAssignedToStudent(studentId));
+        labelIsInactive.setText(studentDAO.isStudentInactive(studentId) ? LABEL_INACTIVE : LABEL_ACTIVE);
+        List<Activity> activities = activityDAO.getActivitiesByStudentId(studentId);
+        tableViewActivityDetails.setItems(FXCollections.observableArrayList(activities));
+        labelCompletedHours.setText(resolveCompletedHours(activities));
     }
 
     private void loadCurrentDataIntoEditors() {
@@ -216,20 +229,17 @@ public class FXMLManageStudentController extends ValidationHandler {
         setNodeVisibility(labelLastName, !isEditing);
         setNodeVisibility(labelDateBirth, !isEditing);
         setNodeVisibility(labelGender, !isEditing);
-
         setNodeVisibility(textFieldName, isEditing);
         setNodeVisibility(textFieldLastName, isEditing);
         setNodeVisibility(datePickerBirthDate, isEditing);
         setNodeVisibility(comboBoxGender, isEditing);
-
         setNodeVisibility(buttonUpdate, !isEditing);
         setNodeVisibility(buttonSave, isEditing);
     }
 
     private void confirmAndInactivate(String studentId) throws OperationException {
-        boolean confirmed = showConfirmation(
-            "Confirmar inactivación",
-            "¿Está seguro que desea inactivar al estudiante?"
+        boolean confirmed = showConfirmation("Confirmar inactivación",
+    "¿Está seguro que desea inactivar al estudiante?"
         );
 
         if (!confirmed) {
@@ -282,24 +292,12 @@ public class FXMLManageStudentController extends ValidationHandler {
 
     private String resolveCompletedHours(List<Activity> activities) throws OperationException {
         String completedHours = "";
+
         if (activities.isEmpty()) {
             completedHours = DEFAULT_HOURS;
         }
         completedHours = reportContextDAO.getTotalReportedHoursByStudentId(currentStudent.getIdStudent());
+
         return completedHours;
-    }
-
-    @FXML
-    private void goToStudentExpedient() {
-        if (currentStudent == null) {
-            showError("No hay alumno cargado");
-        } else {
-            FXMLLoader loader = navigateToWithLoader("/uv/lis/GUI/view/FXMLConsultStudentExpedient.fxml");
-
-            if (loader != null) {
-                FXMLConsultStudentExpedientController controller = loader.getController();
-                controller.loadStudentArchives(currentStudent.getIdStudent());
-            }
-        }
     }
 }

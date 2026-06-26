@@ -10,6 +10,12 @@ import uv.lis.GUI.WindowHandler;
 
 public class FXMLCoordinatorMenuController extends WindowHandler{
 
+    private static final String STUDENT_MANAGEMENT_VIEW = "/uv/lis/GUI/view/FXMLStudentManagement.fxml";
+    private static final String PROJECT_MANAGEMENT_VIEW = "/uv/lis/GUI/view/FXMLProjectManagement.fxml";
+    private static final String SUPERVISOR_MANAGEMENT_VIEW = "/uv/lis/GUI/view/FXMLSupervisorManagement.fxml";
+    private static final String ORGANIZATION_MANAGEMENT_VIEW = "/uv/lis/GUI/view/FXMLOrganizationManagement.fxml";
+    private static final String SUBJECT_MANAGEMENT_VIEW = "/uv/lis/GUI/view/FXMLSubjectManagement.fxml";
+
     @FXML private Button buttonStudentManagement;
     @FXML private Button buttonProjectManagement;
     @FXML private Button buttonSupervisorManagement;
@@ -24,26 +30,26 @@ public class FXMLCoordinatorMenuController extends WindowHandler{
 
     @FXML 
     public void goToStudentManagement() {
-        navigateTo("/uv/lis/GUI/view/FXMLStudentManagement.fxml");
+        navigateTo(STUDENT_MANAGEMENT_VIEW);
     }
 
     @FXML 
     public void goToProjectManagement() {
-        navigateTo("/uv/lis/GUI/view/FXMLProjectManagement.fxml");
+        navigateTo(PROJECT_MANAGEMENT_VIEW);
     }
 
     @FXML 
     public void goToSupervisorManagement() {
-        navigateTo("/uv/lis/GUI/view/FXMLSupervisorManagement.fxml");
+        navigateTo(SUPERVISOR_MANAGEMENT_VIEW);
     }
 
     @FXML 
     public void goToOrganizationManagement() {
-        navigateTo("/uv/lis/GUI/view/FXMLOrganizationManagement.fxml");
+        navigateTo(ORGANIZATION_MANAGEMENT_VIEW);
     }
 
     @FXML 
     public void goToSubjectManagement() {
-        navigateTo("/uv/lis/GUI/view/FXMLSubjectManagement.fxml");
+        navigateTo(SUBJECT_MANAGEMENT_VIEW);
     }
 }

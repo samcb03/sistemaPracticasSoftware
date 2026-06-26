@@ -79,9 +79,9 @@ public class FXMLConsultSubjectController extends WindowHandler {
         comboBoxDocumentFilter.getItems().addAll(FILTER_ALL, FILTER_INITIAL_DOCUMENTS,
             FILTER_MONTHLY_REPORT, FILTER_PARTIAL_REPORT, FILTER_FINAL_REPORT);
 
-            if(SessionManager.getInstance().getCurrentCoordinator().isPresent()) {
-                comboBoxDocumentFilter.getItems().add(FILTER_LIBERATION_LETTER);
-            }
+        if (SessionManager.getInstance().getCurrentCoordinator().isPresent()) {
+            comboBoxDocumentFilter.getItems().add(FILTER_LIBERATION_LETTER);
+        }
 
         comboBoxDocumentFilter.setValue(FILTER_ALL);
         comboBoxDocumentFilter.getSelectionModel().selectedItemProperty().addListener(

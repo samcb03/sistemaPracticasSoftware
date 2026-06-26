@@ -52,6 +52,16 @@ public class FXMLConsultStudentController extends WindowHandler {
         loadStudents();
     }
 
+    @FXML
+    private void handleStudentRowClicked(MouseEvent mouseEvent) {
+        boolean isDoubleClick = mouseEvent.getClickCount() == DOUBLE_CLICK_COUNT;
+        Student selectedStudent = tableViewStudents.getSelectionModel().getSelectedItem();
+
+        if (isDoubleClick && selectedStudent != null) {
+            navigateToShowStudentDetailView(selectedStudent);
+        }
+    }
+
     private void configureTableColumns() {
         tableColumnIdStudent.setCellValueFactory(new PropertyValueFactory<>("idStudent"));
         tableColumnName.setCellValueFactory(cellData -> resolveFullName(cellData.getValue()));
@@ -84,16 +94,6 @@ public class FXMLConsultStudentController extends WindowHandler {
 
     private void configureRowDoubleClick() {
         tableViewStudents.setOnMouseClicked(this::handleStudentRowClicked);
-    }
-
-    @FXML
-    private void handleStudentRowClicked(MouseEvent mouseEvent) {
-        boolean isDoubleClick = mouseEvent.getClickCount() == DOUBLE_CLICK_COUNT;
-        Student selectedStudent = tableViewStudents.getSelectionModel().getSelectedItem();
-
-        if (isDoubleClick && selectedStudent != null) {
-            navigateToShowStudentDetailView(selectedStudent);
-        }
     }
 
     private void navigateToShowStudentDetailView(Student student) {

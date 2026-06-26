@@ -39,6 +39,7 @@ import uv.lis.logic.utils.SessionManager;
 
 public class FXMLLoginController implements Initializable {
 
+    private static final Logger LOGGER = Logger.getLogger(FXMLLoginController.class.getName());
     private static final int USER_TYPE_STUDENT = 1;
     private static final int USER_TYPE_PROFESSOR = 2;
     private static final int USER_TYPE_COORDINATOR = 3;
@@ -49,10 +50,15 @@ public class FXMLLoginController implements Initializable {
     private static final String MESSAGE_TOO_MANY_ATTEMPTS =  "Demasiados intentos fallidos. Reinicie la aplicación.";
     private static final String MESSAGE_USER_DATA_NOT_FOUND = "No se encontraron los datos.";
     private static final String VERIFY_VIEW_FXML = "/uv/lis/GUI/view/FXMLVerifyCode.fxml";
-
-    private static final Logger LOGGER = Logger.getLogger(FXMLLoginController.class.getName());
-
-    private int failedAttempts = 0;
+    private static final String EYE_OPEN_IMAGE = "/uv/lis/GUI/view/images/show-password-icon-eye-symbol" 
+        + "-vision-hide-from-watch-icon-secret-view-web-design-element-vector2.png";
+    private static final String EYE_CLOSED_IMAGE = "/uv/lis/GUI/view/images/show-password-icon-eye-symbol" 
+        + "-vision-hide-from-watch-icon-secret-view-web-design-element-vector1.png";
+    private static final String STUDENT_MENU_VIEW = "/uv/lis/GUI/view/FXMLStudentMenu.fxml";
+    private static final String PROFESSOR_MENU_VIEW = "/uv/lis/GUI/view/FXMLProfessorMenu.fxml";
+    private static final String COORDINATOR_MENU_VIEW = "/uv/lis/GUI/view/FXMLCoordinatorMenu.fxml";
+    private static final String ADMINISTRATOR_MENU_VIEW = "/uv/lis/GUI/view/FXMLAdministratorMenu.fxml";
+    
     
     @FXML private TextField textFieldEmail;
     @FXML private PasswordField passwordFieldPassword;
@@ -67,9 +73,9 @@ public class FXMLLoginController implements Initializable {
     private User user;
     private EmailCommon emailCommon;
     private FXMLVerifyCodeController verifyController;
-
     private Image eyeOpen;
     private Image eyeClosed;
+    private int failedAttempts = 0;
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
@@ -78,11 +84,8 @@ public class FXMLLoginController implements Initializable {
         this.professorDAO = new ProfessorDAO();
         this.emailCommon = new EmailCommon();
         textFieldPasswordVisible.textProperty().bindBidirectional(passwordFieldPassword.textProperty());
-        eyeOpen = new Image(getClass().getResourceAsStream("/uv/lis/GUI/view/images/show-password-icon-eye-symbol" 
-            + "-vision-hide-from-watch-icon-secret-view-web-design-element-vector2.png"));
-        eyeClosed = new Image(getClass().getResourceAsStream("/uv/lis/GUI/view/images/show-password-icon-eye-symbol" 
-            + "-vision-hide-from-watch-icon-secret-view-web-design-element-vector1.png"));
-
+        eyeOpen = new Image(getClass().getResourceAsStream(EYE_OPEN_IMAGE));
+        eyeClosed = new Image(getClass().getResourceAsStream(EYE_CLOSED_IMAGE));
         toggleButtonShowPassword.setGraphic(createIcon(eyeClosed));
     }
 
@@ -92,6 +95,7 @@ public class FXMLLoginController implements Initializable {
         String password = passwordFieldPassword.getText();
 
         if (validateInputs(email, password)) {
+
             try {
                 Optional<User> optionalUser = userDAO.authenticate(email, password);
 
@@ -132,6 +136,7 @@ public class FXMLLoginController implements Initializable {
     
     private void registerFailedAttempt() {
         failedAttempts++;
+
         if (failedAttempts >= MAX_ATTEMPTS) {
             blockLogin();
         } else {
@@ -155,6 +160,7 @@ public class FXMLLoginController implements Initializable {
 
    private boolean completeLogin(User user) {
         boolean loaded = loadSessionByRole(user);
+
         if (loaded) {
             navigateToMenus(user.getRoleId());
         }
@@ -175,10 +181,8 @@ public class FXMLLoginController implements Initializable {
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource(VERIFY_VIEW_FXML));
             Parent root = loader.load();
-
             verifyController = loader.getController();
             verifyController.initializeData(user, challenge);
-
             Stage verifyStage = new Stage();
             verifyStage.setScene(new Scene(root));
             verifyStage.initModality(Modality.APPLICATION_MODAL);
@@ -200,9 +204,7 @@ public class FXMLLoginController implements Initializable {
         boolean isEmpty = false;
         Optional<String> emailError = InputValidator.validateEmail(email, "El correo electrónico");
         Optional<String> passwordError = InputValidator.validatePassword(password, "La contraseña");
-
         Optional<String> validationError = emailError.or(() -> passwordError);
-
         validationError.ifPresent(this::showError);
         isEmpty = validationError.isEmpty();
         return isEmpty;
@@ -212,6 +214,7 @@ public class FXMLLoginController implements Initializable {
         boolean isLoaded = false;
         int roleId = user.getRoleId();
         int userId = user.getId();
+
         try {
             switch (roleId) {
                 case USER_TYPE_STUDENT:
@@ -241,36 +244,42 @@ public class FXMLLoginController implements Initializable {
     private boolean loadStudentSession(int userId) throws OperationException {
         boolean isLoaded = false;
         Optional<Student> validateStudent = studentDAO.getStudentById(userId);
+
         if (validateStudent.isPresent()) {
             SessionManager.getInstance().setCurrentStudent(validateStudent.get());
             isLoaded = true;
         } else {
             showError(MESSAGE_USER_DATA_NOT_FOUND);
         }
+
         return isLoaded;
     }
 
     private boolean loadProfessorSession(int userId) throws OperationException {
         boolean isLoaded = false;
         Optional<Professor> validateProfessor = professorDAO.getProfessorById(userId);
+
         if (validateProfessor.isPresent()) {
             SessionManager.getInstance().setCurrentProfessor(validateProfessor.get());
             isLoaded = true;
         } else {
             showError(MESSAGE_USER_DATA_NOT_FOUND);
         }
+
         return isLoaded;
     }
 
     private boolean loadCoordinatorSession(int userId) throws OperationException {
         boolean isLoaded = false;
         Optional<Professor> validateCoordinator = professorDAO.getProfessorById(userId);
+
         if (validateCoordinator.isPresent()) {
             SessionManager.getInstance().setCurrentCoordinator(validateCoordinator.get());
             isLoaded = true;
         } else {
             showError(MESSAGE_USER_DATA_NOT_FOUND);
         }
+
         return isLoaded;
     }
 
@@ -284,16 +293,16 @@ public class FXMLLoginController implements Initializable {
 
         switch (userRoleId) {
             case USER_TYPE_STUDENT:
-                fxml = "/uv/lis/GUI/view/FXMLStudentMenu.fxml";
+                fxml = STUDENT_MENU_VIEW;
                 break;
             case USER_TYPE_PROFESSOR:
-                fxml = "/uv/lis/GUI/view/FXMLProfessorMenu.fxml";
+                fxml = PROFESSOR_MENU_VIEW;
                 break;
             case USER_TYPE_COORDINATOR:
-                fxml = "/uv/lis/GUI/view/FXMLCoordinatorMenu.fxml";
+                fxml = COORDINATOR_MENU_VIEW;
                 break;
             case USER_TYPE_ADMINISTRATOR:
-                fxml = "/uv/lis/GUI/view/FXMLAdministratorMenu.fxml";
+                fxml = ADMINISTRATOR_MENU_VIEW;
                 break;
             default:
                 showError("Usuario no reconocido");
@@ -301,6 +310,7 @@ public class FXMLLoginController implements Initializable {
         }
 
         if (fxml != null) {
+            
             try {
                 FXMLLoader loader = new FXMLLoader(getClass().getResource(fxml));
                 Parent root = loader.load();

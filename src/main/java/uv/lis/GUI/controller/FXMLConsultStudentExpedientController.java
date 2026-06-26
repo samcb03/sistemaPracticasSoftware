@@ -133,6 +133,22 @@ public class FXMLConsultStudentExpedientController extends ValidationHandler {
         tableViewArchives.getItems().clear();
     }
 
+   @FXML
+    private void addPractice() {
+        if (canReviewAndGrade) {
+            showError(GRADE_FORBIDDEN_MESSAGE);
+        } else {
+            String gradeInput = textFieldGrade.getText().trim();
+            Optional<String> validationError = validateGrade(gradeInput, GRADE_FIELD_NAME);
+
+            if (validationError.isPresent()) {
+                showError(validationError.get());
+            } else {
+                saveGrade(labelStudentId.getText(), Integer.parseInt(gradeInput));
+            }
+        }
+    }
+
     private void resolveReviewAndGradePermissions(String studentId) {
         Professor currentProfessor = SessionManager.getInstance().getCurrentProfessor();
 
@@ -166,22 +182,6 @@ public class FXMLConsultStudentExpedientController extends ValidationHandler {
         textFieldGrade.setManaged(canReviewAndGrade);
         buttonAcceptGrade.setVisible(canReviewAndGrade);
         buttonAcceptGrade.setManaged(canReviewAndGrade);
-    }
-
-    @FXML
-    private void addPractice() {
-        if (canReviewAndGrade) {
-            showError(GRADE_FORBIDDEN_MESSAGE);
-        } else {
-            String gradeInput = textFieldGrade.getText().trim();
-            Optional<String> validationError = validateGrade(gradeInput, GRADE_FIELD_NAME);
-
-            if (validationError.isPresent()) {
-                showError(validationError.get());
-            } else {
-                saveGrade(labelStudentId.getText(), Integer.parseInt(gradeInput));
-            }
-        }
     }
 
     private void configureFilterComboBox() {
