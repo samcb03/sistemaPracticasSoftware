@@ -7,7 +7,6 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import java.awt.EventQueue;
 import java.io.IOException;
 import java.lang.reflect.Field;
 import java.util.List;
@@ -30,7 +29,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.testfx.framework.junit5.ApplicationTest;
 import org.testfx.util.WaitForAsyncUtils;
-import java.util.Arrays;
 
 import uv.lis.GUI.controller.FXMLGenerateFinalReportController;
 import uv.lis.logic.common.FinalReportCommon;
@@ -127,9 +125,7 @@ public class FXMLGenerateFinalReportControllerTest extends ApplicationTest {
             .forEach(Window::hide));
         WaitForAsyncUtils.waitForFxEvents();
 
-        EventQueue.invokeLater(() ->
-            Arrays.stream(java.awt.Window.getWindows()).forEach(java.awt.Window::dispose));
-
+        JasperViewerTestCleaner.disposeOpenWindows();
     }
 
     @BeforeEach
