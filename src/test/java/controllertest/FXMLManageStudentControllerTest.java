@@ -2,7 +2,6 @@ package controllertest;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -12,7 +11,6 @@ import java.lang.reflect.Field;
 import java.sql.Date;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -30,6 +28,7 @@ import org.testfx.util.WaitForAsyncUtils;
 
 import uv.lis.GUI.controller.FXMLManageStudentController;
 import uv.lis.logic.dao.ActivityDAO;
+import uv.lis.logic.dao.ReportContextDAO;
 import uv.lis.logic.dao.RequestProjectDAO;
 import uv.lis.logic.dao.StudentDAO;
 import uv.lis.logic.dao.SubjectDAO;
@@ -46,22 +45,21 @@ public class FXMLManageStudentControllerTest extends ApplicationTest {
     private static final String SUBJECT_DAO_FIELD = "subjectDAO";
     private static final String REQUEST_PROJECT_DAO_FIELD = "requestProjectDAO";
     private static final String ACTIVITY_DAO_FIELD = "activityDAO";
+    private static final String REPORT_CONTEXT_DAO_FIELD = "reportContextDAO";
 
-    private static final String SEARCH_FIELD_SELECTOR = "#textFieldStudentId";
     private static final String NAME_FIELD_SELECTOR = "#textFieldName";
-    private static final String SEARCH_BUTTON_SELECTOR = "#buttonSearch";
     private static final String UPDATE_BUTTON_SELECTOR = "#buttonUpdate";
     private static final String SAVE_BUTTON_SELECTOR = "#buttonSave";
     private static final String MESSAGE_LABEL_SELECTOR = "#labelMessage";
 
     private static final int STUDENT_PK_ID = 3;
-    private static final int VALID_USER_ID = 10;
     private static final String VALID_STUDENT_ID = "S12345678";
     private static final String VALID_FIRST_NAME = "Ana";
     private static final String VALID_LAST_NAME = "Lopez";
     private static final String VALID_GENDER = "Mujer";
     private static final String VALID_BIRTH_DATE = "2000-01-01";
     private static final String EMPTY_VALUE = "";
+    private static final String DEFAULT_HOURS = "0";
 
     private static final String EXPECTED_UPDATE_SUCCESS_MESSAGE = "Alumno actualizado correctamente";
     private static final String EXPECTED_NO_CHANGES_MESSAGE = "No se realizaron cambios en el alumno";
@@ -73,6 +71,7 @@ public class FXMLManageStudentControllerTest extends ApplicationTest {
     private SubjectDAO subjectDAOMock;
     private RequestProjectDAO requestProjectDAOMock;
     private ActivityDAO activityDAOMock;
+    private ReportContextDAO reportContextDAOMock;
 
     @Override
     public void start(Stage stage) throws IOException {
@@ -95,26 +94,26 @@ public class FXMLManageStudentControllerTest extends ApplicationTest {
     }
 
     @BeforeEach
-    void setUpMocks() throws ReflectiveOperationException, OperationException {
+    void setUpMocks() throws ReflectiveOperationException {
         studentDAOMock = mock(StudentDAO.class);
         subjectDAOMock = mock(SubjectDAO.class);
         requestProjectDAOMock = mock(RequestProjectDAO.class);
         activityDAOMock = mock(ActivityDAO.class);
+        reportContextDAOMock = mock(ReportContextDAO.class);
 
         injectField(STUDENT_DAO_FIELD, studentDAOMock);
         injectField(SUBJECT_DAO_FIELD, subjectDAOMock);
         injectField(REQUEST_PROJECT_DAO_FIELD, requestProjectDAOMock);
         injectField(ACTIVITY_DAO_FIELD, activityDAOMock);
-
-        when(studentDAOMock.searchStudentIds(anyString())).thenReturn(new ArrayList<>());
+        injectField(REPORT_CONTEXT_DAO_FIELD, reportContextDAOMock);
     }
 
     @Test
     void saveStudent_validData_showsSuccessMessage() throws OperationException {
-        stubFoundSearch();
+        stubAcademicInfo();
         when(studentDAOMock.modifyStudent(any())).thenReturn(true);
 
-        performSearch();
+        loadStudentData();
         enterEditMode();
         clickSave();
 
@@ -123,10 +122,10 @@ public class FXMLManageStudentControllerTest extends ApplicationTest {
 
     @Test
     void saveStudent_noChangesApplied_showsErrorMessage() throws OperationException {
-        stubFoundSearch();
+        stubAcademicInfo();
         when(studentDAOMock.modifyStudent(any())).thenReturn(false);
 
-        performSearch();
+        loadStudentData();
         enterEditMode();
         clickSave();
 
@@ -135,9 +134,9 @@ public class FXMLManageStudentControllerTest extends ApplicationTest {
 
     @Test
     void saveStudent_emptyFirstName_showsValidationError() throws OperationException {
-        stubFoundSearch();
+        stubAcademicInfo();
 
-        performSearch();
+        loadStudentData();
         enterEditMode();
         interact(() -> lookup(NAME_FIELD_SELECTOR).queryAs(TextField.class).setText(EMPTY_VALUE));
         clickSave();
@@ -168,18 +167,16 @@ public class FXMLManageStudentControllerTest extends ApplicationTest {
         return student;
     }
 
-    private void stubFoundSearch() throws OperationException {
-        when(studentDAOMock.getIdUserByStudentId(anyString())).thenReturn(Optional.of(VALID_USER_ID));
-        when(studentDAOMock.getStudentById(anyInt())).thenReturn(Optional.of(buildStudent()));
+    private void stubAcademicInfo() throws OperationException {
         when(studentDAOMock.isStudentInactive(anyString())).thenReturn(false);
         when(subjectDAOMock.getSubjectNrcByStudentID(anyString())).thenReturn(EMPTY_VALUE);
         when(requestProjectDAOMock.getProjectAssignedToStudent(anyString())).thenReturn(EMPTY_VALUE);
         when(activityDAOMock.getActivitiesByStudentId(anyString())).thenReturn(new ArrayList<Activity>());
+        when(reportContextDAOMock.getTotalReportedHoursByStudentId(anyString())).thenReturn(DEFAULT_HOURS);
     }
 
-    private void performSearch() {
-        clickOn(SEARCH_FIELD_SELECTOR).write(VALID_STUDENT_ID);
-        clickOn(SEARCH_BUTTON_SELECTOR);
+    private void loadStudentData() {
+        interact(() -> manageController.initializeData(buildStudent()));
         WaitForAsyncUtils.waitForFxEvents();
     }
 
@@ -194,7 +191,6 @@ public class FXMLManageStudentControllerTest extends ApplicationTest {
     }
 
     private String messageText() {
-        String message = lookup(MESSAGE_LABEL_SELECTOR).queryAs(Label.class).getText();
-        return message;
+        return lookup(MESSAGE_LABEL_SELECTOR).queryAs(Label.class).getText();
     }
 }

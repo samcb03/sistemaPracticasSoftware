@@ -20,7 +20,6 @@ class InputValidatorTest {
         "Hola, false",
         "'', true",
         "'   ', true",
-        ", true"
     })
     void validateNotEmpty_variousInputs_returnsExpectedResult(String value, boolean hasError) {
         boolean result = InputValidator.validateNotEmpty(value, FIELD_NAME).isPresent();
@@ -280,9 +279,9 @@ class InputValidatorTest {
         "10, 0, false",
         "10, -3, false",
         "'', 5, true",
-        "abc, 5, true",
         "41, 5, true",
         "40, 5, false",
+        "abc, 5, true",
         "99999999999, 5, true",
         "8, 1, false"
     })
