@@ -120,7 +120,8 @@ public class WeeklyAdvanceGridEditor {
 
     private int resolveActivityWeeks(Activity activity) {
         int activityWeeks = WorkProgressCalculator.calculateActivityWeeks(activity);
-        return Math.min(activityWeeks, PartialReport.MAX_WEEKS);
+        int totalWeeks = Math.min(activityWeeks, PartialReport.MAX_WEEKS);
+        return totalWeeks;
     }
 
     private void addColumnHeaders(Activity[] activitiesBySlot) {

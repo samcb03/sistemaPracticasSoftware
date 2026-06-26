@@ -129,9 +129,9 @@ public class AutoevaluationCommon {
             autoevaluation.getInternshipImportance()
         };
 
-        for (int i = 0; i < scores.length; i++) {
-            int questionNumber = i + MINIMUM_SCORE;
-            int selectedScore = scores[i];
+        for (int index = 0; index < scores.length; index++) {
+            int questionNumber = index + MINIMUM_SCORE;
+            int selectedScore = scores[index];
             for (int column = MINIMUM_SCORE; column <= MAXIMUM_SCORE; column++) {
                 parameters.put("p" + column + "_" + questionNumber,
                     column == selectedScore ? MARKED_OPTION : UNMARKED_OPTION);

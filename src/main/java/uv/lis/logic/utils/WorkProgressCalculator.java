@@ -50,7 +50,8 @@ public final class WorkProgressCalculator {
      */
     public static int calculateWeeklyRealAdvance(int writtenRealAdvance, Activity activity) {
         int activityWeeks = calculateActivityWeeks(activity);
-        return writtenRealAdvance / activityWeeks;
+        int realAdvance = writtenRealAdvance / activityWeeks;
+        return realAdvance;
     }
 
     /**
@@ -108,9 +109,10 @@ public final class WorkProgressCalculator {
      *         false otherwise
      */
     private static boolean hasValidSchedule(Activity activity) {
-        return activity != null
+        boolean isValid = activity != null
             && activity.getStartDate() != null
             && activity.getEndDate() != null
             && !activity.getEndDate().isBefore(activity.getStartDate());
+        return isValid;
     }
 }

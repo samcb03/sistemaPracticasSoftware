@@ -38,7 +38,6 @@ public abstract class WindowHandler implements Initializable {
             stage.setScene(new Scene(root));
             stage.show();
         } catch (IOException e) {
-            e.printStackTrace();
             LOGGER.log(Level.SEVERE, "Error al cargar la pantalla", e);
             showError("Error al cargar la pantalla.");
         }

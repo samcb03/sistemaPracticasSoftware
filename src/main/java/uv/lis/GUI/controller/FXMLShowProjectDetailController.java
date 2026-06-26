@@ -14,7 +14,6 @@ import java.util.stream.Stream;
 
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
-import javafx.scene.Node;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
@@ -221,12 +220,6 @@ public class FXMLShowProjectDetailController extends ValidationHandler {
         setNodeVisibility(buttonModifyProject, !isEditing);
         setNodeVisibility(buttonSave, isEditing);
     }
-
-    private void setNodeVisibility(Node node, boolean isVisible) {
-        node.setVisible(isVisible);
-        node.setManaged(isVisible);
-    }
-
 
     private boolean hasAssignedStudents() {
         boolean hasStudents = !listViewStudent.getItems().isEmpty();
