@@ -39,6 +39,8 @@ public class ReportContextDAO implements IReportContextDAO {
 
     private static final String INITIAL_TOTAL_HOURS = "0";
 
+    private static final int FIRST_INDEX = 1;
+
     private final MySQLConnectionManager connectionManager;
 
     public ReportContextDAO() {
@@ -257,7 +259,7 @@ public class ReportContextDAO implements IReportContextDAO {
             preparedStatement.setInt(3, year);
             try (ResultSet resultSet = preparedStatement.executeQuery()) {
                 if (resultSet.next()) {
-                    total = resultSet.getInt(1); 
+                    total = resultSet.getInt(FIRST_INDEX); 
                 }
             }
         } catch (SQLException e) {
@@ -284,7 +286,7 @@ public class ReportContextDAO implements IReportContextDAO {
             preparedStatement.setInt(4, STATUS_REJECTED);
 
             try (ResultSet resultSet = preparedStatement.executeQuery()) {
-                isDuplicate = resultSet.next() && resultSet.getInt(1) > NO_VALUE;
+                isDuplicate = resultSet.next() && resultSet.getInt(FIRST_INDEX) > NO_VALUE;
             }
         } catch (SQLException e) {
             LOGGER.log(Level.SEVERE, "Error al verificar duplicidad de reporte", e);

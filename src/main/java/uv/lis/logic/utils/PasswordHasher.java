@@ -25,7 +25,8 @@ public class PasswordHasher {
      * @return the hashed representation of the password
      */
     public static String hashPassword(String plainPassword) {
-        return ARGON2.hash(ITERATIONS, MEMORY, PARALLELISM, plainPassword.toCharArray());
+        String hashedPassword = ARGON2.hash(ITERATIONS, MEMORY, PARALLELISM, plainPassword.toCharArray());
+        return hashedPassword;
     }
 
     /**
@@ -40,6 +41,7 @@ public class PasswordHasher {
      * @return true if the password matches the hash, false otherwise
      */
     public static boolean verifyPassword(String plainPassword, String hashedPassword) {
-        return ARGON2.verify(hashedPassword, plainPassword.toCharArray());
+        boolean isValid = ARGON2.verify(hashedPassword, plainPassword.toCharArray());
+        return isValid;
     }
 }

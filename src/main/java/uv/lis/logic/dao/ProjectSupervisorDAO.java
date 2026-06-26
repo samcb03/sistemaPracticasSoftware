@@ -1,5 +1,6 @@
 package uv.lis.logic.dao;
 
+import static uv.lis.logic.utils.InputValidator.INVALID_ID;
 import static uv.lis.logic.utils.InputValidator.NO_VALUE;
 
 import java.sql.Connection;
@@ -28,11 +29,11 @@ public class ProjectSupervisorDAO implements IProjectSupervisorDAO {
 
     @Override
     public ArrayList<String> getAllSupervisorNames() throws OperationException{
-        String supervisorQuery = "SELECT nombre FROM ResponsableProyecto";
+        String projectSupervisorQuery = "SELECT nombre FROM ResponsableProyecto";
         ArrayList<String> supervisorNames = new ArrayList<>();
 
         try (Connection databaseConnection = connectionManager.getConnection();
-            PreparedStatement preparedStatement = databaseConnection.prepareStatement(supervisorQuery)) {
+            PreparedStatement preparedStatement = databaseConnection.prepareStatement(projectSupervisorQuery)) {
             try (ResultSet resultSet = preparedStatement.executeQuery()) {
                 while (resultSet.next()) {
                     supervisorNames.add(resultSet.getString("nombre"));
@@ -49,10 +50,10 @@ public class ProjectSupervisorDAO implements IProjectSupervisorDAO {
     @Override
     public Optional<ProjectSupervisor> getProjectSupervisorById(int id) throws OperationException{
         Optional<ProjectSupervisor> validateSupervisor = Optional.empty();
-        String supervisorQuery = "SELECT * FROM ResponsableProyecto WHERE idResponsableProyecto = ?";
+        String projectSupervisorQuery = "SELECT * FROM ResponsableProyecto WHERE idResponsableProyecto = ?";
 
         try (Connection databaseConnection = connectionManager.getConnection();
-            PreparedStatement preparedStatement = databaseConnection.prepareStatement(supervisorQuery)) {
+            PreparedStatement preparedStatement = databaseConnection.prepareStatement(projectSupervisorQuery)) {
 
             preparedStatement.setInt(1, id);
             try (ResultSet resultSet = preparedStatement.executeQuery()) {
@@ -79,14 +80,15 @@ public class ProjectSupervisorDAO implements IProjectSupervisorDAO {
     @Override
     public ArrayList<String> getProjectsBySupervisorName(String supervisorName) throws OperationException {
         ArrayList<String> projectList = new ArrayList<>();
-        String projectQuery = "SELECT p.idProyecto, p.nombre, p.descripcion "
-                            + "FROM Proyecto p "
-                            + "JOIN ResponsableProyecto rp ON p.idResponsableProyecto = rp.idResponsableProyecto "
-                            + "WHERE rp.nombre = ? "
-                            + "ORDER BY p.nombre ASC";
+        String projectSupervisorQuery = "SELECT p.idProyecto, p.nombre, p.descripcion "
+                                      + "FROM Proyecto p "
+                                      + "JOIN ResponsableProyecto rp ON p.idResponsableProyecto " 
+                                      + "= rp.idResponsableProyecto "
+                                      + "WHERE rp.nombre = ? "
+                                      + "ORDER BY p.nombre ASC";
 
         try (Connection databaseConnection = connectionManager.getConnection();
-            PreparedStatement preparedStatement = databaseConnection.prepareStatement(projectQuery)) {
+            PreparedStatement preparedStatement = databaseConnection.prepareStatement(projectSupervisorQuery)) {
 
             preparedStatement.setString(1, supervisorName);
 
@@ -108,11 +110,11 @@ public class ProjectSupervisorDAO implements IProjectSupervisorDAO {
     @Override
     public boolean registerProjectSupervisor(ProjectSupervisor projectSupervisor) throws OperationException {
         boolean isRegistered = false;
-        String supervisorQuery = "INSERT INTO ResponsableProyecto(nombre, cargo," 
-                               + "correo, estado, idOrganizacionVinculada) VALUES(?,?,?,?,?);";
+        String projectSupervisorQuery = "INSERT INTO ResponsableProyecto(nombre, cargo," 
+                                      + "correo, estado, idOrganizacionVinculada) VALUES(?, ?, ?, ?, ?);";
 
         try (Connection databaseConnection = connectionManager.getConnection();
-            PreparedStatement preparedStatement = databaseConnection.prepareStatement(supervisorQuery)) {
+            PreparedStatement preparedStatement = databaseConnection.prepareStatement(projectSupervisorQuery)) {
 
             preparedStatement.setString(1, projectSupervisor.getName());
             preparedStatement.setString(2, projectSupervisor.getPosition());
@@ -137,11 +139,11 @@ public class ProjectSupervisorDAO implements IProjectSupervisorDAO {
     @Override
     public boolean modifyProjectSupervisor(ProjectSupervisor projectSupervisor) throws OperationException {
         boolean isModified = false;
-        String supervisorQuery = "UPDATE responsableProyecto SET " 
-                               + "nombre = ?, cargo = ?, correo = ? WHERE idResponsableProyecto = ?;";
+        String projectSupervisorQuery = "UPDATE responsableProyecto SET " 
+                                      + "nombre = ?, cargo = ?, correo = ? WHERE idResponsableProyecto = ?;";
 
         try (Connection databaseConnection = connectionManager.getConnection();
-            PreparedStatement preparedStatement = databaseConnection.prepareStatement(supervisorQuery)) {
+            PreparedStatement preparedStatement = databaseConnection.prepareStatement(projectSupervisorQuery)) {
             
             preparedStatement.setString(1, projectSupervisor.getName());
             preparedStatement.setString(2, projectSupervisor.getPosition());
@@ -167,12 +169,13 @@ public class ProjectSupervisorDAO implements IProjectSupervisorDAO {
     @Override
     public boolean inactivateProjectSupervisor(String projectSupervisorName) throws OperationException {
         boolean isInactive = false;
-        String supervisorQuery = "UPDATE responsableProyecto SET estado = '0' WHERE idResponsableProyecto = ?;";
+        String projectSupervisorQuery = "UPDATE responsableProyecto SET estado = ? WHERE nombre = ?;";
 
         try (Connection databaseConnection = connectionManager.getConnection();
-            PreparedStatement preparedStatement = databaseConnection.prepareStatement(supervisorQuery)) {
+            PreparedStatement preparedStatement = databaseConnection.prepareStatement(projectSupervisorQuery)) {
 
-            preparedStatement.setString(1,projectSupervisorName);
+            preparedStatement.setInt(1, INACTIVE_STATUS);
+            preparedStatement.setString(2, projectSupervisorName);
 
             if (preparedStatement.executeUpdate() > NO_VALUE) {
                 isInactive = true;
@@ -193,10 +196,10 @@ public class ProjectSupervisorDAO implements IProjectSupervisorDAO {
     @Override
     public ArrayList<String> searchProjectSupervisorName(String supervisorName) throws OperationException {
         ArrayList<String> projectSupervisorNames = new ArrayList<>();
-        String supervisorQuery = "SELECT nombre FROM ResponsableProyecto WHERE nombre LIKE ? LIMIT 10";
+        String projectSupervisorQuery = "SELECT nombre FROM ResponsableProyecto WHERE nombre LIKE ? LIMIT 10";
 
         try (Connection databaseConnection = connectionManager.getConnection();
-            PreparedStatement preparedStatement = databaseConnection.prepareStatement(supervisorQuery)) {
+            PreparedStatement preparedStatement = databaseConnection.prepareStatement(projectSupervisorQuery)) {
 
             preparedStatement.setString(1, supervisorName + "%");
 
@@ -214,11 +217,11 @@ public class ProjectSupervisorDAO implements IProjectSupervisorDAO {
 
     @Override
     public int getSupervisorIdByName(String supervisorName) throws OperationException {
-        int supervisorId = -1;
-        String supervisorQuery = "SELECT idResponsableProyecto FROM ResponsableProyecto WHERE nombre = ?";
+        int supervisorId = INVALID_ID;
+        String projectSupervisorQuery = "SELECT idResponsableProyecto FROM ResponsableProyecto WHERE nombre = ?";
 
         try (Connection databaseConnection = connectionManager.getConnection();
-            PreparedStatement preparedStatement = databaseConnection.prepareStatement(supervisorQuery)) {
+            PreparedStatement preparedStatement = databaseConnection.prepareStatement(projectSupervisorQuery)) {
 
             preparedStatement.setString(1, supervisorName);
 
@@ -237,11 +240,11 @@ public class ProjectSupervisorDAO implements IProjectSupervisorDAO {
     @Override
     public ArrayList<String> getSupervisorsByOrganizationId(int organizationId) throws OperationException {
         ArrayList<String> supervisorNames = new ArrayList<>();
-        String supervisorQuery = "SELECT nombre FROM ResponsableProyecto WHERE idOrganizacionVinculada = ? " 
-                               + "AND estado = ?;";
+        String projectSupervisorQuery = "SELECT nombre FROM ResponsableProyecto WHERE idOrganizacionVinculada = ? " 
+                                      + "AND estado = ?;";
 
         try (Connection databaseConnection = connectionManager.getConnection();
-             PreparedStatement preparedStatement = databaseConnection.prepareStatement(supervisorQuery)) {
+             PreparedStatement preparedStatement = databaseConnection.prepareStatement(projectSupervisorQuery)) {
 
             preparedStatement.setInt(1, organizationId);
             preparedStatement.setBoolean(2, true);
@@ -261,10 +264,10 @@ public class ProjectSupervisorDAO implements IProjectSupervisorDAO {
     @Override
     public boolean isSupervisorInactive(String supervisorName) throws OperationException {
         boolean isInactive = false;
-        String supervisorQuery = "SELECT estado FROM ResponsableProyecto WHERE nombre = ?";
+        String projectSupervisorQuery = "SELECT estado FROM ResponsableProyecto WHERE nombre = ?";
 
         try (Connection databaseConnection = connectionManager.getConnection();
-            PreparedStatement preparedStatement = databaseConnection.prepareStatement(supervisorQuery)) {
+            PreparedStatement preparedStatement = databaseConnection.prepareStatement(projectSupervisorQuery)) {
 
             preparedStatement.setString(1, supervisorName);
 
@@ -287,13 +290,14 @@ public class ProjectSupervisorDAO implements IProjectSupervisorDAO {
     @Override
     public boolean hasProjectsActives(String supervisorName) throws OperationException {
         boolean hasProjectActives = false;
-        String projectQuery = "SELECT 1 FROM Proyecto p "
-                            + "JOIN ResponsableProyecto rp ON p.idResponsableProyecto = rp.idResponsableProyecto "
-                            + "WHERE rp.nombre = ? "
-                            + "AND p.estado = ? "
-                            + "LIMIT 1;";
+        String projectSupervisorQuery = "SELECT 1 FROM Proyecto p "
+                                      + "JOIN ResponsableProyecto rp ON p.idResponsableProyecto " 
+                                      + "= rp.idResponsableProyecto "
+                                      + "WHERE rp.nombre = ? "
+                                      + "AND p.estado = ? "
+                                      + "LIMIT 1;";
         try (Connection databaseConnection = connectionManager.getConnection();
-            PreparedStatement preparedStatement = databaseConnection.prepareStatement(projectQuery)) {
+            PreparedStatement preparedStatement = databaseConnection.prepareStatement(projectSupervisorQuery)) {
 
             preparedStatement.setString(1, supervisorName);
             preparedStatement.setBoolean(2, true);
@@ -311,14 +315,14 @@ public class ProjectSupervisorDAO implements IProjectSupervisorDAO {
     @Override
     public Optional<ProjectSupervisor> getProjectSupervisorByName(String supervisorName) throws OperationException {
         Optional<ProjectSupervisor> validateSupervisor = Optional.empty();
-        String supervisorQuery = "SELECT rp.idResponsableProyecto, rp.nombre, rp.cargo, rp.correo, ov.nombreOV "
-                               + "FROM ResponsableProyecto rp "
-                               + "LEFT JOIN OrganizacionVinculada ov ON rp.idOrganizacionVinculada = " 
-                               + "ov.idOrganizacionVinculada "
-                               + "WHERE rp.nombre = ?";
+        String projectSupervisorQuery = "SELECT rp.idResponsableProyecto, rp.nombre, rp.cargo, rp.correo, ov.nombreOV "
+                                      + "FROM ResponsableProyecto rp "
+                                      + "LEFT JOIN OrganizacionVinculada ov ON rp.idOrganizacionVinculada = " 
+                                      + "ov.idOrganizacionVinculada "
+                                      + "WHERE rp.nombre = ?";
 
         try (Connection databaseConnection = connectionManager.getConnection();
-            PreparedStatement preparedStatement = databaseConnection.prepareStatement(supervisorQuery)) {
+            PreparedStatement preparedStatement = databaseConnection.prepareStatement(projectSupervisorQuery)) {
 
             preparedStatement.setString(1, supervisorName);
 

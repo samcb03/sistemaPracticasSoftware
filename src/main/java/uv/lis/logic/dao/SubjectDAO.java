@@ -235,11 +235,11 @@ public class SubjectDAO implements ISubjectDAO {
     @Override
     public boolean isSectionTakenInPeriod(int periodId, String section) throws OperationException {
         boolean isTaken = false;
-        String sectionQuery = "SELECT COUNT(*) FROM ExperienciaEducativa "
+        String subjectQuery = "SELECT COUNT(*) FROM ExperienciaEducativa "
                             + "WHERE idPeriodoEscolar = ? AND seccion = ?";
  
         try (Connection databaseConnection = connectionManager.getConnection();
-            PreparedStatement preparedStatement = databaseConnection.prepareStatement(sectionQuery)) {
+            PreparedStatement preparedStatement = databaseConnection.prepareStatement(subjectQuery)) {
  
             preparedStatement.setInt(1, periodId);
             preparedStatement.setString(2, section);

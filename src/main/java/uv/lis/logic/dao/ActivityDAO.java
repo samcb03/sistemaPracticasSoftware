@@ -6,6 +6,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -20,7 +21,10 @@ import uv.lis.logic.exceptions.OperationException;
 
 public class ActivityDAO implements IActivityDAO {
     private static final Logger LOGGER = Logger.getLogger(ActivityDAO.class.getName());
+    private static final int FIRST_COLUMN_INDEX = 1;
+    
     private MySQLConnectionManager connectionManager;
+
 
     public ActivityDAO() {
         this.connectionManager = new MySQLConnectionManager();
@@ -109,7 +113,7 @@ public class ActivityDAO implements IActivityDAO {
             if (preparedStatement.executeUpdate() > NO_VALUE) {
                 try (ResultSet generatedKeys = preparedStatement.getGeneratedKeys()) {
                     if (generatedKeys.next()) {
-                        int generatedId = generatedKeys.getInt(1);
+                        int generatedId = generatedKeys.getInt(FIRST_COLUMN_INDEX);
                         activity.setId(generatedId);
                     }
                 }
@@ -124,37 +128,6 @@ public class ActivityDAO implements IActivityDAO {
             throw new OperationException("Error al registrar la actividad", e);
         }
         return isRegistered;
-    }
-
-    @Override
-    public boolean modifyActivity(Activity activity) throws OperationException {
-        boolean isModified = false;
-        
-        String activityQuery = "UPDATE Actividad SET nombreActividad = ?, descripcionActividad = ?, FechaInicio = ?, " 
-                             + "FechaFin = ?, idProyecto = ?, horasReportadas = ? WHERE idActividad = ?;";
-        
-        try (Connection databaseConnection = connectionManager.getConnection();
-            PreparedStatement preparedStatement = databaseConnection.prepareStatement(activityQuery)) {
-            
-            preparedStatement.setString(1, activity.getName());
-            preparedStatement.setString(2, activity.getDescription());
-            preparedStatement.setObject(3, activity.getStartDate());
-            preparedStatement.setObject(4, activity.getEndDate());
-            preparedStatement.setInt(5, activity.getProjectId());
-            preparedStatement.setInt(6, activity.getHoursReported());
-
-            if (preparedStatement.executeUpdate() > NO_VALUE) {
-                isModified = true;
-            } else {
-                LOGGER.log(Level.WARNING, "No se pudo modificar la actividad con ID {0}.", activity.getId());
-                throw new OperationException("No se pudo modificar la actividad con ID: " + activity.getId(), 
-                    null);    
-            }
-        } catch (SQLException e) {
-            LOGGER.log(Level.SEVERE, "Error de conexion con la base de datos", e);
-            throw new OperationException("Error al modificar la actividad", e);
-        }
-        return isModified;
     }
 
     @Override

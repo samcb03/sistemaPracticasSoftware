@@ -288,6 +288,37 @@ public class RequestProjectDAO implements IRequestProjectDAO {
         return assignedStudents;
     }
 
+    @Override
+    public ArrayList<Student> getStudentsWithoutAssignedProject() throws OperationException {
+        ArrayList<Student> students = new ArrayList<>();
+        String requestProjectQuery = "SELECT a.matricula, u.nombre, u.apellidos "
+                                   + "FROM Alumno a "
+                                   + "INNER JOIN Usuario u ON a.idUsuario = u.idUsuario "
+                                   + "WHERE NOT EXISTS ( "
+                                   + "SELECT 1 FROM Solicita_Proyecto sp "
+                                   + "WHERE sp.matricula = a.matricula AND sp.estatus = ?)";
+
+        try (Connection databaseConnection = connectionManager.getConnection();
+            PreparedStatement preparedStatement = databaseConnection.prepareStatement(requestProjectQuery)) {
+
+            preparedStatement.setInt(1, STATUS_ASSIGNED);
+
+            try (ResultSet resultSet = preparedStatement.executeQuery()) {
+                while (resultSet.next()) {
+                    Student student = new Student();
+                    student.setIdStudent(resultSet.getString("matricula"));
+                    student.setFirstName(resultSet.getString("nombre"));
+                    student.setLastName(resultSet.getString("apellidos"));
+                    students.add(student);
+                }
+            }
+        } catch (SQLException e) {
+            LOGGER.log(Level.SEVERE, "Error al obtener alumnos sin proyecto asignado", e);
+            throw new OperationException("Error al obtener alumnos sin proyecto asignado", e);
+        }
+        return students;
+    }
+
     private void applyExistingRequest(Connection databaseConnection, String idStudent, int idProject) 
         throws SQLException {
         assignRequest(databaseConnection, idStudent, idProject);
@@ -354,42 +385,11 @@ public class RequestProjectDAO implements IRequestProjectDAO {
         student.setLastName(resultSet.getString("apellidos"));
         return student;
     }
-    
-    @Override
-    public ArrayList<Student> getStudentsWithoutAssignedProject() throws OperationException {
-        ArrayList<Student> students = new ArrayList<>();
-        String requestProjectQuery = "SELECT a.matricula, u.nombre, u.apellidos "
-                                   + "FROM Alumno a "
-                                   + "INNER JOIN Usuario u ON a.idUsuario = u.idUsuario "
-                                   + "WHERE NOT EXISTS ( "
-                                   + "SELECT 1 FROM Solicita_Proyecto sp "
-                                   + "WHERE sp.matricula = a.matricula AND sp.estatus = ?)";
-
-        try (Connection databaseConnection = connectionManager.getConnection();
-            PreparedStatement preparedStatement = databaseConnection.prepareStatement(requestProjectQuery)) {
-
-            preparedStatement.setInt(1, STATUS_ASSIGNED);
-
-            try (ResultSet resultSet = preparedStatement.executeQuery()) {
-                while (resultSet.next()) {
-                    Student student = new Student();
-                    student.setIdStudent(resultSet.getString("matricula"));
-                    student.setFirstName(resultSet.getString("nombre"));
-                    student.setLastName(resultSet.getString("apellidos"));
-                    students.add(student);
-                }
-            }
-        } catch (SQLException e) {
-            LOGGER.log(Level.SEVERE, "Error al obtener alumnos sin proyecto asignado", e);
-            throw new OperationException("Error al obtener alumnos sin proyecto asignado", e);
-        }
-        return students;
-    }
 
     private void insertAssignment(Connection databaseConnection, String idStudent, int idProject) throws SQLException {
-        String assignmentQuery = "INSERT INTO Solicita_Proyecto (idProyecto, matricula, estatus) VALUES (?, ?, ?)";
+        String requestProjectQuery = "INSERT INTO Solicita_Proyecto (idProyecto, matricula, estatus) VALUES (?, ?, ?)";
 
-        try (PreparedStatement preparedStatement = databaseConnection.prepareStatement(assignmentQuery)) {
+        try (PreparedStatement preparedStatement = databaseConnection.prepareStatement(requestProjectQuery)) {
             preparedStatement.setInt(1, idProject);
             preparedStatement.setString(2, idStudent);
             preparedStatement.setInt(3, STATUS_ASSIGNED);

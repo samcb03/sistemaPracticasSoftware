@@ -159,10 +159,10 @@ public class SchoolPeriodDAO implements ISchoolPeriodDAO{
     @Override
     public boolean existsSchoolPeriod(int idPeriod) throws OperationException {
         boolean exists = false;
-        String periodQuery = "SELECT 1 FROM PeriodoEscolar WHERE idPeriodoEscolar = ?";
+        String schoolPeriodQuery = "SELECT 1 FROM PeriodoEscolar WHERE idPeriodoEscolar = ?";
 
         try (Connection databaseConnection = connectionManager.getConnection();
-            PreparedStatement preparedStatement = databaseConnection.prepareStatement(periodQuery)) {
+            PreparedStatement preparedStatement = databaseConnection.prepareStatement(schoolPeriodQuery)) {
 
             preparedStatement.setInt(1, idPeriod);
             try (ResultSet resultSet = preparedStatement.executeQuery()) {

@@ -38,15 +38,6 @@ public interface IActivityDAO {
     boolean registerActivity(Activity activity) throws OperationException;
 
     /**
-     * Updates the data of an existing activity.
-     *
-     * @param activity the activity data to update
-     * @return true if the activity was updated, false otherwise
-     * @throws OperationException if the activity cannot be updated
-     */
-    boolean modifyActivity(Activity activity) throws OperationException;
-
-    /**
      * Retrieves the activities that belong to a student.
      *
      * @param studentId the identifier of the student whose activities are retrieved

@@ -20,8 +20,7 @@ public class AdvanceDAO implements IAdvanceDAO {
     private static final Logger LOGGER = Logger.getLogger(AdvanceDAO.class.getName());
 
     private MySQLConnectionManager connectionManager;
-    private static final int COUNT_COLUMN = 1;
-    private static final int ZERO_COUNT = 0;
+    private static final int FIRST_INDEX = 1;
 
     public AdvanceDAO() {
         this.connectionManager = new MySQLConnectionManager();
@@ -82,7 +81,7 @@ public class AdvanceDAO implements IAdvanceDAO {
             preparedStatement.setInt(1, reportId);
 
             try (ResultSet resultSet = preparedStatement.executeQuery()) {
-                advanceExists = resultSet.next() && resultSet.getInt(COUNT_COLUMN) > ZERO_COUNT;
+                advanceExists = resultSet.next() && resultSet.getInt(FIRST_INDEX) > NO_VALUE;
             }
         } catch (SQLException e) {
             LOGGER.log(Level.SEVERE, "Error al verificar avance existente", e);

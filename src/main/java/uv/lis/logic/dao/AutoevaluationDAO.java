@@ -77,7 +77,7 @@ public class AutoevaluationDAO implements IAutoevaluationDAO {
 
     @Override
     public boolean registerAutoevaluation(Autoevaluation autoevaluation) throws OperationException {
-    boolean isRegistered = false;
+        boolean isRegistered = false;
 
         String autoevaluationQuery = "INSERT INTO Autoevaluacion (matricula, participacionProductiva, "
                                     + "conocimientoAplicado, confianzaEnActividades, interesEnActividades, " 

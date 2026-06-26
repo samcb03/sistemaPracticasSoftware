@@ -33,7 +33,7 @@ public class ExpedientDAO implements IExpedientDAO {
     private static final int LAST_INITIAL_DOCUMENT_TYPE_ID = 11;
     private static final int NO_MISSING_INITIAL_DOCUMENTS = 0;
     private static final int NO_GENERATED_ID = -1;
-    private static final int NEXT_ENTRY_OFFSET = 1;
+    private static final int FIRST_VALUE = 1;
     private static final int LIBERATION_LETTER_TYPE_ID = 13;
 
     private static final String MONTHLY_REPORT_TYPE_NAME = "Reporte mensual";
@@ -70,7 +70,7 @@ public class ExpedientDAO implements IExpedientDAO {
             if (affectedRows > NO_VALUE) {
                 try (ResultSet resultSet = preparedStatement.getGeneratedKeys()) {
                     if (resultSet.next()) {
-                        generatedId = resultSet.getInt(1);
+                        generatedId = resultSet.getInt(FIRST_VALUE);
                     }
                 }
             }
@@ -330,7 +330,7 @@ public class ExpedientDAO implements IExpedientDAO {
 
             try (ResultSet resultSet = preparedStatement.executeQuery()) {
                 if (resultSet.next()) {
-                    isValidated = resultSet.getInt(1) > NO_VALUE;
+                    isValidated = resultSet.getInt(FIRST_VALUE) > NO_VALUE;
                 }
             }
         } catch (SQLException e) {
@@ -407,7 +407,7 @@ public class ExpedientDAO implements IExpedientDAO {
 
             try (ResultSet resultSet = preparedStatement.executeQuery()) {
                 if (resultSet.next()) {
-                    count = resultSet.getInt(1);
+                    count = resultSet.getInt(FIRST_VALUE);
                 }
             }
         } catch (SQLException e) {
@@ -451,7 +451,7 @@ public class ExpedientDAO implements IExpedientDAO {
             }
         } else {
             int nextEntry = countDocumentsByStudentAndType(expedient.getIdStudent(),
-                MONTHLY_REPORT_DOCUMENT_TYPE_ID) + NEXT_ENTRY_OFFSET;
+                MONTHLY_REPORT_DOCUMENT_TYPE_ID) + FIRST_VALUE;
             isSaved = saveLinkedMonthlyDocument(expedient, nextEntry) > NO_VALUE;
         }
         return isSaved;
@@ -524,7 +524,7 @@ public class ExpedientDAO implements IExpedientDAO {
             if (preparedStatement.executeUpdate() > NO_VALUE) {
                 try (ResultSet resultSet = preparedStatement.getGeneratedKeys()) {
                     if (resultSet.next()) {
-                        generatedId = resultSet.getInt(1);
+                        generatedId = resultSet.getInt(FIRST_VALUE);
                     }
                 }
             }
@@ -599,7 +599,7 @@ public class ExpedientDAO implements IExpedientDAO {
 
         if (expedient.getIdTypeDocument() == MONTHLY_REPORT_DOCUMENT_TYPE_ID) {
             int nextEntry = countDocumentsByStudentAndType(expedient.getIdStudent(),
-                MONTHLY_REPORT_DOCUMENT_TYPE_ID) + NEXT_ENTRY_OFFSET;
+                MONTHLY_REPORT_DOCUMENT_TYPE_ID) + FIRST_VALUE;
             isSaved = saveMonthlyDocument(expedient, nextEntry) > NO_VALUE;
         } else {
             isSaved = replaceOrInsertDocument(expedient);
@@ -626,7 +626,7 @@ public class ExpedientDAO implements IExpedientDAO {
             if (preparedStatement.executeUpdate() > NO_VALUE) {
                 try (ResultSet resultSet = preparedStatement.getGeneratedKeys()) {
                     if (resultSet.next()) {
-                        generatedId = resultSet.getInt(1);
+                        generatedId = resultSet.getInt(FIRST_VALUE);
                     }
                 }
             }

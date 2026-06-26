@@ -40,8 +40,7 @@ public class ReportDAO implements IReportDAO {
     private static final int MONTHLY_REPORT_TYPE_ID = 3;
     private static final int PARTIAL_REPORT_TYPE_ID = 4;
     private static final int NO_ADVANCE = 0;
-    private static final int WEEK_OFFSET = 1;
-    private static final int FIRST_DETAIL = 1;
+    private static final int FIRST_VALUE = 1;
 
     private final MySQLConnectionManager connectionManager;
 
@@ -219,7 +218,7 @@ public class ReportDAO implements IReportDAO {
 
                 try (ResultSet resultSet = preparedStatement.executeQuery()) {
                     if (resultSet.next()) {
-                        hasReport = resultSet.getInt(1) > NO_VALUE;
+                        hasReport = resultSet.getInt(FIRST_VALUE) > NO_VALUE;
                     }
                 }
             } catch (SQLException e) {
@@ -287,7 +286,7 @@ public class ReportDAO implements IReportDAO {
 
             try (ResultSet generatedKeys = preparedStatement.getGeneratedKeys()) {
                 if (generatedKeys.next()) {
-                    report.setId(generatedKeys.getInt(1));
+                    report.setId(generatedKeys.getInt(FIRST_VALUE));
                 } else {
                     throw new SQLException("No se pudo obtener el ID del reporte generado.");
                 }
@@ -346,7 +345,7 @@ public class ReportDAO implements IReportDAO {
             if (hasAdvance) {
                 preparedStatement.setInt(1, partialReport.getId());
                 preparedStatement.setString(2, activityName);
-                preparedStatement.setInt(3, weekIndex + WEEK_OFFSET);
+                preparedStatement.setInt(3, weekIndex + FIRST_VALUE);
                 preparedStatement.setInt(4, plannedAdvance);
                 preparedStatement.setInt(5, realAdvance);
                 preparedStatement.addBatch();
@@ -483,7 +482,7 @@ public class ReportDAO implements IReportDAO {
                            + "VALUES (?, ?, ?, ?)";
 
         try (PreparedStatement preparedStatement = databaseConnection.prepareStatement(reportQuery)) {
-            for (int position = FIRST_DETAIL; position <= monthlyReport.getActivityCount(); position++) {
+            for (int position = FIRST_VALUE; position <= monthlyReport.getActivityCount(); position++) {
                 String activity = monthlyReport.getActivityAt(position);
 
                 if (activity != null && !activity.isBlank()) {
@@ -538,7 +537,7 @@ public class ReportDAO implements IReportDAO {
 
             try (ResultSet resultSet = preparedStatement.executeQuery()) {
                 if (resultSet.next()) {
-                    count = resultSet.getInt(1);
+                    count = resultSet.getInt(FIRST_VALUE);
                 }
             }
         } catch (SQLException e) {

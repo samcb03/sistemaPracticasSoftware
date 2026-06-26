@@ -155,13 +155,14 @@ public class AffiliatedOrganizationDAO implements IAffiliatedOrganizationDAO {
     public boolean inactivateOrganization(String organizationName) throws OperationException {
         boolean isInactive = false;
         String affiliatedOrganizationQuery = "UPDATE OrganizacionVinculada "
-                                           + "SET estadoEnBD = '0' "
+                                           + "SET estadoEnBD = ? "
                                            + "WHERE nombreOV = ?;";
 
         try (Connection databaseConnection = connectionManager.getConnection();
             PreparedStatement preparedStatement = databaseConnection.prepareStatement(affiliatedOrganizationQuery)) {
 
-            preparedStatement.setString(1, organizationName);
+            preparedStatement.setInt(1, INACTIVE_STATE);
+            preparedStatement.setString(2, organizationName);
 
             if (preparedStatement.executeUpdate() > NO_VALUE) {
                 isInactive = true;
