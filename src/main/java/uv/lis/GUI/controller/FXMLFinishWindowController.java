@@ -33,7 +33,6 @@ import uv.lis.logic.dto.Expedient;
 import uv.lis.logic.dto.ProjectSummary;
 import uv.lis.logic.dto.Student;
 import uv.lis.logic.exceptions.OperationException;
-import uv.lis.logic.utils.FileManager;
 import uv.lis.logic.utils.SessionManager;
 
 public class FXMLFinishWindowController extends ValidationHandler {
@@ -50,7 +49,9 @@ public class FXMLFinishWindowController extends ValidationHandler {
     private static final String LOAD_ACTIVITIES_ERROR = "No se pudieron cargar las actividades";
     private static final String EMPTY_TEXT = "";
     private static final String INVALID_URL_MESSAGE = "El documento no tiene una ruta válida";
-    private static final String DESKTOP_NOT_SUPPORTED_MESSAGE = "La apertura de documentos no está soportada en este sistema";
+    private static final String DESKTOP_NOT_SUPPORTED_MESSAGE = "La apertura de documentos no está " 
+        + "soportada en este sistema";
+    private static final String DOCUMENT_OPENED_MESSAGE = "Documento abierto correctamente";
 
     @FXML private VBox sectionSummary;
     @FXML private VBox sectionDocuments;
@@ -249,17 +250,12 @@ public class FXMLFinishWindowController extends ValidationHandler {
     }
 
     private void launchDocument(Expedient expedient) {
-        try {
-            File documentFile = FileManager.resolveFile(expedient.getUrl());
+        File documentFile = new File(expedient.getUrl());
 
-            if (!documentFile.exists()) {
-                showError(FILE_NOT_FOUND_ERROR);
-            } else {
-                tryOpenWithDesktop(documentFile);
-            }
-        } catch (OperationException e) {
-            LOGGER.log(Level.SEVERE, "Error al resolver la ruta del documento", e);
+        if (!documentFile.exists()) {
             showError(FILE_NOT_FOUND_ERROR);
+        } else {
+            tryOpenWithDesktop(documentFile);
         }
     }
 
@@ -274,6 +270,7 @@ public class FXMLFinishWindowController extends ValidationHandler {
     private void executeDesktopOpen(File documentFile) {
         try {
             Desktop.getDesktop().open(documentFile);
+            showSuccess(DOCUMENT_OPENED_MESSAGE);
         } catch (IOException e) {
             LOGGER.log(Level.SEVERE, "Error de E/S al abrir el documento", e);
             showError(FILE_OPEN_ERROR);

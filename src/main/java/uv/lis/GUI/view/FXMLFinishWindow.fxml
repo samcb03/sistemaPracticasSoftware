@@ -16,7 +16,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="530.0" prefWidth="559.0" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="uv.lis.GUI.controller.FXMLFinishWindowController">
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="572.0" prefWidth="559.0" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="uv.lis.GUI.controller.FXMLFinishWindowController">
    <children>
 
       <Label cache="true" layoutX="190.0" layoutY="14.0" prefHeight="22.0" prefWidth="220.0" text="Práctica Finalizada">
@@ -28,7 +28,7 @@
          </effect>
       </Label>
 
-      <Pane layoutX="46.0" layoutY="49.0" prefHeight="465.0" prefWidth="467.0" style="-fx-background-color: #ffaf9c; -fx-background-radius: 20;">
+      <Pane layoutX="46.0" layoutY="49.0" prefHeight="504.0" prefWidth="467.0" style="-fx-background-color: #ffaf9c; -fx-background-radius: 20;">
          <children>
 
             <HBox alignment="CENTER" layoutX="0.0" layoutY="10.0" prefWidth="467.0" spacing="4.0">
@@ -82,10 +82,6 @@
                      </children>
                   </GridPane>
 
-                  <Label fx:id="labelMessage" prefWidth="435.0" textFill="#d31414" wrapText="true">
-                     <font><Font name="System Bold" size="12.0" /></font>
-                  </Label>
-
                   <HBox alignment="CENTER">
                      <Button fx:id="buttonLogOut" mnemonicParsing="false" onAction="#navigateToLogOut" prefHeight="40.0" prefWidth="209.0" style="-fx-background-color: #a11515; -fx-text-fill: white;" text="Cerrar Sesión" />
                   </HBox>
@@ -107,6 +103,10 @@
                         <TableColumn fx:id="columnAction" prefWidth="128.0" text="Acción" />
                      </columns>
                   </TableView>
+
+                  <Label fx:id="labelMessage" prefWidth="435.0" textFill="#d31414" wrapText="true">
+                     <font><Font name="System Bold" size="12.0" /></font>
+                  </Label>
 
                   <HBox alignment="CENTER">
                      <Button mnemonicParsing="false" onAction="#navigateToLogOut" prefHeight="40.0" prefWidth="209.0" style="-fx-background-color: #a11515; -fx-text-fill: white;" text="Cerrar Sesión" />
